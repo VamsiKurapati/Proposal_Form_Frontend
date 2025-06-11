@@ -16,7 +16,7 @@ const CreateProposalPage = () => {
         email: 'test@gmail.com', // Replace with actual user data
         ...data,
       };
-      await axios.post('http://localhost:5000/api/proposals/createProposal', finalData);
+      await axios.post('https://proposal-form-backend.vercel.app/api/proposals/createProposal', finalData);
       // Optionally dispatch an action to update the Redux store
       dispatch(addProposal(finalData));
       navigate('/profile');

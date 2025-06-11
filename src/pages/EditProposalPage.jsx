@@ -14,14 +14,14 @@ const EditProposalPage = () => {
   const [defaultValues, setDefaultValues] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/proposals/${id}`)
+    axios.get(`https://proposal-form-backend.vercel.app/api/proposals/${id}`)
       .then(res => setDefaultValues(res.data))
       .catch(err => console.error('Fetch failed', err));
   }, [id]);
 
   const handleEdit = async (data) => {
     try {
-      await axios.put(`http://localhost:5000/api/proposals/${id}`, data);
+      await axios.put(`https://proposal-form-backend.vercel.app/api/proposals/${id}`, data);
       // Optionally update the Redux store or local state here
       dispatch(editProposal({ id, ...data }));
       navigate('/profile');
@@ -35,7 +35,7 @@ const EditProposalPage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/proposals/${id}`);
+      await axios.delete(`https://proposal-form-backend.vercel.app/api/proposals/${id}`);
       // Update the Redux store or local state
       dispatch(deleteProposal(id));
       navigate('/profile');
