@@ -1,7 +1,7 @@
 // src/features/proposals/proposalSlice.js
 import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { list } from 'postcss';
+// import { list } from 'postcss';
 
 export const fetchProposals = createAsyncThunk(
   'proposals/fetchProposals',

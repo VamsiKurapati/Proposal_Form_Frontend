@@ -7,34 +7,38 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
     register,
     handleSubmit,
     formState: { errors },
-    watch
+    setValue,
   } = useForm({ defaultValues });
 
   const [fileList, setFileList] = useState([]);
 
+  useEffect(() => {
+    if (defaultValues?.projectFiles) {
+      setFileList(defaultValues.projectFiles);
+    }
+  }, [defaultValues]);
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setFileList(prev => [...prev, ...files]); // Append newly selected files
+    setFileList(prev => [...prev, ...files]);
   };
 
   const handleRemoveFile = (indexToRemove) => {
-    const newFiles = fileList.filter((_, i) => i !== indexToRemove);
-    setFileList(newFiles);
+    setFileList(prev => prev.filter((_, i) => i !== indexToRemove));
   };
 
   const processForm = (data) => {
     const formData = new FormData();
-
     for (const key in data) {
-      if (key === 'projects') {
-        fileList.forEach((file) => {
-          formData.append('projects', file);
-        });
-      } else {
-        formData.append(key, data[key]);
-      }
+      formData.append(key, data[key]);
     }
-
+    fileList.forEach((file) => {
+      if (file instanceof File) {
+        formData.append('projects', file);
+      } else {
+        formData.append('existingFiles', JSON.stringify(file));
+      }
+    });
     handleFormSubmit(formData);
   };
 
@@ -50,10 +54,9 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
         { label: "Certifications and Awards", name: "certifications", textarea: true },
         { label: "Unique qualifications and team structure", name: "qualifications", textarea: true },
         { label: "Past Projects/Case Studies", name: "projects", fileUpload: true, multiple: true }
-      ].map(({ label, name, textarea, fileUpload, multiple }) => (
+      ].map(({ label, name, textarea, fileUpload }) => (
         <div key={name}>
           <label className="block font-medium mb-1">{label}</label>
-
           {fileUpload ? (
             <>
               <input
@@ -67,7 +70,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
                 <ul className="text-sm text-gray-600 mt-2 list-disc list-inside">
                   {fileList.map((file, index) => (
                     <li key={index} className="flex justify-between items-center">
-                      {file.name}
+                      {file.name || file.filename}
                       <button
                         type="button"
                         onClick={() => handleRemoveFile(index)}
@@ -94,10 +97,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
               placeholder="Content"
             />
           )}
-
-          {errors[name] && (
-            <p className="text-red-600 text-sm mt-1">{errors[name].message}</p>
-          )}
+          {errors[name] && <p className="text-red-600 text-sm mt-1">{errors[name].message}</p>}
         </div>
       ))}
 

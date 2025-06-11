@@ -2,23 +2,20 @@
 import ProposalForm from '../pages/ProposalForm';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { addProposal } from '../features/proposalSlice';
 import { useDispatch } from 'react-redux';
+import { addProposal } from '../features/proposalSlice';
 
 const CreateProposalPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleCreate = async (data) => {
+  const handleCreate = async (formData) => {
     try {
-      const finalData = {
-        name: 'Jane Doe', // Replace with actual user data
-        email: 'test@gmail.com', // Replace with actual user data
-        ...data,
-      };
-      await axios.post('https://proposal-form-backend.vercel.app/api/proposals/createProposal', finalData);
-      // Optionally dispatch an action to update the Redux store
-      dispatch(addProposal(finalData));
+      formData.append('name', 'Jane Doe');
+      formData.append('email', 'test@gmail.com');
+
+      const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/createProposal', formData);
+      dispatch(addProposal(res.data));
       navigate('/profile');
     } catch (err) {
       console.error('Failed to create proposal:', err);

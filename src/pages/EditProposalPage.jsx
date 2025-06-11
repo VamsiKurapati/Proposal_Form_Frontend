@@ -10,7 +10,7 @@ const EditProposalPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [defaultValues, setDefaultValues] = useState(null);
 
   useEffect(() => {
@@ -19,11 +19,10 @@ const EditProposalPage = () => {
       .catch(err => console.error('Fetch failed', err));
   }, [id]);
 
-  const handleEdit = async (data) => {
+  const handleEdit = async (formData) => {
     try {
-      await axios.put(`https://proposal-form-backend.vercel.app/api/proposals/${id}`, data);
-      // Optionally update the Redux store or local state here
-      dispatch(editProposal({ id, ...data }));
+      const res = await axios.put(`https://proposal-form-backend.vercel.app/api/proposals/${id}`, formData);
+      dispatch(editProposal(res.data));
       navigate('/profile');
     } catch (err) {
       console.error('Failed to update:', err);
@@ -36,7 +35,6 @@ const EditProposalPage = () => {
 
     try {
       await axios.delete(`https://proposal-form-backend.vercel.app/api/proposals/${id}`);
-      // Update the Redux store or local state
       dispatch(deleteProposal(id));
       navigate('/profile');
     } catch (err) {
