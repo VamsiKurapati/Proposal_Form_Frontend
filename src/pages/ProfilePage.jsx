@@ -40,8 +40,8 @@ const ProfilePage = () => {
 
         {status === 'succeeded' && proposals.map((p) => (
           <div key={p._id || p.id} className="border p-4 rounded bg-white shadow">
-            <h3 className="font-semibold text-lg">{p.title || p.companyDetails}</h3>
-            <p className="text-gray-700">{p.description}</p>
+            <h3 className="font-semibold text-lg">{p.title || p.companyName}</h3>
+            <p className="text-gray-700">{p.companyOverview}</p>
             <Link
               to={`/proposal/${p._id || p.id}/edit`}
               className="text-blue-600 underline text-sm inline-block mt-2"
