@@ -76,47 +76,34 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
               />
 
               {isEdit && fileList.length > 0 && (
-                <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
-                  {fileList.map((file, index) => {
-                    if(file.name || file.filename){
-                      return (
-                        <li key={index} className="flex justify-between items-center">
-                          {file.name || file.filename}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile(index)}
-                            className="ml-4 text-red-600 hover:text-red-800 text-xs"
-                          >
-                            ❌ Remove
-                          </button>
-                        </li>
-                      );
-                    }
-                    if (file.fileId) {
-                      return (
-                        <li key={index}>
-                          <a
-                            href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            {file.filename}
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile(index)}
-                            className="ml-3 text-red-600 text-xs hover:text-red-800"
-                          >
-                            ❌ Remove
-                          </button>
-                        </li>
-                      );
-                    }
-                    return null; // Don't show temp files in uploaded list
-                  })}
-                </ul>
-              )}
+  <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
+    {fileList.map((file, index) => (
+      <li key={file.fileId || file.name || index} className="flex justify-between items-center">
+        {file.fileId ? (
+          <a
+            href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {file.filename}
+          </a>
+        ) : (
+          <span>{file.name || file.filename}</span>
+        )}
+
+        <button
+          type="button"
+          onClick={() => handleRemoveFile(index)}
+          className="ml-4 text-red-600 hover:text-red-800 text-xs"
+        >
+          ❌ Remove
+        </button>
+      </li>
+    ))}
+  </ul>
+)}
+
             </>
           ) : textarea ? (
             <textarea
