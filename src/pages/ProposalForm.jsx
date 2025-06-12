@@ -13,8 +13,8 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
   const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
-    if (defaultValues?.projectFiles) {
-      setFileList(defaultValues.projectFiles);
+    if (defaultValues?.uploadedDocuments) {
+      setFileList(defaultValues.uploadedDocuments);
     }
   }, [defaultValues]);
 
