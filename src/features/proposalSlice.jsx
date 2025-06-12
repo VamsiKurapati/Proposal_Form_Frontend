@@ -8,7 +8,7 @@ export const fetchProposals = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals',{
-        name: 'Jane Doe',
+        name: 'Rahul Sharma',
         email: 'test@gmail.com',
       });
       return res.data; // return the list directly
