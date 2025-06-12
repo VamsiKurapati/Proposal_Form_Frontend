@@ -47,29 +47,32 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
 
   return (
     <form onSubmit={handleSubmit(processForm)} className="space-y-6">
-        {[
-          { label: "Company Name", name: "companyName" },
-          { label: "Brief Company Overview", name: "companyOverview", textarea: true },
-          { label: "Mission Statement", name: "mission", textarea: true },
-          { label: "Vision Statement", name: "vision", textarea: true },
-          { label: "Year of Establishment", name: "yearEstablished" },
-          { label: "Number of Employees", name: "employeeCount" },
-          { label: "Key Team Members (Names, Roles, Qualifications)", name: "teamMembers", textarea: true },
-          { label: "Team Experience & Skills", name: "teamExperience", textarea: true },
-          { label: "Certifications & Accreditations", name: "certifications", textarea: true },
-          { label: "Technologies/Tools Used", name: "technologies", textarea: true },
-          { label: "Past Projects & Case Studies", name: "pastProjects", textarea: true },
-          { label: "Client Portfolio", name: "clientPortfolio", textarea: true },
-          { label: "Awards & Recognitions", name: "awards", textarea: true },
-          { label: "Compliance Standards Followed (e.g., ISO, GDPR)", name: "complianceStandards", textarea: true },
-          { label: "Geographical Presence", name: "geographicalPresence", textarea: true },
-          { label: "Preferred Industries/Sectors", name: "preferredIndustries", textarea: true },
-          { label: "Document Upload Section", name: "documents", fileUpload: true, multiple: true }
-        ].map(({ label, name, textarea, fileUpload }) => (
+      {[
+        { label: "Company Name", name: "companyName", placeholder: "e.g., ABC Solutions Pvt. Ltd." },
+        { label: "Brief Company Overview", name: "companyOverview", textarea: true, placeholder: "Provide a short introduction about your company, services, and goals." },
+        { label: "Mission Statement", name: "mission", textarea: true, placeholder: "e.g., To innovate sustainable and scalable tech solutions." },
+        { label: "Vision Statement", name: "vision", textarea: true, placeholder: "e.g., To become a global leader in AI-powered solutions by 2030." },
+        { label: "Year of Establishment", name: "yearEstablished", placeholder: "e.g., 2015" },
+        { label: "Number of Employees", name: "employeeCount", placeholder: "Enter a number or a range like 50–200" },
+        { label: "Key Team Members (Names, Roles, Qualifications)", name: "teamMembers", textarea: true, placeholder: "e.g., John Doe - CEO, M.Tech from IIT Delhi; Jane Smith - CTO, PhD in AI" },
+        { label: "Team Experience & Skills", name: "teamExperience", textarea: true, placeholder: "Summarize relevant domain experience and technical skills of your team." },
+        { label: "Certifications & Accreditations", name: "certifications", textarea: true, placeholder: "e.g., ISO 9001:2015, Microsoft Gold Partner" },
+        { label: "Technologies/Tools Used", name: "technologies", textarea: true, placeholder: "e.g., React.js, Node.js, Python, AWS, MongoDB" },
+        { label: "Past Projects & Case Studies", name: "pastProjects", textarea: true, placeholder: "Briefly describe notable past projects and key results." },
+        { label: "Client Portfolio", name: "clientPortfolio", textarea: true, placeholder: "List your key clients or industries served." },
+        { label: "Awards & Recognitions", name: "awards", textarea: true, placeholder: "e.g., Best Startup Award 2023, Nasscom 10000 Startups" },
+        { label: "Compliance Standards Followed (e.g., ISO, GDPR)", name: "complianceStandards", textarea: true, placeholder: "e.g., ISO 27001, GDPR, HIPAA" },
+        { label: "Geographical Presence", name: "geographicalPresence", textarea: true, placeholder: "e.g., India, USA, UK, Middle East" },
+        { label: "Preferred Industries/Sectors", name: "preferredIndustries", textarea: true, placeholder: "e.g., Healthcare, FinTech, EdTech, Government" },
+        { label: "Document Upload Section", name: "documents", fileUpload: true, multiple: true }
+      ].map(({ label, name, textarea, fileUpload, placeholder }) => (
         <div key={name}>
           <label className="block font-medium mb-1">{label}</label>
           {fileUpload ? (
             <>
+              <p className="mb-1 text-sm text-gray-600">
+                Upload your company brochure, portfolio, certifications, etc.
+              </p>
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
@@ -106,20 +109,19 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
                   ))}
                 </ul>
               )}
-
             </>
           ) : textarea ? (
             <textarea
               {...register(name, { required: 'This field is required' })}
               className="w-full border border-gray-300 bg-gray-100 p-3 rounded"
               rows={4}
-              placeholder="Content"
+              placeholder={placeholder}
             />
           ) : (
             <input
               {...register(name, { required: 'This field is required' })}
               className="w-full border border-gray-300 bg-gray-100 p-3 rounded"
-              placeholder="Content"
+              placeholder={placeholder}
             />
           )}
           {errors[name] && <p className="text-red-600 text-sm mt-1">{errors[name].message}</p>}
@@ -127,8 +129,10 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
       ))}
 
       <div className="flex flex-row gap-4 mt-6">
-        <button className="bg-red-700 px-3 sm:px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular"
+        <button
+          type="button"
           onClick={() => navigate("/")}
+          className="bg-red-700 px-3 sm:px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular"
         >
           Back
         </button>
