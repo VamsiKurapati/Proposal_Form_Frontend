@@ -11,7 +11,7 @@ const CreateProposalPage = () => {
 
   const handleCreate = async (formData) => {
     try {
-      formData.append('name', 'Jane Doe');
+      formData.append('name', 'Rahul Sharma');
       formData.append('email', 'test@gmail.com');
 
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/createProposal', formData);

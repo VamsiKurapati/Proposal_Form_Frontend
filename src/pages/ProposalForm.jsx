@@ -74,10 +74,24 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
                 onChange={handleFileChange}
                 className="w-full border border-gray-300 bg-gray-100 p-3 rounded"
               />
-              
+
               {isEdit && fileList.length > 0 && (
                 <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
                   {fileList.map((file, index) => {
+                    if(file.name || file.filename){
+                      return (
+                        <li key={index} className="flex justify-between items-center">
+                          {file.name || file.filename}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFile(index)}
+                            className="ml-4 text-red-600 hover:text-red-800 text-xs"
+                          >
+                            ❌ Remove
+                          </button>
+                        </li>
+                      );
+                    }
                     if (file.fileId) {
                       return (
                         <li key={index}>
