@@ -27,7 +27,7 @@ const proposalSlice = createSlice({
   },
   reducers: {
     addProposal: (state, action) => {
-      if( list.state.length >= 5 ) {
+      if( state.list.length >= 5 ) {
         console.warn('Maximum number of proposals reached. Cannot add more.');
         return;
       }
