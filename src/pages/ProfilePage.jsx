@@ -17,7 +17,7 @@ const ProfilePage = () => {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">User Profile</h2>
-      <p className="mb-2">Name: {proposals.name}</p>
+      <p className="mb-2">Name: Rahul Sharma</p>
       <p className="mb-4">Total Proposals: {proposals.length}</p>
 
       {proposals.length < 5 ? (
