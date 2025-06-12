@@ -52,7 +52,7 @@ const EditProposalPage = () => {
       <div className="mt-6">
         <button
           onClick={handleDelete}
-          className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition"
+          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
         >
           Delete Proposal
         </button>

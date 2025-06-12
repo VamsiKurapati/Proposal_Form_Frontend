@@ -1,6 +1,7 @@
 // src/components/ProposalForm.jsx
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit = false }) => {
   const {
@@ -11,6 +12,8 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
   } = useForm({ defaultValues });
 
   const [fileList, setFileList] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (defaultValues?.uploadedDocuments) {
@@ -76,33 +79,33 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
               />
 
               {isEdit && fileList.length > 0 && (
-  <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
-    {fileList.map((file, index) => (
-      <li key={file.fileId || file.name || index} className="flex justify-between items-center">
-        {file.fileId ? (
-          <a
-            href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
-          >
-            {file.filename}
-          </a>
-        ) : (
-          <span>{file.name || file.filename}</span>
-        )}
+                <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
+                  {fileList.map((file, index) => (
+                    <li key={file.fileId || file.name || index} className="flex justify-between items-center">
+                      {file.fileId ? (
+                        <a
+                          href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          {file.filename}
+                        </a>
+                      ) : (
+                        <span>{file.name || file.filename}</span>
+                      )}
 
-        <button
-          type="button"
-          onClick={() => handleRemoveFile(index)}
-          className="ml-4 text-red-600 hover:text-red-800 text-xs"
-        >
-          ❌ Remove
-        </button>
-      </li>
-    ))}
-  </ul>
-)}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(index)}
+                        className="ml-4 text-red-600 hover:text-red-800 text-xs"
+                      >
+                        ❌ Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
             </>
           ) : textarea ? (
@@ -123,12 +126,20 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
         </div>
       ))}
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-      >
-        {isEdit ? 'Update Proposal' : 'Submit Proposal'}
-      </button>
+      <div className="flex flex-row gap-4 mt-6">
+        <button className="bg-red-700 px-3 sm:px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular"
+          onClick={() => navigate("/")}
+        >
+          Back
+        </button>
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          {isEdit ? 'Update Proposal' : 'Submit Proposal'}
+        </button>
+      </div>
     </form>
   );
 };

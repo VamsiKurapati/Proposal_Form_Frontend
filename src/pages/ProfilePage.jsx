@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProposals } from '../features/proposalSlice'; // 👈 Add this
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const proposals = useSelector((state) => state.proposals.list);
   const status = useSelector((state) => state.proposals.status);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (status === 'idle') {
@@ -50,6 +53,14 @@ const ProfilePage = () => {
             </Link>
           </div>
         ))}
+      </div>
+
+      <div className="mt-6">
+        <button className="bg-red-700 px-3 sm:px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular"
+          onClick={() => navigate("/")}
+        >
+          Back
+        </button>
       </div>
     </div>
   );
