@@ -44,17 +44,25 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
 
   return (
     <form onSubmit={handleSubmit(processForm)} className="space-y-6">
-      {[
-        { label: "Company Details", name: "companyDetails" },
-        { label: "Industry/Domain", name: "industry" },
-        { label: "Company Description", name: "description", textarea: true },
-        { label: "Mission/Vision Statement", name: "mission", textarea: true },
-        { label: "Team Members & their Roles", name: "team" },
-        { label: "Team experience", name: "experience", textarea: true },
-        { label: "Certifications and Awards", name: "certifications", textarea: true },
-        { label: "Unique qualifications and team structure", name: "qualifications", textarea: true },
-        { label: "Past Projects/Case Studies", name: "projects", fileUpload: true, multiple: true }
-      ].map(({ label, name, textarea, fileUpload }) => (
+        {[
+          { label: "Company Name", name: "companyName" },
+          { label: "Brief Company Overview", name: "companyOverview", textarea: true },
+          { label: "Mission Statement", name: "mission", textarea: true },
+          { label: "Vision Statement", name: "vision", textarea: true },
+          { label: "Year of Establishment", name: "yearEstablished" },
+          { label: "Number of Employees", name: "employeeCount" },
+          { label: "Key Team Members (Names, Roles, Qualifications)", name: "teamMembers", textarea: true },
+          { label: "Team Experience & Skills", name: "teamExperience", textarea: true },
+          { label: "Certifications & Accreditations", name: "certifications", textarea: true },
+          { label: "Technologies/Tools Used", name: "technologies", textarea: true },
+          { label: "Past Projects & Case Studies", name: "pastProjects", textarea: true },
+          { label: "Client Portfolio", name: "clientPortfolio", textarea: true },
+          { label: "Awards & Recognitions", name: "awards", textarea: true },
+          { label: "Compliance Standards Followed (e.g., ISO, GDPR)", name: "complianceStandards", textarea: true },
+          { label: "Geographical Presence", name: "geographicalPresence", textarea: true },
+          { label: "Preferred Industries/Sectors", name: "preferredIndustries", textarea: true },
+          { label: "Document Upload Section", name: "documents", fileUpload: true, multiple: true }
+        ].map(({ label, name, textarea, fileUpload }) => (
         <div key={name}>
           <label className="block font-medium mb-1">{label}</label>
           {fileUpload ? (
@@ -81,6 +89,38 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {isEdit && fileList.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-2">Uploaded Documents</h4>
+                  <ul className="text-sm text-gray-700 list-disc list-inside space-y-1">
+                    {fileList.map((file, index) => {
+                      if (file.fileId) {
+                        return (
+                          <li key={index}>
+                            <a
+                              href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline"
+                            >
+                              {file.filename}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile(index)}
+                              className="ml-3 text-red-600 text-xs hover:text-red-800"
+                            >
+                              ❌ Remove
+                            </button>
+                          </li>
+                        );
+                      }
+                      return null; // Don't show temp files in uploaded list
+                    })}
+                  </ul>
+                </div>
               )}
             </>
           ) : textarea ? (
