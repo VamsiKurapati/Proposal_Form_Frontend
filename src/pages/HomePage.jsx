@@ -1,9 +1,11 @@
 import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlay, FaDashcube } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa";
 import { MdOutlineSearch , MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineVerifiedUser, MdGroupAdd, MdOutlineCheckCircle } from "react-icons/md";
 import { BiTrophy } from "react-icons/bi";
-import { LuInstagram, LuLinkedin, LuTwitter } from "react-icons/lu";
+
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 {/*
   Inter font is used for the entire page.
@@ -121,61 +123,25 @@ const plans = [
 ];
 
 export default function HomePage() {
-  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
     <section className="w-full font-inter bg-white text-gray-800">
-      {/* Navbar */}
-      <nav className="flex items-center justify-between bg-white p-4 shadow-md px-8 md:px-16 relative">
-        <div className="text-2xl font-bold text-blue-600">LOGO</div>
-        <div className="hidden md:flex space-x-8">
-          <a href="/product" className="text-gray-700 hover:text-blue-600">Product</a>
-          <a href="/solutions" className="text-gray-700 hover:text-blue-600">Solutions</a>
-          <a href="/company" className="text-gray-700 hover:text-blue-600">Company</a>
-          <a href="/resources" className="text-gray-700 hover:text-blue-600">Resources</a>
-          <a href="/plans" className="text-gray-700 hover:text-blue-600">Plans</a>
-        </div>
-        <div className="hidden md:flex items-center space-x-4">
-          <button className="text-gray-700 px-4 py-2"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            onClick={() => navigate("/request-demo")}
-          >
-            Request Demo
-          </button>
-        </div>
+      <Navbar />
 
-        <div className="md:hidden">
-          <button className="text-gray-700 focus:outline-none"
-            onClick={() => setIsOpen(!isOpen)}>
-            <FaDashcube className="w-6 h-6" />
-          </button>
-        </div>
-
-        {isOpen && (
-          <div className="absolute top-16 right-0 bg-white shadow-lg w-full md:hidden">
-            <div className="flex flex-col items-center space-y-4 p-4">
-              <a href="#features" className="text-gray-700 hover:text-blue-600">Features</a>
-              <a href="#pricing" className="text-gray-700 hover:text-blue-600">Pricing</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600">About</a>
-              <a href="#contact" className="text-gray-700 hover:text-blue-600">Contact</a>
-              <button className="text-gray-700 px-4 py-2">
-                Login
-              </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                Request Demo
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+      <div className="fixed top-1/2 sm:top-[60%] lg:top-[70%] right-1 sm:right-4 w-12 sm:w-16 h-12 sm:h-[62px] bg-[#2563EB] rounded-xl">
+        <button
+          className="w-full h-full flex items-center justify-center"
+          onClick={()=> navigate('/profile')}
+        >
+          <MdChat className="w-12 sm:w-10 h-8 sm:h-10 text-[#FFFFFF]" />
+        </button>
+      </div>
 
       {/* Hero Section */}
-      <section style={{ background: "linear-gradient(180deg, #EEF4FF 50%, #FFFFFF 100%)" }} >
+      <section 
+        className="mt-12 sm:mt-[62px]"
+        style={{ background: "linear-gradient(180deg, #EEF4FF 50%, #FFFFFF 100%)" }} >
         <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-8 md:py-16">
           {/* Left Text Section */}
           <div className="w-full md:w-1/2 text-left mb-10 md:mb-0">
@@ -222,9 +188,6 @@ export default function HomePage() {
       <section className="bg-white py-8 md:py-16 px-8 md:px-16">
         <div className="flex items-center justify-between mb-4">
           <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
-          <div className="w-16 h-[62px] bg-[#2563EB] rounded-xl flex items-center justify-center">
-            <MdChat className="w-12 sm:w-10 h-8 sm:h-10 text-[#FFFFFF] right-4" />
-          </div>
         </div>
         <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
         {features.map((item, idx) => (
@@ -336,48 +299,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="white text-black py-10 px-8 md:px-16">
-        <div className="grid xs:grid-cols-1 sm:grid-cols-4 gap-2 lg:gap-4 text-sm">
-          <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-            <h4 className="font-bold mb-4">LOGO</h4>
-            <p className="text-[16px] text-[#1E293B] font-regular mb-4">Transforming RFP management with AI-powered solutions</p>
-            <div className="flex items-center justify-center xs:justify-start mb-4">
-              <LuLinkedin className="w-6 h-6 text-[#1E293B] mr-4 inline-block" />
-              <LuTwitter className="w-6 h-6 text-[#1E293B] mr-4 inline-block" />
-              <LuInstagram className="w-6 h-6 text-[#1E293B] inline-block" />
-            </div>
-          </div>
-          <div className="flex flex-col xs:flex-row justify-center items-start text-left gap-8 sm:gap-24 mx-auto">
-            <div className="flex flex-col items-start text-left">
-              <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Product</h4>
-              <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
-                <li>Features</li>
-                <li>Templates</li>
-                <li>Pricing</li>
-              </ul>
-            </div>
-            <div className="flex flex-col items-start text-left">
-              <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Resources</h4>
-              <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
-                <li>Documentation</li>
-                <li>Guide</li>
-                <li>Support</li>
-              </ul>
-            </div>
-            <div className="flex flex-col items-start text-left">
-              <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Company</h4>
-              <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
-                <li>About</li>
-                <li>Blog</li>
-                <li>Contact</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <hr className="my-6 border-1 border-[#1E293B]" />
-        <p className="text-left mt-8  ml-12 text-xs text-black">© 2025. All Rights Reserved.</p>
-      </footer>
+      <Footer />
     </section>
   );
 }
