@@ -54,7 +54,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
         { label: "Vision Statement", name: "vision", textarea: true, placeholder: "e.g., To become a global leader in AI-powered solutions by 2030." },
         { label: "Year of Establishment", name: "yearEstablished", placeholder: "e.g., 2015" },
         { label: "Number of Employees", name: "employeeCount", placeholder: "Enter a number or a range like 50–200" },
-        { label: "Key Team Members (Names, Roles, Qualifications)", name: "teamMembers", textarea: true, placeholder: "e.g., John Doe - CEO, M.Tech from IIT Delhi; Jane Smith - CTO, PhD in AI" },
+        { label: "Key Team Members (Names, Roles, Qualifications)", name: "teamMembers", textarea: true, placeholder: "e.g., John Doe – CEO, 10+ years in executive leadership; Jane Smith – CTO, extensive experience in technology and innovation" },
         { label: "Team Experience & Skills", name: "teamExperience", textarea: true, placeholder: "Summarize relevant domain experience and technical skills of your team." },
         { label: "Certifications & Accreditations", name: "certifications", textarea: true, placeholder: "e.g., ISO 9001:2015, Microsoft Gold Partner" },
         { label: "Technologies/Tools Used", name: "technologies", textarea: true, placeholder: "e.g., React.js, Node.js, Python, AWS, MongoDB" },
