@@ -254,7 +254,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
   };
 
   const handleSingleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.file);
     setFileList(prev => [...prev, ...files]);
   };
 
