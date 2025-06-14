@@ -425,7 +425,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
         />
 
         {/* Pending files (not yet uploaded) */}
-        {pendingFilelist.length > 0 && (
+        {pendingFileList.length > 0 && (
           <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
             {pendingFileList.map((file, index) => (
               <li key={file.name || index} className="flex justify-between items-center">
