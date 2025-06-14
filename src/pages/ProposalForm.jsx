@@ -168,6 +168,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
 
   const navigate = useNavigate();
   const [fileList, setFileList] = useState([]);
+  const [pendingFileList, setPendingFileList] = useState([]);
 
   // Multi-select states
   const [showOtherIndustryInput, setShowOtherIndustryInput] = useState(false);
@@ -249,11 +250,20 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+    setPendingFileList(prev => [...prev, ...files]);
+  };
+
+  const handleSingleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
     setFileList(prev => [...prev, ...files]);
   };
 
   const handleRemoveFile = (indexToRemove) => {
     setFileList(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  const handleRemovePendingFile = (indexToRemove) => {
+    setPendingFileList(prev => prev.filter((_, i) => i !== indexToRemove));
   };
 
   const processForm = (data) => {
@@ -414,22 +424,46 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
           className="w-full border border-gray-300 bg-gray-100 p-3 rounded"
         />
 
+        {/* Pending files (not yet uploaded) */}
+        {pendingFilelist.length > 0 && (
+          <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
+            {pendingFileList.map((file, index) => (
+              <li key={file.name || index} className="flex justify-between items-center">
+                <span>{file.name}</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSingleFileUpload(file, index)}
+                    className="text-green-600 hover:text-green-800 text-xs"
+                  >
+                    ⬆️ Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePendingFile(index)}
+                    className="text-red-600 hover:text-red-800 text-xs"
+                  >
+                    ❌ Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Already uploaded files */}
         {fileList.length > 0 && (
           <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
             {fileList.map((file, index) => (
-              <li key={file.fileId || file.filename|| file.name || index} className="flex justify-between items-center">
-                {file.fileId ? (
-                  <a
-                    href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    {file.filename}
-                  </a>
-                ) : (
-                  <span>{file.name || file.filename}</span>
-                )}
+              <li key={file.fileId || file.filename || index} className="flex justify-between items-center">
+                <a
+                  href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  {file.filename}
+                </a>
                 <button
                   type="button"
                   onClick={() => handleRemoveFile(index)}
