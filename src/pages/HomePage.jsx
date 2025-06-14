@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlay } from "react-icons/fa";
 import { MdOutlineSearch , MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineVerifiedUser, MdGroupAdd, MdOutlineCheckCircle } from "react-icons/md";
@@ -124,6 +124,10 @@ const plans = [
 
 export default function HomePage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <section className="w-full font-inter bg-white text-gray-800">
