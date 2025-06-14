@@ -463,15 +463,19 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
         {fileList.length > 0 && (
           <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
             {fileList.map((file, index) => (
-              <li key={file.fileId || file.filename || index} className="flex justify-between items-center">
-                <a
-                  href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  {file.filename}
-                </a>
+              <li key={file.fileId || file.name || index} className="flex justify-between items-center">
+                {file.fileId ? (
+                  <a
+                    href={`https://proposal-form-backend.vercel.app/api/proposals/file/${file.fileId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {file.filename}
+                  </a>
+                ) : (
+                  <span>{file.name}</span>
+                )}
                 <button
                   type="button"
                   onClick={() => handleRemoveFile(index)}
