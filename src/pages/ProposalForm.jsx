@@ -414,7 +414,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
           className="w-full border border-gray-300 bg-gray-100 p-3 rounded"
         />
 
-        {isEdit && fileList.length > 0 && (
+        {fileList.length > 0 && (
           <ul className="text-sm text-gray-700 mt-2 list-disc list-inside">
             {fileList.map((file, index) => (
               <li key={file.fileId || file.name || index} className="flex justify-between items-center">
