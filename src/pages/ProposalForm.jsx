@@ -203,25 +203,43 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
     }
 
     if (isEdit) {
-      if (defaultValues?.preferredIndustries) {
-        const selected = defaultValues.preferredIndustries.map((item) => ({
+      // Handle preferred industries
+      let industries = defaultValues?.preferredIndustries;
+      if (typeof industries === 'string') {
+        try {
+          industries = JSON.parse(industries);
+        } catch {
+          industries = [industries];
+        }
+      }
+      if (Array.isArray(industries)) {
+        const selected = industries.map((item) => ({
           label: item,
           value: item,
         }));
         setValue("preferredIndustries", selected);
-        if (defaultValues.preferredIndustries.includes("Others")) {
+        if (industries.includes("Others")) {
           setShowOtherIndustryInput(true);
           setOtherIndustry(defaultValues.otherIndustry || "");
         }
       }
 
-      if (defaultValues?.geographicalPresence) {
-        const selectedGeo = defaultValues.geographicalPresence.map((item) => ({
+      // Handle geographical presence
+      let geo = defaultValues?.geographicalPresence;
+      if (typeof geo === 'string') {
+        try {
+          geo = JSON.parse(geo);
+        } catch {
+          geo = [geo];
+        }
+      }
+      if (Array.isArray(geo)) {
+        const selectedGeo = geo.map((item) => ({
           label: item,
           value: item,
         }));
         setValue("geographicalPresence", selectedGeo);
-        if (defaultValues.geographicalPresence.includes("Others")) {
+        if (geo.includes("Others")) {
           setShowOtherGeoInput(true);
           setOtherGeo(defaultValues.otherGeo || "");
         }
