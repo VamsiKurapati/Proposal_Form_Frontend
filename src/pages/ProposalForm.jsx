@@ -253,9 +253,9 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
     setPendingFileList(prev => [...prev, ...files]);
   };
 
-  const handleSingleFileUpload = (e) => {
-    const files = Array.from(e.target.file);
-    setFileList(prev => [...prev, ...files]);
+  const handleSingleFileUpload = (file) => {
+    setFileList(prev => [...prev, file]);  // no spread on `file`
+    setPendingFileList(prev => prev.filter(f => f !== file)); // optional: remove after uploading
   };
 
   const handleRemoveFile = (indexToRemove) => {
@@ -433,7 +433,7 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => handleSingleFileUpload(file, index)}
+                    onClick={() => handleSingleFileUpload(file)}
                     className="text-green-600 hover:text-green-800 text-xs"
                   >
                     ⬆️ Upload
