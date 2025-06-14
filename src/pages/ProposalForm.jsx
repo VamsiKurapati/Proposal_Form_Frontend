@@ -253,6 +253,10 @@ const ProposalForm = ({ onSubmit: handleFormSubmit, defaultValues = {}, isEdit =
     setPendingFileList(prev => [...prev, ...files]);
   };
 
+  useEffect(() => {
+    console.log(pendingFileList);
+  }, [pendingFileList])
+
   const handleSingleFileUpload = (file) => {
     setFileList(prev => [...prev, file]);  // no spread on `file`
     setPendingFileList(prev => prev.filter(f => f !== file)); // optional: remove after uploading
