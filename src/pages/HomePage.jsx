@@ -7,19 +7,6 @@ import { BiTrophy } from "react-icons/bi";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-{/*
-  Inter font is used for the entire page.
-  Font weights used:
-  100: thin
-  200: extra-light
-  300: light
-  400: regular
-  500: medium
-  600: semi-bold
-  700: bold
-  800: extra-bold
-*/}
-
 const features = [
   { title: "AI RFP Discovery", desc: "Find relevant RFPs matched to your business capabilities", image:<MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
   { title: "Smart Templates", desc: "Industry-specific templates with AI-powered customization", image:<MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
@@ -130,7 +117,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <section className="w-full font-inter bg-white text-gray-800">
+    <section className="w-full font-inter bg-white">
       <Navbar />
 
       <div className="fixed top-1/2 sm:top-[60%] lg:top-[70%] right-1 sm:right-4 w-12 sm:w-16 h-12 sm:h-[62px] bg-[#2563EB] rounded-xl">
