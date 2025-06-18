@@ -8,6 +8,9 @@ import { lazy } from "react";
 const Home = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
+const CompanyProfile = lazy(() => import("./pages/CompanyProfile"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboard"));
 
 {/*
   Inter font is used for the entire website.
@@ -31,6 +34,9 @@ const App = () => (
       <Route path="/proposal/:id/edit" element={<EditProposalPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/sign_up" element={<SignUpPage />} />
+      <Route path="/company_profile" element={<CompanyProfile />} />
+      <Route path="/company_profile_dashboard" element={<CompanyProfileDashboard />} />
+      <Route path="/user_profile" element={<UserProfile />} />
       <Route path="*" element={<Home />} />
     </Routes>
   </Router>

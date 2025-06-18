@@ -10,6 +10,7 @@ import '@fontsource/inter'; // Defaults to 400
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
+import '@fontsource/inter/800.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
