@@ -11,6 +11,7 @@ const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const CompanyProfile = lazy(() => import("./pages/CompanyProfile"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboard"));
+const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
 
 {/*
   Inter font is used for the entire website.
@@ -36,6 +37,7 @@ const App = () => (
       <Route path="/sign_up" element={<SignUpPage />} />
       <Route path="/company_profile" element={<CompanyProfile />} />
       <Route path="/company_profile_dashboard" element={<CompanyProfileDashboard />} />
+      <Route path="/rfp_discovery" element={<RFPDiscovery />} />
       <Route path="/user_profile" element={<UserProfile />} />
       <Route path="*" element={<Home />} />
     </Routes>
