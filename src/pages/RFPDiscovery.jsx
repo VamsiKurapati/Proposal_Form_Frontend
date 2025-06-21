@@ -142,6 +142,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
 const DiscoverRFPs = () => {
   const [filters, setFilters] = useState({ fundingType: [], organizationType: [] });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [allRFPs, setAllRFPs] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [recent, setRecent] = useState([]);
   const [saved, setSaved] = useState([]);
@@ -150,9 +151,14 @@ const DiscoverRFPs = () => {
   useEffect(() => {
     const fetchRFPs = async () => {
         try {
-            const res = await axios.get("https://your-backend-url.com/api/rfp/getallRfp");
-            const { recommendedRFPs, recentRFPs, savedRFPs } = res.data;
+            const res = await axios.get("https://your-backend-url.com/api/rfp/getAllRFP",{
+              headers:{
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            });
+            const { allRFPs, recommendedRFPs, recentRFPs, savedRFPs } = res.data;
 
+            setAllRFPs(allRFPs ?? []);
             setRecommended(recommendedRFPs ?? []);
             setRecent(recentRFPs ?? []);
             setSaved(savedRFPs ?? []);
@@ -205,6 +211,7 @@ const DiscoverRFPs = () => {
             setRecommended(dummyRFPs);
             setRecent(dummyRFPs);
             setSaved([]);
+            setAllRFPs([...recommended, ...recent, ...saved])
         }
     };
 
@@ -231,9 +238,17 @@ const DiscoverRFPs = () => {
 
   const handleSave = (rfp) => {
     setSaved((prev) => [...prev, rfp]);
+    try{
+      const res = axios.post("https://your-backend-url.com/api/rfp/saveRFP",{ rfpId: rfp.id, rfp },{
+        headers:{
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return;
+    } catch(err){
+      console.error(err);
+    }
   };
-
-  const allRFPs = [...recommended, ...recent, ...saved];
 
   const searchResults =
   searchQuery.trim() === ""
@@ -246,6 +261,16 @@ const DiscoverRFPs = () => {
 
   const handleUnsave = (rfpId) => {
     setSaved((prev) => prev.filter((r) => r.id !== rfpId));
+    try{
+      const res = axios.post("https://your-backend-url.com/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
+        headers:{
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return;
+    } catch(err){
+      console.error(err);
+    }
   };
 
   const handleShare = (link) => {
