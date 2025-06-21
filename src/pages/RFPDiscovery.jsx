@@ -151,7 +151,7 @@ const DiscoverRFPs = () => {
   useEffect(() => {
     const fetchRFPs = async () => {
         try {
-            const res = await axios.get("https://your-backend-url.com/api/rfp/getAllRFP",{
+            const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getAllRFP",{
               headers:{
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
@@ -239,7 +239,7 @@ const DiscoverRFPs = () => {
   const handleSave = (rfp) => {
     setSaved((prev) => [...prev, rfp]);
     try{
-      const res = axios.post("https://your-backend-url.com/api/rfp/saveRFP",{ rfpId: rfp.id, rfp },{
+      const res = axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP",{ rfpId: rfp.id, rfp },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -262,7 +262,7 @@ const DiscoverRFPs = () => {
   const handleUnsave = (rfpId) => {
     setSaved((prev) => prev.filter((r) => r.id !== rfpId));
     try{
-      const res = axios.post("https://your-backend-url.com/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
+      const res = axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
