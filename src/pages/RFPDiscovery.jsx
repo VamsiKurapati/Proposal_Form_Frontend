@@ -237,14 +237,16 @@ const DiscoverRFPs = () => {
   };
 
   const handleSave = async (rfp) => {
-    setSaved((prev) => [...prev, rfp]);
-    console.log("RFP data:",rfp);
     try{
       const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP",{ rfpId: rfp._id, rfp: rfp },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      if(res.ok){
+        setSaved((prev) => [...prev, rfp]);
+        console.log("RFP data:",rfp);
+      }
       return;
     } catch(err){
       console.error(err);
@@ -261,8 +263,6 @@ const DiscoverRFPs = () => {
 
 
   const handleUnsave = async (rfpId) => {
-    console.log("Handling Unsave...");
-    setSaved((prev) => prev.filter((r) => r._id !== rfpId));
     try{
       console.log("sending request...");
       const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfpId },{
@@ -270,6 +270,10 @@ const DiscoverRFPs = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      if(res.ok){
+        console.log("Handling Unsave...");
+        setSaved((prev) => prev.filter((r) => r._id !== rfpId));
+      }
       return;
     } catch(err){
       console.error(err);
