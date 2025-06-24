@@ -389,7 +389,7 @@ const DiscoverRFPs = () => {
       Won: "bg-yellow-100 text-yellow-600",
     };
     return (
-      <div className="grid grid-cols-12 items-center text-left text-sm text-[#111827] px-4 py-3 border-b last:border-none">
+      <div className="grid grid-cols-12 items-center text-center text-sm text-[#111827] px-4 py-3 border-b last:border-none">
         <div className="col-span-2 truncate font-medium">{rfp.title}</div>
 
         <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280] truncate">
@@ -491,7 +491,7 @@ const DiscoverRFPs = () => {
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
         {saved.length ? (
           <div className="w-full bg-white rounded-xl shadow-sm border">
-            <div className="grid grid-cols-12 font-semibold text-[#374151] text-[16px] font-medium border-b px-4 py-3 text-left">
+            <div className="grid grid-cols-12 font-semibold text-[#374151] text-[16px] font-medium border-b px-4 py-3 text-center">
               <div className="col-span-2">RFP Title</div>
               <div className="col-span-2">Organisation</div>
               <div className="col-span-2">Amount</div>
