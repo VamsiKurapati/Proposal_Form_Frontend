@@ -298,7 +298,7 @@ const DiscoverRFPs = () => {
       <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
       <div className="text-[14px] text-[#4B5563CC] space-y-1">
         <div className="flex items-center gap-2">
-          <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget}
+          <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}
         </div>
         <div className="flex items-center gap-2">
           <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
@@ -375,7 +375,7 @@ const DiscoverRFPs = () => {
 
       {/* Footer */}
       <div className="flex justify-between items-center">
-        <span className="font-semibold text-[#111827]">{rfp.budget}</span>
+        <span className="font-semibold text-[#111827]">{rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}</span>
         <a
           href={rfp.link}
           className="text-[14px] text-[#2563EB]"
@@ -404,7 +404,7 @@ const DiscoverRFPs = () => {
           <p className="truncate overflow-hidden whitespace-nowrap">{rfp.organization}</p>
         </div>
 
-        <div className="col-span-2">{rfp.budget}</div>
+        <div className="col-span-2">{rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}</div>
         <div className="col-span-2">{rfp.deadline}</div>
 
         <div className="col-span-2">
