@@ -260,10 +260,10 @@ const DiscoverRFPs = () => {
       });
 
 
-  const handleUnsave = (rfpId) => {
+  const handleUnsave = async (rfpId) => {
     setSaved((prev) => prev.filter((r) => r.id !== rfpId));
     try{
-      const res = axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
+      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -420,7 +420,7 @@ const DiscoverRFPs = () => {
           />
           {isSaved ? (
             <MdOutlineBookmark
-              onClick={() => handleUnsave(rfp.id)}
+              onClick={() => handleUnsave(rfp._id)}
               className="cursor-pointer"
               title="Unsave"
             />
