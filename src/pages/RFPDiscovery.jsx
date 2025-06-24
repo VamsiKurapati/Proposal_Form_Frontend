@@ -265,7 +265,7 @@ const DiscoverRFPs = () => {
     setSaved((prev) => prev.filter((r) => r._id !== rfpId));
     try{
       console.log("sending request...");
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId },{
+      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfp: rfpId },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
