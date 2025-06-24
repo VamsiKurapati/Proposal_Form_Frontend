@@ -261,7 +261,7 @@ const DiscoverRFPs = () => {
 
 
   const handleUnsave = async (rfpId) => {
-    setSaved((prev) => prev.filter((r) => r.id !== rfpId));
+    setSaved((prev) => prev.filter((r) => r._id !== rfpId));
     try{
       const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
         headers:{
@@ -304,7 +304,7 @@ const DiscoverRFPs = () => {
       <div className="flex justify-between items-center mt-4">
         <div className="flex gap-3 text-[#111827] text-lg">
           {isSaved ? (
-            <MdOutlineBookmark onClick={() => handleUnsave(rfp.id)} className="cursor-pointer text-[#111827]" title="Unsave" />
+            <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
           ) : (
             <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
           )}
@@ -330,7 +330,7 @@ const DiscoverRFPs = () => {
         <div className="flex gap-2 text-lg text-[#111827]">
           {isSaved ? (
             <MdOutlineBookmark
-              onClick={() => handleUnsave(rfp.id)}
+              onClick={() => handleUnsave(rfp._id)}
               className="cursor-pointer"
               title="Unsave"
             />
