@@ -261,8 +261,10 @@ const DiscoverRFPs = () => {
 
 
   const handleUnsave = async (rfpId) => {
+    console.log("Handling Unsave...");
     setSaved((prev) => prev.filter((r) => r._id !== rfpId));
     try{
+      console.log("sending request...");
       const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfp.id },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
