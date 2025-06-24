@@ -474,7 +474,7 @@ const DiscoverRFPs = () => {
             <RFPCard
               key={rfp.id}
               rfp={rfp}
-              isSaved={!!saved.find((s) => s.id === rfp.id)}
+              isSaved={!!saved.find((s) => s.id === rfp._id)}
             />
           ))}
         </div>
@@ -486,7 +486,7 @@ const DiscoverRFPs = () => {
               <RecentRFPCard
                 key={rfp.id}
                 rfp={rfp}
-                isSaved={!!saved.find((s) => s.id === rfp.id)}
+                isSaved={!!saved.find((s) => s.id === rfp._id)}
               />
             ))}
           </div>
