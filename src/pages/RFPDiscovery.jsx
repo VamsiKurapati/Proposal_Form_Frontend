@@ -295,7 +295,7 @@ const DiscoverRFPs = () => {
         </span>
       </div>
       <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title}</h3>
-      <p className="text-[16px] text-[#4B5563] mb-2 truncate">{rfp.description}</p>
+      <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
       <div className="text-[14px] text-[#4B5563CC] space-y-1">
         <div className="flex items-center gap-2">
           <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget}
@@ -304,7 +304,7 @@ const DiscoverRFPs = () => {
           <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
         </div>
         <div className="flex items-center gap-2">
-          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> <p className="truncate"> {rfp.organization} </p>
+          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization} </p>
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">
@@ -396,11 +396,11 @@ const DiscoverRFPs = () => {
     };
     return (
       <div className="grid grid-cols-12 items-center text-center text-sm text-[#111827] px-4 py-3 border-b last:border-none">
-        <div className="col-span-2 truncate font-medium">{rfp.title}</div>
+        <div className="col-span-2 truncate overflow-hidden whitespace-nowrap font-medium">{rfp.title}</div>
 
-        <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280] truncate">
+        <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280]">
           <img src={rfp.logo} alt="logo" className="w-4 h-4 rounded-full" />
-          {rfp.organization}
+          <p className="truncate overflow-hidden whitespace-nowrap">{rfp.organization}</p>
         </div>
 
         <div className="col-span-2">{rfp.budget}</div>
