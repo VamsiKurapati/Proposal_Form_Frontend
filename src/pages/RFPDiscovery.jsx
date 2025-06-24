@@ -303,8 +303,8 @@ const DiscoverRFPs = () => {
         <div className="flex items-center gap-2">
           <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
         </div>
-        <div className="flex items-center gap-2 truncate">
-          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> {rfp.organization}
+        <div className="flex items-center gap-2">
+          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> <p> className="truncate" {rfp.organization} </p>
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">
