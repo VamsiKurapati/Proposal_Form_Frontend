@@ -243,7 +243,7 @@ const DiscoverRFPs = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      if(res.ok){
+      if (res.status === 201 || res.status === 200) {
         setSaved((prev) => [...prev, rfp]);
         console.log("RFP data:",rfp);
       }
@@ -270,7 +270,7 @@ const DiscoverRFPs = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      if(res.ok){
+      if (res.status === 200) {
         console.log("Handling Unsave...");
         setSaved((prev) => prev.filter((r) => r._id !== rfpId));
       }
