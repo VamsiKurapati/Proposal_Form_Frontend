@@ -298,7 +298,7 @@ const DiscoverRFPs = () => {
           <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
         </div>
         <div className="flex items-center gap-2">
-          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> {rfp.organization}
+          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563] truncate" /> {rfp.organization}
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">
@@ -392,7 +392,7 @@ const DiscoverRFPs = () => {
       <div className="grid grid-cols-12 items-center text-left text-sm text-[#111827] px-4 py-3 border-b last:border-none">
         <div className="col-span-2 truncate font-medium">{rfp.title}</div>
 
-        <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280]">
+        <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280] truncate">
           <img src={rfp.logo} alt="logo" className="w-4 h-4 rounded-full" />
           {rfp.organization}
         </div>
