@@ -289,7 +289,7 @@ const DiscoverRFPs = () => {
         </span>
       </div>
       <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title}</h3>
-      <p className="text-[16px] text-[#4B5563] mb-2 whitespace-nowrap">{rfp.description}</p>
+      <p className="text-[16px] text-[#4B5563] mb-2 truncate">{rfp.description}</p>
       <div className="text-[14px] text-[#4B5563CC] space-y-1">
         <div className="flex items-center gap-2">
           <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget}
