@@ -72,7 +72,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
                 {searchResults.length ? (
                   searchResults.map((rfp) => (
                     <a
-                      key={rfp.id}
+                      key={rfp._id}
                       href={rfp.link}
                       className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800 border-b last:border-b-0"
                       target="_blank"
@@ -472,9 +472,9 @@ const DiscoverRFPs = () => {
         <div className="flex overflow-x-auto pb-2 custom-scroll">
           {applyFilters(recommended).map((rfp) => (
             <RFPCard
-              key={rfp.id}
+              key={rfp._id}
               rfp={rfp}
-              isSaved={!!saved.find((s) => s.id === rfp.id)}
+              isSaved={!!saved.find((s) => s._id === rfp._id)}
             />
           ))}
         </div>
@@ -484,9 +484,9 @@ const DiscoverRFPs = () => {
           <div className="flex overflow-x-auto pb-2 custom-scroll">
             {applyFilters(recent).map((rfp) => (
               <RecentRFPCard
-                key={rfp.id}
+                key={rfp._id}
                 rfp={rfp}
-                isSaved={!!saved.find((s) => s.id === rfp.id)}
+                isSaved={!!saved.find((s) => s._id === rfp._id)}
               />
             ))}
           </div>
@@ -507,7 +507,7 @@ const DiscoverRFPs = () => {
             </div>
             {saved.map((rfp) => (
               <SavedRFPCard
-                key={rfp.id}
+                key={rfp._id}
                 rfp={rfp}
                 handleSave={handleSave}
                 handleUnsave={handleUnsave}
