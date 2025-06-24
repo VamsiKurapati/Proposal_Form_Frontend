@@ -239,7 +239,7 @@ const DiscoverRFPs = () => {
   const handleSave = async (rfp) => {
     setSaved((prev) => [...prev, rfp]);
     try{
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP",{ rfpId: rfp._id, rfp: rfp.rfp },{
+      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP",{ rfpId: rfp._id, rfp: rfp },{
         headers:{
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
