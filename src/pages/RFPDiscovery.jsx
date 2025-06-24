@@ -297,8 +297,8 @@ const DiscoverRFPs = () => {
         <div className="flex items-center gap-2">
           <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
         </div>
-        <div className="flex items-center gap-2">
-          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563] truncate" /> {rfp.organization}
+        <div className="flex items-center gap-2 truncate">
+          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563]" /> {rfp.organization}
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">
@@ -496,7 +496,7 @@ const DiscoverRFPs = () => {
               <div className="col-span-2">Organisation</div>
               <div className="col-span-2">Amount</div>
               <div className="col-span-2">Deadline</div>
-              <div className="col-span-1">Status</div>
+              <div className="col-span-2">Status</div>
               <div className="col-span-2 text-center pl-12">Action</div>
             </div>
             {saved.map((rfp) => (
