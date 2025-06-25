@@ -4,6 +4,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import html2pdf from "html2pdf.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -73,9 +74,15 @@ const ProposalEditor = ({ proposalData }) => {
 
   const exportToPDF = () => {
     const element = document.getElementById("proposal-content");
-    import("html2pdf.js").then(({ default: html2pdf }) => {
-      html2pdf().from(element).save("proposal.pdf");
-    });
+    const opt = {
+      margin:       0.5,
+      filename:     "proposal.pdf",
+      image:        { type: "jpeg", quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    html2pdf().set(opt).from(element).save();
   };
 
   const handleFileUpload = (e) => {
