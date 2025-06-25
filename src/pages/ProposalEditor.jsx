@@ -203,19 +203,19 @@ const ProposalEditor = ({ proposalData }) => {
       ))}
       <div className="flex gap-2">
         <button
-          onClick={handleSubmit}
+          onClick={() => handleSubmit()}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Save Version
         </button>
         <button
-          onClick={handleFinalSubmit}
+          onClick={() => handleFinalSubmit()}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Submit Proposal
         </button>
         <button
-          onClick={exportToPDF(proposalData)}
+          onClick={() => exportToPDF(proposalData)}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           Export to PDF

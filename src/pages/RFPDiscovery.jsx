@@ -274,27 +274,30 @@ const DiscoverRFPs = () => {
   };
 
   const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
-    <div className="bg-[#F8FAFC] rounded-xl p-4 shadow w-[355px] mr-4 ">
-      <div className="flex items-center justify-between mb-2">
-        <img src={rfp.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
-        <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
-          {rfp.match}% Match
-        </span>
+    <div className="bg-[#F8FAFC] rounded-xl p-4 shadow w-[355px] mr-4 flex flex-col justify-between h-full">
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <img src={rfp.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
+          <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
+            {rfp.match}% Match
+          </span>
+        </div>
+        <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title}</h3>
+        <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
+        <div className="text-[14px] text-[#4B5563CC] space-y-1">
+          <div className="flex items-center gap-2">
+            <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}
+          </div>
+          <div className="flex items-center gap-2">
+            <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
+          </div>
+          <div className="flex items-center gap-2">
+            <MdOutlineAccountBalance className="text-[16px] text-[#4B5563] shrink-0" />
+            <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization} </p>
+          </div>
+        </div>
       </div>
-      <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title}</h3>
-      <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
-      <div className="text-[14px] text-[#4B5563CC] space-y-1">
-        <div className="flex items-center gap-2">
-          <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}
-        </div>
-        <div className="flex items-center gap-2">
-          <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
-        </div>
-        <div className="flex items-center gap-2">
-          <MdOutlineAccountBalance className="text-[16px] text-[#4B5563] shrink-0" />
-          <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization} </p>
-        </div>
-      </div>
+      
       <div className="mt-auto">
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-3 text-[#111827] text-lg">
