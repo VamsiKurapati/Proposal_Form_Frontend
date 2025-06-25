@@ -4,7 +4,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import html2pdf from "html2pdf.js";
+import jsPDF from "jspdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -72,17 +72,79 @@ const ProposalEditor = ({ proposalData }) => {
     }
   };
 
-  const exportToPDF = () => {
-    const element = document.getElementById("proposal-content");
-    const opt = {
-      margin:       0.5,
-      filename:     "proposal.pdf",
-      image:        { type: "jpeg", quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: "in", format: "letter", orientation: "portrait" },
+  const exportToPDF = (proposalData) => {
+    const doc = new jsPDF({
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    });
+
+    const pageHeight = 297;
+    const marginLeft = 20;
+    const maxWidth = 170;
+    const lineHeight = 8;
+    let y = 20;
+    let pageNumber = 1;
+
+    const stripHtml = (html) => {
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+      return temp.textContent || temp.innerText || "";
     };
 
-    html2pdf().set(opt).from(element).save();
+    const formatLabel = (key) =>
+      key
+        .replace(/([A-Z])/g, " $1")
+        .replace(/_/g, " ")
+        .replace(/^./, (str) => str.toUpperCase());
+
+    const addPageNumber = () => {
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "italic");
+      doc.text(`Page ${pageNumber}`, doc.internal.pageSize.getWidth() / 2, pageHeight - 10, {
+        align: "center",
+      });
+    };
+
+    // Title
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Proposal Document", marginLeft, y);
+    y += 12;
+
+    doc.setFontSize(12);
+
+    Object.entries(proposalData).forEach(([key, raw]) => {
+      if (y > pageHeight - 30) {
+        addPageNumber();
+        doc.addPage();
+        pageNumber++;
+        y = 20;
+      }
+
+      const label = formatLabel(key);
+      let value = "";
+
+      if (typeof raw === "string") {
+        value = stripHtml(raw);
+      } else if (typeof raw === "object") {
+        value = JSON.stringify(raw, null, 2);
+      } else {
+        value = String(raw);
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.text(`${label}:`, marginLeft, y);
+      y += 6;
+
+      doc.setFont("helvetica", "normal");
+      const lines = doc.splitTextToSize(value, maxWidth);
+      doc.text(lines, marginLeft, y);
+      y += lines.length * lineHeight;
+    });
+
+    addPageNumber(); // Add last page number
+    doc.save("proposal.pdf");
   };
 
   const handleFileUpload = (e) => {
@@ -153,7 +215,7 @@ const ProposalEditor = ({ proposalData }) => {
           Submit Proposal
         </button>
         <button
-          onClick={exportToPDF}
+          onClick={exportToPDF(proposalData)}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           Export to PDF

@@ -295,31 +295,33 @@ const DiscoverRFPs = () => {
           <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization} </p>
         </div>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex gap-3 text-[#111827] text-lg">
-          {isSaved ? (
-            <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
-          ) : (
-            <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
-          )}
-          <MdOutlineShare onClick={() => handleShare(rfp.link)} className="cursor-pointer text-[#111827]" title="Share" />
+      <div className="mt-auto">
+        <div className="flex justify-between items-center mt-4">
+          <div className="flex gap-3 text-[#111827] text-lg">
+            {isSaved ? (
+              <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
+            ) : (
+              <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
+            )}
+            <MdOutlineShare onClick={() => handleShare(rfp.link)} className="cursor-pointer text-[#111827]" title="Share" />
+          </div>
+          <a
+            href={rfp.link}
+            className="text-[14px] text-white bg-[#2563EB] px-4 py-2 rounded-lg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Details
+          </a>
         </div>
-        <a
-          href={rfp.link}
-          className="text-[14px] text-white bg-[#2563EB] px-4 py-2 rounded-lg"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Details
-        </a>
-      </div>
-      <div className="flex justify-center mt-3">
-        <button
-          onClick={() => handleGenerateProposal(rfp)}
-          className="px-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
-        >
-          Generate Proposal
-        </button>
+        <div className="flex justify-center mt-3">
+          <button
+            onClick={() => handleGenerateProposal(rfp)}
+            className="px-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
+          >
+            Generate Proposal
+          </button>
+        </div>
       </div>
     </div>
   );
