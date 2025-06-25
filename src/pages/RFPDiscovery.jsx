@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaRegBookmark, FaUserCircle } from "react-icons/fa";
-import { FiSearch, FiBell } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { FaRegBookmark } from "react-icons/fa";
 import { MdOutlineShare, 
   MdOutlineBookmark, 
   MdOutlinePayments, 
@@ -11,27 +11,7 @@ import { MdOutlineShare,
   MdOutlineVisibility,
   MdOutlineFileDownload,
 } from "react-icons/md";
-
-// Navbar Component
-const Navbar = () => (
-  <nav className="fixed top-0 left-0 right-0 bg-white border-b shadow-sm h-16 flex items-center justify-between px-4 z-50">
-    <div className="flex items-center gap-4">
-      <span className="font-bold text-xl">LOGO</span>
-      <div className="hidden md:flex gap-6 text-sm ml-6">
-        {["Discover", "Proposals", "Dashboard", "Profile"].map((item, i) => (
-          <a key={i} href="#" className="hover:text-[#2563EB] text-gray-700">
-            {item}
-          </a>
-        ))}
-      </div>
-    </div>
-    <div className="flex items-center gap-4">
-      <FiSearch className="text-lg" />
-      <FiBell className="text-lg" />
-      <FaUserCircle className="text-2xl text-gray-700" />
-    </div>
-  </nav>
-);
+import NavbarComponent from "./NavbarComponent";
 
 // Sidebar Component
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
@@ -147,6 +127,7 @@ const DiscoverRFPs = () => {
   const [recent, setRecent] = useState([]);
   const [saved, setSaved] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRFPs = async () => {
@@ -289,6 +270,7 @@ const DiscoverRFPs = () => {
   const handleGenerateProposal = (rfp) => {
     console.log("Generating proposal for:", rfp.title);
     // navigate, open modal, or call backend here
+    navigate("/proposal_page", { state: { proposalData: rfp } });
   };
 
   const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
@@ -331,12 +313,14 @@ const DiscoverRFPs = () => {
           View Details
         </a>
       </div>
-      <button
-        onClick={() => handleGenerateProposal(rfp)}
-        className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
-      >
-        Generate Proposal
-      </button>
+      <div className="flex justify-center mt-3">
+        <button
+          onClick={() => handleGenerateProposal(rfp)}
+          className="px-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
+        >
+          Generate Proposal
+        </button>
+      </div>
     </div>
   );
 
@@ -456,7 +440,7 @@ const DiscoverRFPs = () => {
 
   return (
     <div className="min-h-screen bg-[#F3E6FF]">
-      <Navbar />
+      <NavbarComponent />
       <LeftSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

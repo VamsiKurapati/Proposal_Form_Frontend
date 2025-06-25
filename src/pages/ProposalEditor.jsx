@@ -3,6 +3,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -23,15 +24,58 @@ const ProposalEditor = ({ proposalData }) => {
     }
   }, [proposalData]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("autosavedProposal");
+    if (saved) {
+      setForm(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      localStorage.setItem("autosavedProposal", JSON.stringify(form));
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [form]);
+
   const handleChange = (key, value) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = () => {
-    const version = { id: uuidv4(), timestamp: new Date().toISOString(), data: form };
-    setVersionHistory(prev => [version, ...prev]);
+    const version = {
+      id: uuidv4(),
+      timestamp: new Date().toISOString(),
+      data: form,
+    };
+    setVersionHistory((prev) => [version, ...prev]);
     console.log("Saved Version:", version);
-    // Post to backend if needed
+  };
+
+  const handleFinalSubmit = async () => {
+    try {
+      const res = await axios.post(
+        "https://proposal-form-backend.vercel.app/api/proposal/submit",
+        { data: form },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      alert("Proposal submitted successfully!");
+    } catch (err) {
+      console.error("Submit Error:", err);
+      alert("Failed to submit proposal.");
+    }
+  };
+
+  const exportToPDF = () => {
+    const element = document.getElementById("proposal-content");
+    import("html2pdf.js").then(({ default: html2pdf }) => {
+      html2pdf().from(element).save("proposal.pdf");
+    });
   };
 
   const handleFileUpload = (e) => {
@@ -61,11 +105,16 @@ const ProposalEditor = ({ proposalData }) => {
   };
 
   const renderJsonEditor = () => (
-    <div className="space-y-4 bg-white p-6 rounded shadow-md w-full max-w-3xl mx-auto">
+    <div
+      id="proposal-content"
+      className="space-y-4 bg-white p-6 rounded shadow-md w-full max-w-3xl mx-auto"
+    >
       <h2 className="text-xl font-semibold mb-4">Edit Proposal</h2>
       {Object.entries(form).map(([key, value]) => (
         <div key={key}>
-          <label className="block text-sm font-medium text-gray-700">{key}</label>
+          <label className="block text-sm font-medium text-gray-700">
+            {key}
+          </label>
           {typeof value === "string" && value.length > 100 ? (
             <ReactQuill
               theme="snow"
@@ -83,19 +132,36 @@ const ProposalEditor = ({ proposalData }) => {
           )}
         </div>
       ))}
-      <button
-        onClick={handleSubmit}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Save Proposal
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handleSubmit}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Save Version
+        </button>
+        <button
+          onClick={handleFinalSubmit}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Submit Proposal
+        </button>
+        <button
+          onClick={exportToPDF}
+          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+        >
+          Export to PDF
+        </button>
+      </div>
     </div>
   );
 
   const renderPdfViewer = () => (
     <div className="flex flex-col items-center py-6">
       <h2 className="text-xl font-semibold mb-4">Proposal PDF Preview</h2>
-      <Document file={fileUrl} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
+      <Document
+        file={fileUrl}
+        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+      >
         {Array.from(new Array(numPages), (el, index) => (
           <Page key={`page_${index + 1}`} pageNumber={index + 1} />
         ))}
@@ -130,7 +196,6 @@ const ProposalEditor = ({ proposalData }) => {
           className="block w-full text-sm file:px-4 file:py-2 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
         />
       </div>
-
       {isPDF ? renderPdfViewer() : renderJsonEditor()}
       {!isPDF && versionHistory.length > 0 && renderVersionHistory()}
     </section>
