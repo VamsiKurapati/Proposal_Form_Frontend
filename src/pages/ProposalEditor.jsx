@@ -215,7 +215,7 @@ const ProposalEditor = ({ proposalData }) => {
           Submit Proposal
         </button>
         <button
-          onClick={() => exportToPDF(proposalData)}
+          onClick={() => exportToPDF(form)}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           Export to PDF
