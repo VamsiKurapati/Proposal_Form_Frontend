@@ -286,7 +286,12 @@ const DiscoverRFPs = () => {
     });
   };
 
-  const RFPCard = ({ rfp, isSaved }) => (
+  const handleGenerateProposal = (rfp) => {
+    console.log("Generating proposal for:", rfp.title);
+    // navigate, open modal, or call backend here
+  };
+
+  const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
     <div className="bg-[#F8FAFC] rounded-xl p-4 shadow w-[355px] mr-4 ">
       <div className="flex items-center justify-between mb-2">
         <img src={rfp.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
@@ -326,6 +331,12 @@ const DiscoverRFPs = () => {
           View Details
         </a>
       </div>
+      <button
+        onClick={() => handleGenerateProposal(rfp)}
+        className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
+      >
+        Generate Proposal
+      </button>
     </div>
   );
 
@@ -476,6 +487,7 @@ const DiscoverRFPs = () => {
               key={rfp._id}
               rfp={rfp}
               isSaved={!!saved.find((s) => s._id === rfp._id)}
+              handleGenerateProposal={handleGenerateProposal}
             />
           ))}
         </div>
