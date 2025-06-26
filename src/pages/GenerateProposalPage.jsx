@@ -82,7 +82,7 @@ export default function GenerateProposalPage() {
             body: `This is a draft cover letter in response to the RFP titled '${rfpData.title}'.`
           },
           executiveSummary: {
-            objective: "",
+            objective: "THadkn",
             keyOutcomes: [""]
           },
           projectPlan: [
