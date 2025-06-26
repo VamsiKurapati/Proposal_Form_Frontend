@@ -475,6 +475,22 @@ import jsPDF from "jspdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
+// Quill toolbar options
+const toolbarOptions = [
+  [{ 'font': [] }],
+  [{ 'size': [] }],
+  ['bold', 'italic', 'underline', 'strike'],
+  [{ 'color': [] }, { 'background': [] }],
+  [{ 'align': [] }],
+  [{ 'header': [1, 2, 3, 4, 5, false] }],
+  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+  ['link', 'image', 'code-block']
+];
+
+const quillModules = {
+  toolbar: toolbarOptions
+};
+
 const ProposalEditor = ({ proposalData }) => {
   const [isPDF, setIsPDF] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -596,7 +612,12 @@ const ProposalEditor = ({ proposalData }) => {
 
       <div>
         <h3 className="font-medium text-lg mb-2">Cover Letter</h3>
-        <ReactQuill value={form.coverLetter?.body || ""} onChange={(val) => handleChange("coverLetter", "body", val)} />
+        <ReactQuill 
+          theme="snow"
+          value={form.coverLetter?.body || ""} 
+          onChange={(val) => handleChange("coverLetter", "body", val)}
+          modules={quillModules}
+        />
       </div>
 
       <div>
