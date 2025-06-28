@@ -661,7 +661,7 @@ const CreateProfile = () => {
   const signupData = state?.signupData;
 
   const [form, setForm] = useState({
-    companyName: signupData?.companyName || signupData?.organization || "",
+    companyName: signupData?.organization || "",
     industry: "",
     employees: "",
     bio: "",
@@ -795,7 +795,7 @@ const CreateProfile = () => {
     }
   };
 
-  
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold text-blue-600 mb-4">
@@ -841,7 +841,7 @@ const CreateProfile = () => {
               <input type="file" accept=".pdf,.doc,.docx" multiple onChange={e => handleSingleFileUpload(e, section.type)} className="w-full border p-2 rounded bg-gray-100" />
               <ul className="mt-2 space-y-1 text-sm">
                 {(section.type === "documents" ? documents : proposals).map((file, index) => (
-                  <li key={index} className={`flex items-center justify-between p-2 rounded ${highlightedFile === file ? 'bg-blue-100' : ''}`}>
+                  <li key={index} className="flex items-center justify-between p-2 rounded 'bg-blue-100">
                     <button type="button" onClick={() => handleFilePreview(file)} className="text-blue-600 underline truncate w-full text-left">
                       {file.name}
                     </button>
