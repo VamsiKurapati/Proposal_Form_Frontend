@@ -16,19 +16,26 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.ql-header option[value="1"]::before { content: "Heading 1"; }
+/* .ql-header option[value="1"]::before { content: "Heading 1"; }
 .ql-header option[value="2"]::before { content: "Heading 2"; }
 .ql-header option[value="3"]::before { content: "Heading 3"; }
 .ql-header option[value="4"]::before { content: "Heading 4"; }
 .ql-header option[value="5"]::before { content: "Heading 5"; }
-.ql-header option[value="Paragraph"]::before { content: "Paragraph"; }
+.ql-header option[value=""]::before { content: "Paragraph"; }
 
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
 .ql-snow .ql-picker.ql-size .ql-picker-item::before {
   content: attr(data-value);
 }
 
-/* Font sizes rendering */
+.ql-color-picker .ql-picker-item::before {
+  content: attr(data-value);
+}
+
+.ql-background-picker .ql-picker-item::before {
+  content: attr(data-value);
+}
+
 .ql-size-8px { font-size: 8px; }
 .ql-size-10px { font-size: 10px; }
 .ql-size-12px { font-size: 12px; }
@@ -46,7 +53,6 @@
 .ql-size-96px { font-size: 96px; }
 .ql-size-128px { font-size: 128px; }
 
-/* Optional: make toolbar more compact */
 .ql-toolbar {
   border-radius: 0.5rem 0.5rem 0 0;
   padding: 6px 8px;
@@ -54,7 +60,58 @@
   flex-wrap: wrap;
 }
 
-/* Optional: make Quill editor box styled */
+.ql-container {
+  min-height: 120px;
+  border-radius: 0 0 0.5rem 0.5rem;
+} */
+
+/* Header dropdown labels */
+.ql-header option[value="1"]::before { content: "Heading 1"; }
+.ql-header option[value="2"]::before { content: "Heading 2"; }
+.ql-header option[value="3"]::before { content: "Heading 3"; }
+.ql-header option[value="4"]::before { content: "Heading 4"; }
+.ql-header option[value="5"]::before { content: "Heading 5"; }
+.ql-header option[value=""]::before { content: "Paragraph"; }
+
+/* Size picker display */
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+  content: attr(value);
+}
+
+/* Optional: fallback for color/background items */
+.ql-picker-item {
+  min-width: 1rem;
+  min-height: 1rem;
+}
+
+/* Font size styles */
+.ql-size-8px { font-size: 8px; }
+.ql-size-10px { font-size: 10px; }
+.ql-size-12px { font-size: 12px; }
+.ql-size-14px { font-size: 14px; }
+.ql-size-16px { font-size: 16px; }
+.ql-size-18px { font-size: 18px; }
+.ql-size-20px { font-size: 20px; }
+.ql-size-24px { font-size: 24px; }
+.ql-size-28px { font-size: 28px; }
+.ql-size-32px { font-size: 32px; }
+.ql-size-36px { font-size: 36px; }
+.ql-size-48px { font-size: 48px; }
+.ql-size-64px { font-size: 64px; }
+.ql-size-72px { font-size: 72px; }
+.ql-size-96px { font-size: 96px; }
+.ql-size-128px { font-size: 128px; }
+
+/* Compact toolbar */
+.ql-toolbar {
+  border-radius: 0.5rem 0.5rem 0 0;
+  padding: 6px 8px;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Styled editor box */
 .ql-container {
   min-height: 120px;
   border-radius: 0 0 0.5rem 0.5rem;

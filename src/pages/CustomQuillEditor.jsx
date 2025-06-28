@@ -12,6 +12,10 @@ Size.whitelist = [
 ];
 Quill.register(Size, true);
 
+const ColorClass = Quill.import('formats/color');
+Quill.register('formats/color', ColorClass, true);
+Quill.register('formats/background', ColorClass, true);
+
 // Global counter for compact numeric toolbar IDs
 let toolbarCounter = 0;
 
