@@ -417,7 +417,7 @@ const DiscoverRFPs = () => {
           </span>
         </div>
 
-        <div className="col-span-2 flex gap-2 text-xl justify-start text-[#4B5563]">
+        <div className="col-span-2 flex gap-2 text-xl justify-center text-[#4B5563]">
           <MdOutlineVisibility title="View" className="cursor-pointer" />
           <MdOutlineFileDownload title="Download" className="cursor-pointer" />
           <MdOutlineShare
@@ -505,7 +505,7 @@ const DiscoverRFPs = () => {
               <div className="col-span-2">Amount</div>
               <div className="col-span-2">Deadline</div>
               <div className="col-span-2">Status</div>
-              <div className="col-span-2 text-center pl-12">Action</div>
+              <div className="col-span-2">Action</div>
             </div>
             {saved.map((rfp) => (
               <SavedRFPCard

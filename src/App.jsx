@@ -8,8 +8,8 @@ import { lazy } from "react";
 const Home = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
-const CompanyProfile = lazy(() => import("./pages/CompanyProfile"));
-const UserProfile = lazy(() => import("./pages/UserProfile"));
+// const CompanyProfile = lazy(() => import("./pages/CompanyProfile"));
+// const UserProfile = lazy(() => import("./pages/UserProfile"));
 const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboard"));
 const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
 const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
@@ -39,13 +39,12 @@ const App = () => (
       <Route path="/proposal/:id/edit" element={<EditProposalPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/sign_up" element={<SignUpPage />} />
-      <Route path="/company_profile" element={<CompanyProfile />} />
+      {/* <Route path="/company_profile" element={<CompanyProfile />} /> */}
       <Route path="/company_profile_dashboard" element={<CompanyProfileDashboard />} />
       <Route path="/rfp_discovery" element={<RFPDiscovery />} />
       <Route path="/proposal_page" element={<GenerateProposalPage />} />
       {/* <Route path="/my_proposals" element={<ProposalPage />} /> */}
       <Route path="/pdf_editor" element={<PDFEditor />} />
-      <Route path="/user_profile" element={<UserProfile />} />
       <Route path="*" element={<Home />} />
       <Route path = "/create-profile" element={<ProfileForm />} />
     </Routes>
