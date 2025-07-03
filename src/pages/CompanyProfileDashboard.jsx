@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaDownload, FaExternalLinkAlt, FaUserCircle } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment,MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload,  MdOutlineOpenInNew  } from "react-icons/md";
 
@@ -54,26 +54,9 @@ const sidebarItems = [
 ];
 
 // Sidebar
-// const Sidebar = ({ isMobile, onClose }) => (
-//   <div className={`fixed -mt-1 left-0 ${isMobile ? "w-full h-full" : "w-64 h-[calc(100vh-4rem)]"} bg-white p-6 shadow-md overflow-y-auto z-40`}>
-//     {isMobile && (
-//       <button onClick={onClose} className="block text-right w-full text-gray-600 mb-4">Close</button>
-//     )}
-//     <ul className="space-y-2 text-sm">
-//       {["Overview", "Team Details", "Proposals", "Documents", "Case Studies", "Certificates", "Settings"].map((item, i) => (
-//         <li key={i} className={`hover:text-[#2563EB] ${item === "Overview" ? "text-[#2563EB] font-semibold" : "text-gray-700"}`}>{item}</li>
-//       ))}
-//     </ul>
-//     <div className="mt-8 text-sm">
-//       <p>myname@email.com</p>
-//       <p>+91-5877486484</p>
-//       <p>www.mywebsite.com</p>
-//     </div>
-//   </div>
-// );
 const Sidebar = ({ isMobile = false, onClose = () => {}, active = "Overview", onSelect }) => (
   <div
-    className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "-mt-1 w-64 h-[calc(100vh-16rem)] z-20"} left-0 bg-white shadow-md overflow-y-auto p-6`}
+    className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-[calc(100vh-16rem)] z-20"} left-0 bg-white shadow-md overflow-y-auto p-6`}
   >
     {isMobile && (
       <div className="text-right mb-4">
@@ -81,7 +64,7 @@ const Sidebar = ({ isMobile = false, onClose = () => {}, active = "Overview", on
       </div>
     )}
 
-    <ul className="space-y-1 text-sm">
+    <ul className="space-y-1">
       {sidebarItems.map(({ name, icon }) => (
         <li
           key={name}
@@ -108,7 +91,7 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
       <div className="mb-4">
         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
         {deadlines.map((deadline, i) => (
-          <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 text-sm mb-2">
+          <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
             <div className="flex flex-col">
               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
               <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
@@ -120,7 +103,7 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
       <div className="mt-4">
         <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
         {activity.map((act, i) => (
-          <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 text-sm mb-2">
+          <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
             <div className="flex flex-col">
               <span className="text-[14px] text-[#111827]">{act.title}</span>
               <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
@@ -146,7 +129,7 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   }
 
   return (
-    <div className="hidden lg:block fixed -mt-1 right-0 w-64 h-[calc(100vh-4rem)] bg-[#F8F9FA] p-6 shadow-md overflow-y-auto z-20">
+    <div className="hidden lg:block fixed mt-9 right-0 w-64 h-[calc(100vh-4rem)] bg-[#F8F9FA] p-6 shadow-md overflow-y-auto z-20">
       {content}
     </div>
   );
@@ -188,9 +171,9 @@ const CompanyProfileDashboard = () => {
       { name: "Something.docx", type: "DOCX", size: "2.5 MB" },
     ],
     caseStudies: [
-      "Future of Software Development",
-      "All about AI & Technology",
-      "A case study about everything",
+      { title: "Future of Software Development", readTime: "5 min" },
+      { title: "All about AI & Technology", readTime: "4 min" },
+      { title: "A case study about everything", readTime: "6 min" },
     ],
     certifications: [
       { name: "ISO 5864", validTill: "Dec 2025" },
@@ -214,35 +197,35 @@ const CompanyProfileDashboard = () => {
     <div className="h-full relative">
       <Navbar onToggle={() => setIsMobileNavOpen(true)} />
 
-      <div className="bg-[#F8F9FA] md:fixed h-56 mt-16 md:mt-0 md:top-16 left-0 right-0 z-10 shadow-md px-8 py-4">
+      <div className="bg-[#F8F9FA] md:fixed h-76 mt-16 md:mt-0 md:top-16 left-0 right-0 z-10 shadow-md px-12 py-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 mx-12">
-          <div>
-            <h2 className="text-2xl font-semibold">{companyData.companyName}</h2>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
+          <div className="mt-4">
+            <h2 className="text-[24px] font-semibold">{companyData.companyName}</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mb-4">
               <div className="flex items-center gap-2">
-                <MdOutlineBusinessCenter />
-                <p>{companyData.industry}</p>
+                <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.industry}</p>
               </div>
               <p className="hidden md:inline">|</p>
               <div className="flex items-center gap-2">
-                <MdOutlineLocationOn />
-                <p>{companyData.location}</p>
+                <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.location}</p>
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
               <div className="flex items-center gap-2">
-                <MdOutlineMail className="text-gray-600" />
-                <p className="text-sm text-gray-600">{companyData.email}</p>
+                <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.email}</p>
               </div>
               <p className="hidden md:inline">|</p>
               <div className="flex items-center gap-2">
-                <MdOutlineCall className="text-gray-600" />
-                <p className="text-sm text-gray-600">{companyData.phone}</p>
+                <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.phone}</p>
               </div>
               <p className="hidden md:inline">|</p>
               <div className="flex items-center gap-2">
-                <MdOutlineLanguage className="text-gray-600" />
-                <p className="text-sm text-gray-600">{companyData.website}</p>
+                <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.website}</p>
               </div>
             </div>
           </div>
@@ -253,9 +236,9 @@ const CompanyProfileDashboard = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {Object.entries(companyData.stats).map(([key, value]) => (
-            <div key={key} className="p-4 rounded shadow text-center">
-              <div className="text-sm capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
-              <div className="text-xl font-bold text-[#2563EB]">{value}</div>
+            <div key={key} className="p-4 rounded shadow text-left bg-[#FFFFFF]">
+              <div className="text-[16px] text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+              <div className="text-[24px] font-semibold text-[#2563EB]">{value}</div>
             </div>
           ))}
         </div>
@@ -282,7 +265,7 @@ const CompanyProfileDashboard = () => {
         />
       )}
 
-      {/* Activity button: visible only on small screens */}
+      {/* Activity button: visible upto medium screens */}
       <button
         className="block lg:hidden fixed bottom-4 right-4 z-40 bg-[#2563EB] text-white px-4 py-2 rounded-full shadow"
         onClick={() => setShowRightSidebar(true)}
@@ -290,69 +273,82 @@ const CompanyProfileDashboard = () => {
         Activity
       </button>
 
-      {/* <main className="pt-24 px-4 sm:px-6 pb-10 overflow-y-auto md:ml-64 lg:mr-64"> */}
-      <main className="flex-1 md:-mt-7 py-4 px-4 sm:px-6 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
-        <div className="text-gray-800">
+      <main className="flex-1 md:-mt-7 py-16 px-4 sm:px-6 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
+        <div className="bg-[#FFFFFF] ml-3">
           {activeTab === "Overview" && (
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <h3 className="text-[24px] font-semibold mb-2">Company Profile</h3>
                 <p className="text-[#4B5563] text-[16px] mb-4">{companyData.profile.bio}</p>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="font-medium text-[#111827] text-[16px] mb-2">Services</h3>
+                {/* <div className="flex flex-wrap gap-2">
                   {companyData.profile.services.map((service, i) => (
                     <span key={i} className="text-[#6B7280] text-[15px]">{service}</span>
                   ))}
-                </div>
+                </div> */}
+                <ul className="columns-1 xs:columns-2 lg:columns-3 gap-4 list-disc gap-2 mt-2 ml-8">
+                  {companyData.profile.services.map((service, i) => (
+                    <li
+                      key={i}
+                      className="text-[15px] text-[#6B7280] mb-2 break-inside-avoid"
+                    >
+                      {service}
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="border border-1 rounded-xl p-4">
-                  <h4 className="font-semibold text-[#4B5563] text-[16px] mb-2">Recent Proposals</h4>
+                <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
+                  <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Recent Proposals</h4>
                   {companyData.recentProposals.map((proposal, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 rounded shadow text-sm mb-2">
+                    <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4">
                       <div className="flex flex-col">
-                        <span>{proposal.title}</span>
-                        <span className="text-xs text-gray-500">{proposal.date}</span>
+                        <span className="text-[14px] text-[#111827]">{proposal.title}</span>
+                        <span className="text-[11px] text-[#9CA3AF]">{proposal.date}</span>
                       </div>
                       <StatusBadge status={proposal.status} />
                     </div>
                   ))}
                 </div>
-                <div className="border border-1 rounded-xl p-4">
-                  <h4 className="font-semibold text-[#4B5563] text-[16px] mb-2">Document Library</h4>
+                <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
+                  <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Document Library</h4>
                   {companyData.documentLibrary.map((doc, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 rounded shadow text-sm mb-2">
+                    <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                       <div className="flex items-center gap-4">
                         <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
                         <div className="flex flex-col">
-                          <span>{doc.name}</span>
-                          <span>({doc.type} | {doc.size})</span>
+                          <span className="text-[14px] text-[#111827]">{doc.name}</span>
+                          <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
                         </div>
                       </div>
-                      <button className="text-blue-500 text-xs flex items-center gap-1"><MdOutlineDownload className="text-[#2563EB] w-6 h-6" /></button>
+                      <button className="text-[#2563EB] text-xs flex items-center gap-1"><MdOutlineDownload className="text-[#2563EB] w-6 h-6" /></button>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-1 rounded-xl p-4">
-                  <h4 className="font-semibold text-[#4B5563] text-[16px] mb-2">Case Studies</h4>
+                <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
+                  <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Case Studies</h4>
                   {companyData.caseStudies.map((study, i) => (
-                    <div key={i} className="text-sm py-1 flex justify-between items-center p-2 rounded shadow mb-2">
-                      <span>{study}</span>
+                    <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
+                      <div className="flex flex-col items-start">
+                        <span className="text-[14px] text-[#111827]">{study.title}</span>
+                        <span className="text-[12px] text-[#4B5563]">{study.readTime}</span>
+                      </div>
                       <a href="#" className="text-[#2563EB] text-xs flex items-center gap-1"><MdOutlineOpenInNew className="text-[#2563EB] w-4 h-4" /></a>
                     </div>
                   ))}
                 </div>
-                <div className="border border-1 rounded-xl p-4">
-                  <h4 className="font-semibold text-[#4B5563] text-[16px] mb-2">Certifications</h4>
+                <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
+                  <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Certifications</h4>
                   {companyData.certifications.map((cert, i) => (
-                      <div key={i} className="flex gap-2 items-center mb-2">
+                      <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
                         <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
-                        <div className="flex flex-col text-sm p-2 mb-2">
-                          <p>{cert.name}</p>
-                          <p className="text-xs text-gray-500">Valid Till: {cert.validTill}</p>
+                        <div className="flex flex-col items-start ml-2">
+                          <span className="text-[14px] text-[#111827]">{cert.name}</span >
+                          <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
                         </div>
                       </div>
                   ))}
@@ -360,7 +356,9 @@ const CompanyProfileDashboard = () => {
               </div>
             </div>
           )}
-          {activeTab === "Team Details" && <div>Team details content here.</div>}
+          {activeTab === "Team Details" && (
+            <div>Team details content here.</div>
+          )}
           {activeTab === "Proposals" && (
             <div>
               <h3 className="font-semibold text-lg mb-2">Recent Proposals</h3>
@@ -404,7 +402,9 @@ const CompanyProfileDashboard = () => {
               ))}
             </div>
           )}
-          {activeTab === "Settings" && <div>Settings section content here.</div>}
+          {activeTab === "Settings" && (
+            <div>Settings section content here.</div>
+          )}
         </div>
       </main>
     </div>
