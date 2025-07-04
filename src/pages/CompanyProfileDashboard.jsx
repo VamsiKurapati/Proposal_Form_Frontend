@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment,MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload,  MdOutlineOpenInNew  } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd } from "react-icons/md";
 
 // Reusable Badge
 const StatusBadge = ({ status }) => {
@@ -17,7 +17,7 @@ const StatusBadge = ({ status }) => {
     "Pending": "bg-[#FEF9C3] text-[#CA8A04]",
   };
   return (
-    <span className={`px-2 py-1 text-[12px] rounded-full ${statusStyles[status] || "bg-gray-200 text-gray-700"}`}>
+    <span className={`px-2 py-1 text-[12px] rounded-full ${statusStyles[status] || "bg-[#E5E7EB] text-gray-700"}`}>
       {status}
     </span>
   );
@@ -54,7 +54,7 @@ const sidebarItems = [
 ];
 
 // Sidebar
-const Sidebar = ({ isMobile = false, onClose = () => {}, active = "Overview", onSelect }) => (
+const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
   <div
     className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-[calc(100vh-16rem)] z-20"} left-0 bg-white shadow-md overflow-y-auto p-6`}
   >
@@ -68,9 +68,8 @@ const Sidebar = ({ isMobile = false, onClose = () => {}, active = "Overview", on
       {sidebarItems.map(({ name, icon }) => (
         <li
           key={name}
-          className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${
-            name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
-          }`}
+          className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
+            }`}
           onClick={() => {
             onSelect(name);
             if (isMobile) onClose();
@@ -135,6 +134,125 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   );
 };
 
+// Add this above the CompanyProfileDashboard component
+const teamMembers = [
+  { name: "Sara Johnson", role: "CEO & Founder", badge: "Full Access" },
+  { name: "Darrell Steward", role: "President of Sales", badge: "Admin" },
+  { name: "Cody Fisher", role: "Medical Assistant", badge: "Admin" },
+  { name: "Eleanor Pena", role: "Medical Assistant", badge: "Editor" },
+  { name: "Theresa Webb", role: "Medical Assistant", badge: "Editor" },
+  { name: "Bessie Cooper", role: "Web Designer", badge: "Editor" },
+  { name: "Darrell Steward", role: "Dog Trainer", badge: "Editor" },
+  { name: "Jane Cooper", role: "Dog Trainer", badge: "Editor" },
+  { name: "Leslie Alexander", role: "Nursing Assistant", badge: "Editor" },
+  { name: "Ralph Edwards", role: "Dog Trainer", badge: "Viewer" },
+  { name: "Cody Fisher", role: "President of Sales", badge: "Viewer" },
+  { name: "Devon Lane", role: "Web Designer", badge: "Viewer" },
+];
+const badgeStyles = {
+  "Full Access": "bg-[DBEAFE] text-[#2563EB]",
+  "Admin": "bg-[#DCFCE7] text-[#15803D]",
+  "Editor": "bg-[#FEF9C3] text-[#CA8A04]",
+  "Viewer": "bg-[#F3F4F6] text-[#4B5563]",
+};
+
+// Add this above the CompanyProfileDashboard component
+const proposalList = [
+  { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Social Media Proposal", company: "GlobalTech Corp", status: "Rejected", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Something Proposal", company: "GlobalTech Corp", status: "Won", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Web Development Proposal", company: "GlobalTech Corp", status: "Submitted", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "Submitted", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Something Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Web Development Proposal", company: "GlobalTech Corp", status: "Submitted", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "Won", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
+  { title: "Social Media Proposal", company: "GlobalTech Corp", status: "Submitted", date: "Jan 20, 2026", amount: 200000 },
+];
+const proposalStatusStyles = {
+  "In Progress": "bg-[#DBEAFE] text-[#2563EB]",
+  "Submitted": "bg-[#DCFCE7] text-[#15803D]",
+  "Won": "bg-[#FEF9C3] text-[#CA8A04]",
+  "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
+};
+
+// Add this above the CompanyProfileDashboard component
+const documentList = [
+  { name: "A_Journey_Through_Love.pdf", type: "PDF", size: "578 KB", lastModified: "Jan 15, 2026" },
+  { name: "Unlocking_the_Secrets.pdf", type: "PDF", size: "1.1 MB", lastModified: "Jan 15, 2026" },
+  { name: "The_Mysteries_of_the_Unknown.pdf", type: "PDF", size: "578 KB", lastModified: "Jan 15, 2026" },
+  { name: "Mastering_Your_Personal_Finances.pdf", type: "PDF", size: "4 MB", lastModified: "Jan 15, 2026" },
+  { name: "Treasured_Family_Favorites.pdf", type: "PDF", size: "2.3 MB", lastModified: "Jan 15, 2026" },
+  { name: "Ultimate_Dream_Vacation.pdf", type: "PDF", size: "983 KB", lastModified: "Jan 15, 2026" },
+  { name: "Exploring_World_History.pdf", type: "PDF", size: "1.4 MB", lastModified: "Jan 15, 2026" },
+  { name: "The_Great_Artistic_Masters.pdf", type: "PDF", size: "1.1 MB", lastModified: "Jan 15, 2026" },
+  { name: "Comprehensive_Financial_Planning.pdf", type: "PDF", size: "983 KB", lastModified: "Jan 15, 2026" },
+  { name: "Exploring_Unknown_Worlds.pdf", type: "PDF", size: "4 MB", lastModified: "Jan 15, 2026" },
+  { name: "All-Encompassing_Residency.pdf", type: "PDF", size: "983 KB", lastModified: "Jan 15, 2026" },
+  { name: "The_Wonders_of_Nature.pdf", type: "PDF", size: "2 MB", lastModified: "Jan 15, 2026" },
+  { name: "Inspiration_and_Creativity.pdf", type: "PDF", size: "1.1 MB", lastModified: "Jan 15, 2026" },
+  { name: "The_Academic_Journey.pdf", type: "PDF", size: "2.3 MB", lastModified: "Jan 15, 2026" },
+];
+
+// Add this above the CompanyProfileDashboard component
+const caseStudiesList = [
+  {
+    title: "Future of Software Development",
+    company: "Asiberg Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "The More Important the Work, the More Important the Rest",
+    company: "Big Kahuna Burger Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "Any mechanical keyboard enthusiasts in design?",
+    company: "Barone LLC.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "How to design a product that can grow its feature set",
+    company: "Acme Co.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "Understanding color theory: the color wheel and finding complementary colors",
+    company: "Asiberg Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "Yo Reddit! What's a small thing that anyone can do at nearly any time to make their day better?",
+    company: "Binford Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "Understanding color theory: the color wheel and finding complementary colors",
+    company: "Binford Enterprises Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+  {
+    title: "Any mechanical keyboard enthusiasts in design?",
+    company: "Binford Enterprises Ltd.",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?auto=format&fit=crop&w=400&q=80",
+    link: "#"
+  },
+];
 
 // Main Component
 const CompanyProfileDashboard = () => {
@@ -158,7 +276,7 @@ const CompanyProfileDashboard = () => {
     },
     profile: {
       bio: "ABC Company Inc. is a leading technology consulting firm specializing in digital transformation, cloud solutions and enterprise software development. With over 15 years of experience, we help businesses leverage technology to achieve their strategic objectives.",
-      services: ["Cloud Architecture", "Enterprise Solutions", "Data Analytics", "Enterprise Solutions", "Data Analytics","Cloud Architecture", "Data Analytics","Cloud Architecture", "Enterprise Solutions"],
+      services: ["Cloud Architecture", "Enterprise Solutions", "Data Analytics", "Enterprise Solutions", "Data Analytics", "Cloud Architecture", "Data Analytics", "Cloud Architecture", "Enterprise Solutions"],
     },
     recentProposals: [
       { title: "Data Analytics Platform", date: "Jan 20, 2024", status: "In Progress" },
@@ -188,8 +306,19 @@ const CompanyProfileDashboard = () => {
     ],
     activity: [
       { title: "New proposal submitted", date: "Jan 20, 2024" },
-      { title: "Document updated", date: "Jan 20, 2024"},
+      { title: "Document updated", date: "Jan 20, 2024" },
       { title: "Team meeting scheduled", date: "Jan 20, 2024" },
+    ],
+    companyDetails: {
+      "No.of employees": { value: 156, icon: <MdOutlineGroup className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
+      "Team Size": { value: 10, icon: <MdOutlineGraphicEq className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
+      "Department": { value: 16, icon: <MdOutlineDomain className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
+      "Founded": { value: 2000, icon: <MdOutlineCalendarToday className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
+    },
+    teamDetails: [
+      { name: "John Doe", position: "CEO", email: "john.doe@example.com", phone: "+1234567890", website: "www.john.com" },
+      { name: "Jane Smith", position: "CTO", email: "jane.smith@example.com", phone: "+1234567890", website: "www.jane.com" },
+      { name: "Mike Johnson", position: "CFO", email: "mike.johnson@example.com", phone: "+1234567890", website: "www.mike.com" },
     ],
   };
 
@@ -251,7 +380,7 @@ const CompanyProfileDashboard = () => {
           <Sidebar isMobile onClose={() => setIsMobileNavOpen(false)} active={activeTab} onSelect={setActiveTab} />
         </>
       )}
-      
+
       {/* Right Sidebar: desktop */}
       <RightSidebar deadlines={companyData.deadlines} activity={companyData.activity} />
 
@@ -344,52 +473,155 @@ const CompanyProfileDashboard = () => {
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Certifications</h4>
                   {companyData.certifications.map((cert, i) => (
-                      <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
-                        <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
-                        <div className="flex flex-col items-start ml-2">
-                          <span className="text-[14px] text-[#111827]">{cert.name}</span >
-                          <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
-                        </div>
+                    <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
+                      <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
+                      <div className="flex flex-col items-start ml-2">
+                        <span className="text-[14px] text-[#111827]">{cert.name}</span >
+                        <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
                       </div>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
           {activeTab === "Team Details" && (
-            <div>Team details content here.</div>
+            <div className="grid grid-cols-1 gap-6">
+              <div>
+                <h3 className="text-[24px] font-semibold mb-2">About Company</h3>
+                <p className="text-[#4B5563] text-[16px] mb-4">{companyData.profile.bio}</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                  {Object.entries(companyData.companyDetails).map(([key, value]) => (
+                    <div key={key} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
+                      <div className="flex flex-col items-start">
+                        <div className="flex flex-row items-center gap-2">
+                          <span>{value.icon}</span>
+                          <span className="text-[12px] md:text-[14px] text-[#6B7280]">{key}</span>
+                        </div>
+                        <span className="text-[20px] text-[#111827] font-medium">{value.value}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Team Members Section */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-[20px] font-semibold">Team Members</h3>
+                    <button className="flex items-center gap-1 text-[#2563EB] font-medium text-[16px]">
+                      <MdOutlineAdd className="w-6 h-6 shrink-0" />Add Member
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {teamMembers.map((member, i) => (
+                      <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
+                        <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.badge]}`}>{member.badge}</span>
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
+                            {member.avatar ? (
+                              <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                            ) : (
+                              member.name.split(' ').map(n => n[0]).join('')
+                            )}
+                          </div>
+                          <div className="flex flex-col flex-1">
+                            <span className="font-medium text-[16px] text-[#111827]">{member.name}</span>
+                            <span className="text-[14px] text-[#4B5563]">{member.role}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 mt-2 mx-auto">
+                          <a href="#" className="text-[#2563EB] text-[15px]">View Profile</a>
+                          <a href="#" className="text-[#2563EB] text-[15px]">Contact</a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
           {activeTab === "Proposals" && (
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Recent Proposals</h3>
-              {companyData.recentProposals.map((p, i) => (
-                <div key={i} className="mb-2 p-2 border rounded flex justify-between">
-                  <span>{p.title}</span>
-                  <StatusBadge status={p.status} />
+            <div className="bg-white rounded-xl p-6">
+              <h2 className="text-[24px] font-semibold mb-2">Proposals</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                <div className="flex flex-1 gap-4 sm:justify-end items-center">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      placeholder="Search proposals"
+                      className="w-full md:w-1/2 border border-[#E5E7EB] rounded-lg px-4 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-[#2563EB] pl-10"
+                    />
+                    <MdOutlineSearch className="absolute top-1/2 left-4 -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+                  </div>
+                  <button className="flex items-center gap-2 bg-[#2563EB] text-white px-4 py-2 rounded-lg font-medium text-[15px] shadow hover:bg-[#1d4ed8]">
+                    <MdOutlineAdd className="w-6 h-6 shrink-0" /> New Proposal
+                  </button>
                 </div>
-              ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 lg:gap-6">
+                {proposalList.map((proposal, i) => (
+                  <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow">
+                    <span className={`absolute top-4 right-4 px-2 py-1 text-xs rounded-full font-medium ${proposalStatusStyles[proposal.status]}`}>{proposal.status}</span>
+                    <div className="font-semibold text-[16px] text-[#111827] mb-1 truncate">{proposal.title}</div>
+                    <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.company}</div>
+                    <div className="flex items-center gap-2 text-[13px] text-[#6B7280] mb-1">
+                      <MdOutlineCalendarToday className="w-4 h-4 text-[#9CA3AF]" />
+                      <span>{proposal.date}</span>
+                    </div>
+                    <div className="font-semibold text-[#2563EB] text-[17px] mt-2">$ {proposal.amount.toLocaleString()}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeTab === "Documents" && (
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Documents</h3>
-              {companyData.documentLibrary.map((d, i) => (
-                <div key={i} className="mb-2 flex justify-between">
-                  <div>{d.name}</div>
-                  <div className="text-sm text-gray-500">{d.type}, {d.size}</div>
-                </div>
-              ))}
+            <div className="bg-white rounded-xl p-2">
+              <h2 className="text-[24px] font-semibold mb-6">Company Documents</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 lg: gap-4 gap-y-8">
+                {documentList.map((doc, i) => (
+                  <div key={i} className="flex flex-col bg-[#F9FAFB] rounded-xl p-4 shadow-sm border border-[#E5E7EB]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-medium text-[#111827] text-[14px] truncate max-w-[140px] min-w-0" title={doc.name}>{doc.name}</span>
+                          <span className="text-[11px] text-[#4B5563]">{doc.type}, {doc.size}</span>
+                        </div>
+                      </div>
+                      <button className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0">
+                        <MdOutlineDownload className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="text-[11px] text-[#4B5563]">
+                      <span>Last modified: {doc.lastModified}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeTab === "Case Studies" && (
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Case Studies</h3>
-              {companyData.caseStudies.map((cs, i) => (
-                <div key={i} className="mb-2 flex justify-between">
-                  <div>{cs}</div>
-                  <MdOutlineOpenInNew />
-                </div>
-              ))}
+            <div className="bg-white rounded-xl p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-[24px] font-semibold">Case Studies</h2>
+                <button className="flex items-center gap-1 text-[#2563EB] font-medium border border-[#2563EB] px-3 py-1 rounded-lg text-[15px] hover:bg-[#EFF6FF]">
+                  <MdOutlineAdd className="w-5 h-5" /> Add
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {caseStudiesList.map((cs, i) => (
+                  <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
+                    <img src={cs.image} alt={cs.title} className="w-full h-36 object-cover rounded-t-xl" />
+                    <div className="flex-1 flex flex-col p-4">
+                      <div className="font-medium text-[#111827] text-[15px] truncate mb-1" title={cs.title}>{cs.title}</div>
+                      <div className="text-[13px] text-[#6B7280] mb-1 truncate">{cs.company}</div>
+                      <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
+                      <a href={cs.link} className="text-[#2563EB] text-[14px] flex items-center gap-1 mt-auto hover:underline">
+                        Read Case Study <MdOutlineOpenInNew className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeTab === "Certificates" && (
