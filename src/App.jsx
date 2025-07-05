@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProfilePage from './pages/ProfilePage';
 import EditProposalPage from './pages/EditProposalPage';
 import CreateProposalPage from './pages/CreateProposalPage';
+import CompanyProfileUpdate from './pages/CompanyProfileUpdate';
+import EnhancedProposalPage from './pages/EnhancedProposalPage';
 
 import { lazy } from "react";
 
@@ -33,7 +35,7 @@ const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const App = () => (
   <Router>
     <Routes>
-      <Route path="/" element={<Home /> } />
+      <Route path="/" element={<Home />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/proposal/new" element={<CreateProposalPage />} />
       <Route path="/proposal/:id/edit" element={<EditProposalPage />} />
@@ -46,7 +48,9 @@ const App = () => (
       {/* <Route path="/my_proposals" element={<ProposalPage />} /> */}
       <Route path="/pdf_editor" element={<PDFEditor />} />
       <Route path="*" element={<Home />} />
-      <Route path = "/create-profile" element={<ProfileForm />} />
+      <Route path="/create-profile" element={<ProfileForm />} />
+      <Route path="/enhanced-proposal" element={<EnhancedProposalPage />} />
+      <Route path="/company-profile-update" element={<CompanyProfileUpdate />} />
     </Routes>
   </Router>
 );

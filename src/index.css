@@ -5,15 +5,42 @@
 .custom-scroll::-webkit-scrollbar {
   height: 6px;
 }
+
 .custom-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scroll::-webkit-scrollbar-thumb {
   background-color: transparent;
   border-radius: 3px;
 }
+
 .custom-scroll:hover::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 /* .ql-header option[value="1"]::before { content: "Heading 1"; }
@@ -66,12 +93,29 @@
 } */
 
 /* Header dropdown labels */
-.ql-header option[value="1"]::before { content: "Heading 1"; }
-.ql-header option[value="2"]::before { content: "Heading 2"; }
-.ql-header option[value="3"]::before { content: "Heading 3"; }
-.ql-header option[value="4"]::before { content: "Heading 4"; }
-.ql-header option[value="5"]::before { content: "Heading 5"; }
-.ql-header option[value=""]::before { content: "Paragraph"; }
+.ql-header option[value="1"]::before {
+  content: "Heading 1";
+}
+
+.ql-header option[value="2"]::before {
+  content: "Heading 2";
+}
+
+.ql-header option[value="3"]::before {
+  content: "Heading 3";
+}
+
+.ql-header option[value="4"]::before {
+  content: "Heading 4";
+}
+
+.ql-header option[value="5"]::before {
+  content: "Heading 5";
+}
+
+.ql-header option[value=""]::before {
+  content: "Paragraph";
+}
 
 /* Size picker display */
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
@@ -86,22 +130,69 @@
 }
 
 /* Font size styles */
-.ql-size-8px { font-size: 8px; }
-.ql-size-10px { font-size: 10px; }
-.ql-size-12px { font-size: 12px; }
-.ql-size-14px { font-size: 14px; }
-.ql-size-16px { font-size: 16px; }
-.ql-size-18px { font-size: 18px; }
-.ql-size-20px { font-size: 20px; }
-.ql-size-24px { font-size: 24px; }
-.ql-size-28px { font-size: 28px; }
-.ql-size-32px { font-size: 32px; }
-.ql-size-36px { font-size: 36px; }
-.ql-size-48px { font-size: 48px; }
-.ql-size-64px { font-size: 64px; }
-.ql-size-72px { font-size: 72px; }
-.ql-size-96px { font-size: 96px; }
-.ql-size-128px { font-size: 128px; }
+.ql-size-8px {
+  font-size: 8px;
+}
+
+.ql-size-10px {
+  font-size: 10px;
+}
+
+.ql-size-12px {
+  font-size: 12px;
+}
+
+.ql-size-14px {
+  font-size: 14px;
+}
+
+.ql-size-16px {
+  font-size: 16px;
+}
+
+.ql-size-18px {
+  font-size: 18px;
+}
+
+.ql-size-20px {
+  font-size: 20px;
+}
+
+.ql-size-24px {
+  font-size: 24px;
+}
+
+.ql-size-28px {
+  font-size: 28px;
+}
+
+.ql-size-32px {
+  font-size: 32px;
+}
+
+.ql-size-36px {
+  font-size: 36px;
+}
+
+.ql-size-48px {
+  font-size: 48px;
+}
+
+.ql-size-64px {
+  font-size: 64px;
+}
+
+.ql-size-72px {
+  font-size: 72px;
+}
+
+.ql-size-96px {
+  font-size: 96px;
+}
+
+.ql-size-128px {
+  font-size: 128px;
+}
 
 /* Compact toolbar */
 .ql-toolbar {

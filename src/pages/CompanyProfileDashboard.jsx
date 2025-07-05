@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera } from "react-icons/md";
 
 // Unified Badge Styles
 const badgeStyles = {
@@ -62,40 +63,179 @@ const sidebarItems = [
 ];
 
 // Sidebar
+// const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
+//   <div
+//     className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-full z-50"} left-0 bg-white shadow-md p-6 overflow-y-scroll`}
+//   >
+//     {isMobile && (
+//       <div className="text-right mb-4">
+//         <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
+//       </div>
+//     )}
+
+//     <ul className="space-y-1">
+//       {sidebarItems.map(({ name, icon }) => (
+//         <li
+//           key={name}
+//           className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
+//             }`}
+//           onClick={() => {
+//             onSelect(name);
+//             if (isMobile) onClose();
+//           }}
+//         >
+//           <span>{icon}</span>
+//           <span className="font-medium text-[16px]">{name}</span>
+//         </li>
+//       ))}
+//     </ul>
+//   </div>
+// );
+
+// Right Sidebar
+// const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
+//   const content = (
+//     <>
+//       <div className="mb-4">
+//         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
+//         {deadlines.map((deadline, i) => (
+//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
+//             <div className="flex flex-col">
+//               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
+//               <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
+//             </div>
+//             <StatusBadge status={deadline.status} />
+//           </div>
+//         ))}
+//       </div>
+//       <div className="mt-4">
+//         <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
+//         {activity.map((act, i) => (
+//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
+//             <div className="flex flex-col">
+//               <span className="text-[14px] text-[#111827]">{act.title}</span>
+//               <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </>
+//   );
+
+//   if (isMobile) {
+//     return (
+//       <>
+//         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
+//         <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 p-6 shadow-lg overflow-y-auto">
+//           <div className="text-right mb-4">
+//             <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
+//           </div>
+//           {content}
+//         </div>
+//       </>
+//     );
+//   }
+
+//   return (
+//     <div className="hidden lg:block fixed mt-9 right-0 w-64 h-[calc(100vh-4rem)] bg-[#F8F9FA] p-6 shadow-md overflow-y-auto z-20">
+//       {content}
+//     </div>
+//   );
+// };
+
+// Left Sidebar with proper scrolling
 const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
   <div
-    className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-[calc(100vh-16rem)] z-20"} left-0 bg-white shadow-md overflow-y-auto p-6`}
+    className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-full z-50"
+      } left-0 bg-white shadow-md overflow-hidden flex flex-col`}
   >
     {isMobile && (
-      <div className="text-right mb-4">
+      <div className="text-right mb-4 p-6 pb-0 flex-shrink-0">
         <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
       </div>
     )}
 
-    <ul className="space-y-1">
-      {sidebarItems.map(({ name, icon }) => (
-        <li
-          key={name}
-          className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
-            }`}
-          onClick={() => {
-            onSelect(name);
-            if (isMobile) onClose();
-          }}
-        >
-          <span>{icon}</span>
-          <span className="font-medium text-[16px]">{name}</span>
-        </li>
-      ))}
-    </ul>
+    {/* Scrollable content area */}
+    <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+      <ul className="space-y-[1px] min-h-[95vh]">
+        {sidebarItems.map(({ name, icon }) => (
+          <li
+            key={name}
+            className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
+              }`}
+            onClick={() => {
+              onSelect(name);
+              if (isMobile) onClose();
+            }}
+          >
+            <span>{icon}</span>
+            <span className="font-medium text-[16px]">{name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 );
 
-// Right Sidebar
+// Right Sidebar with proper scrolling
+// const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
+//   const content = (
+//     <div className="flex-1 overflow-y-auto">
+//       <div className="mb-4">
+//         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
+//         {deadlines.map((deadline, i) => (
+//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
+//             <div className="flex flex-col">
+//               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
+//               <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
+//             </div>
+//             <StatusBadge status={deadline.status} />
+//           </div>
+//         ))}
+//       </div>
+//       <div className="mt-4">
+//         <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
+//         {activity.map((act, i) => (
+//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
+//             <div className="flex flex-col">
+//               <span className="text-[14px] text-[#111827]">{act.title}</span>
+//               <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+
+//   if (isMobile) {
+//     return (
+//       <>
+//         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
+//         <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 shadow-lg flex flex-col">
+//           <div className="text-right mb-4 p-6 pb-0 flex-shrink-0">
+//             <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
+//           </div>
+//           <div className="flex-1 overflow-hidden px-6 pb-6">
+//             {content}
+//           </div>
+//         </div>
+//       </>
+//     );
+//   }
+
+//   return (
+//     <div className="hidden lg:block fixed mt-9 right-0 w-64 h-full bg-[#F8F9FA] shadow-md z-20 flex flex-col">
+//       <div className="flex-1 overflow-y-auto p-6 min-h-[200vh] custom-scrollbar">
+//         {content}
+//       </div>
+//     </div>
+//   );
+// };
+
 const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   const content = (
-    <>
-      <div className="mb-4">
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+      <div className="min-h-[300vh]">
         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
         {deadlines.map((deadline, i) => (
           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
@@ -106,52 +246,449 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
             <StatusBadge status={deadline.status} />
           </div>
         ))}
-      </div>
-      <div className="mt-4">
-        <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
-        {activity.map((act, i) => (
-          <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
-            <div className="flex flex-col">
-              <span className="text-[14px] text-[#111827]">{act.title}</span>
-              <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
+        <div className="mt-8">
+          <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
+          {activity.map((act, i) => (
+            <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
+              <div className="flex flex-col">
+                <span className="text-[14px] text-[#111827]">{act.title}</span>
+                <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 
   if (isMobile) {
     return (
       <>
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
-        <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 p-6 shadow-lg overflow-y-auto">
-          <div className="text-right mb-4">
+        <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 shadow-lg flex flex-col">
+          <div className="text-right mb-4 p-6 pb-0 flex-shrink-0">
             <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
           </div>
-          {content}
+          <div className="flex-1 overflow-hidden px-6 pb-6">
+            {content}
+          </div>
         </div>
       </>
     );
   }
 
   return (
-    <div className="hidden lg:block fixed mt-9 right-0 w-64 h-[calc(100vh-4rem)] bg-[#F8F9FA] p-6 shadow-md overflow-y-auto z-20">
+    <div className="hidden lg:block fixed mt-9 right-2 w-64 h-full bg-[#F8F9FA] shadow-md z-20 flex flex-col">
       {content}
     </div>
   );
 };
 
+// Team Member Profile Modal
+const TeamMemberModal = ({ member, isOpen, onClose }) => {
+  if (!isOpen) return null;
 
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Team Member Profile</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 rounded-full bg-[#E5E7EB] flex items-center justify-center text-2xl font-bold text-gray-500">
+              {member.name.split(' ').map(n => n[0]).join('')}
+            </div>
+            <div>
+              <h4 className="font-semibold text-lg">{member.name}</h4>
+              <p className="text-gray-600">{member.role}</p>
+              <span className={`px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[member.badge]}`}>
+                {member.badge}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-gray-600">
+              <MdOutlineEmail className="w-4 h-4" />
+              <span>{member.name.toLowerCase().replace(' ', '.')}@company.com</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <MdOutlinePhone className="w-4 h-4" />
+              <span>+1 (555) 123-4567</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <MdOutlineLinkedCamera className="w-4 h-4" />
+              <span>linkedin.com/in/{member.name.toLowerCase().replace(' ', '')}</span>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t">
+            <h5 className="font-medium mb-2">About</h5>
+            <p className="text-gray-600 text-sm">
+              {member.name} is a dedicated team member with expertise in {member.role.toLowerCase()}.
+              They have been contributing to the company's success through their professional skills and collaborative approach.
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// Contact Options Modal
+const ContactModal = ({ member, isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  const contactOptions = [
+    { icon: <MdOutlineEmail className="w-5 h-5" />, label: "Send Email", action: () => window.open(`mailto:${member.name.toLowerCase().replace(' ', '.')}@company.com`) },
+    { icon: <MdOutlinePhone className="w-5 h-5" />, label: "Call", action: () => window.open(`tel:+15551234567`) },
+    { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`https://linkedin.com/in/${member.name.toLowerCase().replace(' ', '')}`) },
+    { icon: <MdOutlineOpenInNew className="w-5 h-5" />, label: "Schedule Meeting", action: () => window.open('https://calendly.com') },
+  ];
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-80 max-w-[90vw] z-50">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Contact {member.name}</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {contactOptions.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                option.action();
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+            >
+              {option.icon}
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
+// Add Team Member Modal
+const AddTeamMemberModal = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    email: '',
+    badge: 'Editor'
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Here you would typically send the data to your backend
+    console.log('Adding team member:', formData);
+    alert('Team member added successfully!');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Add Team Member</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <input
+              type="text"
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
+            <select
+              value={formData.badge}
+              onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+            >
+              <option value="Full Access">Full Access</option>
+              <option value="Admin">Admin</option>
+              <option value="Editor">Editor</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+            >
+              Add Member
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+};
+
+// Add Case Study Modal
+const AddCaseStudyModal = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    company: '',
+    description: '',
+    imageUrl: '',
+    readTime: '5 min read'
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Adding case study:', formData);
+    alert('Case study added successfully!');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Add Case Study</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+            <input
+              type="text"
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              rows="3"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+            <input
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+            >
+              Add Case Study
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+};
+
+// Add Certificate Modal
+const AddCertificateModal = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    issuer: '',
+    validTill: '',
+    description: ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Adding certificate:', formData);
+    alert('Certificate added successfully!');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Add Certificate</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Certificate Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Organization</label>
+            <input
+              type="text"
+              value={formData.issuer}
+              onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Valid Until</label>
+            <input
+              type="date"
+              value={formData.validTill}
+              onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              rows="3"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+            >
+              Add Certificate
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+};
 
 // Main Component
 const CompanyProfileDashboard = () => {
+  const navigate = useNavigate();
   const [showRightSidebar, setShowRightSidebar] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Overview");
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Modal states
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showAddCaseStudyModal, setShowAddCaseStudyModal] = useState(false);
+  const [showAddCertificateModal, setShowAddCertificateModal] = useState(false);
 
   // Fetch company data from backend
   useEffect(() => {
@@ -173,60 +710,89 @@ const CompanyProfileDashboard = () => {
     fetchCompanyData();
   }, []);
 
-  // Button handlers
+  // Updated Button handlers
   const handleEditProfile = () => {
-    // Navigate to edit profile page or open modal
-    console.log("Edit Profile clicked");
-    // You can add navigation logic here
-    // navigate('/edit-profile');
+    // Create a clean version of companyData without React elements
+    const cleanCompanyData = {
+      companyName: companyData?.companyName,
+      industry: companyData?.industry,
+      location: companyData?.location,
+      email: companyData?.email,
+      phone: companyData?.phone,
+      website: companyData?.website,
+      profile: {
+        bio: companyData?.profile?.bio,
+        services: companyData?.profile?.services
+      },
+      companyDetails: {
+        "No.of employees": { value: companyData?.companyDetails?.["No.of employees"]?.value },
+        "Team Size": { value: companyData?.companyDetails?.["Team Size"]?.value },
+        "Department": { value: companyData?.companyDetails?.["Department"]?.value },
+        "Founded": { value: companyData?.companyDetails?.["Founded"]?.value }
+      }
+    };
+
+    // Navigate to edit profile page with clean data
+    navigate('/company-profile-update', {
+      state: {
+        companyData: cleanCompanyData
+      }
+    });
   };
 
   const handleDownloadDocument = (document) => {
-    console.log("Downloading document:", document.name);
-    // Add download logic here
-    // window.open(document.downloadUrl, '_blank');
+    // Create a blob URL for the document (simulating download)
+    const blob = new Blob(['Document content for ' + document.name], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = document.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleReadCaseStudy = (caseStudy) => {
-    console.log("Reading case study:", caseStudy.title);
-    // Add navigation logic here
-    // navigate(`/case-studies/${caseStudy.id}`);
+    // For case studies with external links, open them
+    if (caseStudy.link && caseStudy.link !== '#') {
+      window.open(caseStudy.link, '_blank');
+    } else {
+      // For internal case studies, you could navigate to a case study page
+      alert(`Opening case study: ${caseStudy.title}`);
+    }
   };
 
   const handleAddTeamMember = () => {
-    console.log("Add team member clicked");
-    // Add modal or navigation logic here
+    setShowAddMemberModal(true);
   };
 
   const handleViewProfile = (member) => {
-    console.log("View profile for:", member.name);
-    // Add navigation logic here
+    setSelectedMember(member);
+    setShowMemberModal(true);
   };
 
   const handleContactMember = (member) => {
-    console.log("Contact member:", member.name);
-    // Add contact logic here (email, phone, etc.)
+    setSelectedMember(member);
+    setShowContactModal(true);
   };
 
   const handleSearchProposals = (searchTerm) => {
+    // Implement search functionality
     console.log("Searching proposals:", searchTerm);
-    // Add search logic here
+    // You could filter the proposals list based on search term
   };
 
   const handleNewProposal = () => {
-    console.log("Create new proposal");
-    // Add navigation logic here
-    // navigate('/create-proposal');
+    navigate('/enhanced-proposal');
   };
 
   const handleAddCaseStudy = () => {
-    console.log("Add case study");
-    // Add modal or navigation logic here
+    setShowAddCaseStudyModal(true);
   };
 
   const handleAddCertification = () => {
-    console.log("Add certification");
-    // Add modal or navigation logic here
+    setShowAddCertificateModal(true);
   };
 
   // Mock data function for fallback
@@ -529,10 +1095,7 @@ const CompanyProfileDashboard = () => {
         </>
       )}
 
-      {/* Right Sidebar: desktop */}
-      <RightSidebar deadlines={companyData?.deadlines || []} activity={companyData?.activity || []} />
-
-      {/* Right Sidebar: mobile drawer */}
+      <div className="hidden lg:block mt-[20rem]"><RightSidebar deadlines={companyData?.deadlines || []} activity={companyData?.activity || []} /></div>
       {showRightSidebar && (
         <RightSidebar
           isMobile
@@ -558,11 +1121,6 @@ const CompanyProfileDashboard = () => {
                 <h3 className="text-[24px] font-semibold mb-2">Company Profile</h3>
                 <p className="text-[#4B5563] text-[16px] mb-4">{companyData?.profile?.bio || 'Loading...'}</p>
                 <h3 className="font-medium text-[#111827] text-[16px] mb-2">Services</h3>
-                {/* <div className="flex flex-wrap gap-2">
-                  {companyData?.profile?.services?.map((service, i) => (
-                    <span key={i} className="text-[#6B7280] text-[15px]">{service}</span>
-                  ))}
-                </div> */}
                 <ul className="columns-1 xs:columns-2 lg:columns-3 gap-4 list-disc gap-2 mt-2 ml-8">
                   {companyData?.profile?.services?.map((service, i) => (
                     <li
@@ -711,7 +1269,7 @@ const CompanyProfileDashboard = () => {
             </div>
           )}
           {activeTab === "Proposals" && (
-            <div className="bg-white rounded-xl p-6">
+            <div className="bg-white rounded-xl p-2">
               <h2 className="text-[24px] font-semibold mb-2">Proposals</h2>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div className="flex flex-1 gap-4 sm:justify-end items-center">
@@ -778,7 +1336,7 @@ const CompanyProfileDashboard = () => {
             </div>
           )}
           {activeTab === "Case Studies" && (
-            <div className="bg-white rounded-xl p-4">
+            <div className="bg-white rounded-xl p-2">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-[24px] font-semibold">Case Studies</h2>
                 <button
@@ -809,7 +1367,7 @@ const CompanyProfileDashboard = () => {
             </div>
           )}
           {activeTab === "Certificates" && (
-            <div className="bg-white rounded-xl p-6">
+            <div className="bg-white rounded-xl p-2">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-[24px] font-semibold">Certifications</h2>
                 <button
@@ -820,7 +1378,7 @@ const CompanyProfileDashboard = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {companyData.certifications.map((cert, i) => (
+                {companyData?.certifications?.map((cert, i) => (
                   <div
                     key={i}
                     className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
@@ -841,7 +1399,35 @@ const CompanyProfileDashboard = () => {
           )}
         </div>
       </main>
-    </div >
+
+      {/* Modals */}
+      <TeamMemberModal
+        member={selectedMember}
+        isOpen={showMemberModal}
+        onClose={() => setShowMemberModal(false)}
+      />
+
+      <ContactModal
+        member={selectedMember}
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+      />
+
+      <AddTeamMemberModal
+        isOpen={showAddMemberModal}
+        onClose={() => setShowAddMemberModal(false)}
+      />
+
+      <AddCaseStudyModal
+        isOpen={showAddCaseStudyModal}
+        onClose={() => setShowAddCaseStudyModal(false)}
+      />
+
+      <AddCertificateModal
+        isOpen={showAddCertificateModal}
+        onClose={() => setShowAddCertificateModal(false)}
+      />
+    </div>
   );
 };
 
