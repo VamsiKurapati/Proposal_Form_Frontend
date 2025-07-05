@@ -134,7 +134,6 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   );
 };
 
-// Add this above the CompanyProfileDashboard component
 const teamMembers = [
   { name: "Sara Johnson", role: "CEO & Founder", badge: "Full Access" },
   { name: "Darrell Steward", role: "President of Sales", badge: "Admin" },
@@ -149,6 +148,7 @@ const teamMembers = [
   { name: "Cody Fisher", role: "President of Sales", badge: "Viewer" },
   { name: "Devon Lane", role: "Web Designer", badge: "Viewer" },
 ];
+
 const badgeStyles = {
   "Full Access": "bg-[DBEAFE] text-[#2563EB]",
   "Admin": "bg-[#DCFCE7] text-[#15803D]",
@@ -156,7 +156,6 @@ const badgeStyles = {
   "Viewer": "bg-[#F3F4F6] text-[#4B5563]",
 };
 
-// Add this above the CompanyProfileDashboard component
 const proposalList = [
   { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
   { title: "Social Media Proposal", company: "GlobalTech Corp", status: "Rejected", date: "Jan 20, 2026", amount: 200000 },
@@ -169,6 +168,7 @@ const proposalList = [
   { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
   { title: "Social Media Proposal", company: "GlobalTech Corp", status: "Submitted", date: "Jan 20, 2026", amount: 200000 },
 ];
+
 const proposalStatusStyles = {
   "In Progress": "bg-[#DBEAFE] text-[#2563EB]",
   "Submitted": "bg-[#DCFCE7] text-[#15803D]",
@@ -176,7 +176,6 @@ const proposalStatusStyles = {
   "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
 };
 
-// Add this above the CompanyProfileDashboard component
 const documentList = [
   { name: "A_Journey_Through_Love.pdf", type: "PDF", size: "578 KB", lastModified: "Jan 15, 2026" },
   { name: "Unlocking_the_Secrets.pdf", type: "PDF", size: "1.1 MB", lastModified: "Jan 15, 2026" },
@@ -194,7 +193,6 @@ const documentList = [
   { name: "The_Academic_Journey.pdf", type: "PDF", size: "2.3 MB", lastModified: "Jan 15, 2026" },
 ];
 
-// Add this above the CompanyProfileDashboard component
 const caseStudiesList = [
   {
     title: "Future of Software Development",
@@ -256,7 +254,6 @@ const caseStudiesList = [
 
 // Main Component
 const CompanyProfileDashboard = () => {
-  const [companyData1, setCompanyData1] = useState(null);
   const [showRightSidebar, setShowRightSidebar] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Overview");
@@ -294,9 +291,46 @@ const CompanyProfileDashboard = () => {
       { title: "A case study about everything", readTime: "6 min" },
     ],
     certifications: [
-      { name: "ISO 5864", validTill: "Dec 2025" },
-      { name: "ISO 5864", validTill: "Dec 2025" },
-      { name: "ISO 5864", validTill: "Dec 2025" },
+      {
+        name: "GDPR Compliant",
+        issuer: "European Commission",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Financial Planning Certificate",
+        issuer: "Barone LLC.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Training Certificate",
+        issuer: "Barone LLC.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "CPR Certification",
+        issuer: "Abstergo Ltd.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Certificate of Completion",
+        issuer: "Acme Co.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Leadership Certificate",
+        issuer: "Biffco Enterprises Ltd.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Fitness Instructor Certification",
+        issuer: "Big Kahuna Burger Ltd.",
+        validTill: "Dec 2025",
+      },
+      {
+        name: "Certificate of Achievement",
+        issuer: "Binford Ltd.",
+        validTill: "Dec 2025",
+      },
     ],
     deadlines: [
       { title: "Client Presentation", date: "Jan 20, 2024", status: "Urgent" },
@@ -327,39 +361,46 @@ const CompanyProfileDashboard = () => {
       <Navbar onToggle={() => setIsMobileNavOpen(true)} />
 
       <div className="bg-[#F8F9FA] md:fixed h-76 mt-16 md:mt-0 md:top-16 left-0 right-0 z-10 shadow-md px-12 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 mx-12">
-          <div className="mt-4">
-            <h2 className="text-[24px] font-semibold">{companyData.companyName}</h2>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mb-4">
-              <div className="flex items-center gap-2">
-                <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
-                <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.industry}</p>
-              </div>
-              <p className="hidden md:inline">|</p>
-              <div className="flex items-center gap-2">
-                <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
-                <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.location}</p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="flex flex-col md:flex-row items-start gap-8 mb-3">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-[120px] h-[120px] bg-[#E0E0E0] rounded-lg flex items-center justify-center mb-2">
+                <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
               </div>
             </div>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
-              <div className="flex items-center gap-2">
-                <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.email}</p>
+            <div className="md:mr-12">
+              <h2 className="text-[24px] font-semibold mb-2">{companyData.companyName}</h2>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                  <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.industry}</p>
+                </div>
+                <p className="hidden md:inline">|</p>
+                <div className="flex items-center gap-2">
+                  <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                  <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData.location}</p>
+                </div>
               </div>
-              <p className="hidden md:inline">|</p>
-              <div className="flex items-center gap-2">
-                <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.phone}</p>
-              </div>
-              <p className="hidden md:inline">|</p>
-              <div className="flex items-center gap-2">
-                <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.website}</p>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.email}</p>
+                </div>
+                <p className="hidden md:inline">|</p>
+                <div className="flex items-center gap-2">
+                  <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.phone}</p>
+                </div>
+                <p className="hidden md:inline">|</p>
+                <div className="flex items-center gap-2">
+                  <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData.website}</p>
+                </div>
               </div>
             </div>
           </div>
-          <div className="group flex items-center gap-1 mt-4 md:-mt-12">
-            <button className="text-[#2563EB] flex items-center gap-1" onClick={() => alert("Edit Profile-2 Clicked")}><MdOutlineEdit /> Edit Profile</button>
+          <div className="group -mt-28 flex items-center gap-1">
+            <button className="text-[#2563EB] text-[16px] flex items-center gap-1" onClick={() => alert("Edit Profile-2 Clicked")}><MdOutlineEdit className="w-5 h-5 shrink-0" /> Edit Profile</button>
           </div>
         </div>
 
@@ -625,13 +666,28 @@ const CompanyProfileDashboard = () => {
             </div>
           )}
           {activeTab === "Certificates" && (
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Certificates</h3>
-              {companyData.certifications.map((c, i) => (
-                <div key={i} className="mb-2">
-                  {c.name} - Valid Till: {c.validTill}
-                </div>
-              ))}
+            <div className="bg-white rounded-xl p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-[24px] font-semibold">Certifications</h2>
+                <button className="flex items-center gap-1 border border-[#2563EB] text-[#2563EB] px-4 py-2 rounded-lg font-medium text-[15px] hover:bg-[#EFF6FF]">
+                  <MdOutlineAdd className="w-5 h-5" /> Add
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {companyData.certifications.map((cert, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
+                  >
+                    <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 mt-1" />
+                    <div>
+                      <div className="font-semibold text-[16px] text-[#111827]">{cert.name}</div>
+                      <div className="font-medium text-[13px] text-[#4B5563]">{cert.issuer}</div>
+                      <div className="text-[11px] text-[#6B7280] mt-1">Valid till: {cert.validTill}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeTab === "Settings" && (
