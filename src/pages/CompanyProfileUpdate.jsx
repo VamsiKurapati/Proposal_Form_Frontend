@@ -16,7 +16,7 @@ const CompanyProfileUpdate = () => {
         website: companyData?.website || "",
         bio: companyData?.profile?.bio || "",
         services: companyData?.profile?.services || [""],
-        totalEmployees: companyData?.companyDetails?.["No.of employees"]?.value || "",
+        numberOfEmployees: companyData?.companyDetails?.["No.of employees"]?.value || "",
         teamSize: companyData?.companyDetails?.["Team Size"]?.value || "",
         departments: companyData?.companyDetails?.["Department"]?.value || "",
         founded: companyData?.companyDetails?.["Founded"]?.value || "",
@@ -74,8 +74,8 @@ const CompanyProfileUpdate = () => {
         }
 
         // Website validation (optional but if provided, should be valid)
-        if (form.website && !form.website.startsWith('http')) {
-            newErrors.website = "Website should start with http:// or https://";
+        if (form.website && (!form.website.startsWith('http://') && !form.website.startsWith('https://') && !form.website.startsWith('www.'))) {
+            newErrors.website = "Website should start with http:// or https:// or www.";
         }
 
         return newErrors;
@@ -94,10 +94,8 @@ const CompanyProfileUpdate = () => {
 
         try {
             // Here you would typically make an API call to update the profile
+            const response = await axios.put('https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile', form);
             console.log('Updating company profile:', form);
-
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
 
             alert("Profile updated successfully!");
             navigate("/company_profile_dashboard");
@@ -336,8 +334,8 @@ const CompanyProfileUpdate = () => {
                                 </label>
                                 <input
                                     type="number"
-                                    value={form.totalEmployees}
-                                    onChange={(e) => handleInputChange('totalEmployees', e.target.value)}
+                                    value={form.numberOfEmployees}
+                                    onChange={(e) => handleInputChange('numberOfEmployees', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                                     placeholder="156"
                                 />

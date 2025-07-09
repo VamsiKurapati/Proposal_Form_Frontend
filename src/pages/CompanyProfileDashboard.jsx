@@ -10,8 +10,8 @@ const badgeStyles = {
   // Status badges
   "In Progress": "bg-[#DBEAFE] text-[#2563EB]",
   "Won": "bg-[#DCFCE7] text-[#15803D]",
-  "Submitted": "bg-gray-100 text-gray-700",
-  "Rejected": "bg-red-100 text-red-600",
+  "Submitted": "bg-[#DCFCE7] text-[#15803D]",
+  "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
   "Urgent": "bg-[#FEE2E2] text-[#DC2626]",
   "Scheduled": "bg-[#DBEAFE] text-[#2563EB]",
   "On Track": "bg-[#DCFCE7] text-[#15803D]",
@@ -62,88 +62,6 @@ const sidebarItems = [
   { name: "Settings", icon: <MdOutlineSettings className="w-6 h-6" /> },
 ];
 
-// Sidebar
-// const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
-//   <div
-//     className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-full z-50"} left-0 bg-white shadow-md p-6 overflow-y-scroll`}
-//   >
-//     {isMobile && (
-//       <div className="text-right mb-4">
-//         <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
-//       </div>
-//     )}
-
-//     <ul className="space-y-1">
-//       {sidebarItems.map(({ name, icon }) => (
-//         <li
-//           key={name}
-//           className={`flex items-center gap-2 cursor-pointer px-2 py-2 rounded-lg ${name === active ? "text-[#2563EB] font-semibold bg-[#EFF6FF]" : "text-[#4B5563] bg-[#FFFFFF]"
-//             }`}
-//           onClick={() => {
-//             onSelect(name);
-//             if (isMobile) onClose();
-//           }}
-//         >
-//           <span>{icon}</span>
-//           <span className="font-medium text-[16px]">{name}</span>
-//         </li>
-//       ))}
-//     </ul>
-//   </div>
-// );
-
-// Right Sidebar
-// const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
-//   const content = (
-//     <>
-//       <div className="mb-4">
-//         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
-//         {deadlines.map((deadline, i) => (
-//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
-//             <div className="flex flex-col">
-//               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
-//               <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
-//             </div>
-//             <StatusBadge status={deadline.status} />
-//           </div>
-//         ))}
-//       </div>
-//       <div className="mt-4">
-//         <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
-//         {activity.map((act, i) => (
-//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
-//             <div className="flex flex-col">
-//               <span className="text-[14px] text-[#111827]">{act.title}</span>
-//               <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </>
-//   );
-
-//   if (isMobile) {
-//     return (
-//       <>
-//         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
-//         <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 p-6 shadow-lg overflow-y-auto">
-//           <div className="text-right mb-4">
-//             <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
-//           </div>
-//           {content}
-//         </div>
-//       </>
-//     );
-//   }
-
-//   return (
-//     <div className="hidden lg:block fixed mt-9 right-0 w-64 h-[calc(100vh-4rem)] bg-[#F8F9FA] p-6 shadow-md overflow-y-auto z-20">
-//       {content}
-//     </div>
-//   );
-// };
-
-// Left Sidebar with proper scrolling
 const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
   <div
     className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-full z-50"
@@ -177,65 +95,10 @@ const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", o
   </div>
 );
 
-// Right Sidebar with proper scrolling
-// const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
-//   const content = (
-//     <div className="flex-1 overflow-y-auto">
-//       <div className="mb-4">
-//         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
-//         {deadlines.map((deadline, i) => (
-//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
-//             <div className="flex flex-col">
-//               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
-//               <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
-//             </div>
-//             <StatusBadge status={deadline.status} />
-//           </div>
-//         ))}
-//       </div>
-//       <div className="mt-4">
-//         <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
-//         {activity.map((act, i) => (
-//           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
-//             <div className="flex flex-col">
-//               <span className="text-[14px] text-[#111827]">{act.title}</span>
-//               <span className="text-[11px] text-[#9CA3AF]">{act.date}</span>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-
-//   if (isMobile) {
-//     return (
-//       <>
-//         <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
-//         <div className="fixed top-0 right-0 w-72 h-full bg-white z-50 shadow-lg flex flex-col">
-//           <div className="text-right mb-4 p-6 pb-0 flex-shrink-0">
-//             <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
-//           </div>
-//           <div className="flex-1 overflow-hidden px-6 pb-6">
-//             {content}
-//           </div>
-//         </div>
-//       </>
-//     );
-//   }
-
-//   return (
-//     <div className="hidden lg:block fixed mt-9 right-0 w-64 h-full bg-[#F8F9FA] shadow-md z-20 flex flex-col">
-//       <div className="flex-1 overflow-y-auto p-6 min-h-[200vh] custom-scrollbar">
-//         {content}
-//       </div>
-//     </div>
-//   );
-// };
-
 const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   const content = (
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-      <div className="min-h-[300vh]">
+    <div className="flex-1 h-full overflow-y-auto custom-scrollbar p-6">
+      <div className="min-h-[140vh]">
         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
         {deadlines.map((deadline, i) => (
           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
@@ -278,7 +141,7 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   }
 
   return (
-    <div className="hidden lg:block fixed mt-9 right-2 w-64 h-full bg-[#F8F9FA] shadow-md z-20 flex flex-col">
+    <div className="hidden lg:block fixed mt-9 right-0 w-64 h-full bg-[#F8F9FA] shadow-md z-20 flex flex-col">
       {content}
     </div>
   );
@@ -306,9 +169,9 @@ const TeamMemberModal = ({ member, isOpen, onClose }) => {
             </div>
             <div>
               <h4 className="font-semibold text-lg">{member.name}</h4>
-              <p className="text-gray-600">{member.role}</p>
-              <span className={`px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[member.badge]}`}>
-                {member.badge}
+              <p className="text-gray-600">{member.jobTitle}</p>
+              <span className={`px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>
+                {member.accessLevel}
               </span>
             </div>
           </div>
@@ -331,7 +194,7 @@ const TeamMemberModal = ({ member, isOpen, onClose }) => {
           <div className="pt-4 border-t">
             <h5 className="font-medium mb-2">About</h5>
             <p className="text-gray-600 text-sm">
-              {member.name} is a dedicated team member with expertise in {member.role.toLowerCase()}.
+              {member.name} is a dedicated team member with expertise in {member.jobTitle.toLowerCase()}.
               They have been contributing to the company's success through their professional skills and collaborative approach.
             </p>
           </div>
@@ -387,17 +250,26 @@ const ContactModal = ({ member, isOpen, onClose }) => {
 const AddTeamMemberModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
-    role: '',
+    jobTitle: '',
     email: '',
-    badge: 'Editor'
+    about: '',
+    phone: '',
+    linkedIn: '',
+    accessLevel: 'Editor'
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log('Adding team member:', formData);
-    alert('Team member added successfully!');
-    onClose();
+    try {
+      console.log('Adding team member:', formData);
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addTeamMember', formData);
+      console.log('Response:', response.data.message);
+      alert(response.data.message);
+      onClose();
+    } catch (error) {
+      console.error('Error adding team member:', error);
+      alert('Failed to add team member. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
@@ -405,7 +277,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 h-full max-w-[90vw] z-50 overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Team Member</h3>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -426,11 +298,21 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
+            <textarea
+              value={formData.about}
+              onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
             <input
               type="text"
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              value={formData.jobTitle}
+              onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               required
             />
@@ -448,10 +330,32 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+            <input
+              type="url"
+              value={formData.linkedIn}
+              onChange={(e) => setFormData({ ...formData, linkedIn: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
             <select
-              value={formData.badge}
-              onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+              value={formData.accessLevel}
+              onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
             >
               <option value="Full Access">Full Access</option>
@@ -471,6 +375,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              onClick={() => handleSubmit(formData)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Member
@@ -489,7 +394,9 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
     company: '',
     description: '',
     imageUrl: '',
-    readTime: '5 min read'
+    link: '',
+    readTime: '5 min read',
+    customReadTime: '',
   });
 
   const handleSubmit = (e) => {
@@ -504,7 +411,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 h-full overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Case Study</h3>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -547,6 +454,18 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+            <input
+              type="url"
+              value={formData.link}
+              onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              placeholder="https://example.com"
+              required
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
             <input
               type="url"
@@ -555,6 +474,34 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               placeholder="https://example.com/image.jpg"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Read Time</label>
+            <select
+              value={formData.readTime}
+              onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            >
+              <option value="">Select Read Time</option>
+              <option value="5 min">5 min</option>
+              <option value="10 min">10 min</option>
+              <option value="15 min">15 min</option>
+              <option value="other">Other</option>
+            </select>
+
+            <div className="mt-2">
+              {formData.readTime === "other" && (
+                <input
+                  type="text"
+                  value={formData.customReadTime}
+                  onChange={(e) => setFormData({ ...formData, customReadTime: e.target.value })}
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  placeholder="Enter custom read time"
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -784,7 +731,7 @@ const CompanyProfileDashboard = () => {
   };
 
   const handleNewProposal = () => {
-    navigate('/enhanced-proposal');
+    navigate('/rfp_discovery');
   };
 
   const handleAddCaseStudy = () => {
@@ -813,21 +760,21 @@ const CompanyProfileDashboard = () => {
       bio: "ABC Company Inc. is a leading technology consulting firm specializing in digital transformation, cloud solutions and enterprise software development. With over 15 years of experience, we help businesses leverage technology to achieve their strategic objectives.",
       services: ["Cloud Architecture", "Enterprise Solutions", "Data Analytics", "Enterprise Solutions", "Data Analytics", "Cloud Architecture", "Data Analytics", "Cloud Architecture", "Enterprise Solutions"],
     },
-    recentProposals: [
-      { title: "Data Analytics Platform", date: "Jan 20, 2024", status: "In Progress" },
-      { title: "Security Infrastructure", date: "Jan 20, 2024", status: "Won" },
-      { title: "Enterprise Cloud Migration", date: "Jan 20, 2024", status: "Submitted" },
-      { title: "We Development Site", date: "Jan 20, 2024", status: "Rejected" },
-    ],
-    documentLibrary: [
-      { name: "Company Profile.pdf", type: "PDF", size: "2.5 MB" },
-      { name: "Something.docx", type: "DOCX", size: "2.5 MB" },
-    ],
-    caseStudies: [
-      { title: "Future of Software Development", readTime: "5 min" },
-      { title: "All about AI & Technology", readTime: "4 min" },
-      { title: "A case study about everything", readTime: "6 min" },
-    ],
+    // recentProposals: [
+    //   { title: "Data Analytics Platform", date: "Jan 20, 2024", status: "In Progress" },
+    //   { title: "Security Infrastructure", date: "Jan 20, 2024", status: "Won" },
+    //   { title: "Enterprise Cloud Migration", date: "Jan 20, 2024", status: "Submitted" },
+    //   { title: "We Development Site", date: "Jan 20, 2024", status: "Rejected" },
+    // ],
+    // documentLibrary: [
+    //   { name: "Company Profile.pdf", type: "PDF", size: "2.5 MB" },
+    //   { name: "Something.docx", type: "DOCX", size: "2.5 MB" },
+    // ],
+    // caseStudies: [
+    //   { title: "Future of Software Development", readTime: "5 min" },
+    //   { title: "All about AI & Technology", readTime: "4 min" },
+    //   { title: "A case study about everything", readTime: "6 min" },
+    // ],
     certifications: [
       {
         name: "GDPR Compliant",
@@ -887,25 +834,20 @@ const CompanyProfileDashboard = () => {
       "Department": { value: 16, icon: <MdOutlineDomain className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
       "Founded": { value: 2000, icon: <MdOutlineCalendarToday className="w-6 h-6 shrink-0 text-[#2563EB]" /> },
     },
-    teamDetails: [
-      { name: "John Doe", position: "CEO", email: "john.doe@example.com", phone: "+1234567890", website: "www.john.com" },
-      { name: "Jane Smith", position: "CTO", email: "jane.smith@example.com", phone: "+1234567890", website: "www.jane.com" },
-      { name: "Mike Johnson", position: "CFO", email: "mike.johnson@example.com", phone: "+1234567890", website: "www.mike.com" },
-    ],
     // Consolidated data from separate arrays
-    teamMembers: [
-      { name: "Sara Johnson", role: "CEO & Founder", badge: "Full Access" },
-      { name: "Darrell Steward", role: "President of Sales", badge: "Admin" },
-      { name: "Cody Fisher", role: "Medical Assistant", badge: "Admin" },
-      { name: "Eleanor Pena", role: "Medical Assistant", badge: "Editor" },
-      { name: "Theresa Webb", role: "Medical Assistant", badge: "Editor" },
-      { name: "Bessie Cooper", role: "Web Designer", badge: "Editor" },
-      { name: "Darrell Steward", role: "Dog Trainer", badge: "Editor" },
-      { name: "Jane Cooper", role: "Dog Trainer", badge: "Editor" },
-      { name: "Leslie Alexander", role: "Nursing Assistant", badge: "Editor" },
-      { name: "Ralph Edwards", role: "Dog Trainer", badge: "Viewer" },
-      { name: "Cody Fisher", role: "President of Sales", badge: "Viewer" },
-      { name: "Devon Lane", role: "Web Designer", badge: "Viewer" },
+    employees: [
+      { name: "Sara Johnson", jobTitle: "CEO & Founder", accessLevel: "Full Access" },
+      { name: "Darrell Steward", jobTitle: "President of Sales", accessLevel: "Admin" },
+      { name: "Cody Fisher", jobTitle: "Medical Assistant", accessLevel: "Admin" },
+      { name: "Eleanor Pena", jobTitle: "Medical Assistant", accessLevel: "Editor" },
+      { name: "Theresa Webb", jobTitle: "Medical Assistant", accessLevel: "Editor" },
+      { name: "Bessie Cooper", jobTitle: "Web Designer", accessLevel: "Editor" },
+      { name: "Darrell Steward", jobTitle: "Dog Trainer", accessLevel: "Editor" },
+      { name: "Jane Cooper", jobTitle: "Dog Trainer", accessLevel: "Editor" },
+      { name: "Leslie Alexander", jobTitle: "Nursing Assistant", accessLevel: "Editor" },
+      { name: "Ralph Edwards", jobTitle: "Dog Trainer", accessLevel: "Viewer" },
+      { name: "Cody Fisher", jobTitle: "President of Sales", accessLevel: "Viewer" },
+      { name: "Devon Lane", jobTitle: "Web Designer", accessLevel: "Viewer" },
     ],
     proposalList: [
       { title: "Data Analytics Proposal", company: "GlobalTech Corp", status: "In Progress", date: "Jan 20, 2026", amount: 200000 },
@@ -1080,8 +1022,8 @@ const CompanyProfileDashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {companyData?.stats && Object.entries(companyData.stats).map(([key, value]) => (
             <div key={key} className="p-4 rounded shadow text-left bg-[#FFFFFF]">
-              <div className="text-[16px] text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
-              <div className="text-[24px] font-semibold text-[#2563EB]">{value}</div>
+              <div className="text-[12px] sm:text-[16px] text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+              <div className="text-[16px] sm:text-[24px] font-semibold text-[#2563EB]">{value}</div>
             </div>
           ))}
         </div>
@@ -1136,7 +1078,7 @@ const CompanyProfileDashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Recent Proposals</h4>
-                  {companyData?.recentProposals?.map((proposal, i) => (
+                  {companyData?.proposalList?.map((proposal, i) => (
                     <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4">
                       <div className="flex flex-col">
                         <span className="text-[14px] text-[#111827]">{proposal.title}</span>
@@ -1148,7 +1090,7 @@ const CompanyProfileDashboard = () => {
                 </div>
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Document Library</h4>
-                  {companyData?.documentLibrary?.map((doc, i) => (
+                  {companyData?.documentList?.map((doc, i) => (
                     <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                       <div className="flex items-center gap-4">
                         <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
@@ -1171,7 +1113,7 @@ const CompanyProfileDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Case Studies</h4>
-                  {companyData?.caseStudies?.map((study, i) => (
+                  {companyData?.caseStudiesList?.map((study, i) => (
                     <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
                       <div className="flex flex-col items-start">
                         <span className="text-[14px] text-[#111827]">{study.title}</span>
@@ -1231,9 +1173,9 @@ const CompanyProfileDashboard = () => {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {companyData?.teamMembers?.map((member, i) => (
+                    {companyData?.employees?.map((member, i) => (
                       <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
-                        <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.badge]}`}>{member.badge}</span>
+                        <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>{member.accessLevel}</span>
                         <div className="flex items-center gap-3 w-full">
                           <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
                             {member.avatar ? (
@@ -1244,7 +1186,7 @@ const CompanyProfileDashboard = () => {
                           </div>
                           <div className="flex flex-col flex-1">
                             <span className="font-medium text-[16px] text-[#111827]">{member.name}</span>
-                            <span className="text-[14px] text-[#4B5563]">{member.role}</span>
+                            <span className="text-[14px] text-[#4B5563]">{member.jobTitle}</span>
                           </div>
                         </div>
                         <div className="flex gap-4 mt-2 mx-auto">
