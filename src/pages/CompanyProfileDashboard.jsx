@@ -411,7 +411,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         company: formData.company,
         description: formData.description,
         link: formData.link,
-        imageUrl: formData.imageUrl,
+        image: formData.imageUrl,
         readTime: formData.readTime === "other" ? formData.customReadTime : formData.readTime,
       },
         {
