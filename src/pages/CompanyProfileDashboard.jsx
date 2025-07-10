@@ -179,23 +179,22 @@ const TeamMemberModal = ({ member, isOpen, onClose }) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600">
               <MdOutlineEmail className="w-4 h-4" />
-              <span>{member.name.toLowerCase().replace(' ', '.')}@company.com</span>
+              <span>{member.email}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <MdOutlinePhone className="w-4 h-4" />
-              <span>+1 (555) 123-4567</span>
+              <span>{member.phone}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <MdOutlineLinkedCamera className="w-4 h-4" />
-              <span>linkedin.com/in/{member.name.toLowerCase().replace(' ', '')}</span>
+              <span>{member.linkedIn}</span>
             </div>
           </div>
 
           <div className="pt-4 border-t">
             <h5 className="font-medium mb-2">About</h5>
             <p className="text-gray-600 text-sm">
-              {member.name} is a dedicated team member with expertise in {member.jobTitle.toLowerCase()}.
-              They have been contributing to the company's success through their professional skills and collaborative approach.
+              {member.about}
             </p>
           </div>
         </div>
