@@ -702,8 +702,8 @@ const CompanyProfileDashboard = () => {
             "No.of employees": { value: response.data.numberOfEmployees },
             "Founded": { value: response.data.establishedYear }
           },
-          caseStudies: response.data.caseStudies,
-          certificates: response.data.licensesAndCertifications,
+          caseStudiesList: response.data.caseStudies,
+          certificatesList: response.data.licensesAndCertifications,
           stats: {
             totalProposals: response.data.totalProposals,
             wonProposals: response.data.wonProposals,
@@ -711,6 +711,7 @@ const CompanyProfileDashboard = () => {
             activeProposals: response.data.activeProposals
           }
         }
+        console.log(data);
         setCompanyData(data);
       } catch (err) {
         setError(err.message);
