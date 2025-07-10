@@ -689,30 +689,9 @@ const CompanyProfileDashboard = () => {
 
   // Updated Button handlers
   const handleEditProfile = () => {
-    // Create a clean version of companyData without React elements
-    const cleanCompanyData = {
-      companyName: companyData?.companyName,
-      industry: companyData?.industry,
-      location: companyData?.location,
-      email: companyData?.email,
-      phone: companyData?.phone,
-      website: companyData?.website,
-      profile: {
-        bio: companyData?.bio,
-        services: companyData?.services
-      },
-      companyDetails: {
-        "No.of employees": { value: companyData?.companyDetails?.["No.of employees"]?.value },
-        "Team Size": { value: companyData?.companyDetails?.["Team Size"]?.value },
-        "Department": { value: companyData?.companyDetails?.["Department"]?.value },
-        "Founded": { value: companyData?.companyDetails?.["Founded"]?.value }
-      }
-    };
-
-    // Navigate to edit profile page with clean data
     navigate('/company-profile-update', {
       state: {
-        companyData: cleanCompanyData
+        companyData: companyData
       }
     });
   };
