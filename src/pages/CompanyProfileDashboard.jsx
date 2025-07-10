@@ -643,7 +643,13 @@ const CompanyProfileDashboard = () => {
       try {
         setLoading(true);
         // Replace with your actual API endpoint
-        const response = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProfile');
+        const response = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProfile',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
+        );
         const data = {
           companyName: response.data.companyName,
           industry: response.data.industry,
