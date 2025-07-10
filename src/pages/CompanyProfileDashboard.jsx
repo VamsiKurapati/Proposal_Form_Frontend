@@ -406,7 +406,14 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', formData,
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', {
+        title: formData.title,
+        company: formData.company,
+        description: formData.description,
+        link: formData.link,
+        imageUrl: formData.imageUrl,
+        readTime: formData.readTime === "other" ? formData.customReadTime : formData.readTime,
+      },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
