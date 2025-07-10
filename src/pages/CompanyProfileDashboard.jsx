@@ -26,7 +26,7 @@ const badgeStyles = {
 // Reusable Badge
 const StatusBadge = ({ status }) => {
   return (
-    <span className={`px-2 py-1 text-[12px] rounded-full ${badgeStyles[status] || "bg-[#E5E7EB] text-gray-700"}`}>
+    <span className={`px-2 py-1 text-[12px] rounded-full text-center ${badgeStyles[status] || "bg-[#E5E7EB] text-gray-700"}`}>
       {status}
     </span>
   );
@@ -98,7 +98,7 @@ const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", o
 const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
   const content = (
     <div className="flex-1 h-full overflow-y-auto custom-scrollbar p-6">
-      <div className="min-h-[140vh]">
+      <div className="min-h-[80vh] lg:min-h-[125vh]">
         <h4 className="font-semibold text-[16px] mb-4">Upcoming Deadlines</h4>
         {deadlines.map((deadline, i) => (
           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
@@ -822,7 +822,7 @@ const CompanyProfileDashboard = () => {
     //   { title: "All about AI & Technology", readTime: "4 min" },
     //   { title: "A case study about everything", readTime: "6 min" },
     // ],
-    certifications: [
+    certificationsList: [
       {
         name: "GDPR Compliant",
         issuer: "European Commission",
@@ -1017,66 +1017,135 @@ const CompanyProfileDashboard = () => {
     <div className="h-full relative">
       <Navbar onToggle={() => setIsMobileNavOpen(true)} />
 
-      <div className="bg-[#F8F9FA] md:fixed h-76 mt-16 md:mt-0 md:top-16 left-0 right-0 z-10 shadow-md px-12 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div className="flex flex-col md:flex-row items-start gap-8 mb-3">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-[120px] h-[120px] bg-[#E0E0E0] rounded-lg flex items-center justify-center mb-2">
+      <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px]">
+        {/* Top row: Edit button right-aligned */}
+        {/* <div className="flex justify-end mb-2">
+          <button
+            className="text-[#2563EB] text-[15px] sm:text-[16px] flex items-center gap-1 hover:bg-[#EFF6FF] px-2 sm:px-3 py-2 rounded-lg transition-colors"
+            onClick={() => handleEditProfile()}
+          >
+            <MdOutlineEdit className="w-5 h-5 shrink-0" /> Edit Profile
+          </button>
+        </div> */}
+        {/* Profile image and info */}
+        <div className="w-full">
+          {/* For <lg: Row 1 - image and edit button */}
+          <div className="flex flex-row items-center justify-between gap-4 lg:hidden mb-2">
+            {/* Profile Image */}
+            <div className="flex items-center">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#E0E0E0] rounded-lg flex items-center justify-center">
                 <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
               </div>
             </div>
-            <div className="md:mr-12">
-              <h2 className="text-[24px] font-semibold mb-2">{companyData?.companyName || 'Loading...'}</h2>
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mb-4">
-                <div className="flex items-center gap-2">
-                  <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
-                  <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData?.industry || 'Loading...'}</p>
-                </div>
-                <p className="hidden md:inline">|</p>
-                <div className="flex items-center gap-2">
-                  <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
-                  <p className="text-[14px] md:text-[16px] text-[#4B5563]">{companyData?.location || 'Loading...'}</p>
-                </div>
-              </div>
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData?.email || 'Loading...'}</p>
-                </div>
-                <p className="hidden md:inline">|</p>
-                <div className="flex items-center gap-2">
-                  <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData?.phone || 'Loading...'}</p>
-                </div>
-                <p className="hidden md:inline">|</p>
-                <div className="flex items-center gap-2">
-                  <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
-                  <p className="text-[14px] md:text-[16px] text-[#6B7280]">{companyData?.website || 'Loading...'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="group -mt-28 flex items-center gap-1">
+            {/* Edit Button */}
             <button
-              className="text-[#2563EB] text-[16px] flex items-center gap-1 hover:bg-[#EFF6FF] px-3 py-2 rounded-lg transition-colors"
+              className="text-[#2563EB] text-[15px] sm:text-[16px] flex items-center gap-1 hover:bg-[#EFF6FF] px-2 sm:px-3 py-2 rounded-lg transition-colors"
               onClick={() => handleEditProfile()}
             >
               <MdOutlineEdit className="w-5 h-5 shrink-0" /> Edit Profile
             </button>
           </div>
+          {/* For <lg: Row 2 - company info */}
+          <div className="block lg:hidden">
+            {/* Company Info */}
+            <h2 className="text-[20px] sm:text-[22px] font-semibold mb-2 break-words">{companyData?.companyName || 'Loading...'}</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                <p className="text-[13px] sm:text-[14px] text-[#4B5563]">{companyData?.industry || 'Loading...'}</p>
+              </div>
+              <span className="hidden sm:inline">|</span>
+              <div className="flex items-center gap-2">
+                <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                <p className="text-[13px] sm:text-[14px] text-[#4B5563]">{companyData?.location || 'Loading...'}</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="flex items-center gap-2">
+                <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.email || 'Loading...'}</p>
+              </div>
+              <span className="hidden sm:inline">|</span>
+              <div className="flex items-center gap-2">
+                <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.phone || 'Loading...'}</p>
+              </div>
+              <span className="hidden sm:inline">|</span>
+              <div className="flex items-center gap-2">
+                <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.website || 'Loading...'}</p>
+              </div>
+            </div>
+          </div>
+          {/* For lg and up: all in a row */}
+          <div className="hidden lg:flex flex-row items-start gap-4 flex-wrap w-full">
+            {/* Profile Image */}
+            <div className="flex flex-col items-center justify-center mb-0">
+              <div className="w-[120px] h-[120px] bg-[#E0E0E0] rounded-lg flex items-center justify-center mb-2">
+                <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
+              </div>
+            </div>
+            {/* Company Info */}
+            <div className="flex-1 md:mr-12 w-full min-w-[200px]">
+              <h2 className="text-[24px] font-semibold mb-2 break-words">{companyData?.companyName || 'Loading...'}</h2>
+              <div className="flex flex-row items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                  <p className="text-[16px] text-[#4B5563]">{companyData?.industry || 'Loading...'}</p>
+                </div>
+                <span>|</span>
+                <div className="flex items-center gap-2">
+                  <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
+                  <p className="text-[16px] text-[#4B5563]">{companyData?.location || 'Loading...'}</p>
+                </div>
+              </div>
+              <div className="flex flex-row items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[16px] text-[#6B7280]">{companyData?.email || 'Loading...'}</p>
+                </div>
+                <span>|</span>
+                <div className="flex items-center gap-2">
+                  <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[16px] text-[#6B7280]">{companyData?.phone || 'Loading...'}</p>
+                </div>
+                <span>|</span>
+                <div className="flex items-center gap-2">
+                  <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
+                  <p className="text-[16px] text-[#6B7280]">{companyData?.website || 'Loading...'}</p>
+                </div>
+              </div>
+            </div>
+            {/* Edit Button */}
+            <div className="flex items-start mt-0">
+              <button
+                className="text-[#2563EB] text-[16px] flex items-center gap-1 hover:bg-[#EFF6FF] px-3 py-2 rounded-lg transition-colors"
+                onClick={() => handleEditProfile()}
+              >
+                <MdOutlineEdit className="w-5 h-5 shrink-0" /> Edit Profile
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4">
           {companyData?.stats && Object.entries(companyData.stats).map(([key, value]) => (
-            <div key={key} className="p-4 rounded shadow text-left bg-[#FFFFFF]">
-              <div className="text-[12px] sm:text-[16px] text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
-              <div className="text-[16px] sm:text-[24px] font-semibold text-[#2563EB]">{value}</div>
+            <div key={key} className="p-3 sm:p-4 rounded shadow text-left bg-[#FFFFFF]">
+              <div className="text-[11px] sm:text-[13px] md:text-[16px] text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+              <div className="text-[15px] sm:text-[18px] md:text-[24px] font-semibold text-[#2563EB]">{value}</div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="hidden md:block mt-[20rem]"><Sidebar active={activeTab} onSelect={setActiveTab} /></div>
+      <div className="relative hidden md:block md:mt-[25.5rem] lg:mt-[20rem]">
+        <div className="relative z-10">
+          <Sidebar active={activeTab} onSelect={setActiveTab} />
+        </div>
+        {showRightSidebar && (
+          <div className="absolute inset-0 bg-black bg-opacity-40 z-50 pointer-events-auto"></div>
+        )}
+      </div>
       {isMobileNavOpen && (
         <>
           <div className="fixed inset-0 bg-black opacity-40 z-30" onClick={() => setIsMobileNavOpen(false)}></div>
@@ -1130,9 +1199,9 @@ const CompanyProfileDashboard = () => {
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Recent Proposals</h4>
                   {companyData?.proposalList && companyData.proposalList.length > 0 ? (
-                    companyData.proposalList.map((proposal, i) => (
-                      <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4">
-                        <div className="flex flex-col">
+                    companyData.proposalList.slice(0, 4).map((proposal, i) => (
+                      <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4 gap-2">
+                        <div className="flex flex-col truncate">
                           <span className="text-[14px] text-[#111827]">{proposal.title}</span>
                           <span className="text-[11px] text-[#9CA3AF]">{proposal.date}</span>
                         </div>
@@ -1146,11 +1215,11 @@ const CompanyProfileDashboard = () => {
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Document Library</h4>
                   {companyData?.documentList && companyData.documentList.length > 0 ? (
-                    companyData.documentList.map((doc, i) => (
+                    companyData.documentList.slice(0, 4).map((doc, i) => (
                       <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                         <div className="flex items-center gap-4">
                           <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
-                          <div className="flex flex-col">
+                          <div className="flex flex-col truncate">
                             <span className="text-[14px] text-[#111827]">{doc.name}</span>
                             <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
                           </div>
@@ -1173,9 +1242,9 @@ const CompanyProfileDashboard = () => {
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Case Studies</h4>
                   {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
-                    companyData.caseStudiesList.map((study, i) => (
+                    companyData.caseStudiesList.slice(0, 4).map((study, i) => (
                       <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
-                        <div className="flex flex-col items-start">
+                        <div className="flex flex-col items-start truncate">
                           <span className="text-[14px] text-[#111827]">{study.title}</span>
                           <span className="text-[12px] text-[#4B5563]">{study.readTime}</span>
                         </div>
@@ -1193,11 +1262,11 @@ const CompanyProfileDashboard = () => {
                 </div>
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Certifications</h4>
-                  {companyData?.certifications && companyData.certifications.length > 0 ? (
-                    companyData.certifications.map((cert, i) => (
+                  {companyData?.certificationsList && companyData.certificationsList.length > 0 ? (
+                    companyData.certificationsList.slice(0, 4).map((cert, i) => (
                       <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
                         <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
-                        <div className="flex flex-col items-start ml-2">
+                        <div className="flex flex-col items-start ml-2 truncate">
                           <span className="text-[14px] text-[#111827]">{cert.name}</span >
                           <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
                         </div>
@@ -1220,7 +1289,7 @@ const CompanyProfileDashboard = () => {
                     <div key={key} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                       <div className="flex flex-col items-start">
                         <div className="flex flex-row items-center gap-2 mb-1">
-                          <span>{key === "No.of employees" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB] shrink-0" /> : key === "Founded" ? <MdOutlineCalendarToday className="w-6 h-6 text-[#2563EB] shrink-0" /> : <MdOutlineBusiness className="w-6 h-6 text-[#2563EB] shrink-0" />}</span>
+                          <span>{key === "No.of employees" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB] shrink-0" /> : key === "Founded" ? <MdOutlineCalendarToday className="w-6 h-6 text-[#2563EB] shrink-0" /> : <MdOutlineBusinessCenter className="w-6 h-6 text-[#2563EB] shrink-0" />}</span>
                           <span className="text-[12px] md:text-[16px] text-[#6B7280]">{key}</span>
                         </div>
                         <span className="text-[20px] text-[#111827] font-medium">{value.value}</span>
@@ -1239,7 +1308,7 @@ const CompanyProfileDashboard = () => {
                       <MdOutlineAdd className="w-6 h-6 shrink-0" />Add Member
                     </button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {companyData?.employees && companyData.employees.length > 0 ? (
                       companyData.employees.map((member, i) => (
                         <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
@@ -1247,12 +1316,12 @@ const CompanyProfileDashboard = () => {
                           <div className="flex items-center gap-3 w-full">
                             <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
                               {member.avatar ? (
-                                <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                                <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover min-w-[40px] min-h-[40px]" />
                               ) : (
                                 member.name.split(' ').map(n => n[0]).join('')
                               )}
                             </div>
-                            <div className="flex flex-col flex-1">
+                            <div className="flex flex-col flex-1 truncate overflow-ellipsis">
                               <span className="font-medium text-[16px] text-[#111827]">{member.name}</span>
                               <span className="text-[14px] text-[#4B5563]">{member.jobTitle}</span>
                             </div>
@@ -1373,8 +1442,8 @@ const CompanyProfileDashboard = () => {
                     <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
                       <img src={cs.image} alt={cs.title} className="w-full h-36 object-cover rounded-t-xl" />
                       <div className="flex-1 flex flex-col p-4">
-                        <div className="font-medium text-[#111827] text-[15px] truncate mb-1" title={cs.title}>{cs.title}</div>
-                        <div className="text-[13px] text-[#6B7280] mb-1 truncate">{cs.company}</div>
+                        <div className="font-medium text-[#111827] text-[15px] truncate max-w-[140px] min-w-0 mb-1" title={cs.title}>{cs.title}</div>
+                        <div className="text-[13px] text-[#6B7280] mb-1 truncate max-w-[140px] min-w-0">{cs.company}</div>
                         <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
                         <button
                           onClick={() => handleReadCaseStudy(cs)}

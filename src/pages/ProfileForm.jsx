@@ -130,6 +130,7 @@ const CreateProfile = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const role = state?.role;
+  // const role = "company";
   // const role = "employee";
   const signupData = state?.signupData;
 
