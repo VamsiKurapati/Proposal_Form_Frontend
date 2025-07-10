@@ -691,6 +691,7 @@ const CompanyProfileDashboard = () => {
             bio: response.data.bio,
             services: response.data.services
           },
+          employees: response.data.employees,
           companyDetails: {
             "No.of employees": { value: response.data.numberOfEmployees },
             "Founded": { value: response.data.establishedYear }
