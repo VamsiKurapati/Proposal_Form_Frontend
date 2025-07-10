@@ -237,11 +237,12 @@ const CompanyProfileUpdate = () => {
             formData.append("website", form.website);
             formData.append("linkedIn", form.linkedIn);
             formData.append("bio", form.bio);
-            formData.append("services", JSON.stringify(form.services.filter(service => service.trim())));
+            const filteredServices = form.services.filter(service => service.trim());
+            formData.append("services", JSON.stringify(filteredServices));
             formData.append("numberOfEmployees", form.numberOfEmployees);
             formData.append("founded", form.founded);
 
-            const response = await axios.put('https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile', formData,
+            const response = await axios.put("https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile", formData,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
