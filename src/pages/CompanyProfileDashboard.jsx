@@ -703,7 +703,7 @@ const CompanyProfileDashboard = () => {
             "Founded": { value: response.data.establishedYear }
           },
           caseStudiesList: response.data.caseStudies,
-          certificatesList: response.data.licensesAndCertifications,
+          certificationsList: response.data.licensesAndCertifications,
           stats: {
             totalProposals: response.data.totalProposals,
             wonProposals: response.data.wonProposals,
