@@ -208,9 +208,9 @@ const ContactModal = ({ member, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const contactOptions = [
-    { icon: <MdOutlineEmail className="w-5 h-5" />, label: "Send Email", action: () => window.open(`mailto:${member.name.toLowerCase().replace(' ', '.')}@company.com`) },
-    { icon: <MdOutlinePhone className="w-5 h-5" />, label: "Call", action: () => window.open(`tel:+15551234567`) },
-    { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`https://linkedin.com/in/${member.name.toLowerCase().replace(' ', '')}`) },
+    { icon: <MdOutlineEmail className="w-5 h-5" />, label: "Send Email", action: () => window.open(`mailto:${member.email}`) },
+    { icon: <MdOutlinePhone className="w-5 h-5" />, label: "Call", action: () => window.open(`tel:${member.phone}`) },
+    { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`${member.linkedIn}`) },
     { icon: <MdOutlineOpenInNew className="w-5 h-5" />, label: "Schedule Meeting", action: () => window.open('https://calendly.com') },
   ];
 
