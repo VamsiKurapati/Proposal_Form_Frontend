@@ -1183,7 +1183,7 @@ const CompanyProfileDashboard = () => {
                     <div key={key} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                       <div className="flex flex-col items-start">
                         <div className="flex flex-row items-center gap-2">
-                          <span>{key === "No.of employees" ? <MdOutlineGroup /> : key === "Founded" ? <MdOutlineCalendarToday /> : <MdOutlineBusiness />}</span>
+                          <span>{key === "No.of employees" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB] shrink-0" /> : key === "Founded" ? <MdOutlineCalendarToday className="w-6 h-6 text-[#2563EB] shrink-0" /> : <MdOutlineBusiness className="w-6 h-6 text-[#2563EB] shrink-0" />}</span>
                           <span className="text-[12px] md:text-[14px] text-[#6B7280]">{key}</span>
                         </div>
                         <span className="text-[20px] text-[#111827] font-medium">{value.value}</span>
