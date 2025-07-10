@@ -1074,81 +1074,101 @@ const CompanyProfileDashboard = () => {
                 <p className="text-[#4B5563] text-[16px] mb-4">{companyData?.profile?.bio || 'Loading...'}</p>
                 <h3 className="font-medium text-[#111827] text-[16px] mb-2">Services</h3>
                 <ul className="columns-1 xs:columns-2 lg:columns-3 gap-4 list-disc gap-2 mt-2 ml-8">
-                  {companyData?.profile?.services?.map((service, i) => (
-                    <li
-                      key={i}
-                      className="text-[15px] text-[#6B7280] mb-2 break-inside-avoid"
-                    >
-                      {service}
-                    </li>
-                  ))}
+                  {companyData?.profile?.services && companyData.profile.services.length > 0 ? (
+                    companyData.profile.services.map((service, i) => (
+                      <li
+                        key={i}
+                        className="text-[15px] text-[#6B7280] mb-2 break-inside-avoid"
+                      >
+                        {service}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="col-span-full text-[#9CA3AF] py-2 text-[16px] list-none">No services listed yet...</li>
+                  )}
                 </ul>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Recent Proposals</h4>
-                  {companyData?.proposalList?.map((proposal, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4">
-                      <div className="flex flex-col">
-                        <span className="text-[14px] text-[#111827]">{proposal.title}</span>
-                        <span className="text-[11px] text-[#9CA3AF]">{proposal.date}</span>
+                  {companyData?.proposalList && companyData.proposalList.length > 0 ? (
+                    companyData.proposalList.map((proposal, i) => (
+                      <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-4">
+                        <div className="flex flex-col">
+                          <span className="text-[14px] text-[#111827]">{proposal.title}</span>
+                          <span className="text-[11px] text-[#9CA3AF]">{proposal.date}</span>
+                        </div>
+                        <StatusBadge status={proposal.status} />
                       </div>
-                      <StatusBadge status={proposal.status} />
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-center text-[#9CA3AF] py-8 text-[16px]">No proposals yet...</div>
+                  )}
                 </div>
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Document Library</h4>
-                  {companyData?.documentList?.map((doc, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
-                      <div className="flex items-center gap-4">
-                        <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
-                        <div className="flex flex-col">
-                          <span className="text-[14px] text-[#111827]">{doc.name}</span>
-                          <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
+                  {companyData?.documentList && companyData.documentList.length > 0 ? (
+                    companyData.documentList.map((doc, i) => (
+                      <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
+                        <div className="flex items-center gap-4">
+                          <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
+                          <div className="flex flex-col">
+                            <span className="text-[14px] text-[#111827]">{doc.name}</span>
+                            <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
+                          </div>
                         </div>
+                        <button
+                          className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
+                          onClick={() => handleDownloadDocument(doc)}
+                        >
+                          <MdOutlineDownload className="text-[#2563EB] w-6 h-6" />
+                        </button>
                       </div>
-                      <button
-                        className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
-                        onClick={() => handleDownloadDocument(doc)}
-                      >
-                        <MdOutlineDownload className="text-[#2563EB] w-6 h-6" />
-                      </button>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-center text-[#9CA3AF] py-8 text-[16px]">No documents yet...</div>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Case Studies</h4>
-                  {companyData?.caseStudiesList?.map((study, i) => (
-                    <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
-                      <div className="flex flex-col items-start">
-                        <span className="text-[14px] text-[#111827]">{study.title}</span>
-                        <span className="text-[12px] text-[#4B5563]">{study.readTime}</span>
+                  {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
+                    companyData.caseStudiesList.map((study, i) => (
+                      <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
+                        <div className="flex flex-col items-start">
+                          <span className="text-[14px] text-[#111827]">{study.title}</span>
+                          <span className="text-[12px] text-[#4B5563]">{study.readTime}</span>
+                        </div>
+                        <button
+                          className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
+                          onClick={() => handleReadCaseStudy(study)}
+                        >
+                          <MdOutlineOpenInNew className="text-[#2563EB] w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
-                        onClick={() => handleReadCaseStudy(study)}
-                      >
-                        <MdOutlineOpenInNew className="text-[#2563EB] w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-center text-[#9CA3AF] py-8 text-[16px]">No case studies yet...</div>
+                  )}
                 </div>
                 <div className="border border-1 border-[#E5E7EB] rounded-2xl p-4">
                   <h4 className="font-semibold text-[#000000] text-[16px] mb-2">Certifications</h4>
-                  {companyData?.certifications?.map((cert, i) => (
-                    <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
-                      <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
-                      <div className="flex flex-col items-start ml-2">
-                        <span className="text-[14px] text-[#111827]">{cert.name}</span >
-                        <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
+                  {companyData?.certifications && companyData.certifications.length > 0 ? (
+                    companyData.certifications.map((cert, i) => (
+                      <div key={i} className="flex items-center p-2 mb-2 bg-[#F9FAFB]">
+                        <MdOutlineAssignment className="text-[#2563EB] w-6 h-6" />
+                        <div className="flex flex-col items-start ml-2">
+                          <span className="text-[14px] text-[#111827]">{cert.name}</span >
+                          <span className="text-[11px] text-[#4B5563]">Valid Till: {cert.validTill}</span >
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-center text-[#9CA3AF] py-8 text-[16px]">No certifications yet...</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1183,38 +1203,42 @@ const CompanyProfileDashboard = () => {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {companyData?.employees?.map((member, i) => (
-                      <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
-                        <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>{member.accessLevel}</span>
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
-                            {member.avatar ? (
-                              <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
-                            ) : (
-                              member.name.split(' ').map(n => n[0]).join('')
-                            )}
+                    {companyData?.employees && companyData.employees.length > 0 ? (
+                      companyData.employees.map((member, i) => (
+                        <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
+                          <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>{member.accessLevel}</span>
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
+                              {member.avatar ? (
+                                <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                              ) : (
+                                member.name.split(' ').map(n => n[0]).join('')
+                              )}
+                            </div>
+                            <div className="flex flex-col flex-1">
+                              <span className="font-medium text-[16px] text-[#111827]">{member.name}</span>
+                              <span className="text-[14px] text-[#4B5563]">{member.jobTitle}</span>
+                            </div>
                           </div>
-                          <div className="flex flex-col flex-1">
-                            <span className="font-medium text-[16px] text-[#111827]">{member.name}</span>
-                            <span className="text-[14px] text-[#4B5563]">{member.jobTitle}</span>
+                          <div className="flex gap-4 mt-2 mx-auto">
+                            <button
+                              onClick={() => handleViewProfile(member)}
+                              className="text-[#2563EB] text-[15px] hover:underline transition-colors"
+                            >
+                              View Profile
+                            </button>
+                            <button
+                              onClick={() => handleContactMember(member)}
+                              className="text-[#2563EB] text-[15px] hover:underline transition-colors"
+                            >
+                              Contact
+                            </button>
                           </div>
                         </div>
-                        <div className="flex gap-4 mt-2 mx-auto">
-                          <button
-                            onClick={() => handleViewProfile(member)}
-                            className="text-[#2563EB] text-[15px] hover:underline transition-colors"
-                          >
-                            View Profile
-                          </button>
-                          <button
-                            onClick={() => handleContactMember(member)}
-                            className="text-[#2563EB] text-[15px] hover:underline transition-colors"
-                          >
-                            Contact
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">Nothing yet... Add your first team member!</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1243,18 +1267,22 @@ const CompanyProfileDashboard = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 lg:gap-6">
-                {companyData?.proposalList?.map((proposal, i) => (
-                  <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow">
-                    <span className={`absolute top-4 right-4 px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[proposal.status]}`}>{proposal.status}</span>
-                    <div className="font-semibold text-[16px] text-[#111827] mb-1 truncate">{proposal.title}</div>
-                    <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.company}</div>
-                    <div className="flex items-center gap-2 text-[13px] text-[#6B7280] mb-1">
-                      <MdOutlineCalendarToday className="w-4 h-4 text-[#9CA3AF]" />
-                      <span>{proposal.date}</span>
+                {companyData?.proposalList && companyData.proposalList.length > 0 ? (
+                  companyData.proposalList.map((proposal, i) => (
+                    <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow">
+                      <span className={`absolute top-4 right-4 px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[proposal.status]}`}>{proposal.status}</span>
+                      <div className="font-semibold text-[16px] text-[#111827] mb-1 truncate">{proposal.title}</div>
+                      <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.company}</div>
+                      <div className="flex items-center gap-2 text-[13px] text-[#6B7280] mb-1">
+                        <MdOutlineCalendarToday className="w-4 h-4 text-[#9CA3AF]" />
+                        <span>{proposal.date}</span>
+                      </div>
+                      <div className="font-semibold text-[#2563EB] text-[17px] mt-2">$ {proposal.amount.toLocaleString()}</div>
                     </div>
-                    <div className="font-semibold text-[#2563EB] text-[17px] mt-2">$ {proposal.amount.toLocaleString()}</div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">No proposals yet... Start by creating a new proposal!</div>
+                )}
               </div>
             </div>
           )}
@@ -1262,28 +1290,32 @@ const CompanyProfileDashboard = () => {
             <div className="bg-white rounded-xl p-2">
               <h2 className="text-[24px] font-semibold mb-6">Company Documents</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 lg: gap-4 gap-y-8">
-                {companyData?.documentList?.map((doc, i) => (
-                  <div key={i} className="flex flex-col bg-[#F9FAFB] rounded-xl p-4 shadow-sm border border-[#E5E7EB]">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-medium text-[#111827] text-[14px] truncate max-w-[140px] min-w-0" title={doc.name}>{doc.name}</span>
-                          <span className="text-[11px] text-[#4B5563]">{doc.type}, {doc.size}</span>
+                {companyData?.documentList && companyData.documentList.length > 0 ? (
+                  companyData.documentList.map((doc, i) => (
+                    <div key={i} className="flex flex-col bg-[#F9FAFB] rounded-xl p-4 shadow-sm border border-[#E5E7EB]">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-[#111827] text-[14px] truncate max-w-[140px] min-w-0" title={doc.name}>{doc.name}</span>
+                            <span className="text-[11px] text-[#4B5563]">{doc.type}, {doc.size}</span>
+                          </div>
                         </div>
+                        <button
+                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                          onClick={() => handleDownloadDocument(doc)}
+                        >
+                          <MdOutlineDownload className="w-5 h-5" />
+                        </button>
                       </div>
-                      <button
-                        className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
-                        onClick={() => handleDownloadDocument(doc)}
-                      >
-                        <MdOutlineDownload className="w-5 h-5" />
-                      </button>
+                      <div className="text-[11px] text-[#4B5563]">
+                        <span>Last modified: {doc.lastModified}</span>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-[#4B5563]">
-                      <span>Last modified: {doc.lastModified}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">No documents yet... Upload your first document!</div>
+                )}
               </div>
             </div>
           )}
@@ -1299,22 +1331,26 @@ const CompanyProfileDashboard = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {companyData?.caseStudiesList?.map((cs, i) => (
-                  <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
-                    <img src={cs.image} alt={cs.title} className="w-full h-36 object-cover rounded-t-xl" />
-                    <div className="flex-1 flex flex-col p-4">
-                      <div className="font-medium text-[#111827] text-[15px] truncate mb-1" title={cs.title}>{cs.title}</div>
-                      <div className="text-[13px] text-[#6B7280] mb-1 truncate">{cs.company}</div>
-                      <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
-                      <button
-                        onClick={() => handleReadCaseStudy(cs)}
-                        className="text-[#2563EB] text-[14px] flex items-center gap-1 mt-auto hover:underline transition-colors"
-                      >
-                        Read Case Study <MdOutlineOpenInNew className="w-4 h-4" />
-                      </button>
+                {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
+                  companyData.caseStudiesList.map((cs, i) => (
+                    <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
+                      <img src={cs.image} alt={cs.title} className="w-full h-36 object-cover rounded-t-xl" />
+                      <div className="flex-1 flex flex-col p-4">
+                        <div className="font-medium text-[#111827] text-[15px] truncate mb-1" title={cs.title}>{cs.title}</div>
+                        <div className="text-[13px] text-[#6B7280] mb-1 truncate">{cs.company}</div>
+                        <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
+                        <button
+                          onClick={() => handleReadCaseStudy(cs)}
+                          className="text-[#2563EB] text-[14px] flex items-center gap-1 mt-auto hover:underline transition-colors"
+                        >
+                          Read Case Study <MdOutlineOpenInNew className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">No case studies yet... Add your first case study!</div>
+                )}
               </div>
             </div>
           )}
@@ -1330,19 +1366,23 @@ const CompanyProfileDashboard = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {companyData?.certifications?.map((cert, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
-                  >
-                    <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 mt-1" />
-                    <div>
-                      <div className="font-semibold text-[16px] text-[#111827]">{cert.name}</div>
-                      <div className="font-medium text-[13px] text-[#4B5563]">{cert.issuer}</div>
-                      <div className="text-[11px] text-[#6B7280] mt-1">Valid till: {cert.validTill}</div>
+                {companyData?.certifications && companyData.certifications.length > 0 ? (
+                  companyData.certifications.map((cert, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
+                    >
+                      <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 mt-1" />
+                      <div>
+                        <div className="font-semibold text-[16px] text-[#111827]">{cert.name}</div>
+                        <div className="font-medium text-[13px] text-[#4B5563]">{cert.issuer}</div>
+                        <div className="text-[11px] text-[#6B7280] mt-1">Valid till: {cert.validTill}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">No certifications yet... Add your first certification!</div>
+                )}
               </div>
             </div>
           )}
