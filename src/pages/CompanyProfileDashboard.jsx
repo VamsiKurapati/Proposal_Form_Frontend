@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineNotifications, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineLightMode, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera } from "react-icons/md";
 
 // Unified Badge Styles
 const badgeStyles = {
@@ -643,8 +643,32 @@ const CompanyProfileDashboard = () => {
       try {
         setLoading(true);
         // Replace with your actual API endpoint
-        const response = await axios.get('/api/company-profile');
-        setCompanyData(getMockCompanyData());
+        const response = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProfile');
+        const data = {
+          companyName: response.data.companyName,
+          industry: response.data.industry,
+          location: response.data.location,
+          email: response.data.email,
+          phone: response.data.phone,
+          website: response.data.website,
+          profile: {
+            bio: response.data.bio,
+            services: response.data.services
+          },
+          companyDetails: {
+            "No.of employees": { value: response.data.numberOfEmployees },
+            "Founded": { value: response.data.establishedYear }
+          },
+          caseStudies: response.data.caseStudies,
+          certificates: response.data.licensesAndCertifications,
+          stats: {
+            totalProposals: response.data.totalProposals,
+            wonProposals: response.data.wonProposals,
+            successRate: response.data.successRate,
+            activeProposals: response.data.activeProposals
+          }
+        }
+        setCompanyData(data);
       } catch (err) {
         setError(err.message);
         // Fallback to mock data if API fails
@@ -668,8 +692,8 @@ const CompanyProfileDashboard = () => {
       phone: companyData?.phone,
       website: companyData?.website,
       profile: {
-        bio: companyData?.profile?.bio,
-        services: companyData?.profile?.services
+        bio: companyData?.bio,
+        services: companyData?.services
       },
       companyDetails: {
         "No.of employees": { value: companyData?.companyDetails?.["No.of employees"]?.value },

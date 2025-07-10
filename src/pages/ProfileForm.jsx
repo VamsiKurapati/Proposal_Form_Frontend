@@ -14,6 +14,7 @@ const FormInput = ({
   error,
   required = false,
   id,
+  disabled = false,
   ...props
 }) => (
   <div className="mb-2">
@@ -26,8 +27,63 @@ const FormInput = ({
       value={value}
       onChange={onChange}
       required={required}
-      className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${error ? "border-red-500" : ""}`}
+      disabled={disabled}
+      className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${error ? "border-red-500" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       {...props}
+    />
+    {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+  </div>
+);
+
+// Phone input component to reduce duplication
+const PhoneInputField = ({
+  value,
+  onChange,
+  error,
+  disabled = false
+}) => (
+  <div className="mb-2">
+    <label htmlFor="phone" className="text-[18px] md:text-[24px] font-medium text-[#111827]">
+      Phone *
+    </label>
+    <PhoneInput
+      country={'in'}
+      value={value}
+      onChange={onChange}
+      disabled={disabled}
+      inputProps={{
+        name: 'phone',
+        required: true,
+        autoFocus: true,
+        placeholder: "Enter your mobile number",
+        disabled: disabled
+      }}
+      inputStyle={{
+        width: "100%",
+        paddingLeft: "56px",
+        height: "40px",
+        backgroundColor: "#D9D9D966",
+        fontSize: "20px",
+        color: "#000000",
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "text",
+        boxSizing: "border-box"
+      }}
+      containerStyle={{
+        width: "100%",
+      }}
+      dropdownStyle={{
+        maxHeight: "200px",
+        overflowY: "auto",
+        zIndex: 99999
+      }}
+      buttonStyle={{
+        height: "40px",
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
+        boxSizing: "border-box"
+      }}
+      containerClass="w-full md:w-[436px] mt-1"
     />
     {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
   </div>
@@ -95,6 +151,7 @@ const CreateProfile = () => {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   // Helper to check valid URL
   function isValidUrl(url) {
@@ -173,8 +230,10 @@ const CreateProfile = () => {
       if (signupData?.password) {
         formData.append("password", signupData?.password);
       } else {
+        setRedirecting(true);
         alert("Please sign up again to create your profile");
         setTimeout(() => navigate("/sign_up"), 2000);
+        return;
       }
       formData.append("fullName", form.fullName);
       formData.append("phone", form.phone);
@@ -225,6 +284,9 @@ const CreateProfile = () => {
     }
   };
 
+  // Check if form should be disabled
+  const isFormDisabled = loading || redirecting;
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold text-blue-600 mb-4">
@@ -239,6 +301,12 @@ const CreateProfile = () => {
         (* All fields are mandatory.)
       </p>
 
+      {redirecting && (
+        <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+          Redirecting to sign up page...
+        </div>
+      )}
+
       {role === "company" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-2">
@@ -249,6 +317,7 @@ const CreateProfile = () => {
               onChange={e => setForm({ ...form, companyName: e.target.value })}
               error={errors.companyName}
               required
+              disabled={isFormDisabled}
             />
           </div>
           <div className="col-span-2 md:col-span-1">
@@ -259,7 +328,8 @@ const CreateProfile = () => {
               id="industry"
               value={form.industry}
               onChange={e => setForm({ ...form, industry: e.target.value, customIndustry: "" })}
-              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.industry ? "border-red-500" : ""}`}
+              disabled={isFormDisabled}
+              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.industry ? "border-red-500" : ""} ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
               required
             >
               <option value="">Select Industry</option>
@@ -270,10 +340,11 @@ const CreateProfile = () => {
             {form.industry === "Other" && (
               <input
                 type="text"
-                className="w-full border rounded-md mt-2 p-2 bg-[#F0F0F0]"
+                className={`w-full border rounded-md mt-2 p-2 bg-[#F0F0F0] ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 placeholder="Please specify your industry"
                 value={form.customIndustry}
                 onChange={e => setForm({ ...form, customIndustry: e.target.value })}
+                disabled={isFormDisabled}
                 required
               />
             )}
@@ -288,6 +359,7 @@ const CreateProfile = () => {
               placeholder="Eg: California, USA"
               error={errors.location}
               required
+              disabled={isFormDisabled}
             />
           </div>
           <div className="col-span-2 md:col-span-1">
@@ -299,50 +371,16 @@ const CreateProfile = () => {
               onChange={e => setForm({ ...form, email: e.target.value })}
               error={errors.email}
               required
+              disabled={isFormDisabled}
             />
           </div>
           <div className="col-span-2 md:col-span-1">
-            <label htmlFor="phone" className="text-[18px] md:text-[24px] font-medium text-[#111827]">
-              Phone *
-            </label>
-            <PhoneInput
-              country={'in'}
+            <PhoneInputField
               value={form.phone}
               onChange={phone => setForm({ ...form, phone })}
-              inputProps={{
-                name: 'phone',
-                required: true,
-                autoFocus: true,
-                placeholder: "Enter your mobile number"
-              }}
-              inputStyle={{
-                width: "100%",
-                paddingLeft: "56px",
-                height: "40px",
-                backgroundColor: "#D9D9D966",
-                fontSize: "20px",
-                color: "#000000",
-                // border: "2px solid #000000B2",
-                // borderRadius: "10px",
-                boxSizing: "border-box"
-              }}
-              containerStyle={{
-                width: "100%",
-              }}
-              dropdownStyle={{
-                maxHeight: "200px",
-                overflowY: "auto",
-                zIndex: 99999
-              }}
-              buttonStyle={{
-                height: "40px",
-                // border: "2px solid #000000B2",
-                // borderRadius: "10px 0 0 10px",
-                boxSizing: "border-box"
-              }}
-              containerClass="w-full md:w-[436px] mt-1"
+              error={errors.phone}
+              disabled={isFormDisabled}
             />
-            {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
           </div>
           <div className="col-span-2 md:col-span-1">
             <label htmlFor="establishedYear" className="text-[18px] md:text-[24px] font-medium text-[#111827]">
@@ -352,7 +390,8 @@ const CreateProfile = () => {
               id="establishedYear"
               value={form.establishedYear}
               onChange={e => setForm({ ...form, establishedYear: e.target.value })}
-              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.establishedYear ? "border-red-500" : ""}`}
+              disabled={isFormDisabled}
+              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.establishedYear ? "border-red-500" : ""} ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
               required
             >
               <option value="">Select Year</option>
@@ -364,13 +403,14 @@ const CreateProfile = () => {
           </div>
           <div className="col-span-2 md:col-span-1">
             <label htmlFor="numberOfEmployees" className="text-[18px] md:text-[24px] font-medium text-[#111827]">
-              Total no.of Employees *
+              Total No.of Employees *
             </label>
             <select
               id="numberOfEmployees"
               value={form.numberOfEmployees}
               onChange={e => setForm({ ...form, numberOfEmployees: e.target.value })}
-              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.numberOfEmployees ? "border-red-500" : ""}`}
+              disabled={isFormDisabled}
+              className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.numberOfEmployees ? "border-red-500" : ""} ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
               required
             >
               <option value="">Select Range</option>
@@ -387,10 +427,11 @@ const CreateProfile = () => {
               </label>
               <textarea
                 id="bio"
-                className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.bio ? "border-red-500" : ""}`}
+                className={`w-full border rounded-md mt-1 p-2 bg-[#F0F0F0] ${errors.bio ? "border-red-500" : ""} ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 rows={4}
                 value={form.bio}
                 onChange={e => setForm({ ...form, bio: e.target.value })}
+                disabled={isFormDisabled}
                 required
               />
               {errors.bio && <div className="text-red-500 text-sm mt-1">{errors.bio}</div>}
@@ -405,6 +446,7 @@ const CreateProfile = () => {
               onChange={e => setForm({ ...form, website: e.target.value })}
               error={errors.website}
               required
+              disabled={isFormDisabled}
               pattern="https?://.+"
               title="Please enter a valid URL starting with http:// or https://"
             />
@@ -418,6 +460,7 @@ const CreateProfile = () => {
               onChange={e => setForm({ ...form, linkedIn: e.target.value })}
               error={errors.linkedIn}
               required
+              disabled={isFormDisabled}
               pattern="https?://.+"
               title="Please enter a valid URL starting with http:// or https://"
             />
@@ -444,66 +487,36 @@ const CreateProfile = () => {
               onChange={e => setForm({ ...form, [field.key]: e.target.value })}
               error={errors[field.key]}
               required
+              disabled={isFormDisabled}
               {...(field.pattern ? { pattern: field.pattern } : {})}
               {...(field.maxLength ? { maxLength: field.maxLength } : {})}
             />
           ))}
           <div className="col-span-2 md:col-span-1">
-            <label htmlFor="phone" className="text-[18px] md:text-[24px] font-medium text-[#111827]">
-              Phone *
-            </label>
-            <PhoneInput
-              country={'in'}
+            <PhoneInputField
               value={form.phone}
               onChange={phone => setForm({ ...form, phone })}
-              inputProps={{
-                name: 'phone',
-                required: true,
-                autoFocus: true,
-                placeholder: "Enter your mobile number"
-              }}
-              inputStyle={{
-                width: "100%",
-                paddingLeft: "56px",
-                height: "40px",
-                backgroundColor: "#D9D9D966",
-                fontSize: "20px",
-                color: "#000000",
-                // border: "2px solid #000000B2",
-                // borderRadius: "10px",
-                boxSizing: "border-box"
-              }}
-              containerStyle={{
-                width: "100%",
-              }}
-              dropdownStyle={{
-                maxHeight: "200px",
-                overflowY: "auto",
-                zIndex: 99999
-              }}
-              buttonStyle={{
-                height: "40px",
-                // border: "2px solid #000000B2",
-                // borderRadius: "10px 0 0 10px",
-                boxSizing: "border-box"
-              }}
-              containerClass="w-full md:w-[436px] mt-1"
+              error={errors.phone}
+              disabled={isFormDisabled}
             />
-            {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
           </div>
         </div>
       )}
 
       <div className="mt-6 flex justify-end gap-3">
-        <button className={`px-4 py-2 rounded bg-gray-200 ${loading ? "opacity-60 cursor-not-allowed" : ""}`} onClick={() => navigate("/sign_up")} disabled={loading}>
+        <button
+          className={`px-4 py-2 rounded bg-gray-200 ${isFormDisabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          onClick={() => navigate("/sign_up")}
+          disabled={isFormDisabled}
+        >
           Cancel
         </button>
         <button
-          className={`px-4 py-2 rounded bg-blue-600 text-white ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+          className={`px-4 py-2 rounded bg-blue-600 text-white ${isFormDisabled ? "opacity-60 cursor-not-allowed" : ""}`}
           onClick={() => handleSubmit()}
-          disabled={loading}
+          disabled={isFormDisabled}
         >
-          {loading ? "Creating..." : "Create profile"}
+          {loading ? "Creating..." : redirecting ? "Redirecting..." : "Create profile"}
         </button>
       </div>
     </div>

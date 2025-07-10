@@ -115,7 +115,7 @@ const LoginPage = () => {
       const token = res.data.token;
       localStorage.setItem("token", token); // Store JWT
       alert("Login successful!");
-      navigate("/profile"); // Redirect to profile page
+      navigate("/company_profile_dashboard"); // Redirect to profile page
     } catch (error) {
       alert(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
@@ -147,9 +147,8 @@ const LoginPage = () => {
               placeholder="Enter your company email id"
               value={form.email}
               onChange={handleChange}
-              className={`w-full bg-[#0000000F] text-[16px] text-[#6B7280] p-3 rounded-md ${
-                errors.email ? "border border-red-500" : ""
-              }`}
+              className={`w-full bg-[#0000000F] text-[16px] text-[#6B7280] p-3 rounded-md ${errors.email ? "border border-red-500" : ""
+                }`}
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
@@ -162,9 +161,8 @@ const LoginPage = () => {
               placeholder="Enter your password"
               value={form.password}
               onChange={handleChange}
-              className={`w-full bg-[#0000000F] text-[16px] text-[#6B7280] p-3 rounded-md pr-12 ${
-                errors.password ? "border border-red-500" : ""
-              }`}
+              className={`w-full bg-[#0000000F] text-[16px] text-[#6B7280] p-3 rounded-md pr-12 ${errors.password ? "border border-red-500" : ""
+                }`}
             />
             <button
               type="button"
