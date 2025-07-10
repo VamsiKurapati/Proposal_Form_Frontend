@@ -657,6 +657,7 @@ const CompanyProfileDashboard = () => {
           email: response.data.email,
           phone: response.data.phone,
           website: response.data.website,
+          linkedIn: response.data.linkedIn,
           profile: {
             bio: response.data.bio,
             services: response.data.services
