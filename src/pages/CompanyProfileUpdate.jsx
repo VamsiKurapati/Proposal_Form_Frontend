@@ -241,7 +241,13 @@ const CompanyProfileUpdate = () => {
             formData.append("numberOfEmployees", form.numberOfEmployees);
             formData.append("founded", form.founded);
 
-            const response = await axios.put('https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile', formData);
+            const response = await axios.put('https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile', formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
 
             if (response.status === 200) {
                 alert("Profile updated successfully!");
