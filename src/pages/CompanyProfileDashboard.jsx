@@ -1403,8 +1403,8 @@ const CompanyProfileDashboard = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {companyData?.certifications && companyData.certifications.length > 0 ? (
-                  companyData.certifications.map((cert, i) => (
+                {companyData?.certificationsList && companyData.certificationsList.length > 0 ? (
+                  companyData.certificationsList.map((cert, i) => (
                     <div
                       key={i}
                       className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
