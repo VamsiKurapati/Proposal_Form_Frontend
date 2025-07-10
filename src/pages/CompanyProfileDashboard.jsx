@@ -1178,11 +1178,11 @@ const CompanyProfileDashboard = () => {
               <div>
                 <h3 className="text-[24px] font-semibold mb-2">About Company</h3>
                 <p className="text-[#4B5563] text-[16px] mb-4">{companyData?.profile?.bio || 'Loading...'}</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                   {companyData?.companyDetails && Object.entries(companyData.companyDetails).map(([key, value]) => (
                     <div key={key} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
                       <div className="flex flex-col items-start">
-                        <div className="flex flex-row items-center gap-2">
+                        <div className="flex flex-row items-center gap-2 mb-1">
                           <span>{key === "No.of employees" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB] shrink-0" /> : key === "Founded" ? <MdOutlineCalendarToday className="w-6 h-6 text-[#2563EB] shrink-0" /> : <MdOutlineBusiness className="w-6 h-6 text-[#2563EB] shrink-0" />}</span>
                           <span className="text-[12px] md:text-[16px] text-[#6B7280]">{key}</span>
                         </div>
