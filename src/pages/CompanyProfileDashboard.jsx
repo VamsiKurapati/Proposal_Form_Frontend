@@ -261,8 +261,13 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Adding team member:', formData);
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addTeamMember', formData);
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addEmployee', formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
       console.log('Response:', response.data.message);
       alert(response.data.message);
       onClose();
@@ -399,11 +404,23 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
     customReadTime: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Adding case study:', formData);
-    alert('Case study added successfully!');
-    onClose();
+    try {
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+      console.log('Response:', response.data.message);
+      alert(response.data.message);
+      onClose();
+    } catch (error) {
+      console.error('Error adding case study:', error);
+      alert('Failed to add case study. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
@@ -536,9 +553,21 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Adding certificate:', formData);
-    alert('Certificate added successfully!');
-    onClose();
+    try {
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addLicenseAndCertification', formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+      console.log('Response:', response.data.message);
+      alert(response.data.message);
+      onClose();
+    } catch (error) {
+      console.error('Error adding certificate:', error);
+      alert('Failed to add certificate. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
