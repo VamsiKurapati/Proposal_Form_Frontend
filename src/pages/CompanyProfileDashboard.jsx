@@ -551,7 +551,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
     description: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addLicenseAndCertification', formData,
