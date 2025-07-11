@@ -930,17 +930,37 @@ const CompanyProfileDashboard = () => {
     });
   };
 
-  const handleDownloadDocument = (docItem) => {
-    // Create a blob URL for the document (simulating download)
-    const blob = new Blob(['Document content for ' + docItem.name], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = docItem.name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const handleDownloadDocument = async (docItem) => {
+    try {
+      // Download the actual document from the backend
+      const response = await axios.get(
+        `https://proposal-form-backend.vercel.app/api/profile/getDocument/${docItem.name}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          },
+          responseType: 'blob' // Important: set responseType to blob
+        }
+      );
+
+      // Create a blob URL for the downloaded file
+      const blob = new Blob([response.data], {
+        type: response.headers['content-type'] || 'application/octet-stream'
+      });
+      const url = URL.createObjectURL(blob);
+
+      // Create download link
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = docItem.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      alert('Failed to download document. Please try again.');
+    }
   };
 
   const handleReadCaseStudy = (caseStudy) => {
