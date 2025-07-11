@@ -75,7 +75,7 @@ const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", o
 
     {/* Scrollable content area */}
     <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-      <ul className="space-y-[1px] min-h-[95vh]">
+      <ul className="space-y-[1px] min-h-[50vh] md:min-h-[100vh] lg:min-h-[90vh]">
         {sidebarItems.map(({ name, icon }) => (
           <li
             key={name}
@@ -896,6 +896,7 @@ const CompanyProfileDashboard = () => {
           },
           caseStudiesList: response.data.caseStudies,
           certificationsList: response.data.licensesAndCertifications,
+          documentList: response.data.documents,
           stats: {
             totalProposals: response.data.totalProposals,
             wonProposals: response.data.wonProposals,
@@ -904,10 +905,10 @@ const CompanyProfileDashboard = () => {
           },
           logoUrl_1: "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl
         }
-        console.log(data);
+        // console.log(data);
         setCompanyData(data);
         setLogoUrl(data.logoUrl_1);
-        console.log(data.logoUrl_1);
+        // console.log(data.logoUrl_1);
       } catch (err) {
         setError(err.message);
         // Fallback to mock data if API fails
@@ -1225,7 +1226,7 @@ const CompanyProfileDashboard = () => {
         }
       );
       setLogoUrl("https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl);
-      console.log(logoUrl);
+      // console.log(logoUrl);
       setEditMode(false);
       setSelectedFile(null);
       setPreviewUrl(null);
