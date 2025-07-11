@@ -1055,7 +1055,7 @@ const CompanyProfileDashboard = () => {
           },
         }
       );
-      setLogoUrl(response.data.logoUrl);
+      setLogoUrl("https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl);
       setEditMode(false);
       setSelectedFile(null);
       setPreviewUrl(null);
