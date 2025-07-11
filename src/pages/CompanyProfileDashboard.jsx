@@ -395,28 +395,48 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
 const AddCaseStudyModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     title: '',
-    company: '',
     description: '',
-    imageUrl: '',
-    link: '',
     readTime: '5 min read',
     customReadTime: '',
+    file: null,
   });
+
+  const [filePreview, setFilePreview] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is PDF or TXT
+      if (file.type === 'application/pdf' || file.type === 'text/plain' || file.name.endsWith('.pdf') || file.name.endsWith('.txt')) {
+        setFormData({ ...formData, file: file });
+        setFilePreview(file.name);
+      } else {
+        alert('Please upload only PDF or TXT files.');
+        e.target.value = '';
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.file) {
+      alert('Please upload a PDF or TXT file.');
+      return;
+    }
+
     try {
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', {
-        title: formData.title,
-        company: formData.company,
-        description: formData.description,
-        link: formData.link,
-        image: formData.imageUrl,
-        readTime: formData.readTime === "other" ? formData.customReadTime : formData.readTime,
-      },
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('readTime', formData.readTime === "other" ? formData.customReadTime : formData.readTime);
+      formDataToSend.append('file', formData.file);
+
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', formDataToSend,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'Content-Type': 'multipart/form-data'
           }
         }
       );
@@ -434,7 +454,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 h-full overflow-y-auto custom-scrollbar">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Case Study</h3>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -450,17 +470,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-            <input
-              type="text"
-              value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              placeholder="Enter case study title"
               required
             />
           </div>
@@ -472,30 +482,8 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               rows="3"
+              placeholder="Enter case study description"
               required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
-            <input
-              type="url"
-              value={formData.link}
-              onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              placeholder="https://example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-            <input
-              type="url"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              placeholder="https://example.com/image.jpg"
             />
           </div>
 
@@ -508,23 +496,68 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               required
             >
               <option value="">Select Read Time</option>
-              <option value="5 min">5 min</option>
-              <option value="10 min">10 min</option>
-              <option value="15 min">15 min</option>
+              <option value="5 min read">5 min read</option>
+              <option value="10 min read">10 min read</option>
+              <option value="15 min read">15 min read</option>
               <option value="other">Other</option>
             </select>
 
-            <div className="mt-2">
-              {formData.readTime === "other" && (
+            {formData.readTime === "other" && (
+              <div className="mt-2">
                 <input
                   type="text"
                   value={formData.customReadTime}
                   onChange={(e) => setFormData({ ...formData, customReadTime: e.target.value })}
                   className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  placeholder="Enter custom read time"
+                  placeholder="Enter custom read time (e.g., 20 min read)"
                 />
-              )}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload File (PDF or TXT)</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#2563EB] transition-colors">
+              <input
+                type="file"
+                accept=".pdf,.txt"
+                onChange={handleFileChange}
+                className="hidden"
+                id="file-upload"
+                required
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <div className="space-y-2">
+                  <div className="text-gray-600">
+                    <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium text-[#2563EB] hover:text-[#1d4ed8]">Click to upload</span> or drag and drop
+                  </div>
+                  <div className="text-xs text-gray-500">PDF or TXT files only</div>
+                </div>
+              </label>
             </div>
+            {filePreview && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-green-700">{filePreview}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, file: null });
+                      setFilePreview(null);
+                      document.getElementById('file-upload').value = '';
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <MdOutlineClose className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -759,11 +792,11 @@ const CompanyProfileDashboard = () => {
   };
 
   const handleReadCaseStudy = (caseStudy) => {
-    // For case studies with external links, open them
-    if (caseStudy.link && caseStudy.link !== '#') {
-      window.open(caseStudy.link, '_blank');
+    // For case studies with file URLs, open them
+    if (caseStudy.fileUrl) {
+      window.open(caseStudy.fileUrl, '_blank');
     } else {
-      // For internal case studies, you could navigate to a case study page
+      // For case studies without file URLs, show an alert
       alert(`Opening case study: ${caseStudy.title}`);
     }
   };
@@ -937,61 +970,41 @@ const CompanyProfileDashboard = () => {
     ],
     caseStudiesList: [
       {
-        title: "Future of Software Development",
-        company: "Asiberg Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
-        link: "#"
+        title: "Digital Transformation Success Story",
+        description: "How we helped a Fortune 500 company modernize their legacy systems and improve operational efficiency by 40%",
+        readTime: "8 min read",
+        fileUrl: "/case-studies/digital-transformation-2024.pdf"
       },
       {
-        title: "The More Important the Work, the More Important the Rest",
-        company: "Big Kahuna Burger Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
-        link: "#"
+        title: "Cloud Migration Case Study",
+        description: "Complete migration of enterprise applications to AWS, reducing infrastructure costs by 60% while improving performance",
+        readTime: "12 min read",
+        fileUrl: "/case-studies/cloud-migration-success.pdf"
       },
       {
-        title: "Any mechanical keyboard enthusiasts in design?",
-        company: "Barone LLC.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
-        link: "#"
+        title: "AI-Powered Analytics Implementation",
+        description: "Implementation of machine learning algorithms for predictive analytics, resulting in 25% increase in customer retention",
+        readTime: "10 min read",
+        fileUrl: "/case-studies/ai-analytics-implementation.pdf"
       },
       {
-        title: "How to design a product that can grow its feature set",
-        company: "Acme Co.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?auto=format&fit=crop&w=400&q=80",
-        link: "#"
+        title: "Cybersecurity Infrastructure Overhaul",
+        description: "Comprehensive security assessment and implementation of zero-trust architecture for a financial services client",
+        readTime: "15 min read",
+        fileUrl: "/case-studies/cybersecurity-overhaul.pdf"
       },
       {
-        title: "Understanding color theory: the color wheel and finding complementary colors",
-        company: "Asiberg Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=crop&w=400&q=80",
-        link: "#"
+        title: "Mobile App Development Success",
+        description: "End-to-end development of a cross-platform mobile application serving 100,000+ users with 99.9% uptime",
+        readTime: "6 min read",
+        fileUrl: "/case-studies/mobile-app-development.pdf"
       },
       {
-        title: "Yo Reddit! What's a small thing that anyone can do at nearly any time to make their day better?",
-        company: "Binford Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80",
-        link: "#"
-      },
-      {
-        title: "Understanding color theory: the color wheel and finding complementary colors",
-        company: "Binford Enterprises Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
-        link: "#"
-      },
-      {
-        title: "Any mechanical keyboard enthusiasts in design?",
-        company: "Binford Enterprises Ltd.",
-        readTime: "5 min read",
-        image: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?auto=format&fit=crop&w=400&q=80",
-        link: "#"
-      },
+        title: "Data Center Modernization Project",
+        description: "Complete overhaul of data center infrastructure, reducing energy consumption by 35% and improving reliability",
+        readTime: "14 min read",
+        fileUrl: "/case-studies/data-center-modernization.pdf"
+      }
     ],
     logoUrl: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
   });
@@ -1414,12 +1427,12 @@ const CompanyProfileDashboard = () => {
                   {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
                     companyData.caseStudiesList.slice(0, 4).map((study, i) => (
                       <div key={i} className="bg-[#F9FAFB] py-1 flex justify-between items-center p-2 rounded shadow mb-2">
-                        <div className="flex flex-col items-start truncate">
-                          <span className="text-[14px] text-[#111827]">{study.title}</span>
+                        <div className="flex flex-col items-start truncate flex-1">
+                          <span className="text-[14px] text-[#111827] truncate w-full" title={study.title}>{study.title}</span>
                           <span className="text-[12px] text-[#4B5563]">{study.readTime}</span>
                         </div>
                         <button
-                          className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
+                          className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors ml-2"
                           onClick={() => handleReadCaseStudy(study)}
                         >
                           <MdOutlineOpenInNew className="text-[#2563EB] w-4 h-4" />
@@ -1610,10 +1623,12 @@ const CompanyProfileDashboard = () => {
                 {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
                   companyData.caseStudiesList.map((cs, i) => (
                     <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
-                      <img src={cs.image} alt={cs.title} className="w-full h-36 object-cover rounded-t-xl" />
                       <div className="flex-1 flex flex-col p-4">
-                        <div className="font-medium text-[#111827] text-[15px] truncate max-w-[140px] min-w-0 mb-1" title={cs.title}>{cs.title}</div>
-                        <div className="text-[13px] text-[#6B7280] mb-1 truncate max-w-[140px] min-w-0">{cs.company}</div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
+                          <div className="font-medium text-[#111827] justify-center text-[15px] mb-1 line-clamp-2" title={cs.title}>{cs.title}</div>
+                        </div>
+                        <div className="text-[13px] text-[#6B7280] mb-1 line-clamp-3" title={cs.description}>{cs.description}</div>
                         <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
                         <button
                           onClick={() => handleReadCaseStudy(cs)}
