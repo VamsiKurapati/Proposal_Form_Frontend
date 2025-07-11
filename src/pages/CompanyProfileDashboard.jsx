@@ -687,6 +687,165 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
   );
 };
 
+// Add Document Modal
+const AddDocumentModal = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    file: null,
+  });
+
+  const [filePreview, setFilePreview] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is PDF or TXT
+      if (file.type === 'application/pdf' || file.type === 'text/plain' || file.name.endsWith('.pdf') || file.name.endsWith('.txt')) {
+        setFormData({ ...formData, file: file });
+        setFilePreview(file.name);
+      } else {
+        alert('Please upload only PDF or TXT files.');
+        e.target.value = '';
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.file) {
+      alert('Please upload a file.');
+      return;
+    }
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('type', formData.file.type === 'application/pdf' ? 'PDF' : 'TXT');
+      formDataToSend.append('file', formData.file);
+
+      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addDocument', formDataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      console.log('Response:', response.data.message);
+      alert(response.data.message);
+      onClose();
+    } catch (error) {
+      console.error('Error adding document:', error);
+      alert('Failed to add document. Please try again.');
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Add Document</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <MdOutlineClose className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              placeholder="Enter document name"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              rows="3"
+              placeholder="Brief description of the document"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload File</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#2563EB] transition-colors">
+              <input
+                type="file"
+                accept=".pdf,.txt"
+                onChange={handleFileChange}
+                className="hidden"
+                id="document-upload"
+                required
+              />
+              <label htmlFor="document-upload" className="cursor-pointer">
+                <div className="space-y-2">
+                  <div className="text-gray-600">
+                    <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium text-[#2563EB] hover:text-[#1d4ed8]">Click to upload</span> or drag and drop
+                  </div>
+                  <div className="text-xs text-gray-500">PDF or TXT files only</div>
+                </div>
+              </label>
+            </div>
+            {filePreview && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-green-700">{filePreview}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, file: null });
+                      setFilePreview(null);
+                      document.getElementById('document-upload').value = '';
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <MdOutlineClose className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+            >
+              Add Document
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+};
+
 // Main Component
 const CompanyProfileDashboard = () => {
   const navigate = useNavigate();
@@ -712,6 +871,7 @@ const CompanyProfileDashboard = () => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showAddCaseStudyModal, setShowAddCaseStudyModal] = useState(false);
   const [showAddCertificateModal, setShowAddCertificateModal] = useState(false);
+  const [showAddDocumentModal, setShowAddDocumentModal] = useState(false);
 
   // Fetch company data from backend
   useEffect(() => {
@@ -831,6 +991,10 @@ const CompanyProfileDashboard = () => {
 
   const handleAddCertification = () => {
     setShowAddCertificateModal(true);
+  };
+
+  const handleAddDocument = () => {
+    setShowAddDocumentModal(true);
   };
 
   // Mock data function for fallback
@@ -1577,7 +1741,15 @@ const CompanyProfileDashboard = () => {
           )}
           {activeTab === "Documents" && (
             <div className="bg-white rounded-xl p-2">
-              <h2 className="text-[24px] font-semibold mb-6">Company Documents</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-[24px] font-semibold">Company Documents</h2>
+                <button
+                  className="flex items-center gap-1 text-[#2563EB] font-medium border border-[#2563EB] px-3 py-1 rounded-lg text-[15px] hover:bg-[#EFF6FF] transition-colors"
+                  onClick={handleAddDocument}
+                >
+                  <MdOutlineAdd className="w-5 h-5" /> Add
+                </button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 lg: gap-4 gap-y-8">
                 {companyData?.documentList && companyData.documentList.length > 0 ? (
                   companyData.documentList.map((doc, i) => (
@@ -1709,6 +1881,11 @@ const CompanyProfileDashboard = () => {
       <AddCertificateModal
         isOpen={showAddCertificateModal}
         onClose={() => setShowAddCertificateModal(false)}
+      />
+
+      <AddDocumentModal
+        isOpen={showAddDocumentModal}
+        onClose={() => setShowAddDocumentModal(false)}
       />
     </div>
   );
