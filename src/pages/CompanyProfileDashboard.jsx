@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera, MdOutlineCheck } from "react-icons/md";
 
 // Unified Badge Styles
 const badgeStyles = {
@@ -664,6 +664,14 @@ const CompanyProfileDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Logo upload state and ref
+  const [logoUrl, setLogoUrl] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   // Modal states
   const [selectedMember, setSelectedMember] = useState(null);
   const [showMemberModal, setShowMemberModal] = useState(false);
@@ -709,10 +717,12 @@ const CompanyProfileDashboard = () => {
             wonProposals: response.data.wonProposals,
             successRate: response.data.successRate,
             activeProposals: response.data.activeProposals
-          }
+          },
+          logoUrl: response.data.logoUrl
         }
         console.log(data);
         setCompanyData(data);
+        setLogoUrl(response.data.logoUrl);
       } catch (err) {
         setError(err.message);
         // Fallback to mock data if API fails
@@ -982,6 +992,7 @@ const CompanyProfileDashboard = () => {
         link: "#"
       },
     ],
+    logoUrl: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
   });
 
   // Loading state
@@ -1013,28 +1024,137 @@ const CompanyProfileDashboard = () => {
     );
   }
 
+  // Image upload handlers
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setEditMode(true); // Ensure editMode stays true after file selection
+  };
+
+  const handleSaveLogo = async () => {
+    if (!selectedFile) return;
+    const formData = new FormData();
+    formData.append('logo', selectedFile);
+
+    try {
+      const response = await axios.post(
+        'https://proposal-form-backend.vercel.app/api/profile/uploadLogo',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setLogoUrl(response.data.logoUrl);
+      setEditMode(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      alert('Logo updated!');
+    } catch (err) {
+      alert('Failed to upload image');
+    }
+  };
+
+  // Image/logo hover and edit handlers
+  const handleLogoMouseEnter = () => setIsHoveringLogo(true);
+  const handleLogoMouseLeave = () => {
+    setIsHoveringLogo(false);
+    // Only reset editMode if not editing (no preview/file selected)
+    if (!previewUrl) {
+      setEditMode(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  };
+
+  const handleViewLogo = (e) => {
+    e.stopPropagation();
+    if (logoUrl) window.open(logoUrl, '_blank');
+  };
+
+  const handleEditLogo = (e) => {
+    e.stopPropagation();
+    setEditMode(true);
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleCancelLogo = () => {
+    setEditMode(false);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+  };
+
   return (
     <div className="h-full relative">
       <Navbar onToggle={() => setIsMobileNavOpen(true)} />
 
       <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px]">
-        {/* Top row: Edit button right-aligned */}
-        {/* <div className="flex justify-end mb-2">
-          <button
-            className="text-[#2563EB] text-[15px] sm:text-[16px] flex items-center gap-1 hover:bg-[#EFF6FF] px-2 sm:px-3 py-2 rounded-lg transition-colors"
-            onClick={() => handleEditProfile()}
-          >
-            <MdOutlineEdit className="w-5 h-5 shrink-0" /> Edit Profile
-          </button>
-        </div> */}
         {/* Profile image and info */}
         <div className="w-full">
           {/* For <lg: Row 1 - image and edit button */}
           <div className="flex flex-row items-center justify-between gap-4 lg:hidden mb-2">
             {/* Profile Image */}
             <div className="flex items-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#E0E0E0] rounded-lg flex items-center justify-center">
-                <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageChange}
+              />
+              <div
+                className="w-24 h-24 sm:w-28 sm:h-28 bg-[#E0E0E0] rounded-lg flex items-center justify-center cursor-pointer overflow-hidden relative group"
+                onMouseEnter={handleLogoMouseEnter}
+                onMouseLeave={handleLogoMouseLeave}
+                title="Upload company logo"
+              >
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                ) : logoUrl ? (
+                  <img src={logoUrl} alt="Company Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
+                )}
+                {(isHoveringLogo || editMode) && (
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center gap-2 transition-opacity">
+                    {!editMode ? (
+                      <button
+                        className="bg-white p-2 rounded-full hover:bg-[#EFF6FF] flex items-center justify-center"
+                        onClick={handleEditLogo}
+                        title="Edit"
+                      >
+                        <MdOutlineEdit className="w-6 h-6 text-[#2563EB]" />
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          className="bg-[#2563EB] p-2 rounded-full flex items-center justify-center hover:bg-[#1d4ed8]"
+                          onClick={handleSaveLogo}
+                          title="Save"
+                        >
+                          <MdOutlineCheck className="w-6 h-6 text-white" />
+                        </button>
+                        <button
+                          className="bg-white p-2 rounded-full flex items-center justify-center hover:bg-[#EFF6FF]"
+                          onClick={handleCancelLogo}
+                          title="Cancel"
+                        >
+                          <MdOutlineClose className="w-6 h-6 text-[#2563EB]" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             {/* Edit Button */}
@@ -1081,8 +1201,56 @@ const CompanyProfileDashboard = () => {
           <div className="hidden lg:flex flex-row items-start gap-4 flex-wrap w-full">
             {/* Profile Image */}
             <div className="flex flex-col items-center justify-center mb-0">
-              <div className="w-[120px] h-[120px] bg-[#E0E0E0] rounded-lg flex items-center justify-center mb-2">
-                <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageChange}
+              />
+              <div
+                className="w-[120px] h-[120px] bg-[#E0E0E0] rounded-lg flex items-center justify-center mb-2 cursor-pointer overflow-hidden relative group"
+                onMouseEnter={handleLogoMouseEnter}
+                onMouseLeave={handleLogoMouseLeave}
+                title="Upload company logo"
+              >
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                ) : logoUrl ? (
+                  <img src={logoUrl} alt="Company Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <MdOutlineAddAPhoto className="w-6 h-6 text-[#6B7280]" />
+                )}
+                {(isHoveringLogo || editMode) && (
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center gap-2 transition-opacity">
+                    {!editMode ? (
+                      <button
+                        className="bg-white p-2 rounded-full hover:bg-[#EFF6FF] flex items-center justify-center"
+                        onClick={handleEditLogo}
+                        title="Edit"
+                      >
+                        <MdOutlineEdit className="w-6 h-6 text-[#2563EB]" />
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          className="bg-[#2563EB] p-2 rounded-full flex items-center justify-center hover:bg-[#1d4ed8]"
+                          onClick={handleSaveLogo}
+                          title="Save"
+                        >
+                          <MdOutlineCheck className="w-6 h-6 text-white" />
+                        </button>
+                        <button
+                          className="bg-white p-2 rounded-full flex items-center justify-center hover:bg-[#EFF6FF]"
+                          onClick={handleCancelLogo}
+                          title="Cancel"
+                        >
+                          <MdOutlineClose className="w-6 h-6 text-[#2563EB]" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             {/* Company Info */}

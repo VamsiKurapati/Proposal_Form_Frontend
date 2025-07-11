@@ -131,7 +131,7 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const role = state?.role;
   // const role = "company";
-  // const role = "employee";
+  // const role = "freelancer";
   const signupData = state?.signupData;
 
   const [form, setForm] = useState({
@@ -469,7 +469,7 @@ const CreateProfile = () => {
         </div>
       )}
 
-      {role === "employee" && (
+      {role === "freelancer" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { key: "fullName", label: "Full Name", type: "text" },

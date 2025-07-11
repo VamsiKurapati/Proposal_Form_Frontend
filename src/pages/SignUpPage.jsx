@@ -8,7 +8,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 const SignupForm = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0); // Step 0 = Choose Role
-  const [role, setRole] = useState(""); // company | employee
+  const [role, setRole] = useState(""); // company | freelancer
 
   const [form, setForm] = useState({
     fullName: "",
@@ -82,12 +82,12 @@ const SignupForm = () => {
             </button>
             <button
               onClick={() => {
-                setRole("employee");
+                setRole("freelancer");
                 setStep(1);
               }}
               className="border border-1 border-[#2563EB] text-[#2563EB] py-2 rounded-md font-semibold"
             >
-              Employee
+              Freelancer
             </button>
           </div>
         </div>
