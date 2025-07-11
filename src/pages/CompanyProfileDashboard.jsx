@@ -75,7 +75,7 @@ const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", o
 
     {/* Scrollable content area */}
     <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-      <ul className="space-y-[1px] min-h-[50vh] md:min-h-[100vh] lg:min-h-[90vh]">
+      <ul className="space-y-[1px] min-h-[100vh]">
         {sidebarItems.map(({ name, icon }) => (
           <li
             key={name}
@@ -930,13 +930,13 @@ const CompanyProfileDashboard = () => {
     });
   };
 
-  const handleDownloadDocument = (document) => {
+  const handleDownloadDocument = (docItem) => {
     // Create a blob URL for the document (simulating download)
-    const blob = new Blob(['Document content for ' + document.name], { type: 'application/pdf' });
+    const blob = new Blob(['Document content for ' + docItem.name], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = document.name;
+    link.download = docItem.name;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
