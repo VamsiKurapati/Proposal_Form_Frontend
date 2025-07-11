@@ -691,7 +691,6 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
 const AddDocumentModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
     file: null,
   });
 
@@ -722,9 +721,8 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
       formDataToSend.append('type', formData.file.type === 'application/pdf' ? 'PDF' : 'TXT');
-      formDataToSend.append('file', formData.file);
+      formDataToSend.append('document', formData.file);
 
       const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addDocument', formDataToSend,
         {
@@ -756,6 +754,10 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
+        <div className="text-sm text-gray-500 mb-4">
+          <p>💡 <strong>Tip:</strong> Upload relevant company documents that showcase your expertise and capabilities. These documents will be used to enhance proposal recommendations and improve your proposal creation process.</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
@@ -766,17 +768,6 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               placeholder="Enter document name"
               required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              rows="3"
-              placeholder="Brief description of the document"
             />
           </div>
 
