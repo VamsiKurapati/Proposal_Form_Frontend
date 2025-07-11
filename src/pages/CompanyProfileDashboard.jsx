@@ -718,11 +718,12 @@ const CompanyProfileDashboard = () => {
             successRate: response.data.successRate,
             activeProposals: response.data.activeProposals
           },
-          logoUrl: response.data.logoUrl
+          logoUrl_1: "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl
         }
         console.log(data);
         setCompanyData(data);
-        setLogoUrl(response.data.logoUrl);
+        setLogoUrl(data.logoUrl_1);
+        console.log(data.logoUrl_1);
       } catch (err) {
         setError(err.message);
         // Fallback to mock data if API fails
