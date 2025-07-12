@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaUserCircle } from "react-icons/fa";
-import { FiMenu } from "react-icons/fi";
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera, MdOutlineCheck } from "react-icons/md";
+import NavbarComponent from "./NavbarComponent";
 
 // Unified Badge Styles
 const badgeStyles = {
@@ -32,25 +31,6 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// Navbar
-const Navbar = ({ onToggle }) => (
-  <div className="fixed top-0 left-0 right-0 bg-white border-b shadow px-4 sm:px-6 py-4 flex justify-between items-center z-30 h-16">
-    <div className="flex items-center gap-4">
-      <button className="md:hidden" onClick={onToggle}>
-        <FiMenu className="text-xl" />
-      </button>
-      <span className="font-bold text-lg">LOGO</span>
-      <nav className="hidden md:flex gap-6 text-sm text-gray-700">
-        {["Discover", "Proposals", "Dashboard", "Profile"].map((item, i) => (
-          <a key={i} href="#" className="hover:text-[#2563EB]">
-            {item}
-          </a>
-        ))}
-      </nav>
-    </div>
-    <FaUserCircle className="text-2xl text-gray-600" />
-  </div>
-);
 
 const sidebarItems = [
   { name: "Overview", icon: <MdOutlineHome className="w-6 h-6" /> },
@@ -62,17 +42,57 @@ const sidebarItems = [
   { name: "Settings", icon: <MdOutlineSettings className="w-6 h-6" /> },
 ];
 
+// Mobile Dropdown Component
+const MobileDropdown = ({ activeTab, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="max-w-[250px] flex items-center justify-between p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[#2563EB]">{sidebarItems.find(item => item.name === activeTab)?.icon}</span>
+          <span className="font-medium text-[#2563EB]">{activeTab}</span>
+        </div>
+        <svg
+          className={`ml-1 w-5 h-5 text-[#2563EB] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg w-full xs:w-1/2">
+          {sidebarItems.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => {
+                onSelect(item.name);
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center gap-2 p-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${item.name === activeTab ? 'bg-[#EFF6FF] text-[#2563EB] font-medium' : 'text-gray-700'
+                }`}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
 const Sidebar = ({ isMobile = false, onClose = () => { }, active = "Overview", onSelect }) => (
   <div
     className={`fixed ${isMobile ? "top-0 w-64 h-full z-50" : "mt-9 w-64 h-full z-50"
       } left-0 bg-white shadow-md overflow-hidden flex flex-col`}
   >
-    {isMobile && (
-      <div className="text-right mb-4 p-6 pb-0 flex-shrink-0">
-        <button onClick={onClose} className="text-gray-600 font-semibold">Close</button>
-      </div>
-    )}
-
     {/* Scrollable content area */}
     <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
       <ul className="space-y-[1px] min-h-[100vh]">
@@ -841,7 +861,6 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
 const CompanyProfileDashboard = () => {
   const navigate = useNavigate();
   const [showRightSidebar, setShowRightSidebar] = useState(false);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Overview");
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -938,15 +957,51 @@ const CompanyProfileDashboard = () => {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
-          },
-          responseType: 'blob' // Important: set responseType to blob
+          }
         }
       );
 
-      // Create a blob URL for the downloaded file
-      const blob = new Blob([response.data], {
-        type: response.data.type
-      });
+      // Handle base64 response
+      let fileData, contentType;
+
+      if (typeof response.data === 'string') {
+        // If response is base64 string
+        fileData = response.data;
+
+        // Determine content type based on file extension (only PDF and TXT supported)
+        const fileExtension = docItem.name.split('.').pop().toLowerCase();
+        switch (fileExtension) {
+          case 'pdf':
+            contentType = 'application/pdf';
+            break;
+          case 'txt':
+            contentType = 'text/plain';
+            break;
+          default:
+            contentType = 'application/octet-stream';
+        }
+      } else {
+        // If response is already a blob
+        fileData = response.data;
+        contentType = response.headers['content-type'] || 'application/octet-stream';
+      }
+
+      // Convert base64 to blob if needed
+      let blob;
+      if (typeof fileData === 'string') {
+        // Convert base64 to blob
+        const byteCharacters = atob(fileData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        blob = new Blob([byteArray], { type: contentType });
+      } else {
+        // Already a blob
+        blob = new Blob([fileData], { type: contentType });
+      }
+
       const url = URL.createObjectURL(blob);
 
       // Create download link
@@ -991,10 +1046,6 @@ const CompanyProfileDashboard = () => {
     // Implement search functionality
     console.log("Searching proposals:", searchTerm);
     // You could filter the proposals list based on search term
-  };
-
-  const handleNewProposal = () => {
-    navigate('/rfp_discovery');
   };
 
   const handleAddCaseStudy = () => {
@@ -1213,13 +1264,6 @@ const CompanyProfileDashboard = () => {
     );
   }
 
-  // Image upload handlers
-  const handleImageClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1257,6 +1301,7 @@ const CompanyProfileDashboard = () => {
 
   // Image/logo hover and edit handlers
   const handleLogoMouseEnter = () => setIsHoveringLogo(true);
+
   const handleLogoMouseLeave = () => {
     setIsHoveringLogo(false);
     // Only reset editMode if not editing (no preview/file selected)
@@ -1265,11 +1310,6 @@ const CompanyProfileDashboard = () => {
       setSelectedFile(null);
       setPreviewUrl(null);
     }
-  };
-
-  const handleViewLogo = (e) => {
-    e.stopPropagation();
-    if (logoUrl) window.open(logoUrl, '_blank');
   };
 
   const handleEditLogo = (e) => {
@@ -1286,7 +1326,7 @@ const CompanyProfileDashboard = () => {
 
   return (
     <div className="h-full relative">
-      <Navbar onToggle={() => setIsMobileNavOpen(true)} />
+      <NavbarComponent />
 
       <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px]">
         {/* Profile image and info */}
@@ -1504,12 +1544,6 @@ const CompanyProfileDashboard = () => {
           <div className="absolute inset-0 bg-black bg-opacity-40 z-50 pointer-events-auto"></div>
         )}
       </div>
-      {isMobileNavOpen && (
-        <>
-          <div className="fixed inset-0 bg-black opacity-40 z-30" onClick={() => setIsMobileNavOpen(false)}></div>
-          <Sidebar isMobile onClose={() => setIsMobileNavOpen(false)} active={activeTab} onSelect={setActiveTab} />
-        </>
-      )}
 
       <div className="hidden lg:block mt-[20rem]"><RightSidebar deadlines={companyData?.deadlines || []} activity={companyData?.activity || []} /></div>
       {showRightSidebar && (
@@ -1531,6 +1565,8 @@ const CompanyProfileDashboard = () => {
 
       <main className="flex-1 md:-mt-7 py-16 px-4 sm:px-6 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
         <div className="bg-[#FFFFFF] ml-3">
+          {/* Mobile Dropdown */}
+          <div className="relative md:hidden right-0 -mt-12 mb-4"><MobileDropdown activeTab={activeTab} onSelect={setActiveTab} /></div>
           {activeTab === "Overview" && (
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -1575,19 +1611,19 @@ const CompanyProfileDashboard = () => {
                   {companyData?.documentList && companyData.documentList.length > 0 ? (
                     companyData.documentList.slice(0, 4).map((doc, i) => (
                       <div key={i} className="flex justify-between items-center p-2 rounded shadow bg-[#F9FAFB] mb-2">
-                        <div className="flex items-center gap-4">
-                          <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6" />
+                        <div className="flex items-center gap-4 flex-1 justify-between w-full">
+                          <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6 shrink-0" />
                           <div className="flex flex-col truncate">
                             <span className="text-[14px] text-[#111827]">{doc.name}</span>
                             <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
                           </div>
+                          <button
+                            className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors shrink-0"
+                            onClick={() => handleDownloadDocument(doc)}
+                          >
+                            <MdOutlineDownload className="text-[#2563EB] w-6 h-6 shrink-0" />
+                          </button>
                         </div>
-                        <button
-                          className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors"
-                          onClick={() => handleDownloadDocument(doc)}
-                        >
-                          <MdOutlineDownload className="text-[#2563EB] w-6 h-6" />
-                        </button>
                       </div>
                     ))
                   ) : (
@@ -1722,12 +1758,6 @@ const CompanyProfileDashboard = () => {
                     />
                     <MdOutlineSearch className="absolute top-1/2 left-4 -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
                   </div>
-                  <button
-                    className="flex items-center gap-2 bg-[#2563EB] text-white px-4 py-2 rounded-lg font-medium text-[15px] shadow hover:bg-[#1d4ed8] transition-colors"
-                    onClick={handleNewProposal}
-                  >
-                    <MdOutlineAdd className="w-6 h-6 shrink-0" /> New Proposal
-                  </button>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 lg:gap-6">

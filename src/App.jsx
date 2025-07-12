@@ -17,6 +17,7 @@ const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
 const PDFEditor = lazy(() => import("./pages/PdfEditor"));
 // const ProposalPage = lazy(() => import("./pages/ProposalPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
+const Proposals = lazy(() => import("./pages/Proposals"));
 
 {/*
   Inter font is used for the entire website.
@@ -49,6 +50,7 @@ const App = () => (
       <Route path="*" element={<Home />} />
       <Route path="/create-profile" element={<ProfileForm />} />
       <Route path="/company-profile-update" element={<CompanyProfileUpdate />} />
+      <Route path="/proposals" element={<Proposals />} />
     </Routes>
   </Router>
 );
