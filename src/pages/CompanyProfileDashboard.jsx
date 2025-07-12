@@ -903,7 +903,7 @@ const CompanyProfileDashboard = () => {
             successRate: response.data.successRate,
             activeProposals: response.data.activeProposals
           },
-          logoUrl_1: "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl
+          logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
         }
         // console.log(data);
         setCompanyData(data);
