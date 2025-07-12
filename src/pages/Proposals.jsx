@@ -285,7 +285,7 @@ const Proposals = () => {
             <div>
                 <NavbarComponent />
             </div>
-            <div className="w-full mx-auto mt-16 px-4 md:px-8 py-8">
+            <div className="w-full mx-auto mt-16 px-8 py-8">
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#2563EB]"></div>
