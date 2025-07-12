@@ -945,7 +945,7 @@ const CompanyProfileDashboard = () => {
 
       // Create a blob URL for the downloaded file
       const blob = new Blob([response.data], {
-        type: response.headers['content-type'] || 'application/octet-stream'
+        type: response.data.type
       });
       const url = URL.createObjectURL(blob);
 
