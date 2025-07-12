@@ -415,9 +415,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
 const AddCaseStudyModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    readTime: '5 min read',
-    customReadTime: '',
+    company: '',
     file: null,
   });
 
@@ -448,8 +446,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('readTime', formData.readTime === "other" ? formData.customReadTime : formData.readTime);
+      formDataToSend.append('company', formData.company);
       formDataToSend.append('file', formData.file);
 
       const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', formDataToSend,
@@ -496,43 +493,15 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+            <input
+              type="text"
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              rows="3"
-              placeholder="Enter case study description"
+              placeholder="Enter case study company"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Read Time</label>
-            <select
-              value={formData.readTime}
-              onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              required
-            >
-              <option value="">Select Read Time</option>
-              <option value="5 min read">5 min read</option>
-              <option value="10 min read">10 min read</option>
-              <option value="15 min read">15 min read</option>
-              <option value="other">Other</option>
-            </select>
-
-            {formData.readTime === "other" && (
-              <div className="mt-2">
-                <input
-                  type="text"
-                  value={formData.customReadTime}
-                  onChange={(e) => setFormData({ ...formData, customReadTime: e.target.value })}
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  placeholder="Enter custom read time (e.g., 20 min read)"
-                />
-              </div>
-            )}
           </div>
 
           <div>

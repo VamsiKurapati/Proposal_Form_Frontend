@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import NavbarComponent from './NavbarComponent';
 import { MdOutlineBookmark, MdOutlineBookmarkBorder, MdOutlineShare, MdOutlineCalendarMonth } from 'react-icons/md';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const initialProposals = {
     saved: [
@@ -207,6 +208,7 @@ const Proposals = () => {
     const [savedProposals, setSavedProposals] = useState([]);
     const [draftProposals, setDraftProposals] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProposals = async () => {
@@ -272,8 +274,8 @@ const Proposals = () => {
         });
     };
 
-    const handleGenerate = (title) => {
-        alert(`Generating proposal: ${title}`);
+    const handleGenerate = (proposal) => {
+        navigate('/proposal_page', { state: { proposal } });
     };
 
     const isSaved = (rfpId) => {
@@ -303,7 +305,7 @@ const Proposals = () => {
                                     }}
                                     onBookmark={() => handleUnsave(proposal.rfpId)}
                                     onShare={() => handleShare(proposal.rfp.link)}
-                                    onGenerate={() => handleGenerate(proposal.rfp.title)}
+                                    onGenerate={() => handleGenerate(proposal.rfp)}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No saved proposals yet
@@ -320,7 +322,7 @@ const Proposals = () => {
                                     }}
                                     onBookmark={() => isSaved(proposal.rfpId) ? handleUnsave(proposal.rfpId) : handleSave(proposal.rfp)}
                                     onShare={() => handleShare(proposal.rfp.link)}
-                                    onGenerate={() => handleGenerate(proposal.rfp.title)}
+                                    onGenerate={() => handleGenerate(proposal.rfp)}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No draft proposals yet
