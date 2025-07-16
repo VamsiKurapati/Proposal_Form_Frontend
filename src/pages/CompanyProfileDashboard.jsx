@@ -1687,3 +1687,5 @@ const CompanyProfileDashboard = () => {
 };
 
 export default CompanyProfileDashboard;
+
+export { AddTeamMemberModal, AddCaseStudyModal };
