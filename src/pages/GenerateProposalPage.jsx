@@ -91,11 +91,13 @@ const GenerateProposalPage = () => {
                       ))}
                       {showViewAllTeam === true && companyData?.employees && companyData?.employees.map((member, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-[#F8F9FA] rounded-lg px-2 py-1">
-                          {member.avatar ? (
-                            <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover min-w-[40px] min-h-[40px]" />
-                          ) : (
-                            member.name.split(' ').map(n => n[0]).join('')
-                          )}
+                          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
+                            {member.avatar ? (
+                              <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover min-w-[40px] min-h-[40px]" />
+                            ) : (
+                              member.name.split(' ').map(n => n[0]).join('')
+                            )}
+                          </div>
                           <div>
                             <div className="text-[16px] font-medium text-[#111827]">{member.name}</div>
                             <div className="text-[14px] text-[#4B5563]">{member.jobTitle}</div>
