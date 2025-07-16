@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MdOutlineArrowBack, MdOutlineSave, MdOutlineCancel, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineDescription, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday } from "react-icons/md";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { useProfile } from "../context/ProfileContext";
 
 const INDUSTRY_OPTIONS = [
     "Information Technology",
@@ -131,8 +132,7 @@ const PhoneInputField = ({
 
 const CompanyProfileUpdate = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const companyData = location.state?.companyData;
+    const { companyData, loading, error, refreshProfile } = useProfile();
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
@@ -149,7 +149,7 @@ const CompanyProfileUpdate = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false); // This line is removed
 
     // Helper to check valid URL
     function isValidUrl(url) {
@@ -226,7 +226,7 @@ const CompanyProfileUpdate = () => {
             return;
         }
 
-        setLoading(true);
+        // setLoading(true); // This line is removed
         try {
             const formData = new FormData();
             formData.append("companyName", form.companyName);
@@ -258,7 +258,7 @@ const CompanyProfileUpdate = () => {
             console.error(error);
             alert("Failed to update profile: " + (error.response?.data?.message || error.message));
         } finally {
-            setLoading(false);
+            // setLoading(false); // This line is removed
         }
     };
 
