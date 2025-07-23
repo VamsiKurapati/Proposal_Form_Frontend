@@ -54,7 +54,11 @@ const App = () => (
         <Route path="/basic-compliance-check" element={<BasicComplianceCheck />} />
         <Route path="/advanced-compliance-check" element={<AdvancedComplianceCheck />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={
+          <ProfileProvider>
+            <Dashboard />
+          </ProfileProvider>
+        } />
 
         <Route path="/company_profile_dashboard" element={
           <ProfileProvider>

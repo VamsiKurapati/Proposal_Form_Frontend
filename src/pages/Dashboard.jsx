@@ -4,6 +4,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineAdd, MdOutlineDelete, MdOutlineVisibility, MdOutlineRestore, MdOutlineDeleteForever } from "react-icons/md";
+import { useProfile } from '../context/ProfileContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -20,6 +21,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'In Progress',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
     {
@@ -27,6 +29,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'Submitted',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
     {
@@ -34,6 +37,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'Won',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
     {
@@ -41,6 +45,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'Rejected',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
     {
@@ -48,6 +53,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'In Progress',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
     {
@@ -55,6 +61,7 @@ const proposals = [
         client: 'Government Agency',
         deadline: 'Mar 15, 2024',
         status: 'Won',
+        editor: 'John Doe',
         submission: 'Mar 15, 2024',
     },
 ];
@@ -177,7 +184,34 @@ function statusBadge(status) {
 }
 
 const Dashboard = () => {
+    const { companyData } = useProfile();
+
+    // const userName = companyData?.companyName || 'John Doe';
+    const userName = 'John Doe';
+    console.log(userName);
+    console.log(proposals[0].editor === userName);
+
     const [search, setSearch] = useState('');
+
+    const [proposalsState, setProposalsState] = useState(proposals);
+
+    const employees = (companyData && companyData?.employees) || [
+        { name: 'John Doe' },
+        { name: 'Sara Johnson' },
+        { name: 'Darrell Steward' },
+        { name: 'Cody Fisher' },
+        { name: 'Eleanor Pena' },
+        { name: 'Theresa Webb' },
+        { name: 'Bessie Cooper' },
+        { name: 'Jane Cooper' },
+        { name: 'Leslie Alexander' },
+        { name: 'Ralph Edwards' },
+        { name: 'Devon Lane' },
+    ];
+
+    const handleEditorChange = (idx, newEditor) => {
+        setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, editor: newEditor } : p));
+    };
 
     return (
         <div className="min-h-screen bg-gray-200">
@@ -221,6 +255,7 @@ const Dashboard = () => {
                             <tr className="bg-gray-50">
                                 <th className="px-4 py-2 text-left font-medium">Proposal Name</th>
                                 <th className="px-4 py-2 text-left font-medium">Client Name</th>
+                                <th className="px-4 py-2 text-left font-medium">Current Editor</th>
                                 <th className="px-4 py-2 text-left font-medium">Deadline</th>
                                 <th className="px-4 py-2 text-left font-medium">Status</th>
                                 <th className="px-4 py-2 text-left font-medium">Submission Date</th>
@@ -228,21 +263,36 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {proposals
+                            {proposalsState
                                 .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
                                 .map((p, idx) => (
                                     <tr key={idx} className="border-t">
                                         <td className="px-4 py-2">{p.name}</td>
                                         <td className="px-4 py-2">{p.client}</td>
+                                        {p.editor === userName ? (
+                                            <td className="px-4 py-2">
+                                                <select
+                                                    className="border rounded px-2 py-1"
+                                                    value={p.editor}
+                                                    onChange={e => handleEditorChange(idx, e.target.value)}
+                                                >
+                                                    {employees.map(emp => (
+                                                        <option key={emp.name} value={emp.name}>{emp.name === userName ? `${emp.name} (You)` : emp.name}</option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                        ) : (
+                                            <td className="px-4 py-2">{p.editor}</td>
+                                        )}
                                         <td className="px-4 py-2">{p.deadline}</td>
                                         <td className="px-4 py-2">{statusBadge(p.status)}</td>
                                         <td className="px-4 py-2">{p.submission}</td>
-                                        <td className="px-4 py-2 flex gap-2">
-                                            <button className="text-blue-600 hover:underline" title="Edit">
-                                                <span className="material-icons text-base">edit</span>
+                                        <td className="px-4 py-2 flex gap-2 items-center mt-2">
+                                            <button className="text-[#2563EB]" title="Edit" onClick={() => handleEdit(idx)}>
+                                                <MdOutlineEdit />
                                             </button>
-                                            <button className="text-blue-600 hover:underline" title="View">
-                                                <span className="material-icons text-base">visibility</span>
+                                            <button className="text-[#2563EB]" title="View">
+                                                <MdOutlineVisibility />
                                             </button>
                                         </td>
                                     </tr>
@@ -252,7 +302,7 @@ const Dashboard = () => {
                 </div>
                 {/* Calendar Section */}
                 <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <h3 className="text-lg font-semibold mb-4">April, 2025</h3>
+                    <h3 className="text-lg font-semibold mb-4">July, 2025</h3>
                     <Calendar
                         localizer={localizer}
                         events={calendarEvents}
@@ -296,11 +346,11 @@ const Dashboard = () => {
                                         <td className="px-4 py-2">{statusBadge(p.status)}</td>
                                         <td className="px-4 py-2">{p.restore}</td>
                                         <td className="px-4 py-2 flex gap-2">
-                                            <button className="text-blue-600 hover:underline" title="Restore">
-                                                <span className="material-icons text-base">restore</span>
+                                            <button className="text-[#2563EB]" title="Restore">
+                                                <MdOutlineRestore />
                                             </button>
-                                            <button className="text-blue-600 hover:underline" title="Delete Permanently">
-                                                <span className="material-icons text-base">delete_forever</span>
+                                            <button className="text-[#2563EB]" title="Delete Permanently">
+                                                <MdOutlineDeleteForever />
                                             </button>
                                         </td>
                                     </tr>
