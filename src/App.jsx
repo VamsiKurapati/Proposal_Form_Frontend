@@ -15,6 +15,8 @@ const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
 const BasicComplianceCheck = lazy(() => import("./pages/BasicComplianceCheck"));
 const AdvancedComplianceCheck = lazy(() => import("./pages/AdvancedComplianceCheck"));
 
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+
 const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboard"));
 const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
@@ -51,6 +53,8 @@ const App = () => (
         } />
         <Route path="/basic-compliance-check" element={<BasicComplianceCheck />} />
         <Route path="/advanced-compliance-check" element={<AdvancedComplianceCheck />} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
 
         <Route path="/company_profile_dashboard" element={
           <ProfileProvider>
