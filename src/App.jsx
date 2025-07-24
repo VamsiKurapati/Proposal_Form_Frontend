@@ -42,6 +42,7 @@ const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
 const App = () => {
   const { role } = useUser();
+  console.log("role: ", role);
   return (
     <UserProvider>
       <Router>
