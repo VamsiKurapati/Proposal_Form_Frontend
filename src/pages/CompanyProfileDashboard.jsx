@@ -882,9 +882,8 @@ const CompanyProfileDashboard = () => {
     try {
       // Determine content type based on file extension
       const fileExtension = docItem.type.toLowerCase();
-      console.log("docItem: ", docItem);
-      console.log("fileExtension: ", fileExtension);
       let contentType;
+
       switch (fileExtension) {
         case 'pdf':
           contentType = 'application/pdf';
@@ -895,7 +894,7 @@ const CompanyProfileDashboard = () => {
         default:
           contentType = 'application/octet-stream';
       }
-      console.log("contentType: ", contentType);
+
       // Download the actual document from the backend as binary
       const response = await axios.get(
         `https://proposal-form-backend.vercel.app/api/profile/getDocument/${docItem.fileId}`,
@@ -1347,7 +1346,7 @@ const CompanyProfileDashboard = () => {
                           <MdOutlineDocumentScanner className="text-[#2563EB] w-6 h-6 shrink-0" />
                           <div className="flex flex-col truncate">
                             <span className="text-[14px] text-[#111827]">{doc.name}</span>
-                            <span className="text-[12px] text-[#4B5563]">({doc.type} | {doc.size})</span>
+                            <span className="text-[12px] text-[#4B5563]">({doc.type} | {(doc.size / 1024 > 1024) ? ((doc.size / 1024 / 1024).toFixed(2) + " MB") : ((doc.size / 1024).toFixed(2) + " KB")})</span>
                           </div>
                           <button
                             className="text-[#2563EB] text-xs flex items-center gap-1 hover:bg-[#EFF6FF] rounded-full p-1 transition-colors shrink-0"
@@ -1532,7 +1531,7 @@ const CompanyProfileDashboard = () => {
                           <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
                           <div className="flex flex-col min-w-0">
                             <span className="font-medium text-[#111827] text-[14px] truncate max-w-[140px] min-w-0" title={doc.name}>{doc.name}</span>
-                            <span className="text-[11px] text-[#4B5563]">{doc.type}, {doc.size}</span>
+                            <span className="text-[11px] text-[#4B5563]">{doc.type}, {(doc.size / 1024 > 1024) ? ((doc.size / 1024 / 1024).toFixed(2) + " MB") : ((doc.size / 1024).toFixed(2) + " KB")}</span>
                           </div>
                         </div>
                         <button
