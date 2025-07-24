@@ -47,13 +47,14 @@ const LoginPage = () => {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       const token = res.data.token;
       const role = res.data.user.role;
+      console.log("role received: ", role);
       setRole(role);
       localStorage.setItem("token", token); // Store JWT
       alert("Login successful!");
       if (role === "company") {
         navigate("/company_profile_dashboard"); // Redirect to company profile page
       } else {
-        navigate("/profile_dashboard"); // Redirect to profile page
+        navigate("/employee_profile_dashboard"); // Redirect to profile page
       }
     } catch (error) {
       alert(error.response?.data?.message || "Login failed. Please try again.");

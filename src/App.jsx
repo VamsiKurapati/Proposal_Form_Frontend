@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 
 import { lazy, Suspense } from "react";
 import { ProfileProvider } from './context/ProfileContext';
-import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
 
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
