@@ -893,7 +893,7 @@ const CompanyProfileDashboard = () => {
         default:
           contentType = 'application/octet-stream';
       }
-
+      console.log("contentType: ", contentType);
       // Download the actual document from the backend as binary
       const response = await axios.get(
         `https://proposal-form-backend.vercel.app/api/profile/getDocument/${docItem.fileId}`,
