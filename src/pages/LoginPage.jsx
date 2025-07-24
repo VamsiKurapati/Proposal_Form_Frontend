@@ -48,8 +48,10 @@ const LoginPage = () => {
       localStorage.setItem("token", token); // Store JWT
       localStorage.setItem("userRole", role);
       if (role === "company") {
+        console.log("Navigating to company profile dashboard");
         navigate("/company_profile_dashboard"); // Redirect to company profile page
       } else {
+        console.log("Navigating to employee profile dashboard");
         navigate("/employee_profile_dashboard"); // Redirect to profile page
       }
     } catch (error) {
