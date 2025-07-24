@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -10,7 +9,6 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { setRole } = useUser();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -47,8 +45,8 @@ const LoginPage = () => {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       const token = res.data.token;
       const role = res.data.user.role;
-      setRole(role);
       localStorage.setItem("token", token); // Store JWT
+      localStorage.setItem("userRole", role);
       if (role === "company") {
         navigate("/company_profile_dashboard"); // Redirect to company profile page
       } else {

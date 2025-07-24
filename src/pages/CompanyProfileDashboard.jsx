@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera, MdOutlineCheck } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineLinkedCamera, MdOutlineCheck } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
 
@@ -880,62 +880,33 @@ const CompanyProfileDashboard = () => {
 
   const handleDownloadDocument = async (docItem) => {
     try {
-      // Download the actual document from the backend
+      // Determine content type based on file extension
+      const fileExtension = docItem.name.split('.').pop().toLowerCase();
+      let contentType;
+      switch (fileExtension) {
+        case 'pdf':
+          contentType = 'application/pdf';
+          break;
+        case 'txt':
+          contentType = 'text/plain';
+          break;
+        default:
+          contentType = 'application/octet-stream';
+      }
+
+      // Download the actual document from the backend as binary
       const response = await axios.get(
         `https://proposal-form-backend.vercel.app/api/profile/getDocument/${docItem.fileId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
+          },
+          responseType: 'arraybuffer' // <-- THIS IS IMPORTANT
         }
       );
 
-      // Handle base64 response
-      let fileData, contentType;
-
-      if (typeof response.data === 'string') {
-        // If response is base64 string
-        console.log("response.data: ", response.data);
-        console.log(" type of response.data: ", typeof response.data);
-        fileData = response.data;
-
-        // Determine content type based on file extension (only PDF and TXT supported)
-        const fileExtension = docItem.name.split('.').pop().toLowerCase();
-        switch (fileExtension) {
-          case 'pdf':
-            contentType = 'application/pdf';
-            break;
-          case 'txt':
-            contentType = 'text/plain';
-            break;
-          default:
-            contentType = 'application/octet-stream';
-        }
-      } else {
-        // If response is already a blob
-        fileData = response.data;
-        contentType = response.headers['content-type'] || 'application/octet-stream';
-      }
-
-      console.log("fileData: ", fileData);
-      console.log("contentType: ", contentType);
-
-      // Convert base64 to blob if needed
-      let blob;
-      if (typeof fileData === 'string') {
-        // Convert base64 to blob
-        const byteCharacters = atob(fileData);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        blob = new Blob([byteArray], { type: contentType });
-      } else {
-        // Already a blob
-        blob = new Blob([fileData], { type: contentType });
-      }
-
+      // Create a Blob from the binary data
+      const blob = new Blob([response.data], { type: contentType });
       const url = URL.createObjectURL(blob);
 
       // Create download link
