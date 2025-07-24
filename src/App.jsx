@@ -38,30 +38,30 @@ const App = () => {
           <Route path="/sign_up" element={<SignUpPage />} />
           <Route path="/create-profile" element={<ProfileForm />} />
 
-          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
             <RFPDiscovery />
           </ProtectedRoutes>} />
 
-          <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+          <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
             <Proposals />
           </ProtectedRoutes>} />
 
           <Route path="/proposal_page" element={
-            <ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+            <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
               <ProfileProvider>
                 <GenerateProposalPage />
               </ProfileProvider>
             </ProtectedRoutes>
           } />
-          <Route path="/basic-compliance-check" element={<ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+          <Route path="/basic-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
             <BasicComplianceCheck />
           </ProtectedRoutes>} />
-          <Route path="/advanced-compliance-check" element={<ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+          <Route path="/advanced-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
             <AdvancedComplianceCheck />
           </ProtectedRoutes>} />
 
           <Route path="/dashboard" element={
-            <ProtectedRoutes allowedRoles={["admin", "editor", "viewer"]}>
+            <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
               <ProfileProvider>
                 <Dashboard />
               </ProfileProvider>
@@ -69,14 +69,14 @@ const App = () => {
           } />
 
           <Route path="/company_profile_dashboard" element={
-            <ProtectedRoutes allowedRoles={["admin"]}>
+            <ProtectedRoutes allowedRoles={["company"]}>
               <ProfileProvider>
                 <CompanyProfileDashboard />
               </ProfileProvider>
             </ProtectedRoutes>
           } />
           <Route path="/company-profile-update" element={
-            <ProtectedRoutes allowedRoles={["admin"]}>
+            <ProtectedRoutes allowedRoles={["company"]}>
               <ProfileProvider>
                 <CompanyProfileUpdate />
               </ProfileProvider>
