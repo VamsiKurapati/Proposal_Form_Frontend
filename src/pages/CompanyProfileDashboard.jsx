@@ -881,7 +881,7 @@ const CompanyProfileDashboard = () => {
   const handleDownloadDocument = async (docItem) => {
     try {
       // Determine content type based on file extension
-      const fileExtension = docItem.name.split('.').pop().toLowerCase();
+      const fileExtension = docItem.type.toLowerCase();
       console.log("docItem: ", docItem);
       console.log("fileExtension: ", fileExtension);
       let contentType;
