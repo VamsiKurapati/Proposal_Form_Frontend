@@ -73,7 +73,7 @@ const statusStyles = {
     "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
 };
 
-const stasStyles = {
+const statsStyles = {
     "All Proposals": "bg-[#EFF6FF] text-[#2563EB]",
     "In Progress": "bg-[#EEF2FF] text-[#4F46E5]",
     "Submitted": "bg-[#F0FDF4] text-[#16A34A]",
@@ -182,6 +182,8 @@ function statusBadge(status) {
     );
 }
 
+const PAGE_SIZE = 5;
+
 const Dashboard = () => {
     const { companyData } = useProfile();
     const userName = 'John Doe';
@@ -190,6 +192,10 @@ const Dashboard = () => {
     const [showAddPersonIdx, setShowAddPersonIdx] = useState(null);
     const [selectedProposals, setSelectedProposals] = useState([]);
     const [showDeleteOptions, setShowDeleteOptions] = useState(false);
+    const [currentProposalPage, setCurrentProposalPage] = useState(1);
+    const [currentDeletedPage, setCurrentDeletedPage] = useState(1);
+    const [calendarMonth, setCalendarMonth] = useState(moment().month());
+    const [calendarYear, setCalendarYear] = useState(moment().year());
 
     const employees = (companyData && companyData?.employees) || [
         { name: 'John Doe' },
@@ -204,6 +210,8 @@ const Dashboard = () => {
         { name: 'Ralph Edwards' },
         { name: 'Devon Lane' },
     ];
+
+    // console.log
 
     const handleEditorChange = (idx, newEditor) => {
         setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, editor: newEditor } : p));
@@ -220,6 +228,72 @@ const Dashboard = () => {
         setShowDeleteOptions(false);
     };
 
+    // Pagination logic for proposals
+    const filteredProposals = proposalsState.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+    const totalProposalPages = Math.ceil(filteredProposals.length / PAGE_SIZE);
+    const paginatedProposals = filteredProposals.slice((currentProposalPage - 1) * PAGE_SIZE, currentProposalPage * PAGE_SIZE);
+
+    // Pagination logic for deleted proposals
+    const totalDeletedPages = Math.ceil(deletedProposals.length / PAGE_SIZE);
+    const paginatedDeletedProposals = deletedProposals.slice((currentDeletedPage - 1) * PAGE_SIZE, currentDeletedPage * PAGE_SIZE);
+
+    // Helper: get all years in a reasonable range
+    const yearOptions = Array.from({ length: 11 }, (_, i) => 2020 + i);
+    const monthOptions = moment.months();
+
+    // Helper: get events for a specific date
+    function getEventsForDate(date) {
+        return calendarEvents.filter(ev =>
+            moment(ev.start).isSame(date, 'day')
+        );
+    }
+
+    // Helper: bg color map for calendar
+    const bgColor = {
+        'In Progress': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(14, 45, 85, 0.1))',
+        'Submitted': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(220,252,231,0.1))',
+        'Won': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,249,195,0.1))',
+        'Rejected': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,226,226,0.1))',
+        'Deadline': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,226,226,0.1))',
+    }
+
+    // Helper: status color map for bg and text, dot
+    const statusBgMap = {
+        'In Progress': 'bg-[#DBEAFE] text-[#2563EB]',
+        'Submitted': 'bg-[#DCFCE7] text-[#16A34A]',
+        'Won': 'bg-[#FEF9C3] text-[#CA8A04]',
+        'Rejected': 'bg-[#FEE2E2] text-[#DC2626]',
+        'Deadline': 'bg-[#FEF3C7] text-[#F59E42]',
+    };
+
+    const statusDotMap = {
+        'In Progress': 'bg-[#2563EB]',
+        'Submitted': 'bg-[#16A34A]',
+        'Won': 'bg-[#CA8A04]',
+        'Rejected': 'bg-[#DC2626]',
+        'Deadline': 'bg-[#F59E42]',
+    };
+
+    // Custom date cell for calendar
+    function CustomDateCellWrapper({ value, children }) {
+        const events = getEventsForDate(value);
+        const isEmpty = events.length === 0;
+        return (
+            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[events[0].status] || 'bg-[#F3F4F6]'} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
+                <div className="absolute top-1 left-2 text-[18px] text-[#9CA3AF] font-medium">{moment(value).date()}</div>
+                {events.map((ev, i) => (
+                    <div key={i} className="absolute bottom-1 left-2 mb-1 flex flex-col items-start w-full">
+                        <span className="font-medium text-[17px] w-2/3 line-clamp-4">{ev.title}</span>
+                        <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
+                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
+                            {ev.status}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen">
             <NavbarComponent />
@@ -229,7 +303,7 @@ const Dashboard = () => {
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 mb-4">
                     {summaryStats.map((stat) => (
-                        <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left ${stasStyles[stat.label]}`}>
+                        <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left ${statsStyles[stat.label]}`}>
                             <div className="text-[11px] sm:text-[13px] md:text-[16px]  capitalize">{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
                             <div className={`text-[18px] sm:text-[24px] md:text-[32px] font-semibold`}>{stat.value}</div>
                         </div>
@@ -274,72 +348,94 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {proposalsState
-                                .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
-                                .map((p, idx) => (
-                                    <tr key={idx} className="border-t">
-                                        {showDeleteOptions && (
-                                            <td className="px-2 py-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedProposals.includes(idx)}
-                                                    onChange={() => handleSelectProposal(idx)}
-                                                />
+                            {paginatedProposals
+                                .map((p, idx) => {
+                                    const realIdx = (currentProposalPage - 1) * PAGE_SIZE + idx;
+                                    return (
+                                        <tr key={realIdx} className="border-t">
+                                            {showDeleteOptions && (
+                                                <td className="px-2 py-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedProposals.includes(realIdx)}
+                                                        onChange={() => handleSelectProposal(realIdx)}
+                                                    />
+                                                </td>
+                                            )}
+                                            <td className="px-4 py-2 font-semibold">{p.name}</td>
+                                            <td className="px-4 py-2">{p.client}</td>
+                                            {p.editor === userName ? (
+                                                <td className="px-4 py-2 flex items-center gap-2">
+                                                    <span>{userName} (You)</span>
+                                                    <button
+                                                        className="text-[#2563EB]"
+                                                        title="Assign Editor"
+                                                        onClick={() => setShowAddPersonIdx(realIdx)}
+                                                    >
+                                                        <MdPersonAddAlt1 className="w-4 h-4" />
+                                                    </button>
+                                                    {showAddPersonIdx === realIdx && (
+                                                        <div className="absolute bg-white border rounded shadow z-10 mt-8">
+                                                            <ul>
+                                                                {employees.filter(emp => emp.name !== userName).map(emp => (
+                                                                    <li key={emp.name}>
+                                                                        <button
+                                                                            className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
+                                                                            onClick={() => handleEditorChange(realIdx, emp.name)}
+                                                                        >
+                                                                            {emp.name}
+                                                                        </button>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            ) : (
+                                                <td className="px-4 py-2">{p.editor}</td>
+                                            )}
+                                            <td className="px-4 py-2">{p.deadline}</td>
+                                            <td className="px-4 py-2">
+                                                <div className="flex items-center text-center">
+                                                    {statusBadge(p.status)}
+                                                </div>
                                             </td>
-                                        )}
-                                        <td className="px-4 py-2 font-semibold">{p.name}</td>
-                                        <td className="px-4 py-2">{p.client}</td>
-                                        {p.editor === userName ? (
-                                            <td className="px-4 py-2 flex items-center gap-2">
-                                                <span>{userName} (You)</span>
-                                                <button
-                                                    className="text-[#2563EB]"
-                                                    title="Assign Editor"
-                                                    onClick={() => setShowAddPersonIdx(idx)}
-                                                >
-                                                    <MdPersonAddAlt1 className="w-4 h-4" />
-                                                </button>
-                                                {showAddPersonIdx === idx && (
-                                                    <div className="absolute bg-white border rounded shadow z-10 mt-8">
-                                                        <ul>
-                                                            {employees.filter(emp => emp.name !== userName).map(emp => (
-                                                                <li key={emp.name}>
-                                                                    <button
-                                                                        className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
-                                                                        onClick={() => handleEditorChange(idx, emp.name)}
-                                                                    >
-                                                                        {emp.name}
-                                                                    </button>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                            <td className="px-4 py-2">{p.submission}</td>
+                                            <td className="px-4 py-2">
+                                                <div className="flex items-center gap-2">
+                                                    <button className="text-[#2563EB]" title="Edit" onClick={() => handleEdit(realIdx)}>
+                                                        <MdOutlineEdit className="w-5 h-5" />
+                                                    </button>
+                                                    <button className="text-[#2563EB]" title="View">
+                                                        <MdOutlineVisibility className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </td>
-                                        ) : (
-                                            <td className="px-4 py-2">{p.editor}</td>
-                                        )}
-                                        <td className="px-4 py-2">{p.deadline}</td>
-                                        <td className="px-4 py-2">
-                                            <div className="flex items-center text-center">
-                                                {statusBadge(p.status)}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-2">{p.submission}</td>
-                                        <td className="px-4 py-2">
-                                            <div className="flex items-center gap-2">
-                                                <button className="text-[#2563EB]" title="Edit" onClick={() => handleEdit(idx)}>
-                                                    <MdOutlineEdit className="w-5 h-5" />
-                                                </button>
-                                                <button className="text-[#2563EB]" title="View">
-                                                    <MdOutlineVisibility className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                        </tr>
+                                    );
+                                })}
                         </tbody>
                     </table>
+                    {/* Pagination controls for proposals */}
+                    <div className="flex justify-end gap-2 my-2">
+                        <button
+                            className="px-2 py-1 border rounded disabled:opacity-50"
+                            onClick={() => setCurrentProposalPage(p => Math.max(1, p - 1))}
+                            disabled={currentProposalPage === 1}
+                        >Prev</button>
+                        {Array.from({ length: totalProposalPages }, (_, i) => (
+                            <button
+                                key={i}
+                                className={`px-2 py-1 border rounded ${currentProposalPage === i + 1 ? 'bg-[#2563EB] text-white' : ''}`}
+                                onClick={() => setCurrentProposalPage(i + 1)}
+                            >{i + 1}</button>
+                        ))}
+                        <button
+                            className="px-2 py-1 border rounded disabled:opacity-50"
+                            onClick={() => setCurrentProposalPage(p => Math.min(totalProposalPages, p + 1))}
+                            disabled={currentProposalPage === totalProposalPages}
+                        >Next</button>
+                    </div>
                     {showDeleteOptions && (
                         <div className="flex gap-4 mt-4 justify-end mb-4 px-4">
                             <button
@@ -363,25 +459,32 @@ const Dashboard = () => {
 
                 {/* Calendar Section */}
                 <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <h3 className="text-lg font-semibold mb-4">August, 2025</h3>
+                    <div className="flex gap-2 mb-4 items-center">
+                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="border rounded px-2 py-1">
+                            {monthOptions.map((m, idx) => (
+                                <option key={m} value={idx}>{m}</option>
+                            ))}
+                        </select>
+                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="border rounded px-2 py-1">
+                            {yearOptions.map(y => (
+                                <option key={y} value={y}>{y}</option>
+                            ))}
+                        </select>
+                    </div>
                     <Calendar
                         localizer={localizer}
-                        events={calendarEvents}
                         startAccessor="start"
                         endAccessor="end"
-                        style={{ height: 1000 }}
-                        eventPropGetter={(event) => {
-                            let bg = '#e5e7eb';
-                            if (event.status === 'Submitted') bg = '#d1fae5';
-                            if (event.status === 'In Progress') bg = '#dbeafe';
-                            if (event.status === 'Won') bg = '#fef9c3';
-                            if (event.status === 'Rejected') bg = '#fee2e2';
-                            if (event.status === 'Deadline') bg = '#fef3c7';
-                            return { style: { backgroundColor: bg, color: '#222', borderRadius: 6 } };
-                        }}
+                        style={{ height: 1000, width: '100%' }}
                         views={['month']}
                         toolbar={false}
-                        date={new Date(2025, 7, 1)}
+                        date={new Date(calendarYear, calendarMonth, 1)}
+                        components={{
+                            month: {
+                                dateCellWrapper: CustomDateCellWrapper,
+                                dateHeader: () => null // Hide default date number
+                            }
+                        }}
                     />
                 </div>
 
@@ -400,8 +503,8 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {deletedProposals.map((p, idx) => (
-                                <tr key={idx} className="border-t">
+                            {paginatedDeletedProposals.map((p, idx) => (
+                                <tr key={idx + (currentDeletedPage - 1) * PAGE_SIZE} className="border-t">
                                     <td className="px-4 py-2 font-semibold">{p.name}</td>
                                     <td className="px-4 py-2">{p.client}</td>
                                     <td className="px-4 py-2">{p.deadline}</td>
@@ -421,6 +524,26 @@ const Dashboard = () => {
                             ))}
                         </tbody>
                     </table>
+                    {/* Pagination controls for deleted proposals */}
+                    <div className="flex justify-end gap-2 my-2">
+                        <button
+                            className="px-2 py-1 border rounded disabled:opacity-50"
+                            onClick={() => setCurrentDeletedPage(p => Math.max(1, p - 1))}
+                            disabled={currentDeletedPage === 1}
+                        >Prev</button>
+                        {Array.from({ length: totalDeletedPages }, (_, i) => (
+                            <button
+                                key={i}
+                                className={`px-2 py-1 border rounded ${currentDeletedPage === i + 1 ? 'bg-[#2563EB] text-white' : ''}`}
+                                onClick={() => setCurrentDeletedPage(i + 1)}
+                            >{i + 1}</button>
+                        ))}
+                        <button
+                            className="px-2 py-1 border rounded disabled:opacity-50"
+                            onClick={() => setCurrentDeletedPage(p => Math.min(totalDeletedPages, p + 1))}
+                            disabled={currentDeletedPage === totalDeletedPages}
+                        >Next</button>
+                    </div>
                 </div>
             </div>
         </div>
