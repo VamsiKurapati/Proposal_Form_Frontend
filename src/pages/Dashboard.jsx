@@ -3,16 +3,16 @@ import NavbarComponent from './NavbarComponent';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineAdd, MdOutlineDelete, MdOutlineVisibility, MdOutlineRestore, MdOutlineDeleteForever } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1 } from "react-icons/md";
 import { useProfile } from '../context/ProfileContext';
 
 const localizer = momentLocalizer(moment);
 
 const summaryStats = [
-    { label: 'All Proposals', value: 120, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'In Progress', value: 45, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-    { label: 'Submitted', value: 62, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Won', value: 10, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+    { label: 'All Proposals', value: 120 },
+    { label: 'In Progress', value: 45 },
+    { label: 'Submitted', value: 62 },
+    { label: 'Won', value: 10 },
 ];
 
 const proposals = [
@@ -68,78 +68,77 @@ const proposals = [
 
 const statusStyles = {
     "In Progress": "bg-[#DBEAFE] text-[#2563EB]",
-    "Won": "bg-[#DCFCE7] text-[#15803D]",
+    "Won": "bg-[#FEF9C3] text-[#CA8A04]",
     "Submitted": "bg-[#DCFCE7] text-[#15803D]",
     "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
-    "Urgent": "bg-[#FEE2E2] text-[#DC2626]",
-    "Scheduled": "bg-[#DBEAFE] text-[#2563EB]",
-    "On Track": "bg-[#DCFCE7] text-[#15803D]",
-    "Pending": "bg-[#FEF9C3] text-[#CA8A04]",
-    "Full Access": "bg-[#DBEAFE] text-[#2563EB]",
-    "Admin": "bg-[#DCFCE7] text-[#15803D]",
-    "Editor": "bg-[#FEF9C3] text-[#CA8A04]",
-    "Viewer": "bg-[#F3F4F6] text-[#4B5563]",
 };
+
+const stasStyles = {
+    "All Proposals": "bg-[#EFF6FF] text-[#2563EB]",
+    "In Progress": "bg-[#EEF2FF] text-[#4F46E5]",
+    "Submitted": "bg-[#F0FDF4] text-[#16A34A]",
+    "Won": "bg-[#FEFCE8] text-[#CA8A04]",
+}
 
 const calendarEvents = [
     {
         title: 'Sustainable Office Park Development',
-        start: new Date(2025, 3, 1),
-        end: new Date(2025, 3, 1),
+        start: new Date(2025, 7, 1),
+        end: new Date(2025, 7, 1),
         status: 'Submitted',
     },
     {
         title: 'High-Tech Campus Expansion',
-        start: new Date(2025, 3, 6),
-        end: new Date(2025, 3, 6),
+        start: new Date(2025, 7, 6),
+        end: new Date(2025, 7, 6),
         status: 'In Progress',
     },
     {
         title: 'Affordable Housing Project',
-        start: new Date(2025, 3, 8),
-        end: new Date(2025, 3, 8),
+        start: new Date(2025, 7, 8),
+        end: new Date(2025, 7, 8),
         status: 'Won',
     },
     {
         title: 'Educational Facility Modernization - Design-Build',
-        start: new Date(2025, 3, 14),
-        end: new Date(2025, 3, 14),
+        start: new Date(2025, 7, 14),
+        end: new Date(2025, 7, 14),
         status: 'Rejected',
     },
     {
         title: 'Urban Infrastructure Improvement',
-        start: new Date(2025, 3, 23),
-        end: new Date(2025, 3, 23),
+        start: new Date(2025, 7, 23),
+        end: new Date(2025, 7, 23),
         status: 'Submitted',
     },
     {
         title: 'Historic Landmark Restoration',
-        start: new Date(2025, 3, 29),
-        end: new Date(2025, 3, 29),
+        start: new Date(2025, 7, 29),
+        end: new Date(2025, 7, 29),
         status: 'Won',
     },
     {
         title: 'Walmart Fuel Station',
-        start: new Date(2025, 3, 4),
-        end: new Date(2025, 3, 4),
+        start: new Date(2025, 7, 4),
+        end: new Date(2025, 7, 4),
         status: 'Deadline',
     },
     {
         title: 'Smart City Technology Integration',
-        start: new Date(2025, 3, 18),
-        end: new Date(2025, 3, 18),
+        start: new Date(2025, 7, 18),
+        end: new Date(2025, 7, 18),
         status: 'Rejected',
     },
     {
         title: 'Mixed-Use Development Opportunity',
-        start: new Date(2025, 3, 20),
-        end: new Date(2025, 3, 20),
+        start: new Date(2025, 7, 20),
+        end: new Date(2025, 7, 20),
         status: 'Won',
     },
     {
         title: 'Civil Design Services',
-        start: new Date(2025, 3, 26),
-        end: new Date(2025, 3, 26),
+        start: new Date(2025, 7, 26),
+        end: new Date(2025, 7, 26),
         status: 'Deadline',
     },
 ];
@@ -185,15 +184,12 @@ function statusBadge(status) {
 
 const Dashboard = () => {
     const { companyData } = useProfile();
-
-    // const userName = companyData?.companyName || 'John Doe';
     const userName = 'John Doe';
-    // console.log(userName);
-    // console.log(proposals[0].editor === userName);
-
     const [search, setSearch] = useState('');
-
     const [proposalsState, setProposalsState] = useState(proposals);
+    const [showAddPersonIdx, setShowAddPersonIdx] = useState(null);
+    const [selectedProposals, setSelectedProposals] = useState([]);
+    const [showDeleteOptions, setShowDeleteOptions] = useState(false);
 
     const employees = (companyData && companyData?.employees) || [
         { name: 'John Doe' },
@@ -211,48 +207,63 @@ const Dashboard = () => {
 
     const handleEditorChange = (idx, newEditor) => {
         setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, editor: newEditor } : p));
+        setShowAddPersonIdx(null);
+    };
+
+    const handleSelectProposal = (idx) => {
+        setSelectedProposals(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+    };
+
+    const handleDeleteProposals = () => {
+        setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
+        setSelectedProposals([]);
+        setShowDeleteOptions(false);
     };
 
     return (
-        <div className="min-h-screen bg-gray-200">
+        <div className="min-h-screen">
             <NavbarComponent />
-            <div className="max-w-7xl mx-auto py-8 px-4">
-                <h2 className="text-xl font-semibold mb-4">Tracking Dashboard</h2>
+            <div className="w-full mx-auto py-8 px-4 md:px-8 mt-12">
+                <h2 className="text-[24px] font-semibold mb-4">Tracking Dashboard</h2>
+
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 mb-4">
                     {summaryStats.map((stat) => (
-                        <div key={stat.label} className={`rounded-lg p-6 shadow ${stat.bg}`}>
-                            <div className="text-sm text-gray-500">{stat.label}</div>
-                            <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
+                        <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left ${stasStyles[stat.label]}`}>
+                            <div className="text-[11px] sm:text-[13px] md:text-[16px]  capitalize">{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className={`text-[18px] sm:text-[24px] md:text-[32px] font-semibold`}>{stat.value}</div>
                         </div>
                     ))}
                 </div>
+
                 {/* Search and Actions */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                <div className="flex flex-row items-center justify-between mb-4 gap-2">
                     <div className="flex relative w-full md:w-1/3 items-center gap-2">
                         <MdOutlineSearch className="absolute left-3 text-gray-500" />
                         <input
                             type="text"
                             placeholder="Search proposals"
-                            className="border rounded px-3 py-2 w-full bg-white focus:outline-none pl-10"
+                            className="border rounded px-3 py-2 w-full bg-white border-[#E5E7EB] text-[#9CA3AF] pl-10 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2 mt-2 md:mt-0">
-                        <button className="flex items-center gap-1 px-4 py-2 border rounded text-[#2563EB] border-[#2563EB]">
-                            <MdOutlineDelete /> Delete
-                        </button>
-                        <button className="flex items-center gap-1 px-4 py-2 bg-[#2563EB] text-white rounded">
-                            <MdOutlineAdd /> Add
+                    <div className="justify-end group flex gap-2">
+                        <button
+                            className="flex items-center gap-1 px-4 py-2 border rounded text-[#2563EB] border-[#2563EB] text-[14px] md:text-[16px] group-hover:bg-[#2563EB] group-hover:text-white"
+                            onClick={() => setShowDeleteOptions(true)}
+                        >
+                            <MdOutlineDeleteForever className="w-5 h-5 group-hover:text-white" /> Delete
                         </button>
                     </div>
                 </div>
+
                 {/* Proposals Table */}
                 <div className="bg-white rounded-lg shadow overflow-x-auto mb-8">
                     <table className="min-w-full text-sm">
                         <thead>
-                            <tr className="bg-gray-50">
+                            <tr className="bg-[#F8FAFC]">
+                                {showDeleteOptions && <th className="px-4 py-2"></th>}
                                 <th className="px-4 py-2 text-left font-medium">Proposal Name</th>
                                 <th className="px-4 py-2 text-left font-medium">Client Name</th>
                                 <th className="px-4 py-2 text-left font-medium">Current Editor</th>
@@ -267,48 +278,98 @@ const Dashboard = () => {
                                 .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
                                 .map((p, idx) => (
                                     <tr key={idx} className="border-t">
-                                        <td className="px-4 py-2">{p.name}</td>
+                                        {showDeleteOptions && (
+                                            <td className="px-2 py-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedProposals.includes(idx)}
+                                                    onChange={() => handleSelectProposal(idx)}
+                                                />
+                                            </td>
+                                        )}
+                                        <td className="px-4 py-2 font-semibold">{p.name}</td>
                                         <td className="px-4 py-2">{p.client}</td>
                                         {p.editor === userName ? (
-                                            <td className="px-4 py-2">
-                                                <select
-                                                    className="border rounded px-2 py-1"
-                                                    value={p.editor}
-                                                    onChange={e => handleEditorChange(idx, e.target.value)}
+                                            <td className="px-4 py-2 flex items-center gap-2">
+                                                <span>{userName} (You)</span>
+                                                <button
+                                                    className="text-[#2563EB]"
+                                                    title="Assign Editor"
+                                                    onClick={() => setShowAddPersonIdx(idx)}
                                                 >
-                                                    {employees.map(emp => (
-                                                        <option key={emp.name} value={emp.name}>{emp.name === userName ? `${emp.name} (You)` : emp.name}</option>
-                                                    ))}
-                                                </select>
+                                                    <MdPersonAddAlt1 className="w-4 h-4" />
+                                                </button>
+                                                {showAddPersonIdx === idx && (
+                                                    <div className="absolute bg-white border rounded shadow z-10 mt-8">
+                                                        <ul>
+                                                            {employees.filter(emp => emp.name !== userName).map(emp => (
+                                                                <li key={emp.name}>
+                                                                    <button
+                                                                        className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
+                                                                        onClick={() => handleEditorChange(idx, emp.name)}
+                                                                    >
+                                                                        {emp.name}
+                                                                    </button>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
                                             </td>
                                         ) : (
                                             <td className="px-4 py-2">{p.editor}</td>
                                         )}
                                         <td className="px-4 py-2">{p.deadline}</td>
-                                        <td className="px-4 py-2">{statusBadge(p.status)}</td>
+                                        <td className="px-4 py-2">
+                                            <div className="flex items-center text-center">
+                                                {statusBadge(p.status)}
+                                            </div>
+                                        </td>
                                         <td className="px-4 py-2">{p.submission}</td>
-                                        <td className="px-4 py-2 flex gap-2 items-center mt-2">
-                                            <button className="text-[#2563EB]" title="Edit" onClick={() => handleEdit(idx)}>
-                                                <MdOutlineEdit />
-                                            </button>
-                                            <button className="text-[#2563EB]" title="View">
-                                                <MdOutlineVisibility />
-                                            </button>
+                                        <td className="px-4 py-2">
+                                            <div className="flex items-center gap-2">
+                                                <button className="text-[#2563EB]" title="Edit" onClick={() => handleEdit(idx)}>
+                                                    <MdOutlineEdit className="w-5 h-5" />
+                                                </button>
+                                                <button className="text-[#2563EB]" title="View">
+                                                    <MdOutlineVisibility className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                         </tbody>
                     </table>
+                    {showDeleteOptions && (
+                        <div className="flex gap-4 mt-4 justify-end mb-4 px-4">
+                            <button
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                                onClick={handleDeleteProposals}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                                onClick={() => {
+                                    setShowDeleteOptions(false);
+                                    setSelectedProposals([]);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
                 </div>
+
                 {/* Calendar Section */}
                 <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <h3 className="text-lg font-semibold mb-4">July, 2025</h3>
+                    <h3 className="text-lg font-semibold mb-4">August, 2025</h3>
                     <Calendar
                         localizer={localizer}
                         events={calendarEvents}
                         startAccessor="start"
                         endAccessor="end"
-                        style={{ height: 500 }}
+                        style={{ height: 1000 }}
                         eventPropGetter={(event) => {
                             let bg = '#e5e7eb';
                             if (event.status === 'Submitted') bg = '#d1fae5';
@@ -320,44 +381,46 @@ const Dashboard = () => {
                         }}
                         views={['month']}
                         toolbar={false}
+                        date={new Date(2025, 7, 1)}
                     />
                 </div>
+
                 {/* Deleted Proposals Table */}
-                <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <h3 className="text-lg font-semibold mb-4">Deleted Proposals</h3>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm">
-                            <thead>
-                                <tr className="bg-gray-50">
-                                    <th className="px-4 py-2 text-left font-medium">Proposal Name</th>
-                                    <th className="px-4 py-2 text-left font-medium">Client Name</th>
-                                    <th className="px-4 py-2 text-left font-medium">Deadline</th>
-                                    <th className="px-4 py-2 text-left font-medium">Status</th>
-                                    <th className="px-4 py-2 text-left font-medium">Restore in</th>
-                                    <th className="px-4 py-2 text-left font-medium">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {deletedProposals.map((p, idx) => (
-                                    <tr key={idx} className="border-t">
-                                        <td className="px-4 py-2">{p.name}</td>
-                                        <td className="px-4 py-2">{p.client}</td>
-                                        <td className="px-4 py-2">{p.deadline}</td>
-                                        <td className="px-4 py-2">{statusBadge(p.status)}</td>
-                                        <td className="px-4 py-2">{p.restore}</td>
-                                        <td className="px-4 py-2 flex gap-2">
+                <h3 className="text-[18px] sm:text-[24px] font-semibold mb-2">Deleted Proposals</h3>
+                <div className="bg-white rounded-lg overflow-x-auto shadow mb-8">
+                    <table className="min-w-full text-sm ">
+                        <thead>
+                            <tr className="bg-[#F8FAFC]">
+                                <th className="px-4 py-2 text-left font-medium">Proposal Name</th>
+                                <th className="px-4 py-2 text-left font-medium">Client Name</th>
+                                <th className="px-4 py-2 text-left font-medium">Deadline</th>
+                                <th className="px-4 py-2 text-left font-medium">Status</th>
+                                <th className="px-4 py-2 text-left font-medium">Restore in</th>
+                                <th className="px-4 py-2 text-left font-medium">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {deletedProposals.map((p, idx) => (
+                                <tr key={idx} className="border-t">
+                                    <td className="px-4 py-2 font-semibold">{p.name}</td>
+                                    <td className="px-4 py-2">{p.client}</td>
+                                    <td className="px-4 py-2">{p.deadline}</td>
+                                    <td className="px-4 py-2">{statusBadge(p.status)}</td>
+                                    <td className="px-4 py-2">{p.restore}</td>
+                                    <td className="px-4 py-2">
+                                        <div className="flex items-center gap-2">
                                             <button className="text-[#2563EB]" title="Restore">
-                                                <MdOutlineRestore />
+                                                <MdOutlineRotateLeft className="w-5 h-5" />
                                             </button>
                                             <button className="text-[#2563EB]" title="Delete Permanently">
-                                                <MdOutlineDeleteForever />
+                                                <MdOutlineDeleteForever className="w-5 h-5" />
                                             </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
