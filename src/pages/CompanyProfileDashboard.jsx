@@ -895,6 +895,8 @@ const CompanyProfileDashboard = () => {
 
       if (typeof response.data === 'string') {
         // If response is base64 string
+        console.log("response.data: ", response.data);
+        console.log(" type of response.data: ", typeof response.data);
         fileData = response.data;
 
         // Determine content type based on file extension (only PDF and TXT supported)
@@ -914,6 +916,9 @@ const CompanyProfileDashboard = () => {
         fileData = response.data;
         contentType = response.headers['content-type'] || 'application/octet-stream';
       }
+
+      console.log("fileData: ", fileData);
+      console.log("contentType: ", contentType);
 
       // Convert base64 to blob if needed
       let blob;

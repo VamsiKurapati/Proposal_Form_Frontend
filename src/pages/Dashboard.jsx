@@ -188,8 +188,8 @@ const Dashboard = () => {
 
     // const userName = companyData?.companyName || 'John Doe';
     const userName = 'John Doe';
-    console.log(userName);
-    console.log(proposals[0].editor === userName);
+    // console.log(userName);
+    // console.log(proposals[0].editor === userName);
 
     const [search, setSearch] = useState('');
 
