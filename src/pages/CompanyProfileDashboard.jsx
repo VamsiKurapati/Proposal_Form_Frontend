@@ -882,6 +882,8 @@ const CompanyProfileDashboard = () => {
     try {
       // Determine content type based on file extension
       const fileExtension = docItem.name.split('.').pop().toLowerCase();
+      console.log("docItem: ", docItem);
+      console.log("fileExtension: ", fileExtension);
       let contentType;
       switch (fileExtension) {
         case 'pdf':
