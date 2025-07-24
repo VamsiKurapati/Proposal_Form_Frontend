@@ -1,75 +1,8 @@
-// import React from "react";
-
-// const LoginPage = () => {
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-white px-4">
-//       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 items-center justify-center">
-//         {/* Left Section - Illustration */}
-//         <div className="flex justify-center items-center">
-//           <div className="relative">
-//             <div className="p-10 rounded shadow-md w-[90%] sm:w-[421px] h-[200px] md:h-[381px] relative">
-//               <div className="absolute bottom-0 left-8">
-//                 <img
-//                   src="/Login.png" // Example illustration
-//                   alt="Illustration"
-//                   className="w-full h-full"
-//                 />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Right Section - Form */}
-//         <div className="p-8">
-//           <h1 className="text-[36px] text-[#000000] font-extra-bold italic mb-1">LOGO</h1>
-//           <h2 className="text-[32px] font-semibold text-[#2563EB]">Log In</h2>
-//           <p className="text-[#6B7280] text-[16px] mb-6">Welcome back! Login to continue</p>
-
-//           <form className="space-y-8">
-//             <div className="mb-2">
-//               <label htmlFor="email" className="text-[24px] font-medium text-[#111827] mb-1">
-//                 Email id
-//               </label>
-//               <input
-//                 id="email"
-//                 type="email"
-//                 placeholder="Enter your company email id"
-//                 className="w-full sm:w-[80%] md:w-[90%] lg:w-[500px] px-4 py-3 rounded-md bg-[#0000000F] focus:outline-none"
-//               />
-//             </div>
-
-//             <div className="mb-3">
-//               <label htmlFor="password" className="text-[24px] font-medium text-[#111827] mb-1">
-//                 Password
-//               </label>
-//               <input
-//                 id="password"
-//                 type="password"
-//                 placeholder="Enter your password"
-//                 className="w-full sm:w-[80%] md:w-[90%] lg:w-[500px] px-4 py-3 rounded-md bg-[#0000000F] focus:outline-none"
-//               />
-//             </div>
-
-//             <button
-//               type="submit"
-//               className="mt-6 w-full sm:w-[80%] md:w-[90%] lg:w-[500px] bg-[#2563EB] text-white py-3 rounded font-semibold text-[20px] transition duration-200"
-//             >
-//               Log In
-//             </button>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default LoginPage;
-
-
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -77,7 +10,7 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  const { setRole } = useUser();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -113,9 +46,15 @@ const LoginPage = () => {
     try {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       const token = res.data.token;
+      const role = res.data.user.role;
+      setRole(role);
       localStorage.setItem("token", token); // Store JWT
       alert("Login successful!");
-      navigate("/company_profile_dashboard"); // Redirect to profile page
+      if (role === "company") {
+        navigate("/company_profile_dashboard"); // Redirect to company profile page
+      } else {
+        navigate("/profile_dashboard"); // Redirect to profile page
+      }
     } catch (error) {
       alert(error.response?.data?.message || "Login failed. Please try again.");
     } finally {

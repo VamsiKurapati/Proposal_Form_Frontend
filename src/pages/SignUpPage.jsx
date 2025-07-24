@@ -93,7 +93,7 @@ const SignupForm = () => {
         </div>
       )}
 
-      {step > 0 && (
+      {step > 0 && role === "company" && (
         <>
           <div className="w-full md:w-1/2 flex justify-center mb-10 md:mb-0">
             <img src="/Sign_Up.png" alt="SignUp" className="w-2/3 max-w-sm" />
@@ -248,6 +248,18 @@ const SignupForm = () => {
             </div>
           </div>
         </>
+      )}
+
+      {step > 0 && role === "freelancer" && (
+        <div>
+          <span className="text-[32px] font-semibold text-[#2563EB] mb-1">This is still in development</span>
+          <p className="text-[16px] text-[#6B7280] mb-6">
+            We are working on this feature and it will be available soon.
+          </p>
+          <button className="bg-[#2563EB] text-white py-2 rounded-md font-semibold" onClick={() => navigate("/")}>
+            Go to Home
+          </button>
+        </div>
       )}
     </div>
   );
