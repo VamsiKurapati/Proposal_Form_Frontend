@@ -300,14 +300,17 @@ const Dashboard = () => {
         const isDropdownOpen = openDropdownDate === dateKey;
 
         return (
-            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
+            <div
+                className={`relative h-full w-full min-h-[56px] min-w-[56px] p-1 sm:min-h-[80px] sm:min-w-[80px] sm:p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}
+                style={{ fontSize: '12px' }}
+            >
                 <div className="absolute top-1 left-2 text-[18px] text-[#9CA3AF] font-medium">{moment(value).date()}</div>
                 {sortedEvents.length > 0 && (
                     <>
                         {/* Show the most important event */}
                         <div className="absolute bottom-6 left-2 mb-1 flex flex-col items-start w-full">
-                            <span className="font-medium text-[17px] line-clamp-4 w-full pr-2">{sortedEvents[0].title}</span>
-                            <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[sortedEvents[0].status]}`}>
+                            <span className="font-medium text-[13px] sm:text-[17px] line-clamp-4 w-full pr-2">{sortedEvents[0].title}</span>
+                            <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-[10px] sm:text-xs font-medium ${statusBgMap[sortedEvents[0].status]}`}>
                                 <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[sortedEvents[0].status]}`}></span>
                                 {sortedEvents[0].status}
                             </span>
@@ -315,7 +318,7 @@ const Dashboard = () => {
                         {/* Show "+X more" if more events */}
                         {sortedEvents.length > 1 && (
                             <div
-                                className="absolute bottom-1 left-2 text-[11px] text-[#2563EB] cursor-pointer underline font-medium"
+                                className="absolute bottom-1 left-2 text-[10px] sm:text-[11px] text-[#2563EB] cursor-pointer underline font-medium"
                                 onClick={() => setOpenDropdownDate(isDropdownOpen ? null : dateKey)}
                             >
                                 +{sortedEvents.length - 1} more
@@ -323,12 +326,12 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-10 left-2 bottom-8 bg-[#F3F4F6] border rounded shadow-lg p-2 w-56">
+                            <div className="absolute z-10 left-2 bottom-8 bg-[#F3F4F6] border rounded shadow-lg p-2 w-40 sm:w-56">
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="mb-2 last:mb-0">
-                                        <span className="font-medium">{ev.title}</span>
-                                        <span className={`ml-2 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
-                                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
+                                        <span className="font-medium text-[12px] sm:text-base">{ev.title}</span>
+                                        <span className={`ml-2 px-2 py-[2px] rounded-full text-[10px] sm:text-xs font-medium ${statusBgMap[ev.status]}`}>
+                                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]} mr-1`}></span>
                                             {ev.status}
                                         </span>
                                     </div>
@@ -505,34 +508,36 @@ const Dashboard = () => {
                 </div>
 
                 {/* Calendar Section */}
-                <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <div className="flex gap-2 mb-4 items-center justify-end">
-                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827]">
+                <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-8 overflow-x-auto">
+                    <div className="flex gap-2 mb-4 items-center justify-end min-w-[320px]">
+                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
                             {monthOptions.map((m, idx) => (
                                 <option key={m} value={idx}>{m}</option>
                             ))}
                         </select>
-                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827]">
+                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
                             {yearOptions.map(y => (
                                 <option key={y} value={y}>{y}</option>
                             ))}
                         </select>
                     </div>
-                    <Calendar
-                        localizer={localizer}
-                        startAccessor="start"
-                        endAccessor="end"
-                        style={{ height: 1000, width: '100%' }}
-                        views={['month']}
-                        toolbar={false}
-                        date={new Date(calendarYear, calendarMonth, 1)}
-                        components={{
-                            month: {
-                                dateCellWrapper: CustomDateCellWrapper,
-                                dateHeader: () => null // Hide default date number
-                            }
-                        }}
-                    />
+                    <div className="w-[600px] sm:w-full">
+                        <Calendar
+                            localizer={localizer}
+                            startAccessor="start"
+                            endAccessor="end"
+                            style={{ height: 1000, width: '100%' }}
+                            views={['month']}
+                            toolbar={false}
+                            date={new Date(calendarYear, calendarMonth, 1)}
+                            components={{
+                                month: {
+                                    dateCellWrapper: CustomDateCellWrapper,
+                                    dateHeader: () => null // Hide default date number
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
 
                 {/* Deleted Proposals Table */}
