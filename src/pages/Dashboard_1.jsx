@@ -514,6 +514,12 @@ const Dashboard = () => {
                                         </tr>
                                     );
                                 })}
+                            {/* if no proposals, show a message */}
+                            {paginatedProposals.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="text-center py-4">No proposals found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                     {/* Pagination controls for proposals */}
@@ -628,6 +634,12 @@ const Dashboard = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {/* if no deleted proposals, show a message */}
+                            {paginatedDeletedProposals.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="text-center py-4">No deleted proposals found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                     {/* Pagination controls for deleted proposals */}
