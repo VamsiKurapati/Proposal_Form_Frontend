@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaRegBookmark } from "react-icons/fa";
-import { MdOutlineShare, 
-  MdOutlineBookmark, 
-  MdOutlinePayments, 
-  MdOutlineCalendarMonth, 
-  MdOutlineAccountBalance, 
+import {
+  MdOutlineShare,
+  MdOutlineBookmark,
+  MdOutlinePayments,
+  MdOutlineCalendarMonth,
+  MdOutlineAccountBalance,
   MdOutlineSearch,
   MdOutlineVisibility,
   MdOutlineFileDownload,
@@ -33,41 +34,41 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   const content = (
     <div className="p-4 w-64 bg-white h-full overflow-y-auto border-r">
       <div className="relative">
-            {/* Search Input */}
-            <div className="relative mb-6">
-              <MdOutlineSearch className="absolute w-6 h-6 left-2 top-1/2 transform -translate-y-1/2 text--[#9CA3AF] text-xl" />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search RFPs"
-                className="w-full text-[16px] text-[#9CA3AF] bg-[#FFFFFF] pl-10 p-2 border border-1 border-[#E5E7EB] rounded-md"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+        {/* Search Input */}
+        <div className="relative mb-6">
+          <MdOutlineSearch className="absolute w-6 h-6 left-2 top-1/2 transform -translate-y-1/2 text--[#9CA3AF] text-xl" />
+          <input
+            type="text"
+            autoFocus
+            placeholder="Search RFPs"
+            className="w-full text-[16px] text-[#9CA3AF] bg-[#FFFFFF] pl-10 p-2 border border-1 border-[#E5E7EB] rounded-md"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-            {/* Dropdown Search Results */}
-            {searchQuery && (
-              <div className="absolute z-50 bg-white border mt-2 rounded-md shadow w-72 max-h-64 overflow-y-auto">
-                {searchResults.length ? (
-                  searchResults.map((rfp) => (
-                    <a
-                      key={rfp._id}
-                      href={rfp.link}
-                      className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800 border-b last:border-b-0"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <div className="font-medium">{rfp.title}</div>
-                      <div className="text-gray-500 text-xs">{rfp.organization}</div>
-                      <div className="text-gray-400 text-xs">Deadline: {rfp.deadline}</div>
-                    </a>
-                  ))
-                ) : (
-                  <div className="px-4 py-3 text-gray-500 text-sm">No matches found</div>
-                )}
-              </div>
+        {/* Dropdown Search Results */}
+        {searchQuery && (
+          <div className="absolute z-50 bg-white border mt-2 rounded-md shadow w-72 max-h-64 overflow-y-auto">
+            {searchResults.length ? (
+              searchResults.map((rfp) => (
+                <a
+                  key={rfp._id}
+                  href={rfp.link}
+                  className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800 border-b last:border-b-0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="font-medium">{rfp.title}</div>
+                  <div className="text-gray-500 text-xs">{rfp.organization}</div>
+                  <div className="text-gray-400 text-xs">Deadline: {rfp.deadline}</div>
+                </a>
+              ))
+            ) : (
+              <div className="px-4 py-3 text-gray-500 text-sm">No matches found</div>
             )}
+          </div>
+        )}
       </div>
       {Object.entries(categories).map(([category, values]) => (
         <div key={category} className="mb-4">
@@ -131,69 +132,69 @@ const DiscoverRFPs = () => {
 
   useEffect(() => {
     const fetchRFPs = async () => {
-        try {
-            const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getAllRFP",{
-              headers:{
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            });
-            const { allRFPs, recommendedRFPs, recentRFPs, savedRFPs } = res.data;
+      try {
+        const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getAllRFP", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const { allRFPs, recommendedRFPs, recentRFPs, savedRFPs } = res.data;
 
-            setAllRFPs(allRFPs ?? []);
-            setRecommended(recommendedRFPs ?? []);
-            setRecent(recentRFPs ?? []);
-            setSaved(savedRFPs ?? []);
-        } catch (err) {
-            console.error("Backend failed, loading dummy data...");
+        setAllRFPs(allRFPs ?? []);
+        setRecommended(recommendedRFPs ?? []);
+        setRecent(recentRFPs ?? []);
+        setSaved(savedRFPs ?? []);
+      } catch (err) {
+        console.error("Backend failed, loading dummy data...");
 
-            const dummyRFPs = [
-                {
-                    id: 1,
-                    logo: "https://via.placeholder.com/32",
-                    title: "AI Research Grant Program",
-                    description: "Supporting innovative AI research projects.",
-                    match: 95,
-                    budget: "$250,000 - $500,000",
-                    deadline: "Mar 15, 2025",
-                    organization: "Government Agency",
-                    fundingType: "Research & Development",
-                    organizationType: "Government",
-                    link: "#",
-                },
-                {
-                    id: 2,
-                    logo: "https://via.placeholder.com/32?text=T",
-                    title: "Tech Infrastructure Development",
-                    description: "Boosting national technology capacity.",
-                    match: 92,
-                    budget: "$300,000",
-                    deadline: "Apr 20, 2025",
-                    organization: "TechFund",
-                    fundingType: "Infrastructure",
-                    organizationType: "Private Sector",
-                    link: "#",
-                },
-                {
-                    id: 3,
-                    logo: "https://via.placeholder.com/32",
-                    title: "AI Research Grant Program",
-                    description: "Supporting innovative AI research projects.",
-                    match: 95,
-                    budget: "$250,000 - $500,000",
-                    deadline: "Mar 15, 2025",
-                    organization: "Government Agency",
-                    fundingType: "Research & Development",
-                    organizationType: "Government",
-                    link: "#",
-                },
+        const dummyRFPs = [
+          {
+            id: 1,
+            logo: "https://via.placeholder.com/32",
+            title: "AI Research Grant Program",
+            description: "Supporting innovative AI research projects.",
+            match: 95,
+            budget: "$250,000 - $500,000",
+            deadline: "Mar 15, 2025",
+            organization: "Government Agency",
+            fundingType: "Research & Development",
+            organizationType: "Government",
+            link: "#",
+          },
+          {
+            id: 2,
+            logo: "https://via.placeholder.com/32?text=T",
+            title: "Tech Infrastructure Development",
+            description: "Boosting national technology capacity.",
+            match: 92,
+            budget: "$300,000",
+            deadline: "Apr 20, 2025",
+            organization: "TechFund",
+            fundingType: "Infrastructure",
+            organizationType: "Private Sector",
+            link: "#",
+          },
+          {
+            id: 3,
+            logo: "https://via.placeholder.com/32",
+            title: "AI Research Grant Program",
+            description: "Supporting innovative AI research projects.",
+            match: 95,
+            budget: "$250,000 - $500,000",
+            deadline: "Mar 15, 2025",
+            organization: "Government Agency",
+            fundingType: "Research & Development",
+            organizationType: "Government",
+            link: "#",
+          },
 
-            ];
+        ];
 
-            setRecommended(dummyRFPs);
-            setRecent(dummyRFPs);
-            setSaved([]);
-            setAllRFPs([...recommended, ...recent, ...saved])
-        }
+        setRecommended(dummyRFPs);
+        setRecent(dummyRFPs);
+        setSaved([]);
+        setAllRFPs([...recommended, ...recent, ...saved])
+      }
     };
 
     fetchRFPs();
@@ -218,36 +219,36 @@ const DiscoverRFPs = () => {
   };
 
   const handleSave = async (rfp) => {
-    try{
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP",{ rfpId: rfp._id, rfp: rfp },{
-        headers:{
+    try {
+      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP", { rfpId: rfp._id, rfp: rfp }, {
+        headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (res.status === 201 || res.status === 200) {
         setSaved((prev) => [...prev, rfp]);
-        console.log("RFP data:",rfp);
+        console.log("RFP data:", rfp);
       }
       return;
-    } catch(err){
+    } catch (err) {
       console.error(err);
     }
   };
 
   const searchResults =
-  searchQuery.trim() === ""
-    ? []
-    : allRFPs.filter((rfp) => {
+    searchQuery.trim() === ""
+      ? []
+      : allRFPs.filter((rfp) => {
         const pattern = new RegExp(`\\b${searchQuery.toLowerCase()}`, "i")
         return pattern.test(rfp.title.toLowerCase());
       });
 
 
   const handleUnsave = async (rfpId) => {
-    try{
+    try {
       console.log("sending request...");
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP",{ rfpId: rfpId },{
-        headers:{
+      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP", { rfpId: rfpId }, {
+        headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
@@ -256,7 +257,7 @@ const DiscoverRFPs = () => {
         setSaved((prev) => prev.filter((r) => r._id !== rfpId));
       }
       return;
-    } catch(err){
+    } catch (err) {
       console.error(err);
     }
   };
@@ -286,7 +287,7 @@ const DiscoverRFPs = () => {
         <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
         <div className="text-[14px] text-[#4B5563CC] space-y-1">
           <div className="flex items-center gap-2">
-            <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}
+            <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}
           </div>
           <div className="flex items-center gap-2">
             <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
@@ -308,22 +309,23 @@ const DiscoverRFPs = () => {
             )}
             <MdOutlineShare onClick={() => handleShare(rfp.link)} className="cursor-pointer text-[#111827]" title="Share" />
           </div>
-          <a
-            href={rfp.link}
-            className="text-[14px] text-white bg-[#2563EB] px-4 py-2 rounded-lg"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Details
-          </a>
-        </div>
-        <div className="flex justify-center mt-3">
-          <button
-            onClick={() => handleGenerateProposal(rfp)}
-            className="px-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium"
-          >
-            Generate Proposal
-          </button>
+
+          <div className="flex justify-center mt-3 gap-2">
+            <button
+              onClick={() => handleGenerateProposal(rfp)}
+              className="text-[#2563EB] text-[14px] font-medium underline"
+            >
+              Generate
+            </button>
+
+            <a href={rfp.link}
+              className="text-[14px] text-white bg-[#2563EB] px-4 py-2 rounded-lg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Details
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -375,7 +377,7 @@ const DiscoverRFPs = () => {
 
       {/* Footer */}
       <div className="flex justify-between items-center">
-        <span className="font-semibold text-[#111827]">{rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}</span>
+        <span className="font-semibold text-[#111827]">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}</span>
         <a
           href={rfp.link}
           className="text-[14px] text-[#2563EB]"
@@ -400,18 +402,16 @@ const DiscoverRFPs = () => {
         <div className="col-span-2 truncate overflow-hidden whitespace-nowrap font-medium">{rfp.title}</div>
 
         <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280]">
-          <img src={rfp.logo} alt="logo" className="w-4 h-4 rounded-full" />
           <p className="truncate overflow-hidden whitespace-nowrap">{rfp.organization}</p>
         </div>
 
-        <div className="col-span-2">{rfp.budget ==="Not found" ? "Not Disclosed" :  rfp.budget}</div>
+        <div className="col-span-2">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}</div>
         <div className="col-span-2">{rfp.deadline}</div>
 
         <div className="col-span-2">
           <span
-            className={`text-xs px-3 py-1 rounded-full font-medium ${
-              statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
-            }`}
+            className={`text-xs px-3 py-1 rounded-full font-medium ${statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
+              }`}
           >
             {rfp.status || "None"}
           </span>
