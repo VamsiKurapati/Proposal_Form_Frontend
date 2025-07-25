@@ -444,7 +444,7 @@ const DiscoverRFPs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F3E6FF]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
       <LeftSidebar
         isOpen={sidebarOpen}
