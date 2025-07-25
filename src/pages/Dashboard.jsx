@@ -224,6 +224,10 @@ const Dashboard = () => {
         setShowAddPersonIdx(null);
     };
 
+    const handleEditProposalStatus = (idx, newStatus) => {
+        setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, status: newStatus } : p));
+    };
+
     const handleSelectProposal = (idx) => {
         setSelectedProposals(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
     };

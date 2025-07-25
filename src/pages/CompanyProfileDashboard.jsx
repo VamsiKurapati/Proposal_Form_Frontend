@@ -5,6 +5,8 @@ import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCe
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
 
+// Short desc, job title, highest edu, skills
+
 // Unified Badge Styles
 const badgeStyles = {
   // Status badges
