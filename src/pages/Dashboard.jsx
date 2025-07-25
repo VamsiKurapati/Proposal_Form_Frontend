@@ -88,6 +88,12 @@ const calendarEvents = [
         status: 'Submitted',
     },
     {
+        title: 'Sustainable Office Park Development_2',
+        start: new Date(2025, 7, 1),
+        end: new Date(2025, 7, 1),
+        status: 'In Progress',
+    },
+    {
         title: 'High-Tech Campus Expansion',
         start: new Date(2025, 7, 6),
         end: new Date(2025, 7, 6),
@@ -238,7 +244,9 @@ const Dashboard = () => {
     const paginatedDeletedProposals = deletedProposals.slice((currentDeletedPage - 1) * PAGE_SIZE, currentDeletedPage * PAGE_SIZE);
 
     // Helper: get all years in a reasonable range
-    const yearOptions = Array.from({ length: 11 }, (_, i) => 2020 + i);
+    // Get 5 years before and after the current year
+    const currentYear = moment().year();
+    const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
     const monthOptions = moment.months();
 
     // Helper: get events for a specific date
@@ -250,11 +258,11 @@ const Dashboard = () => {
 
     // Helper: bg color map for calendar
     const bgColor = {
-        'In Progress': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(14, 45, 85, 0.1))',
-        'Submitted': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(220,252,231,0.1))',
-        'Won': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,249,195,0.1))',
-        'Rejected': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,226,226,0.1))',
-        'Deadline': 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(254,226,226,0.1))',
+        'In Progress': 'bg-[#DBEAFE] bg-opacity-50',
+        'Submitted': 'bg-[#DCFCE7] bg-opacity-50',
+        'Won': 'bg-[#FEF9C3] bg-opacity-50',
+        'Rejected': 'bg-[#FEE2E2] bg-opacity-50',
+        'Deadline': 'bg-[#FEF3C7] bg-opacity-50',
     }
 
     // Helper: status color map for bg and text, dot
@@ -279,11 +287,11 @@ const Dashboard = () => {
         const events = getEventsForDate(value);
         const isEmpty = events.length === 0;
         return (
-            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[events[0].status] || 'bg-[#F3F4F6]'} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
+            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[events[0].status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
                 <div className="absolute top-1 left-2 text-[18px] text-[#9CA3AF] font-medium">{moment(value).date()}</div>
                 {events.map((ev, i) => (
                     <div key={i} className="absolute bottom-1 left-2 mb-1 flex flex-col items-start w-full">
-                        <span className="font-medium text-[17px] w-2/3 line-clamp-4">{ev.title}</span>
+                        <span className="font-medium text-[17px] line-clamp-4 w-full pr-2">{ev.title}</span>
                         <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
                             <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
                             {ev.status}
@@ -459,13 +467,13 @@ const Dashboard = () => {
 
                 {/* Calendar Section */}
                 <div className="bg-white rounded-lg shadow p-4 mb-8">
-                    <div className="flex gap-2 mb-4 items-center">
-                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="border rounded px-2 py-1">
+                    <div className="flex gap-2 mb-4 items-center justify-end">
+                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827]">
                             {monthOptions.map((m, idx) => (
                                 <option key={m} value={idx}>{m}</option>
                             ))}
                         </select>
-                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="border rounded px-2 py-1">
+                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827]">
                             {yearOptions.map(y => (
                                 <option key={y} value={y}>{y}</option>
                             ))}

@@ -59,14 +59,14 @@ const App = () => {
             <AdvancedComplianceCheck />
           </ProtectedRoutes>} />
 
-          <Route path="/dashboard" element={
+          {/* <Route path="/dashboard" element={
             <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
               <ProfileProvider>
                 <Dashboard />
               </ProfileProvider>
             </ProtectedRoutes>
-          } />
-          {/* <Route path="/dashboard" element={<ProfileProvider><Dashboard /></ProfileProvider>} /> */}
+          } /> */}
+          <Route path="/dashboard" element={<ProfileProvider><Dashboard /></ProfileProvider>} />
 
           <Route path="/company_profile_dashboard" element={
             <ProtectedRoutes allowedRoles={["company"]}>
