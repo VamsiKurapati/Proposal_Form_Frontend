@@ -8,64 +8,6 @@ import { useProfile } from '../context/ProfileContext';
 
 const localizer = momentLocalizer(moment);
 
-const summaryStats = [
-    { label: 'All Proposals', value: 120 },
-    { label: 'In Progress', value: 45 },
-    { label: 'Submitted', value: 62 },
-    { label: 'Won', value: 10 },
-];
-
-const proposals = [
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'In Progress',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'Submitted',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'Won',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'Rejected',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'In Progress',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-    {
-        name: 'Research in Artificial Intelligence',
-        client: 'Government Agency',
-        deadline: 'Mar 15, 2024',
-        status: 'Won',
-        editor: 'John Doe',
-        submission: 'Mar 15, 2024',
-    },
-];
-
 const statusStyles = {
     "In Progress": "bg-[#DBEAFE] text-[#2563EB]",
     "Won": "bg-[#FEF9C3] text-[#CA8A04]",
@@ -80,106 +22,6 @@ const statsStyles = {
     "Won": "bg-[#FEFCE8] text-[#CA8A04]",
 }
 
-const calendarEvents = [
-    {
-        title: 'Sustainable Office Park Development',
-        start: new Date(2025, 7, 1),
-        end: new Date(2025, 7, 1),
-        status: 'Submitted',
-    },
-    {
-        title: 'Sustainable Office Park Development_2',
-        start: new Date(2025, 7, 1),
-        end: new Date(2025, 7, 1),
-        status: 'Deadline',
-    },
-    {
-        title: 'High-Tech Campus Expansion',
-        start: new Date(2025, 7, 6),
-        end: new Date(2025, 7, 6),
-        status: 'In Progress',
-    },
-    {
-        title: 'Affordable Housing Project',
-        start: new Date(2025, 7, 8),
-        end: new Date(2025, 7, 8),
-        status: 'Won',
-    },
-    {
-        title: 'Educational Facility Modernization - Design-Build',
-        start: new Date(2025, 7, 14),
-        end: new Date(2025, 7, 14),
-        status: 'Rejected',
-    },
-    {
-        title: 'Urban Infrastructure Improvement',
-        start: new Date(2025, 7, 23),
-        end: new Date(2025, 7, 23),
-        status: 'Submitted',
-    },
-    {
-        title: 'Historic Landmark Restoration',
-        start: new Date(2025, 7, 29),
-        end: new Date(2025, 7, 29),
-        status: 'Won',
-    },
-    {
-        title: 'Walmart Fuel Station',
-        start: new Date(2025, 7, 4),
-        end: new Date(2025, 7, 4),
-        status: 'Deadline',
-    },
-    {
-        title: 'Smart City Technology Integration',
-        start: new Date(2025, 7, 18),
-        end: new Date(2025, 7, 18),
-        status: 'Rejected',
-    },
-    {
-        title: 'Mixed-Use Development Opportunity',
-        start: new Date(2025, 7, 20),
-        end: new Date(2025, 7, 20),
-        status: 'Won',
-    },
-    {
-        title: 'Civil Design Services',
-        start: new Date(2025, 7, 26),
-        end: new Date(2025, 7, 26),
-        status: 'Deadline',
-    },
-];
-
-const deletedProposals = [
-    {
-        name: 'Healthcare Campus Planning Services',
-        client: 'Lumens Auto Pte Ltd',
-        deadline: 'Mar 15, 2024',
-        status: 'Rejected',
-        restore: '4 days',
-    },
-    {
-        name: 'Educational Facility Modernization...',
-        client: 'Worthing Brothers Crane',
-        deadline: 'Mar 15, 2024',
-        status: 'Submitted',
-        restore: '6 days',
-    },
-    {
-        name: 'Walmart Fuel Station',
-        client: 'Tower Inc',
-        deadline: 'Mar 15, 2024',
-        status: 'Rejected',
-        restore: '1 day',
-    },
-    {
-        name: 'Mixed-Use Development Opportunity',
-        client: 'ABC Crane',
-        deadline: 'Mar 15, 2024',
-        status: 'Rejected',
-        restore: '3 days',
-    },
-];
-
 function statusBadge(status) {
     return (
         <span className={`px-2 py-1 rounded text-xs font-semibold ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
@@ -193,16 +35,6 @@ const PAGE_SIZE = 5;
 const Dashboard = () => {
     const { companyData } = useProfile();
     const userName = 'John Doe';
-    const [search, setSearch] = useState('');
-    const [proposalsState, setProposalsState] = useState(proposals);
-    const [showAddPersonIdx, setShowAddPersonIdx] = useState(null);
-    const [selectedProposals, setSelectedProposals] = useState([]);
-    const [showDeleteOptions, setShowDeleteOptions] = useState(false);
-    const [currentProposalPage, setCurrentProposalPage] = useState(1);
-    const [currentDeletedPage, setCurrentDeletedPage] = useState(1);
-    const [calendarMonth, setCalendarMonth] = useState(moment().month());
-    const [calendarYear, setCalendarYear] = useState(moment().year());
-    const [openDropdownDate, setOpenDropdownDate] = useState(null);
 
     const employees = (companyData && companyData?.employees) || [
         { name: 'John Doe' },
@@ -218,7 +50,174 @@ const Dashboard = () => {
         { name: 'Devon Lane' },
     ];
 
-    // console.log
+    const calendarEvents = [
+        {
+            title: 'Sustainable Office Park Development',
+            start: new Date(2025, 7, 1),
+            end: new Date(2025, 7, 1),
+            status: 'Submitted',
+        },
+        {
+            title: 'Sustainable Office Park Development_2',
+            start: new Date(2025, 7, 1),
+            end: new Date(2025, 7, 1),
+            status: 'Deadline',
+        },
+        {
+            title: 'High-Tech Campus Expansion',
+            start: new Date(2025, 7, 6),
+            end: new Date(2025, 7, 6),
+            status: 'In Progress',
+        },
+        {
+            title: 'Affordable Housing Project',
+            start: new Date(2025, 7, 8),
+            end: new Date(2025, 7, 8),
+            status: 'Won',
+        },
+        {
+            title: 'Educational Facility Modernization - Design-Build',
+            start: new Date(2025, 7, 14),
+            end: new Date(2025, 7, 14),
+            status: 'Rejected',
+        },
+        {
+            title: 'Urban Infrastructure Improvement',
+            start: new Date(2025, 7, 23),
+            end: new Date(2025, 7, 23),
+            status: 'Submitted',
+        },
+        {
+            title: 'Historic Landmark Restoration',
+            start: new Date(2025, 7, 29),
+            end: new Date(2025, 7, 29),
+            status: 'Won',
+        },
+        {
+            title: 'Walmart Fuel Station',
+            start: new Date(2025, 7, 4),
+            end: new Date(2025, 7, 4),
+            status: 'Deadline',
+        },
+        {
+            title: 'Smart City Technology Integration',
+            start: new Date(2025, 7, 18),
+            end: new Date(2025, 7, 18),
+            status: 'Rejected',
+        },
+        {
+            title: 'Mixed-Use Development Opportunity',
+            start: new Date(2025, 7, 20),
+            end: new Date(2025, 7, 20),
+            status: 'Won',
+        },
+        {
+            title: 'Civil Design Services',
+            start: new Date(2025, 7, 26),
+            end: new Date(2025, 7, 26),
+            status: 'Deadline',
+        },
+    ];
+
+    const deletedProposals = [
+        {
+            name: 'Healthcare Campus Planning Services',
+            client: 'Lumens Auto Pte Ltd',
+            deadline: 'Mar 15, 2024',
+            status: 'Rejected',
+            restore: '4 days',
+        },
+        {
+            name: 'Educational Facility Modernization...',
+            client: 'Worthing Brothers Crane',
+            deadline: 'Mar 15, 2024',
+            status: 'Submitted',
+            restore: '6 days',
+        },
+        {
+            name: 'Walmart Fuel Station',
+            client: 'Tower Inc',
+            deadline: 'Mar 15, 2024',
+            status: 'Rejected',
+            restore: '1 day',
+        },
+        {
+            name: 'Mixed-Use Development Opportunity',
+            client: 'ABC Crane',
+            deadline: 'Mar 15, 2024',
+            status: 'Rejected',
+            restore: '3 days',
+        },
+    ];
+
+    const summaryStats = [
+        { label: 'All Proposals', value: 120 },
+        { label: 'In Progress', value: 45 },
+        { label: 'Submitted', value: 62 },
+        { label: 'Won', value: 10 },
+    ];
+
+    const proposals = [
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'In Progress',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'Submitted',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'Won',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'Rejected',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'In Progress',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+        {
+            name: 'Research in Artificial Intelligence',
+            client: 'Government Agency',
+            deadline: 'Mar 15, 2024',
+            status: 'Won',
+            editor: 'John Doe',
+            submission: 'Mar 15, 2024',
+        },
+    ];
+
+    const [search, setSearch] = useState('');
+    const [proposalsState, setProposalsState] = useState(proposals);
+    const [showAddPersonIdx, setShowAddPersonIdx] = useState(null);
+    const [selectedProposals, setSelectedProposals] = useState([]);
+    const [showDeleteOptions, setShowDeleteOptions] = useState(false);
+    const [currentProposalPage, setCurrentProposalPage] = useState(1);
+    const [currentDeletedPage, setCurrentDeletedPage] = useState(1);
+    const [calendarMonth, setCalendarMonth] = useState(moment().month());
+    const [calendarYear, setCalendarYear] = useState(moment().year());
+    const [openDropdownDate, setOpenDropdownDate] = useState(null);
 
     const handleEditorChange = (idx, newEditor) => {
         setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, editor: newEditor } : p));
