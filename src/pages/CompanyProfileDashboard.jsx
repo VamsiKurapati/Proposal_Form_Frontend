@@ -385,10 +385,9 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
               onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
             >
-              <option value="Full Access">Full Access</option>
-              <option value="Admin">Admin</option>
               <option value="Editor">Editor</option>
               <option value="Viewer">Viewer</option>
+              <option value="Member">Member</option>
             </select>
           </div>
 
