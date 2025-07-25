@@ -529,10 +529,14 @@ const Dashboard = () => {
                             views={['month']}
                             toolbar={false}
                             date={new Date(calendarYear, calendarMonth, 1)}
+                            onNavigate={date => {
+                                setCalendarMonth(date.getMonth());
+                                setCalendarYear(date.getFullYear());
+                            }}
                             components={{
                                 month: {
                                     dateCellWrapper: CustomDateCellWrapper,
-                                    dateHeader: () => null // Hide default date number
+                                    dateHeader: () => null
                                 }
                             }}
                         />
