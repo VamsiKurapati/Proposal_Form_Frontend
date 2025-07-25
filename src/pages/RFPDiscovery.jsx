@@ -323,7 +323,7 @@ const DiscoverRFPs = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              View Details
+              View
             </a>
           </div>
         </div>
