@@ -313,7 +313,7 @@ const DiscoverRFPs = () => {
           <div className="flex justify-center mt-3 gap-2">
             <button
               onClick={() => handleGenerateProposal(rfp)}
-              className="text-[#2563EB] text-[14px] font-medium underline"
+              className="text-[#2563EB] text-[14px] font-medium hover:underline"
             >
               Generate
             </button>
