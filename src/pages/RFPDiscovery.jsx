@@ -319,7 +319,7 @@ const DiscoverRFPs = () => {
             </button>
 
             <a href={rfp.link}
-              className="text-[14px] text-white bg-[#2563EB] px-4 py-2 rounded-lg"
+              className="text-[14px] text-white bg-[#2563EB] px-2 py-1 rounded-md"
               target="_blank"
               rel="noopener noreferrer"
             >
