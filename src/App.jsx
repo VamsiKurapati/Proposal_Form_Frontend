@@ -18,7 +18,7 @@ const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
 const BasicComplianceCheck = lazy(() => import("./pages/BasicComplianceCheck"));
 const AdvancedComplianceCheck = lazy(() => import("./pages/AdvancedComplianceCheck"));
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Dashboard = lazy(() => import("./pages/Dashboard_1"));
 
 const EmployeeProfileDashboard = lazy(() => import("./pages/EmployeeProfileDashboard"));
 const EmployeeProfileUpdate = lazy(() => import("./pages/EmployeeProfileUpdate"));
