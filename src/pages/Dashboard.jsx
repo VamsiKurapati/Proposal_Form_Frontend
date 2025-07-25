@@ -252,7 +252,7 @@ const Dashboard = () => {
     // Helper: get events for a specific date
     function getEventsForDate(date) {
         return calendarEvents.filter(ev =>
-            moment(ev.start).isSame(date, 'day')
+            moment(ev.start).isSameOrBefore(date, 'day') && moment(ev.end).isSameOrAfter(date, 'day')
         );
     }
 
