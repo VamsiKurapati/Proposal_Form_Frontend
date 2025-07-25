@@ -398,19 +398,20 @@ const DiscoverRFPs = () => {
       Won: "bg-yellow-100 text-yellow-600",
     };
     return (
-      <div className="grid grid-cols-12 items-center text-center text-sm text-[#111827] px-4 py-3 border-b last:border-none">
+      <div className="grid grid-cols-12 items-center text-center text-[16px] text-[#111827] px-4 py-3 border-b last:border-none">
         <div className="col-span-2 truncate overflow-hidden whitespace-nowrap font-medium">{rfp.title}</div>
 
-        <div className="col-span-2 flex items-center gap-2 text-xs text-[#6B7280]">
+        <div className="col-span-2 flex items-center gap-2">
           <p className="truncate overflow-hidden whitespace-nowrap">{rfp.organization}</p>
         </div>
 
         <div className="col-span-2">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}</div>
+
         <div className="col-span-2">{rfp.deadline}</div>
 
         <div className="col-span-2">
           <span
-            className={`text-xs px-3 py-1 rounded-full font-medium ${statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
+            className={`text-[12px] px-3 py-1 rounded-full font-medium ${statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
               }`}
           >
             {rfp.status || "None"}
@@ -418,8 +419,8 @@ const DiscoverRFPs = () => {
         </div>
 
         <div className="col-span-2 flex gap-2 text-xl justify-center text-[#4B5563]">
-          <MdOutlineVisibility title="View" className="cursor-pointer" />
-          <MdOutlineFileDownload title="Download" className="cursor-pointer" />
+          {/* <MdOutlineVisibility title="View" className="cursor-pointer" />
+          <MdOutlineFileDownload title="Download" className="cursor-pointer" /> */}
           <MdOutlineShare
             title="Share"
             className="cursor-pointer"
@@ -499,7 +500,7 @@ const DiscoverRFPs = () => {
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
         {saved.length ? (
           <div className="w-full bg-white rounded-xl shadow-sm border">
-            <div className="grid grid-cols-12 font-semibold text-[#374151] text-[16px] font-medium border-b px-4 py-3 text-center">
+            <div className="grid grid-cols-12 font-semibold bg-[#F8FAFC] text-[#374151] text-[16px] font-medium border-b px-4 py-3 text-center">
               <div className="col-span-2">RFP Title</div>
               <div className="col-span-2">Organisation</div>
               <div className="col-span-2">Amount</div>
