@@ -91,7 +91,7 @@ const calendarEvents = [
         title: 'Sustainable Office Park Development_2',
         start: new Date(2025, 7, 1),
         end: new Date(2025, 7, 1),
-        status: 'In Progress',
+        status: 'Deadline',
     },
     {
         title: 'High-Tech Campus Expansion',
@@ -202,6 +202,7 @@ const Dashboard = () => {
     const [currentDeletedPage, setCurrentDeletedPage] = useState(1);
     const [calendarMonth, setCalendarMonth] = useState(moment().month());
     const [calendarYear, setCalendarYear] = useState(moment().year());
+    const [openDropdownDate, setOpenDropdownDate] = useState(null);
 
     const employees = (companyData && companyData?.employees) || [
         { name: 'John Doe' },
@@ -283,21 +284,59 @@ const Dashboard = () => {
     };
 
     // Custom date cell for calendar
-    function CustomDateCellWrapper({ value, children }) {
+    function CustomDateCellWrapper({ value }) {
         const events = getEventsForDate(value);
         const isEmpty = events.length === 0;
+
+        // Sort: Deadline first, then others
+        const sortedEvents = [...events].sort((a, b) => {
+            if (a.status === "Deadline") return -1;
+            if (b.status === "Deadline") return 1;
+            return 0;
+        });
+
+        // For dropdown toggle
+        const dateKey = moment(value).format("YYYY-MM-DD");
+        const isDropdownOpen = openDropdownDate === dateKey;
+
         return (
-            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[events[0].status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
+            <div className={`relative h-full w-full min-h-[80px] min-w-[80px] p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}>
                 <div className="absolute top-1 left-2 text-[18px] text-[#9CA3AF] font-medium">{moment(value).date()}</div>
-                {events.map((ev, i) => (
-                    <div key={i} className="absolute bottom-1 left-2 mb-1 flex flex-col items-start w-full">
-                        <span className="font-medium text-[17px] line-clamp-4 w-full pr-2">{ev.title}</span>
-                        <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
-                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
-                            {ev.status}
-                        </span>
-                    </div>
-                ))}
+                {sortedEvents.length > 0 && (
+                    <>
+                        {/* Show the most important event */}
+                        <div className="absolute bottom-6 left-2 mb-1 flex flex-col items-start w-full">
+                            <span className="font-medium text-[17px] line-clamp-4 w-full pr-2">{sortedEvents[0].title}</span>
+                            <span className={`flex items-center gap-1 mt-1 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[sortedEvents[0].status]}`}>
+                                <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[sortedEvents[0].status]}`}></span>
+                                {sortedEvents[0].status}
+                            </span>
+                        </div>
+                        {/* Show "+X more" if more events */}
+                        {sortedEvents.length > 1 && (
+                            <div
+                                className="absolute bottom-1 left-2 text-[11px] text-[#2563EB] cursor-pointer underline font-medium"
+                                onClick={() => setOpenDropdownDate(isDropdownOpen ? null : dateKey)}
+                            >
+                                +{sortedEvents.length - 1} more
+                            </div>
+                        )}
+                        {/* Dropdown with all events */}
+                        {isDropdownOpen && (
+                            <div className="absolute z-10 left-2 bottom-8 bg-[#F3F4F6] border rounded shadow-lg p-2 w-56">
+                                {sortedEvents.map((ev, i) => (
+                                    <div key={i} className="mb-2 last:mb-0">
+                                        <span className="font-medium">{ev.title}</span>
+                                        <span className={`ml-2 px-2 py-[2px] rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
+                                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
+                                            {ev.status}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         );
     }
