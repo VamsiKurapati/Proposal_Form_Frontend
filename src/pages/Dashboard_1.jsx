@@ -280,7 +280,7 @@ const Dashboard = () => {
         });
 
         const [errors, setErrors] = useState({});
-        const [error, setError] = useState('');
+        const [calendarError, setCalendarError] = useState('');
 
         const handleChange = (e) => {
             const { name, value } = e.target;
@@ -315,15 +315,15 @@ const Dashboard = () => {
                 });
                 if (res.status === 201) {
                     setFormData({ title: '', start: '', end: '' });
-                    setError('');
+                    setCalendarError('');
                     setErrors({});
                     alert('Event added successfully');
                     onClose();
                 } else {
-                    setError('Failed to add event');
+                    setCalendarError('Failed to add event');
                 }
             } catch (error) {
-                setError('Failed to add event');
+                setCalendarError('Failed to add event');
             }
         };
 
