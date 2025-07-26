@@ -3,7 +3,7 @@ import NavbarComponent from './NavbarComponent';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineSave } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineSave, MdOutlineClose } from "react-icons/md";
 import { useProfile } from '../context/ProfileContext';
 import axios from 'axios';
 
@@ -137,6 +137,8 @@ const Dashboard = () => {
     const [calendarYear, setCalendarYear] = useState(moment().year());
     const [openDropdownDate, setOpenDropdownDate] = useState(null);
     const [showEditStatus, setShowEditStatus] = useState(false);
+    const [addEventModalOpen, setAddEventModalOpen] = useState(false);
+
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -268,6 +270,115 @@ const Dashboard = () => {
         } catch (error) {
             setError('Failed to delete proposal permanently');
         }
+    };
+
+    const AddEventModal = ({ isOpen, onClose }) => {
+        if (!isOpen) return null;
+
+        const [formData, setFormData] = useState({
+            title: '',
+            start: '',
+            end: '',
+        });
+
+        const [errors, setErrors] = useState({});
+        const [error, setError] = useState('');
+
+        const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData(prev => ({ ...prev, [name]: value }));
+        };
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            // Handle form submission logic here
+            console.log('Event Data:', formData);
+            if(!formData.title){
+                setErrors({ title: 'Title is required' });
+                return;
+            }
+            if(!formData.start){
+                setErrors({ start: 'Start date is required' });
+                return;
+            }
+            if(!formData.end){
+                setErrors({ end: 'End date is required' });
+                return;
+            }
+            setErrors({});
+            console.log('Event Data:', formData);
+            try{
+                const token = localStorage.getItem('token');
+                
+                const res = axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addEvent', formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (res.status === 200) {
+                    onClose();
+                } else {
+                    setError('Failed to add event');
+                }
+            } catch (error) {
+                setError('Failed to add event');
+            }
+        };
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold">Add Event</h3>
+                        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                            <MdOutlineClose className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <form>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">Title</label>
+                            <input
+                                type="text"
+                                placeholder="Event Title"
+                                className="border border-gray-300 rounded-lg p-2 w-full"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">Start Date</label>
+                            <input
+                                type="date"
+                                name="start"
+                                value={formData.start}
+                                onChange={handleChange}
+                                className="border border-gray-300 rounded-lg p-2 w-full"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">End Date</label>
+                            <input
+                                type="date"
+                                name="end"
+                                value={formData.end}
+                                min={formData.start}
+                                onChange={handleChange}
+                                className="border border-gray-300 rounded-lg p-2 w-full"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="bg-[#2563EB] text-white px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition"
+                            onClick={() => handleSubmit()}
+                        >
+                            Add Event
+                        </button>
+                    </form>
+                    {error && <p className="text-red-500 mt-4">{error}</p>}
+                </div>
+            </div>
+        );
+    };
+
+    const handleAddEvent = () => {
+        setAddEventModalOpen(true);
     };
 
     // Pagination logic for proposals
@@ -523,7 +634,7 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                     {/* Pagination controls for proposals */}
-                    <div className="flex justify-end gap-2 my-2">
+                    <div className="flex justify-end gap-2 my-2 px-4">
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentProposalPage(p => Math.max(1, p - 1))}
@@ -564,19 +675,31 @@ const Dashboard = () => {
                 </div>
 
                 {/* Calendar Section */}
+                <h3 className="text-[18px] sm:text-[24px] font-semibold mt-4 mb-2">Calendar</h3>
                 <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-8 overflow-x-auto">
-                    <div className="flex gap-2 mb-4 items-center justify-end min-w-[320px]">
-                        <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
-                            {monthOptions.map((m, idx) => (
-                                <option key={m} value={idx}>{m}</option>
-                            ))}
-                        </select>
-                        <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
-                            {yearOptions.map(y => (
-                                <option key={y} value={y}>{y}</option>
-                            ))}
-                        </select>
+                    <div className="flex flex-col xs:flex-row items-center justify-between mb-4">
+                        <div className="flex gap-2 mb-4">
+                            <select value={calendarMonth} onChange={e => setCalendarMonth(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
+                                {monthOptions.map((m, idx) => (
+                                    <option key={m} value={idx}>{m}</option>
+                                ))}
+                            </select>
+                            <select value={calendarYear} onChange={e => setCalendarYear(Number(e.target.value))} className="bg-[#F3F4F6] border rounded-md px-2 py-1 text-[#111827] text-xs sm:text-base">
+                                {yearOptions.map(y => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex gap-2 mb-4">
+                            <button
+                                className="flex items-center gap-1 px-2 py-1 border rounded text-[#2563EB] border-[#2563EB] text-[14px] md:text-[16px] hover:bg-[#2563EB] hover:text-white"
+                                onClick={() => handleAddEvent()}
+                            >
+                                <MdOutlineEdit className="w-5 h-5" /> Add Event
+                            </button>
+                        </div>
                     </div>
+
                     <div className="w-[600px] sm:w-full">
                         <Calendar
                             localizer={localizer}
@@ -643,7 +766,7 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                     {/* Pagination controls for deleted proposals */}
-                    <div className="flex justify-end gap-2 my-2">
+                    <div className="flex justify-end gap-2 my-2 px-4">
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentDeletedPage(p => Math.max(1, p - 1))}
@@ -663,6 +786,12 @@ const Dashboard = () => {
                         >Next</button>
                     </div>
                 </div>
+
+                {/* Add Event Modal */}
+                <AddEventModal
+                    isOpen={addEventModalOpen}
+                    onClose={() => setAddEventModalOpen(false)}
+                />
             </div>
         </div>
     );
