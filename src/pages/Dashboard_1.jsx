@@ -6,7 +6,6 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineSave, MdOutlineClose } from "react-icons/md";
 import { useProfile } from '../context/ProfileContext';
 import axios from 'axios';
-import { set } from 'react-hook-form';
 
 const localizer = momentLocalizer(moment);
 
@@ -309,7 +308,7 @@ const Dashboard = () => {
             try{
                 const token = localStorage.getItem('token');
                 
-                const res = axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addCalendarEvent', formData, {
+                const res = await axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addCalendarEvent', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
