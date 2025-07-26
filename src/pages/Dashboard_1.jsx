@@ -310,13 +310,18 @@ const Dashboard = () => {
             try{
                 const token = localStorage.getItem('token');
                 
-                const res = axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addEvent', formData, {
+                const res = axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addCalendarEvent', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
                 if (res.status === 200) {
-                    onClose();
+                    setAddEventModalOpen(false);
+                    setFormData({ title: '', start: '', end: '' });
+                    setError('');
+                    // Optionally, you can refresh the calendar events here
+                    // fetchCalendarEvents();
+                    alert('Event added successfully');
                 } else {
                     setError('Failed to add event');
                 }
@@ -341,6 +346,7 @@ const Dashboard = () => {
                                 placeholder="Event Title"
                                 className="border border-gray-300 rounded-lg p-2 w-full"
                             />
+                            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                         </div>
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">Start Date</label>
@@ -351,6 +357,7 @@ const Dashboard = () => {
                                 onChange={handleChange}
                                 className="border border-gray-300 rounded-lg p-2 w-full"
                             />
+                            {errors.start && <p className="text-red-500 text-sm">{errors.start}</p>}
                         </div>
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">End Date</label>
@@ -362,6 +369,7 @@ const Dashboard = () => {
                                 onChange={handleChange}
                                 className="border border-gray-300 rounded-lg p-2 w-full"
                             />
+                            {errors.end && <p className="text-red-500 text-sm">{errors.end}</p>}
                         </div>
                         <button
                             type="submit"
