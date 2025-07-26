@@ -6,6 +6,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineSave, MdOutlineClose } from "react-icons/md";
 import { useProfile } from '../context/ProfileContext';
 import axios from 'axios';
+import { set } from 'react-hook-form';
 
 const localizer = momentLocalizer(moment);
 
@@ -273,8 +274,6 @@ const Dashboard = () => {
     };
 
     const AddEventModal = ({ isOpen, onClose }) => {
-        if (!isOpen) return null;
-
         const [formData, setFormData] = useState({
             title: '',
             start: '',
@@ -289,7 +288,7 @@ const Dashboard = () => {
             setFormData(prev => ({ ...prev, [name]: value }));
         };
 
-        const handleSubmit = (e) => {
+        const handleSubmit = async (e) => {
             e.preventDefault();
             // Handle form submission logic here
             console.log('Event Data:', formData);
@@ -315,13 +314,12 @@ const Dashboard = () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                if (res.status === 200) {
-                    setAddEventModalOpen(false);
+                if (res.status === 201) {
                     setFormData({ title: '', start: '', end: '' });
                     setError('');
-                    // Optionally, you can refresh the calendar events here
-                    // fetchCalendarEvents();
+                    setErrors({});
                     alert('Event added successfully');
+                    onClose();
                 } else {
                     setError('Failed to add event');
                 }
@@ -329,6 +327,9 @@ const Dashboard = () => {
                 setError('Failed to add event');
             }
         };
+
+        if (!isOpen) return null;
+        
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
