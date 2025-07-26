@@ -202,22 +202,18 @@ const TeamMemberModal = ({ member, isOpen, onClose }) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600">
               <MdOutlineEmail className="w-4 h-4" />
-              <span>{member.email}</span>
+              <span>{member.email || "Email not available."}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <MdOutlinePhone className="w-4 h-4" />
-              <span>{member.phone}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <MdOutlineLinkedCamera className="w-4 h-4" />
-              <span>{member.linkedIn}</span>
+              <span>{member.phone || "Phone not available."}</span>
             </div>
           </div>
 
           <div className="pt-4 border-t">
-            <h5 className="font-medium mb-2">About</h5>
+            <h5 className="font-medium mb-2">Short Description</h5>
             <p className="text-gray-600 text-sm">
-              {member.about}
+              {member.shortDesc || "No description available."}
             </p>
           </div>
         </div>
@@ -233,8 +229,8 @@ const ContactModal = ({ member, isOpen, onClose }) => {
   const contactOptions = [
     { icon: <MdOutlineEmail className="w-5 h-5" />, label: "Send Email", action: () => window.open(`mailto:${member.email}`) },
     { icon: <MdOutlinePhone className="w-5 h-5" />, label: "Call", action: () => window.open(`tel:${member.phone}`) },
-    { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`${member.linkedIn}`) },
-    { icon: <MdOutlineOpenInNew className="w-5 h-5" />, label: "Schedule Meeting", action: () => window.open('https://calendly.com') },
+    // { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`${member.linkedIn}`) },
+    // { icon: <MdOutlineOpenInNew className="w-5 h-5" />, label: "Schedule Meeting", action: () => window.open('https://calendly.com') },
   ];
 
   return (
@@ -274,15 +270,18 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
     name: '',
     jobTitle: '',
     email: '',
-    about: '',
+    shortDesc: '',
+    highestQualifications: '',
+    skills: '',
     phone: '',
-    linkedIn: '',
-    accessLevel: 'Editor'
+    accessLevel: 'Member'
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let skillsArray = formData.skills.split(',').map(skill => skill.trim());
+      formData.skills = skillsArray;
       const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addEmployee', formData,
         {
           headers: {
@@ -290,11 +289,11 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           }
         }
       );
-      console.log('Response:', response.data.message);
+      //console.log('Response:', response.data.message);
       alert(response.data.message);
       onClose();
     } catch (error) {
-      console.error('Error adding team member:', error);
+      //console.error('Error adding team member:', error);
       alert('Failed to add team member. Please try again.');
     }
   };
@@ -325,11 +324,34 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
             <textarea
-              value={formData.about}
-              onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+              value={formData.shortDesc}
+              onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualifications</label>
+            <input
+              type="text"
+              value={formData.highestQualifications}
+              onChange={(e) => setFormData({ ...formData, highestQualifications: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)</label>
+            <input
+              type="text"
+              value={formData.skills}
+              onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              placeholder="e.g., React, Node.js, Project Management"
               required
             />
           </div>
@@ -362,17 +384,6 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-            <input
-              type="url"
-              value={formData.linkedIn}
-              onChange={(e) => setFormData({ ...formData, linkedIn: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               required
             />
@@ -459,11 +470,11 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
           }
         }
       );
-      console.log('Response:', response.data.message);
+      //console.log('Response:', response.data.message);
       alert(response.data.message);
       onClose();
     } catch (error) {
-      console.error('Error adding case study:', error);
+      //console.error('Error adding case study:', error);
       alert('Failed to add case study. Please try again.');
     }
   };
@@ -591,11 +602,11 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
           }
         }
       );
-      console.log('Response:', response.data.message);
+      //console.log('Response:', response.data.message);
       alert(response.data.message);
       onClose();
     } catch (error) {
-      console.error('Error adding certificate:', error);
+      //console.error('Error adding certificate:', error);
       alert('Failed to add certificate. Please try again.');
     }
   };
@@ -723,11 +734,11 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
           }
         }
       );
-      console.log('Response:', response.data.message);
+      //console.log('Response:', response.data.message);
       alert(response.data.message);
       onClose();
     } catch (error) {
-      console.error('Error adding document:', error);
+      //console.error('Error adding document:', error);
       alert('Failed to add document. Please try again.');
     }
   };
@@ -920,7 +931,7 @@ const CompanyProfileDashboard = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading document:', error);
+      //console.error('Error downloading document:', error);
       alert('Failed to download document. Please try again.');
     }
   };
@@ -951,7 +962,7 @@ const CompanyProfileDashboard = () => {
 
   const handleSearchProposals = (searchTerm) => {
     // Implement search functionality
-    console.log("Searching proposals:", searchTerm);
+    //console.log("Searching proposals:", searchTerm);
     // You could filter the proposals list based on search term
   };
 
@@ -1021,7 +1032,7 @@ const CompanyProfileDashboard = () => {
         }
       );
       setLogoUrl("https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl);
-      // console.log(logoUrl);
+      // //console.log(logoUrl);
       setEditMode(false);
       setSelectedFile(null);
       setPreviewUrl(null);
