@@ -37,88 +37,7 @@ const Dashboard = () => {
     const { companyData } = useProfile();
     const userName = 'John Doe';
 
-    const employees = (companyData && companyData?.employees) || [
-        { name: 'John Doe' },
-        { name: 'Sara Johnson' },
-        { name: 'Darrell Steward' },
-        { name: 'Cody Fisher' },
-        { name: 'Eleanor Pena' },
-        { name: 'Theresa Webb' },
-        { name: 'Bessie Cooper' },
-        { name: 'Jane Cooper' },
-        { name: 'Leslie Alexander' },
-        { name: 'Ralph Edwards' },
-        { name: 'Devon Lane' },
-    ];
-
-    const calendarEvents = [
-        {
-            title: 'Sustainable Office Park Development',
-            start: new Date(2025, 7, 1),
-            end: new Date(2025, 7, 1),
-            status: 'Submitted',
-        },
-        {
-            title: 'Sustainable Office Park Development_2',
-            start: new Date(2025, 7, 1),
-            end: new Date(2025, 7, 1),
-            status: 'Deadline',
-        },
-        {
-            title: 'High-Tech Campus Expansion',
-            start: new Date(2025, 7, 6),
-            end: new Date(2025, 7, 6),
-            status: 'In Progress',
-        },
-        {
-            title: 'Affordable Housing Project',
-            start: new Date(2025, 7, 8),
-            end: new Date(2025, 7, 8),
-            status: 'Won',
-        },
-        {
-            title: 'Educational Facility Modernization - Design-Build',
-            start: new Date(2025, 7, 14),
-            end: new Date(2025, 7, 14),
-            status: 'Rejected',
-        },
-        {
-            title: 'Urban Infrastructure Improvement',
-            start: new Date(2025, 7, 23),
-            end: new Date(2025, 7, 23),
-            status: 'Submitted',
-        },
-        {
-            title: 'Historic Landmark Restoration',
-            start: new Date(2025, 7, 29),
-            end: new Date(2025, 7, 29),
-            status: 'Won',
-        },
-        {
-            title: 'Walmart Fuel Station',
-            start: new Date(2025, 7, 4),
-            end: new Date(2025, 7, 4),
-            status: 'Deadline',
-        },
-        {
-            title: 'Smart City Technology Integration',
-            start: new Date(2025, 7, 18),
-            end: new Date(2025, 7, 18),
-            status: 'Rejected',
-        },
-        {
-            title: 'Mixed-Use Development Opportunity',
-            start: new Date(2025, 7, 20),
-            end: new Date(2025, 7, 20),
-            status: 'Won',
-        },
-        {
-            title: 'Civil Design Services',
-            start: new Date(2025, 7, 26),
-            end: new Date(2025, 7, 26),
-            status: 'Deadline',
-        },
-    ];
+    const employees = (companyData && companyData?.employees) || [];
 
     // State for backend data
     const [proposalsState, setProposalsState] = useState([]);
@@ -136,9 +55,52 @@ const Dashboard = () => {
     const [calendarMonth, setCalendarMonth] = useState(moment().month());
     const [calendarYear, setCalendarYear] = useState(moment().year());
     const [openDropdownDate, setOpenDropdownDate] = useState(null);
-    const [showEditStatus, setShowEditStatus] = useState(false);
     const [addEventModalOpen, setAddEventModalOpen] = useState(false);
+    const [calendarEvents, setCalendarEvents] = useState([]);
 
+    const [editIdx, setEditIdx] = useState(null);
+    const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
+
+    const handleEditClick = (idx, proposal) => {
+        setEditIdx(idx);
+        setEditForm({
+            deadline: proposal.deadline ? proposal.deadline.split("T")[0] : "",
+            submittedAt: proposal.submittedAt ? proposal.submittedAt.split("T")[0] : "",
+            status: proposal.status
+        });
+    };
+
+    const handleEditChange = (field, value) => {
+        setEditForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSaveProposal = async (proposalId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await axios.patch(
+            `https://proposal-form-backend.vercel.app/api/proposal/${proposalId}`,
+            editForm,
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+            );
+
+            if (res.status === 200) {
+            // ✅ Update local proposals list
+            setPaginatedProposals(prev =>
+                prev.map(p =>
+                p._id === proposalId ? { ...p, ...editForm } : p
+                )
+            );
+
+            setEditIdx(null); // exit edit mode
+            alert("Proposal updated!");
+            }
+        } catch (err) {
+            console.error("Error updating proposal:", err);
+            alert("Failed to update proposal");
+        }
+    };
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -160,6 +122,7 @@ const Dashboard = () => {
                     { label: 'Submitted', value: data.submittedProposals || 0 },
                     { label: 'Won', value: data.wonProposals || 0 },
                 ]);
+                setCalendarEvents(data.calendarEvents || []);
             } catch (err) {
                 setError('Failed to load dashboard data');
             } finally {
@@ -168,22 +131,6 @@ const Dashboard = () => {
         };
         fetchDashboardData();
     }, []);
-
-    const handleEditProposalStatus = async (idx, newStatus) => {
-        const token = localStorage.getItem('token');
-        const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/editProposalStatus', {
-            proposalId: proposalsState[idx]._id,
-            status: newStatus
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        if (res.status === 200) {
-            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, status: newStatus } : p));
-            setShowAddPersonIdx(null);
-        }
-    };
 
     const handleSetCurrentEditor = async (idx, editorId) => {
         const token = localStorage.getItem('token');
@@ -219,7 +166,6 @@ const Dashboard = () => {
                 setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                 setSelectedProposals([]);
                 setShowDeleteOptions(false);
-                setShowEditStatus(false);
             } else {
                 setError('Failed to delete proposals');
             }
@@ -338,12 +284,15 @@ const Dashboard = () => {
                             <MdOutlineClose className="w-6 h-6" />
                         </button>
                     </div>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">Title</label>
                             <input
                                 type="text"
                                 placeholder="Event Title"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
                                 className="border border-gray-300 rounded-lg p-2 w-full"
                             />
                             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
@@ -374,12 +323,11 @@ const Dashboard = () => {
                         <button
                             type="submit"
                             className="bg-[#2563EB] text-white px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition"
-                            onClick={() => handleSubmit()}
                         >
                             Add Event
                         </button>
                     </form>
-                    {error && <p className="text-red-500 mt-4">{error}</p>}
+                    {calendarError && <p className="text-red-500 mt-4">{calendarError}</p>}
                 </div>
             </div>
         );
@@ -505,7 +453,7 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen">
             <NavbarComponent />
-            <div className="w-full mx-auto py-8 px-4 md:px-8 mt-12">
+            <main className="w-full mx-auto py-8 px-4 md:px-8 mt-12">
                 <h2 className="text-[24px] font-semibold mb-4">Tracking Dashboard</h2>
 
                 {/* Summary Cards */}
@@ -570,7 +518,18 @@ const Dashboard = () => {
                                                     />
                                                 </td>
                                             )}
-                                            <td className="px-4 py-2 font-semibold">{p.title}</td>
+
+                                            <td className="px-4 py-2 font-semibold">
+                                                <a 
+                                                    href={`https://proposal-form-backend.vercel.app/api/proposal/${p._id}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[#2563EB] hover:underline"
+                                                >
+                                                    {p.title}
+                                                </a>
+                                            </td>
+
                                             <td className="px-4 py-2">{p.client}</td>
                                             {p.currentEditor.name === userName ? (
                                                 <td className="px-4 py-2 flex items-center gap-2">
@@ -602,32 +561,78 @@ const Dashboard = () => {
                                             ) : (
                                                 <td className="px-4 py-2">{p.currentEditor.name}</td>
                                             )}
-                                            <td className="px-4 py-2">{p.deadline}</td>
+
                                             <td className="px-4 py-2">
-                                                {showEditStatus && (
-                                                    <div className="flex items-center gap-2">
-                                                        <select className="border rounded px-2 py-1 text-[#111827] text-xs sm:text-base" value={p.status} onChange={e => handleEditProposalStatus(realIdx, e.target.value)}>
-                                                            <option value="In Progress">In Progress</option>
-                                                            <option value="Submitted">Submitted</option>
-                                                            <option value="Won">Won</option>
-                                                            <option value="Rejected">Rejected</option>
-                                                            <option value="Deadline">Deadline</option>
-                                                        </select>
-                                                        <button className="text-[#2563EB]" title="Save" onClick={() => handleEditProposalStatus(realIdx, p.status)}>
-                                                            <MdOutlineSave className="w-5 h-5" />
-                                                        </button>
-                                                    </div>
+                                                {editIdx === realIdx ? (
+                                                    <input
+                                                        type="date"
+                                                        value={p.deadline}
+                                                        onChange={e => handleEditChange("deadline", e.target.value)}
+                                                    />
+                                                ) : (
+                                                    new Date(p.deadline).toLocaleDateString()
                                                 )}
                                             </td>
-                                            <td className="px-4 py-2">{p.submittedAt}</td>
+
+                                            <td className="px-4 py-2">
+                                                {editIdx === realIdx ? (
+                                                    <select className="border rounded px-2 py-1 text-[#111827] text-xs sm:text-base" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                        <option value="In Progress">In Progress</option>
+                                                        <option value="Submitted">Submitted</option>
+                                                        <option value="Won">Won</option>
+                                                        <option value="Rejected">Rejected</option>
+                                                        <option value="Deadline">Deadline</option>
+                                                    </select>
+                                                ) : (
+                                                    statusBadge(p.status)
+                                                )}
+                                            </td>
+
+                                            <td className="px-4 py-2">
+                                                {editIdx === realIdx ? (
+                                                    <input
+                                                        type="date"
+                                                        value={p.submittedAt}
+                                                        onChange={e => handleEditChange("submittedAt", e.target.value)}
+                                                    />
+                                                ) : (
+                                                    new Date(p.submittedAt).toLocaleDateString()
+                                                )}
+                                            </td>
+                                                
                                             <td className="px-4 py-2">
                                                 <div className="flex items-center gap-2">
-                                                    <button className="text-[#2563EB]" title="Edit" onClick={() => setShowEditStatus(true)}>
+                                                    {editIdx === realIdx ? (
+                                                    <>
+                                                        <button
+                                                        className="text-green-600"
+                                                        title="Save"
+                                                        onClick={() => handleSaveProposal(p._id)}
+                                                        >
+                                                        ✅ Save
+                                                        </button>
+                                                        <button
+                                                        className="text-gray-500"
+                                                        title="Cancel"
+                                                        onClick={() => setEditIdx(null)}
+                                                        >
+                                                        ❌ Cancel
+                                                        </button>
+                                                    </>
+                                                    ) : (
+                                                    <>
+                                                        <button
+                                                        className="text-[#2563EB]"
+                                                        title="Edit"
+                                                        onClick={() => handleEditClick(realIdx, p)}
+                                                        >
                                                         <MdOutlineEdit className="w-5 h-5" />
-                                                    </button>
-                                                    <button className="text-[#2563EB]" title="View">
+                                                        </button>
+                                                        <button className="text-[#2563EB]" title="View">
                                                         <MdOutlineVisibility className="w-5 h-5" />
-                                                    </button>
+                                                        </button>
+                                                    </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -750,7 +755,7 @@ const Dashboard = () => {
                                 <tr key={idx + (currentDeletedPage - 1) * PAGE_SIZE} className="border-t">
                                     <td className="px-4 py-2 font-semibold">{p.title}</td>
                                     <td className="px-4 py-2">{p.client}</td>
-                                    <td className="px-4 py-2">{p.deadline}</td>
+                                    <td className="px-4 py-2">{new Date(p.deadline).toLocaleDateString()}</td>
                                     <td className="px-4 py-2">{statusBadge(p.status)}</td>
                                     <td className="px-4 py-2">{p.restoreIn}</td>
                                     <td className="px-4 py-2">
@@ -800,7 +805,7 @@ const Dashboard = () => {
                     isOpen={addEventModalOpen}
                     onClose={() => setAddEventModalOpen(false)}
                 />
-            </div>
+            </main>
         </div>
     );
 };
