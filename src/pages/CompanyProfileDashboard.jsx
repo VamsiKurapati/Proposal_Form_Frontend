@@ -1147,7 +1147,7 @@ const CompanyProfileDashboard = () => {
                 <MdOutlineBusinessCenter className="w-5 h-5 shrink-0 text-[#4B5563]" />
                 <p className="text-[13px] sm:text-[14px] text-[#4B5563]">{companyData?.industry || 'Loading...'}</p>
               </div>
-              <span className="hidden sm:inline">|</span>
+              <div className="ml-1 w-[2px] h-6 bg-[#111827] hidden sm:block"></div>
               <div className="flex items-center gap-2">
                 <MdOutlineLocationOn className="w-5 h-5 shrink-0 text-[#4B5563]" />
                 <p className="text-[13px] sm:text-[14px] text-[#4B5563]">{companyData?.location || 'Loading...'}</p>
@@ -1158,12 +1158,12 @@ const CompanyProfileDashboard = () => {
                 <MdOutlineMail className="w-5 h-5 shrink-0 text-[#6B7280]" />
                 <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.email || 'Loading...'}</p>
               </div>
-              <span className="hidden sm:inline">|</span>
+              <div className="ml-1 w-[2px] h-6 bg-[#111827] hidden sm:block"></div>
               <div className="flex items-center gap-2">
                 <MdOutlineCall className="w-5 h-5 shrink-0 text-[#6B7280]" />
                 <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.phone || 'Loading...'}</p>
               </div>
-              <span className="hidden sm:inline">|</span>
+              <div className="ml-1 w-[2px] h-6 bg-[#111827] hidden sm:block"></div>
               <div className="flex items-center gap-2">
                 <MdOutlineLanguage className="w-5 h-5 shrink-0 text-[#6B7280]" />
                 <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{companyData?.website || 'Loading...'}</p>

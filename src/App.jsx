@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import { lazy, Suspense } from "react";
 import { ProfileProvider } from './context/ProfileContext';
+import { EmployeeProfileProvider } from './context/EmployeeProfileContext';
 import { useUser } from './context/UserContext';
 
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
@@ -75,12 +76,6 @@ const App = () => {
               </ProfileProvider>
             </ProtectedRoutes>
           } />
-          {/* <Route path="/company_profile_dashboard" element={
-              <ProfileProvider>
-                <CompanyProfileDashboard />
-              </ProfileProvider>
-          } /> */}
-
           <Route path="/company-profile-update" element={
             <ProtectedRoutes allowedRoles={["company"]}>
               <ProfileProvider>
@@ -91,16 +86,16 @@ const App = () => {
 
           <Route path="/employee_profile_dashboard" element={
             <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
-              <ProfileProvider>
+              <EmployeeProfileProvider>
                 <EmployeeProfileDashboard />
-              </ProfileProvider>
+              </EmployeeProfileProvider>
             </ProtectedRoutes>
           } />
           <Route path="/employee-profile-update" element={
             <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
-              <ProfileProvider>
+              <EmployeeProfileProvider>
                 <EmployeeProfileUpdate />
-              </ProfileProvider>
+              </EmployeeProfileProvider>
             </ProtectedRoutes>
           } />
 

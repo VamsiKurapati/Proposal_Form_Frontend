@@ -46,12 +46,13 @@ const LoginPage = () => {
       const token = res.data.token;
       const role = res.data.user.role;
       localStorage.setItem("token", token); // Store JWT
-      localStorage.setItem("userRole", role);
       if (role === "company") {
-        console.log("Navigating to company profile dashboard");
+        localStorage.setItem("userRole", "company");
+        //console.log("Navigating to company profile dashboard");
         navigate("/company_profile_dashboard"); // Redirect to company profile page
       } else {
-        console.log("Navigating to employee profile dashboard");
+        localStorage.setItem("userRole", res.data.user.accessLevel || "viewer");
+        //console.log("Navigating to employee profile dashboard");
         navigate("/employee_profile_dashboard"); // Redirect to profile page
       }
     } catch (error) {
