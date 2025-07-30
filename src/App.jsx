@@ -62,12 +62,10 @@ const App = () => {
 
           <Route path="/dashboard" element={
             <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
-              <ProfileProvider>
                 <Dashboard />
-              </ProfileProvider>
             </ProtectedRoutes>
           } />
-          {/* <Route path="/dashboard" element={<ProfileProvider><Dashboard /></ProfileProvider>} /> */}
+          {/* <Route path="/dashboard" element={ Dashboard } /> */}
 
           <Route path="/company_profile_dashboard" element={
             <ProtectedRoutes allowedRoles={["company"]}>
@@ -85,18 +83,18 @@ const App = () => {
           } />
 
           <Route path="/employee_profile_dashboard" element={
-            <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
+            // <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileDashboard />
               </EmployeeProfileProvider>
-            </ProtectedRoutes>
+            // </ProtectedRoutes>
           } />
           <Route path="/employee-profile-update" element={
-            <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
+            // <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileUpdate />
               </EmployeeProfileProvider>
-            </ProtectedRoutes>
+            // </ProtectedRoutes>
           } />
 
           <Route path="*" element={<Home />} />

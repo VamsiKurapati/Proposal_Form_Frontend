@@ -4,7 +4,6 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose } from "react-icons/md";
-import { useProfile } from '../context/ProfileContext';
 import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
@@ -34,10 +33,8 @@ function statusBadge(status) {
 const PAGE_SIZE = 5;
 
 const Dashboard = () => {
-    const { companyData } = useProfile();
-    const userName = 'John Doe';
-
-    const employees = (companyData && companyData?.employees) || [];
+    const user = localStorage.getItem("user");
+    const userName = user ? JSON.parse(user).name : (JSON.parse(user).companyName || "Unknown User");
 
     // State for backend data
     const [proposalsState, setProposalsState] = useState([]);
@@ -57,6 +54,7 @@ const Dashboard = () => {
     const [openDropdownDate, setOpenDropdownDate] = useState(null);
     const [addEventModalOpen, setAddEventModalOpen] = useState(false);
     const [calendarEvents, setCalendarEvents] = useState([]);
+    const [employees, setEmployees] = useState([]);
 
     const [editIdx, setEditIdx] = useState(null);
     const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
@@ -123,6 +121,7 @@ const Dashboard = () => {
                     { label: 'Won', value: data.wonProposals || 0 },
                 ]);
                 setCalendarEvents(data.calendarEvents || []);
+                setEmployees(data.employees || []);
             } catch (err) {
                 setError('Failed to load dashboard data');
             } finally {

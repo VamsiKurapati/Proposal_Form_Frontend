@@ -45,6 +45,7 @@ const LoginPage = () => {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       const token = res.data.token;
       const role = res.data.user.role;
+      localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user data
       localStorage.setItem("token", token); // Store JWT
       if (role === "company") {
         localStorage.setItem("userRole", "company");
