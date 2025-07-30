@@ -334,7 +334,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualifications</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualification</label>
             <input
               type="text"
               value={formData.highestQualification}

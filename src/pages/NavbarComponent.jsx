@@ -3,17 +3,20 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FiSearch, FiBell, FiMenu } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
+import { useUser } from "../context/UserContext";
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
+  const { role } = useUser();
+
   const navItems = [
     { name: "Discover", path: "/rfp_discovery" },
     { name: "Proposals", path: "/proposals" },
     { name: "Dashboard", path: "/dashboard" },
-    { name: "Profile", path: "/company_profile_dashboard" },
+    { name: "Profile", path: role === "company" ? "/company_profile_dashboard" : "/employee_profile_dashboard" },
   ];
 
   return (
