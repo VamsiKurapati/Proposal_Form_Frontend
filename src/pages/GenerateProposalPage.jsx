@@ -4,6 +4,7 @@ import NavbarComponent from './NavbarComponent';
 import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment } from 'react-icons/md';
 import { useProfile } from '../context/ProfileContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
+import axios from 'axios';
 
 const GenerateProposalPage = () => {
   const location = useLocation();
