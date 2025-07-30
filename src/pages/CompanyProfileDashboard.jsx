@@ -271,7 +271,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
     jobTitle: '',
     email: '',
     shortDesc: '',
-    highestQualifications: '',
+    highestQualification: '',
     skills: '',
     phone: '',
     accessLevel: 'Member'
@@ -337,8 +337,8 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualifications</label>
             <input
               type="text"
-              value={formData.highestQualifications}
-              onChange={(e) => setFormData({ ...formData, highestQualifications: e.target.value })}
+              value={formData.highestQualification}
+              onChange={(e) => setFormData({ ...formData, highestQualification: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               required
             />

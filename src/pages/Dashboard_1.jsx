@@ -34,7 +34,7 @@ const PAGE_SIZE = 5;
 
 const Dashboard = () => {
     const user = localStorage.getItem("user");
-    const userName = user ? JSON.parse(user).name : (JSON.parse(user).companyName || "Unknown User");
+    const userName = user ? (JSON.parse(user).name || JSON.parse(user).companyName || "Unknown User") : "Unknown User";
 
     // State for backend data
     const [proposalsState, setProposalsState] = useState([]);
@@ -75,24 +75,24 @@ const Dashboard = () => {
     const handleSaveProposal = async (proposalId) => {
         try {
             const token = localStorage.getItem("token");
-            const res = await axios.patch(
-            `https://proposal-form-backend.vercel.app/api/proposal/${proposalId}`,
-            editForm,
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+            const res = await axios.put(
+                `https://proposal-form-backend.vercel.app/api/dashboard/updateProposal`,
+                { proposalId, editForm },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
             );
 
             if (res.status === 200) {
-            // ✅ Update local proposals list
-            setPaginatedProposals(prev =>
-                prev.map(p =>
-                p._id === proposalId ? { ...p, ...editForm } : p
-                )
-            );
+                // ✅ Update local proposals list
+                setProposalsState(prev =>
+                    prev.map(p =>
+                        p._id === proposalId ? { ...p, ...editForm } : p
+                    )
+                );
 
-            setEditIdx(null); // exit edit mode
-            alert("Proposal updated!");
+                setEditIdx(null); // exit edit mode
+                alert("Proposal updated!");
             }
         } catch (err) {
             console.error("Error updating proposal:", err);
@@ -236,23 +236,23 @@ const Dashboard = () => {
             e.preventDefault();
             // Handle form submission logic here
             console.log('Event Data:', formData);
-            if(!formData.title){
+            if (!formData.title) {
                 setErrors({ title: 'Title is required' });
                 return;
             }
-            if(!formData.start){
+            if (!formData.start) {
                 setErrors({ start: 'Start date is required' });
                 return;
             }
-            if(!formData.end){
+            if (!formData.end) {
                 setErrors({ end: 'End date is required' });
                 return;
             }
             setErrors({});
             console.log('Event Data:', formData);
-            try{
+            try {
                 const token = localStorage.getItem('token');
-                
+
                 const res = await axios.post('https://proposal-form-backend.vercel.app/api/dashboard/addCalendarEvent', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -273,7 +273,7 @@ const Dashboard = () => {
         };
 
         if (!isOpen) return null;
-        
+
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
@@ -519,7 +519,7 @@ const Dashboard = () => {
                                             )}
 
                                             <td className="px-4 py-2 font-semibold">
-                                                <a 
+                                                <a
                                                     href={`https://proposal-form-backend.vercel.app/api/proposal/${p._id}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
@@ -530,7 +530,7 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">{p.client}</td>
-                                            {p.currentEditor.name === userName ? (
+                                            {p.currentEditor && p.currentEditor.name === userName ? (
                                                 <td className="px-4 py-2 flex items-center gap-2">
                                                     <span>{userName} (You)</span>
                                                     <button
@@ -558,7 +558,7 @@ const Dashboard = () => {
                                                     )}
                                                 </td>
                                             ) : (
-                                                <td className="px-4 py-2">{p.currentEditor.name}</td>
+                                                <td className="px-4 py-2">{p.currentEditor ? p.currentEditor.name : 'No Editor Assigned'}</td>
                                             )}
 
                                             <td className="px-4 py-2">
@@ -598,39 +598,39 @@ const Dashboard = () => {
                                                     new Date(p.submittedAt).toLocaleDateString()
                                                 )}
                                             </td>
-                                                
+
                                             <td className="px-4 py-2">
                                                 <div className="flex items-center gap-2">
                                                     {editIdx === realIdx ? (
-                                                    <>
-                                                        <button
-                                                        className="text-green-600"
-                                                        title="Save"
-                                                        onClick={() => handleSaveProposal(p._id)}
-                                                        >
-                                                        ✅ Save
-                                                        </button>
-                                                        <button
-                                                        className="text-gray-500"
-                                                        title="Cancel"
-                                                        onClick={() => setEditIdx(null)}
-                                                        >
-                                                        ❌ Cancel
-                                                        </button>
-                                                    </>
+                                                        <>
+                                                            <button
+                                                                className="text-green-600"
+                                                                title="Save"
+                                                                onClick={() => handleSaveProposal(p._id)}
+                                                            >
+                                                                ✅ Save
+                                                            </button>
+                                                            <button
+                                                                className="text-gray-500"
+                                                                title="Cancel"
+                                                                onClick={() => setEditIdx(null)}
+                                                            >
+                                                                ❌ Cancel
+                                                            </button>
+                                                        </>
                                                     ) : (
-                                                    <>
-                                                        <button
-                                                        className="text-[#2563EB]"
-                                                        title="Edit"
-                                                        onClick={() => handleEditClick(realIdx, p)}
-                                                        >
-                                                        <MdOutlineEdit className="w-5 h-5" />
-                                                        </button>
-                                                        <button className="text-[#2563EB]" title="View">
-                                                        <MdOutlineVisibility className="w-5 h-5" />
-                                                        </button>
-                                                    </>
+                                                        <>
+                                                            <button
+                                                                className="text-[#2563EB]"
+                                                                title="Edit"
+                                                                onClick={() => handleEditClick(realIdx, p)}
+                                                            >
+                                                                <MdOutlineEdit className="w-5 h-5" />
+                                                            </button>
+                                                            <button className="text-[#2563EB]" title="View">
+                                                                <MdOutlineVisibility className="w-5 h-5" />
+                                                            </button>
+                                                        </>
                                                     )}
                                                 </div>
                                             </td>
