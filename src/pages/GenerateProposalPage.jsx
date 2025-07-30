@@ -41,7 +41,7 @@ const GenerateProposalPage = () => {
       console.error("Error saving company data:", error);
     }
     console.log("Save and Next");
-    navigate('/company_profile_dashboard');
+    // navigate('/company_profile_dashboard');
   };
 
   return (
