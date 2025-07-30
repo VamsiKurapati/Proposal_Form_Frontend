@@ -38,30 +38,30 @@ const App = () => {
           <Route path="/sign_up" element={<SignUpPage />} />
           <Route path="/create-profile" element={<ProfileForm />} />
 
-          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <RFPDiscovery />
           </ProtectedRoutes>} />
 
-          <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+          <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <Proposals />
           </ProtectedRoutes>} />
 
           <Route path="/proposal_page" element={
-            <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+            <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
               <ProfileProvider>
                 <GenerateProposalPage />
               </ProfileProvider>
             </ProtectedRoutes>
           } />
-          <Route path="/basic-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+          <Route path="/basic-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <BasicComplianceCheck />
           </ProtectedRoutes>} />
-          <Route path="/advanced-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+          <Route path="/advanced-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <AdvancedComplianceCheck />
           </ProtectedRoutes>} />
 
           <Route path="/dashboard" element={
-            <ProtectedRoutes allowedRoles={["company", "editor", "viewer"]}>
+            <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
                 <Dashboard />
             </ProtectedRoutes>
           } />
@@ -83,14 +83,14 @@ const App = () => {
           } />
 
           <Route path="/employee_profile_dashboard" element={
-            // <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
+            // <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileDashboard />
               </EmployeeProfileProvider>
             // </ProtectedRoutes>
           } />
           <Route path="/employee-profile-update" element={
-            // <ProtectedRoutes allowedRoles={["editor", "viewer"]}>
+            // <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileUpdate />
               </EmployeeProfileProvider>
