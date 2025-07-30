@@ -83,18 +83,18 @@ const App = () => {
           } />
 
           <Route path="/employee_profile_dashboard" element={
-            // <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
+            <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileDashboard />
               </EmployeeProfileProvider>
-            // </ProtectedRoutes>
+            </ProtectedRoutes>
           } />
           <Route path="/employee-profile-update" element={
-            // <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
+            <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
               <EmployeeProfileProvider>
                 <EmployeeProfileUpdate />
               </EmployeeProfileProvider>
-            // </ProtectedRoutes>
+            </ProtectedRoutes>
           } />
 
           <Route path="*" element={<Home />} />
