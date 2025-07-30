@@ -35,7 +35,7 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
-        console.log("Company data saved successfully");
+        console.log(res.data);
       }
     } catch (error) {
       console.error("Error saving company data:", error);
