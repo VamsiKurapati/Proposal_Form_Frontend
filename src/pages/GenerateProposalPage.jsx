@@ -15,7 +15,30 @@ const GenerateProposalPage = () => {
   const [showViewAllTeam, setShowViewAllTeam] = useState(false);
   const [showAddCaseStudy, setShowAddCaseStudy] = useState(false);
 
-  const handleSaveAndNext = () => {
+  const handleSaveAndNext = async () => {
+    try {
+      // const res = await axios.get(`http://56.228.64.88:5000/run-proposal-generation`, { proposal} , {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`
+      //   }
+      // });
+
+      const token = localStorage.getItem("token");
+      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/rfp/sendDataForProposalGeneration`, {
+        proposal,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        console.log("Company data saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving company data:", error);
+    }
     console.log("Save and Next");
     navigate('/company_profile_dashboard');
   };
