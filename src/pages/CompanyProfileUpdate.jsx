@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineArrowBack, MdOutlineSave, MdOutlineCancel, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineDescription, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday } from "react-icons/md";
+import { MdOutlineArrowBack, MdOutlineSave, MdOutlineCancel, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineDescription, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineClose } from "react-icons/md";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -42,6 +42,122 @@ const getYearOptions = () => {
         years.push(y.toString());
     }
     return years;
+};
+
+// Custom MultiSelect Component
+const MultiSelect = ({
+    options,
+    value = [],
+    onChange,
+    placeholder = "Select options...",
+    disabled = false,
+    className = ""
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const containerRef = React.useRef(null);
+
+    const filteredOptions = options.filter(option =>
+        !value.includes(option) &&
+        option.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleSelect = (option) => {
+        if (!value.includes(option)) {
+            onChange([...value, option]);
+        }
+        setSearchTerm("");
+        setIsOpen(false);
+    };
+
+    const handleRemove = (optionToRemove) => {
+        onChange(value.filter(option => option !== optionToRemove));
+    };
+
+    const handleInputClick = () => {
+        if (!disabled) {
+            setIsOpen(!isOpen);
+        }
+    };
+
+    const handleInputKeyDown = (e) => {
+        if (e.key === 'Backspace' && searchTerm === '' && value.length > 0) {
+            handleRemove(value[value.length - 1]);
+        }
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    return (
+        <div className={`relative ${className}`} ref={containerRef}>
+            <div
+                className={`w-full border rounded-md p-2 bg-[#F0F0F0] min-h-[40px] flex flex-wrap gap-1 items-center cursor-text ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={handleInputClick}
+            >
+                {value.map((selectedOption, index) => (
+                    <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-[#2563EB] text-white text-sm rounded-md"
+                    >
+                        {selectedOption}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemove(selectedOption);
+                            }}
+                            className="ml-1 hover:bg-[#1d4ed8] rounded-full p-0.5"
+                            disabled={disabled}
+                        >
+                            <MdOutlineClose className="w-3 h-3" />
+                        </button>
+                    </span>
+                ))}
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleInputKeyDown}
+                    placeholder={value.length === 0 ? placeholder : ""}
+                    className="flex-1 bg-transparent outline-none text-sm"
+                    disabled={disabled}
+                    onFocus={() => setIsOpen(true)}
+                />
+            </div>
+
+            {isOpen && !disabled && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option) => (
+                            <div
+                                key={option}
+                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                onClick={() => handleSelect(option)}
+                            >
+                                {option}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="px-3 py-2 text-gray-500 text-sm">
+                            No options available
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
 };
 
 // Reusable input component
@@ -274,10 +390,7 @@ const CompanyProfileUpdate = () => {
         }
     }
 
-    const handlePreferredIndustriesChange = (e) => {
-        const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-        setForm(prev => ({ ...prev, preferredIndustries: selectedOptions }));
-    }
+
 
     const validateForm = () => {
         const newErrors = {};
@@ -651,22 +764,13 @@ const CompanyProfileUpdate = () => {
                                 Preferred Industries
                             </label>
                             {/* Multiple Select from the list of industries */}
-                            <div className="flex items-center gap-2 w-full">
-                                <MdOutlineBusinessCenter className="w-6 h-6 text-[#2563EB]" />
-                                <select
-                                    multiple={true}
-                                    name="preferredIndustries"
-                                    id="preferredIndustries"
-                                    value={form.preferredIndustries}
-                                    onChange={handlePreferredIndustriesChange}
-                                    className={`w-full border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    size="5"
-                                >
-                                    {INDUSTRY_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <MultiSelect
+                                options={INDUSTRY_OPTIONS}
+                                value={form.preferredIndustries}
+                                onChange={(newValue) => setForm(prev => ({ ...prev, preferredIndustries: newValue }))}
+                                placeholder="Select preferred industries"
+                                disabled={loading}
+                            />
                         </div>
                     </div>
 
