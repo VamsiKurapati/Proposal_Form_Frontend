@@ -147,7 +147,7 @@ const CompanyProfileUpdate = () => {
         services: companyData?.profile?.services || [""],
         awards: companyData?.profile?.awards || [""],
         clients: companyData?.profile?.clients || [""],
-        preferredIndustries: companyData?.profile?.preferredIndustries || "",
+        preferredIndustries: companyData?.profile?.preferredIndustries || [""],
         numberOfEmployees: companyData?.companyDetails?.["No.of employees"]?.value || "",
         founded: companyData?.companyDetails?.["Founded"]?.value || "",
     });
@@ -275,8 +275,8 @@ const CompanyProfileUpdate = () => {
     }
 
     const handlePreferredIndustriesChange = (e) => {
-        console.log(e.target.value);
-        setForm(prev => ({ ...prev, preferredIndustries: e.target.value }));
+        const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+        setForm(prev => ({ ...prev, preferredIndustries: selectedOptions }));
     }
 
     const validateForm = () => {
@@ -330,7 +330,7 @@ const CompanyProfileUpdate = () => {
             formData.append("website", form.website);
             formData.append("linkedIn", form.linkedIn);
             formData.append("bio", form.bio);
-            formData.append("preferredIndustries", form.preferredIndustries);
+            formData.append("preferredIndustries", JSON.stringify(form.preferredIndustries));
             const filteredServices = form.services.filter(service => service.trim());
             formData.append("services", JSON.stringify(filteredServices));
             const filteredAwards = form.awards.filter(award => award.trim());
@@ -654,12 +654,14 @@ const CompanyProfileUpdate = () => {
                             <div className="flex items-center gap-2 w-full">
                                 <MdOutlineBusinessCenter className="w-6 h-6 text-[#2563EB]" />
                                 <select
+                                    multiple={true}
+                                    name="preferredIndustries"
                                     id="preferredIndustries"
                                     value={form.preferredIndustries}
                                     onChange={handlePreferredIndustriesChange}
                                     className={`w-full border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    size="5"
                                 >
-                                    <option value="">Select Industry</option>
                                     {INDUSTRY_OPTIONS.map(opt => (
                                         <option key={opt} value={opt}>{opt}</option>
                                     ))}
