@@ -13,6 +13,7 @@ export const ProfileProvider = ({ children }) => {
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockCompanyData = useCallback(() => ({
         companyName: "ABC Company Inc.",
+        adminName: "John Doe",
         industry: "Technology Solutions & Consulting",
         location: "San Francisco, CA",
         email: "myname@email.com",
@@ -181,6 +182,7 @@ export const ProfileProvider = ({ children }) => {
             });
             const data = {
                 companyName: response.data.companyName,
+                adminName: response.data.adminName,
                 industry: response.data.industry,
                 location: response.data.location,
                 email: response.data.email,
@@ -189,7 +191,10 @@ export const ProfileProvider = ({ children }) => {
                 linkedIn: response.data.linkedIn,
                 profile: {
                     bio: response.data.bio,
-                    services: response.data.services
+                    services: response.data.services,
+                    awards: response.data.awards,
+                    clients: response.data.clients,
+                    preferredIndustries: response.data.preferredIndustries
                 },
                 employees: response.data.employees,
                 companyDetails: {

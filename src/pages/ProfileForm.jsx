@@ -136,6 +136,7 @@ const CreateProfile = () => {
 
   const [form, setForm] = useState({
     companyName: signupData?.organization || "",
+    adminName: "",
     industry: "",
     location: "",
     website: "",
@@ -173,6 +174,8 @@ const CreateProfile = () => {
     const phoneNumber = parsePhoneNumberFromString(form.phone.startsWith('+') ? form.phone : `+${form.phone}`);
     if (role === "company") {
       if (!form.companyName.trim()) newErrors.companyName = "Company Name is required";
+
+      if (!form.adminName.trim()) newErrors.adminName = "Admin Name is required";
 
       if (!form.industry.trim()) newErrors.industry = "Industry is required";
       else if (form.industry === "Other" && !form.customIndustry.trim()) newErrors.industry = "Please specify your industry";
@@ -241,6 +244,7 @@ const CreateProfile = () => {
 
       if (role === "company") {
         formData.append("companyName", form.companyName);
+        formData.append("adminName", form.adminName);
         formData.append("industry", form.industry === "Other" ? form.customIndustry : form.industry);
         formData.append("numberOfEmployees", form.numberOfEmployees);
         formData.append("bio", form.bio);
@@ -261,6 +265,7 @@ const CreateProfile = () => {
         alert("Profile created successfully");
         setForm({
           companyName: "",
+          adminName: "",
           industry: "",
           location: "",
           website: "",
@@ -310,13 +315,22 @@ const CreateProfile = () => {
 
       {role === "company" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2">
+          <div className="col-span-2 md:col-span-1">
             <FormInput
               id="companyName"
               label="Company Name"
               value={form.companyName}
               onChange={e => setForm({ ...form, companyName: e.target.value })}
               error={errors.companyName}
+              required
+              disabled={isFormDisabled}
+            />
+            <FormInput
+              id="adminName"
+              label="Admin Name"
+              value={form.adminName}
+              onChange={e => setForm({ ...form, adminName: e.target.value })}
+              error={errors.adminName}
               required
               disabled={isFormDisabled}
             />

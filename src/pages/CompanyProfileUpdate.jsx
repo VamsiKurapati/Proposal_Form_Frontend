@@ -136,6 +136,7 @@ const CompanyProfileUpdate = () => {
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
+        adminName: companyData?.adminName || "",
         industry: companyData?.industry || "",
         location: companyData?.location || "",
         email: companyData?.email || "",
@@ -144,6 +145,9 @@ const CompanyProfileUpdate = () => {
         linkedIn: companyData?.linkedIn || "",
         bio: companyData?.profile?.bio || "",
         services: companyData?.profile?.services || [""],
+        awards: companyData?.profile?.awards || [""],
+        clients: companyData?.profile?.clients || [""],
+        preferredIndustries: companyData?.profile?.preferredIndustries || "",
         numberOfEmployees: companyData?.companyDetails?.["No.of employees"]?.value || "",
         founded: companyData?.companyDetails?.["Founded"]?.value || "",
     });
@@ -168,24 +172,112 @@ const CompanyProfileUpdate = () => {
         }
     };
 
-    const handleServiceChange = (index, value) => {
-        const newServices = [...form.services];
-        newServices[index] = value;
-        setForm(prev => ({ ...prev, services: newServices }));
-    };
+    // const handleServiceChange = (index, value) => {
+    //     const newServices = [...form.services];
+    //     newServices[index] = value;
+    //     setForm(prev => ({ ...prev, services: newServices }));
+    // };
 
-    const addService = () => {
-        if (form.services.length < 10) {
-            setForm(prev => ({ ...prev, services: [...prev.services, ""] }));
+    // const handleAwardChange = (index, value) => {
+    //     const newAwards = [...form.awards];
+    //     newAwards[index] = value;
+    //     setForm(prev => ({ ...prev, awards: newAwards }));
+    // };
+
+    // const handleClientChange = (index, value) => {
+    //     const newClients = [...form.clients];
+    //     newClients[index] = value;
+    //     setForm(prev => ({ ...prev, clients: newClients }));
+    // };
+
+    // const addService = () => {
+    //     if (form.services.length < 10) {
+    //         setForm(prev => ({ ...prev, services: [...prev.services, ""] }));
+    //     }
+    // };
+
+    // const removeService = (index) => {
+    //     if (form.services.length > 1) {
+    //         const newServices = form.services.filter((_, i) => i !== index);
+    //         setForm(prev => ({ ...prev, services: newServices }));
+    //     }
+    // };
+
+    // const addAward = () => {
+    //     if (form.awards.length < 10) {
+    //         setForm(prev => ({ ...prev, awards: [...prev.awards, ""] }));
+    //     }
+    // };
+
+    // const removeAward = (index) => {
+    //     if (form.awards.length > 1) {
+    //         const newAwards = form.awards.filter((_, i) => i !== index);
+    //         setForm(prev => ({ ...prev, awards: newAwards }));
+    //     }
+    // };
+
+    // const addClient = () => {
+    //     if (form.clients.length < 10) {
+    //         setForm(prev => ({ ...prev, clients: [...prev.clients, ""] }));
+    //     }
+    // };
+
+    // const removeClient = (index) => {
+    //     if (form.clients.length > 1) {
+    //         const newClients = form.clients.filter((_, i) => i !== index);
+    //         setForm(prev => ({ ...prev, clients: newClients }));
+    //     }
+    // };
+
+    const handleChange = (type, index, value) => {
+        if (type === "service") {
+            const newServices = [...form.services];
+            newServices[index] = value;
+            setForm(prev => ({ ...prev, services: newServices }));
+        } else if (type === "award") {
+            const newAwards = [...form.awards];
+            newAwards[index] = value;
+            setForm(prev => ({ ...prev, awards: newAwards }));
+        } else if (type === "client") {
+            const newClients = [...form.clients];
+            newClients[index] = value;
+            setForm(prev => ({ ...prev, clients: newClients }));
         }
-    };
+    }
 
-    const removeService = (index) => {
-        if (form.services.length > 1) {
+    const add = (type) => {
+        if (type === "service") {
+            if (form.services.length < 10) {
+                setForm(prev => ({ ...prev, services: [...prev.services, ""] }));
+            }
+        } else if (type === "award") {
+            if (form.awards.length < 10) {
+                setForm(prev => ({ ...prev, awards: [...prev.awards, ""] }));
+            }
+        } else if (type === "client") {
+            if (form.clients.length < 10) {
+                setForm(prev => ({ ...prev, clients: [...prev.clients, ""] }));
+            }
+        }
+    }
+
+    const remove = (type, index) => {
+        if (type === "service") {
             const newServices = form.services.filter((_, i) => i !== index);
             setForm(prev => ({ ...prev, services: newServices }));
+        } else if (type === "award") {
+            const newAwards = form.awards.filter((_, i) => i !== index);
+            setForm(prev => ({ ...prev, awards: newAwards }));
+        } else if (type === "client") {
+            const newClients = form.clients.filter((_, i) => i !== index);
+            setForm(prev => ({ ...prev, clients: newClients }));
         }
-    };
+    }
+
+    const handlePreferredIndustriesChange = (e) => {
+        console.log(e.target.value);
+        setForm(prev => ({ ...prev, preferredIndustries: e.target.value }));
+    }
 
     const validateForm = () => {
         const newErrors = {};
@@ -230,6 +322,7 @@ const CompanyProfileUpdate = () => {
         try {
             const formData = new FormData();
             formData.append("companyName", form.companyName);
+            formData.append("adminName", form.adminName);
             formData.append("industry", form.industry);
             formData.append("location", form.location);
             formData.append("email", form.email);
@@ -237,8 +330,13 @@ const CompanyProfileUpdate = () => {
             formData.append("website", form.website);
             formData.append("linkedIn", form.linkedIn);
             formData.append("bio", form.bio);
+            formData.append("preferredIndustries", form.preferredIndustries);
             const filteredServices = form.services.filter(service => service.trim());
             formData.append("services", JSON.stringify(filteredServices));
+            const filteredAwards = form.awards.filter(award => award.trim());
+            formData.append("awards", JSON.stringify(filteredAwards));
+            const filteredClients = form.clients.filter(client => client.trim());
+            formData.append("clients", JSON.stringify(filteredClients));
             formData.append("numberOfEmployees", form.numberOfEmployees);
             formData.append("founded", form.founded);
 
@@ -307,6 +405,16 @@ const CompanyProfileUpdate = () => {
                                     required
                                     disabled={loading}
                                     placeholder="Enter company name"
+                                />
+                                <FormInput
+                                    id="adminName"
+                                    label="Admin Name"
+                                    value={form.adminName}
+                                    onChange={(e) => handleInputChange('adminName', e.target.value)}
+                                    error={errors.adminName}
+                                    required
+                                    disabled={loading}
+                                    placeholder="Enter admin name"
                                 />
                             </div>
 
@@ -418,7 +526,7 @@ const CompanyProfileUpdate = () => {
                             {errors.bio && <div className="text-red-500 text-sm mt-1">{errors.bio}</div>}
                         </div>
 
-                        <div>
+                        <div className="mb-6">
                             <label className="text-[18px] md:text-[24px] font-medium text-[#111827] mb-2 block">
                                 Services Offered
                             </label>
@@ -428,7 +536,7 @@ const CompanyProfileUpdate = () => {
                                         <input
                                             type="text"
                                             value={service}
-                                            onChange={(e) => handleServiceChange(index, e.target.value)}
+                                            onChange={(e) => handleChange("service", index, e.target.value)}
                                             disabled={loading}
                                             className={`flex-1 border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                                             placeholder={`Service ${index + 1}`}
@@ -436,7 +544,7 @@ const CompanyProfileUpdate = () => {
                                         {form.services.length > 1 && (
                                             <button
                                                 type="button"
-                                                onClick={() => removeService(index)}
+                                                onClick={() => remove("service", index)}
                                                 disabled={loading}
                                                 className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
@@ -448,13 +556,114 @@ const CompanyProfileUpdate = () => {
                                 {form.services.length < 10 && (
                                     <button
                                         type="button"
-                                        onClick={addService}
+                                        onClick={() => add("service")}
                                         disabled={loading}
                                         className="text-[#2563EB] hover:text-[#1d4ed8] text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         + Add Service
                                     </button>
                                 )}
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="text-[18px] md:text-[24px] font-medium text-[#111827] mb-2 block">
+                                Awards
+                            </label>
+                            <div className="space-y-3">
+                                {form.awards.map((award, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={award}
+                                            onChange={(e) => handleChange("award", index, e.target.value)}
+                                            disabled={loading}
+                                            className={`flex-1 border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            placeholder={`Award ${index + 1}`}
+                                        />
+                                        {form.awards.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => remove("award", index)}
+                                                disabled={loading}
+                                                className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                {form.awards.length < 10 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => add("award")}
+                                        disabled={loading}
+                                        className="text-[#2563EB] hover:text-[#1d4ed8] text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        + Add Award
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="text-[18px] md:text-[24px] font-medium text-[#111827] mb-2 block">
+                                Clients
+                            </label>
+                            <div className="space-y-3">
+                                {form.clients.map((client, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={client}
+                                            onChange={(e) => handleChange("client", index, e.target.value)}
+                                            disabled={loading}
+                                            className={`flex-1 border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            placeholder={`Client ${index + 1}`}
+                                        />
+                                        {form.clients.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => remove("client", index)}
+                                                disabled={loading}
+                                                className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                {form.clients.length < 10 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => add("client")}
+                                        disabled={loading}
+                                        className="text-[#2563EB] hover:text-[#1d4ed8] text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        + Add Client
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-[18px] md:text-[24px] font-medium text-[#111827] mb-2 block">
+                                Preferred Industries
+                            </label>
+                            {/* Multiple Select from the list of industries */}
+                            <div className="flex items-center gap-2 w-full">
+                                <MdOutlineBusinessCenter className="w-6 h-6 text-[#2563EB]" />
+                                <select
+                                    id="preferredIndustries"
+                                    value={form.preferredIndustries}
+                                    onChange={handlePreferredIndustriesChange}
+                                    className={`w-full border rounded-md p-2 bg-[#F0F0F0] ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                >
+                                    <option value="">Select Industry</option>
+                                    {INDUSTRY_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </div>
