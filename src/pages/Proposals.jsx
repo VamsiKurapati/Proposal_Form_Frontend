@@ -300,7 +300,7 @@ const Proposals = () => {
                                 <ProposalCard
                                     key={proposal._id}
                                     proposal={{
-                                        ...proposal.rfp,
+                                        proposal,
                                         bookmarked: true
                                     }}
                                     onBookmark={() => handleUnsave(proposal.rfpId)}
@@ -317,7 +317,7 @@ const Proposals = () => {
                                 <ProposalCard
                                     key={proposal._id}
                                     proposal={{
-                                        ...proposal.rfp,
+                                        proposal,
                                         bookmarked: false
                                     }}
                                     onBookmark={() => isSaved(proposal.rfpId) ? handleUnsave(proposal.rfpId) : handleSave(proposal.rfp)}
