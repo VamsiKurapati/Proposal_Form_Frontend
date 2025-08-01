@@ -9,8 +9,6 @@ import {
   MdOutlineCalendarMonth,
   MdOutlineAccountBalance,
   MdOutlineSearch,
-  MdOutlineVisibility,
-  MdOutlineFileDownload,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 
