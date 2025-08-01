@@ -303,9 +303,9 @@ const Proposals = () => {
                                         proposal,
                                         bookmarked: true
                                     }}
-                                    onBookmark={() => handleUnsave(proposal.rfpId)}
-                                    onShare={() => handleShare(proposal.rfp.link)}
-                                    onGenerate={() => handleGenerate(proposal.rfp)}
+                                    onBookmark={() => handleUnsave(proposal._id)}
+                                    onShare={() => handleShare(proposal.link)}
+                                    onGenerate={() => handleGenerate(proposal)}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No saved proposals yet
@@ -320,9 +320,9 @@ const Proposals = () => {
                                         proposal,
                                         bookmarked: false
                                     }}
-                                    onBookmark={() => isSaved(proposal.rfpId) ? handleUnsave(proposal.rfpId) : handleSave(proposal.rfp)}
-                                    onShare={() => handleShare(proposal.rfp.link)}
-                                    onGenerate={() => handleGenerate(proposal.rfp)}
+                                    onBookmark={() => isSaved(proposal._id) ? handleUnsave(proposal._id) : handleSave(proposal)}
+                                    onShare={() => handleShare(proposal.link)}
+                                    onGenerate={() => handleGenerate(proposal)}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No draft proposals yet
