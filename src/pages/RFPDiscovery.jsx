@@ -332,8 +332,8 @@ const DiscoverRFPs = () => {
   const RecentRFPCard = ({ rfp, isSaved }) => (
     <div className="bg-white rounded-xl p-4 shadow-sm border w-[511px] flex flex-col justify-between mr-4 border-[#E5E7EB]">
       {/* Top Row: Title and Actions */}
+      <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
       <div className="flex justify-between items-center gap-8 mb-2">
-        <h3 className="font-semibold text-[#111827] text-[18px] whitespace-nowrap">{rfp.title}</h3>
         <div className="flex gap-2 text-lg text-[#111827]">
           {isSaved ? (
             <MdOutlineBookmark
