@@ -330,7 +330,7 @@ const DiscoverRFPs = () => {
   );
 
   const RecentRFPCard = ({ rfp, isSaved }) => (
-    <div className="bg-white rounded-xl p-4 shadow-sm w-[500px] mr-4 flex flex-col justify-between border border-[#E5E7EB]">
+    <div className="bg-white rounded-xl p-4 shadow-sm w-[500px] mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0">
       {/* Top Row: Title and Actions */}
       <div>
         <div className="flex justify-between items-center gap-8 mb-2">
