@@ -398,49 +398,58 @@ const DiscoverRFPs = () => {
       Won: "bg-yellow-100 text-yellow-600",
     };
     return (
-      <div className="grid grid-cols-12 items-center text-center text-[16px] text-[#111827] px-4 py-3 border-b last:border-none">
-        <div className="col-span-2 truncate overflow-hidden whitespace-nowrap font-medium">{rfp.title}</div>
-
-        <div className="col-span-2 flex items-center gap-2">
-          <p className="truncate overflow-hidden whitespace-nowrap">{rfp.organization}</p>
-        </div>
-
-        <div className="col-span-2">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}</div>
-
-        <div className="col-span-2">{rfp.deadline}</div>
-
-        <div className="col-span-2">
+      <tr className="border-b last:border-none hover:bg-gray-50">
+        <td className="px-4 py-3 text-left">
+          <div className="font-medium text-[#111827] text-[14px] max-w-[200px] truncate" title={rfp.title}>
+            {rfp.title}
+          </div>
+        </td>
+        <td className="px-4 py-3 text-left">
+          <div className="text-[#4B5563] text-[14px] max-w-[150px] truncate" title={rfp.organization}>
+            {rfp.organization}
+          </div>
+        </td>
+        <td className="px-4 py-3 text-left">
+          <span className="text-[#2563EB] text-[14px] font-semibold">
+            {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}
+          </span>
+        </td>
+        <td className="px-4 py-3 text-left">
+          <div className="text-[#4B5563] text-[14px]">
+            {rfp.deadline}
+          </div>
+        </td>
+        <td className="px-4 py-3 text-center">
           <span
             className={`text-[12px] px-3 py-1 rounded-full font-medium ${statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
               }`}
           >
             {rfp.status || "None"}
           </span>
-        </div>
-
-        <div className="col-span-2 flex gap-2 text-xl justify-center text-[#4B5563]">
-          {/* <MdOutlineVisibility title="View" className="cursor-pointer" />
-          <MdOutlineFileDownload title="Download" className="cursor-pointer" /> */}
-          <MdOutlineShare
-            title="Share"
-            className="cursor-pointer"
-            onClick={() => handleShare(rfp.link)}
-          />
-          {isSaved ? (
-            <MdOutlineBookmark
-              onClick={() => handleUnsave(rfp._id)}
-              className="cursor-pointer"
-              title="Unsave"
+        </td>
+        <td className="px-4 py-3 text-center">
+          <div className="flex gap-2 text-xl justify-center text-[#4B5563]">
+            <MdOutlineShare
+              title="Share"
+              className="cursor-pointer hover:text-[#2563EB] transition-colors"
+              onClick={() => handleShare(rfp.link)}
             />
-          ) : (
-            <FaRegBookmark
-              onClick={() => handleSave(rfp)}
-              className="cursor-pointer"
-              title="Save"
-            />
-          )}
-        </div>
-      </div>
+            {isSaved ? (
+              <MdOutlineBookmark
+                onClick={() => handleUnsave(rfp._id)}
+                className="cursor-pointer hover:text-[#2563EB] transition-colors"
+                title="Unsave"
+              />
+            ) : (
+              <FaRegBookmark
+                onClick={() => handleSave(rfp)}
+                className="cursor-pointer hover:text-[#2563EB] transition-colors"
+                title="Save"
+              />
+            )}
+          </div>
+        </td>
+      </tr>
     );
   };
 
@@ -499,25 +508,33 @@ const DiscoverRFPs = () => {
 
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
         {saved.length ? (
-          <div className="w-full bg-white rounded-xl shadow-sm border">
-            <div className="grid grid-cols-12 font-semibold bg-[#F8FAFC] text-[#374151] text-[16px] font-medium border-b px-4 py-3 text-center">
-              <div className="col-span-2">RFP Title</div>
-              <div className="col-span-2">Organisation</div>
-              <div className="col-span-2">Amount</div>
-              <div className="col-span-2">Deadline</div>
-              <div className="col-span-2">Status</div>
-              <div className="col-span-2">Action</div>
+          <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-[#F8FAFC]">
+                  <tr className="text-[#374151] text-[14px] font-medium">
+                    <th className="px-4 py-3 text-left">RFP Title</th>
+                    <th className="px-4 py-3 text-left">Organisation</th>
+                    <th className="px-4 py-3 text-left">Amount</th>
+                    <th className="px-4 py-3 text-left">Deadline</th>
+                    <th className="px-4 py-3 text-center">Status</th>
+                    <th className="px-4 py-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {saved.map((rfp) => (
+                    <SavedRFPCard
+                      key={rfp._id}
+                      rfp={rfp}
+                      handleSave={handleSave}
+                      handleUnsave={handleUnsave}
+                      handleShare={handleShare}
+                      isSaved={true}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {saved.map((rfp) => (
-              <SavedRFPCard
-                key={rfp._id}
-                rfp={rfp}
-                handleSave={handleSave}
-                handleUnsave={handleUnsave}
-                handleShare={handleShare}
-                isSaved={true}
-              />
-            ))}
           </div>
         ) : (
           <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
