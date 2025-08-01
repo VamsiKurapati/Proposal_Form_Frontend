@@ -480,16 +480,20 @@ const DiscoverRFPs = () => {
         </div>
 
         <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
-        <div className="flex overflow-x-auto pb-2 custom-scroll">
-          {applyFilters(recommended).map((rfp) => (
-            <RFPCard
-              key={rfp._id}
-              rfp={rfp}
-              isSaved={!!saved.find((s) => s._id === rfp._id)}
-              handleGenerateProposal={handleGenerateProposal}
-            />
-          ))}
-        </div>
+        {recommended.length ? (
+          <div className="flex overflow-x-auto pb-2 custom-scroll">
+            {applyFilters(recommended).map((rfp) => (
+              <RFPCard
+                key={rfp._id}
+                rfp={rfp}
+                isSaved={!!saved.find((s) => s._id === rfp._id)}
+                handleGenerateProposal={handleGenerateProposal}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+        )}
 
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Recently Added RFPs</h2>
         {recent.length ? (
