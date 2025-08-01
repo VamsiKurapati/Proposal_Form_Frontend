@@ -68,9 +68,13 @@ const Proposals = () => {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
-                console.log(res.data);
+                console.log("res.data", res.data);
                 setSavedProposals(res.data.savedRFPs);
                 setDraftProposals(res.data.draftRFPs);
+                console.log("savedProposals", savedProposals);
+                console.log("draftProposals", draftProposals);
+                console.log("res.data.savedRFPs", res.data.savedRFPs);
+                console.log("res.data.draftRFPs", res.data.draftRFPs);
             } catch (error) {
                 console.error('Error fetching proposals:', error);
                 alert("Error fetching proposals");
