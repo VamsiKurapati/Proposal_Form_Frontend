@@ -332,44 +332,46 @@ const DiscoverRFPs = () => {
   const RecentRFPCard = ({ rfp, isSaved }) => (
     <div className="bg-white rounded-xl p-4 shadow-sm border w-[511px] flex flex-col justify-between mr-4 border-[#E5E7EB]">
       {/* Top Row: Title and Actions */}
-      <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
-      <div className="flex justify-between items-center gap-8 mb-2">
-        <div className="flex gap-2 text-lg text-[#111827]">
-          {isSaved ? (
-            <MdOutlineBookmark
-              onClick={() => handleUnsave(rfp._id)}
+      <div>
+        <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
+        <div className="flex justify-between items-center gap-8 mb-2">
+          <div className="flex gap-2 text-lg text-[#111827]">
+            {isSaved ? (
+              <MdOutlineBookmark
+                onClick={() => handleUnsave(rfp._id)}
+                className="cursor-pointer"
+                title="Unsave"
+              />
+            ) : (
+              <FaRegBookmark
+                onClick={() => handleSave(rfp)}
+                className="cursor-pointer"
+                title="Save"
+              />
+            )}
+            <MdOutlineShare
+              onClick={() => handleShare(rfp.link)}
               className="cursor-pointer"
-              title="Unsave"
+              title="Share"
             />
-          ) : (
-            <FaRegBookmark
-              onClick={() => handleSave(rfp)}
-              className="cursor-pointer"
-              title="Save"
-            />
-          )}
-          <MdOutlineShare
-            onClick={() => handleShare(rfp.link)}
-            className="cursor-pointer"
-            title="Share"
-          />
+          </div>
         </div>
-      </div>
 
-      {/* Description */}
-      <p className="text-[14px] text-[#4B5563] mb-3 line-clamp-2">
-        {rfp.description}
-      </p>
+        {/* Description */}
+        <p className="text-[14px] text-[#4B5563] mb-3 line-clamp-2">
+          {rfp.description}
+        </p>
 
-      {/* Meta Info */}
-      <div className="text-[14px] text-[#6B7280] mb-4 space-y-1">
-        <div className="flex items-center gap-2">
-          <MdOutlineCalendarMonth className="text-[16px]" />
-          <span>Deadline: {rfp.deadline}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <MdOutlineAccountBalance className="text-[16px]" />
-          <span>{rfp.organization}</span>
+        {/* Meta Info */}
+        <div className="text-[14px] text-[#6B7280] mb-4 space-y-1">
+          <div className="flex items-center gap-2">
+            <MdOutlineCalendarMonth className="text-[16px]" />
+            <span>Deadline: {rfp.deadline}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <MdOutlineAccountBalance className="text-[16px]" />
+            <span>{rfp.organization}</span>
+          </div>
         </div>
       </div>
 
