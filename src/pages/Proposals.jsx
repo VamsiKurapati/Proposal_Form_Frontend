@@ -254,12 +254,7 @@ const Proposals = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-[24px] font-semibold">Saved Proposals</h2>
-                            <span className="text-[#6B7280] text-sm">
-                                {savedProposals.length} total proposals
-                            </span>
-                        </div>
+                        <h2 className="text-[24px] font-semibold mb-2">Saved Proposals</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                             {currentSavedProposals.length > 0 ? currentSavedProposals.map((proposal, idx) => (
                                 <ProposalCard
@@ -285,12 +280,7 @@ const Proposals = () => {
                             />
                         )}
 
-                        <div className="flex justify-between items-center mb-4 mt-10">
-                            <h2 className="text-[24px] font-semibold">Drafts</h2>
-                            <span className="text-[#6B7280] text-sm">
-                                {draftProposals.length} total proposals
-                            </span>
-                        </div>
+                        <h2 className="text-[24px] font-semibold mb-2 mt-10">Draft Proposals</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                             {currentDraftProposals.length > 0 ? currentDraftProposals.map((proposal, idx) => (
                                 <ProposalCard
