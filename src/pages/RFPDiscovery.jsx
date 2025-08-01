@@ -330,7 +330,7 @@ const DiscoverRFPs = () => {
   );
 
   const RecentRFPCard = ({ rfp, isSaved }) => (
-    <div className="bg-white rounded-xl p-4 shadow-sm border w-[511px] flex flex-col justify-between mr-4 border-[#E5E7EB]">
+    <div className="bg-white rounded-xl p-4 shadow-sm w-[500px] mr-4 flex flex-col justify-between border border-[#E5E7EB]">
       {/* Top Row: Title and Actions */}
       <div>
         <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
