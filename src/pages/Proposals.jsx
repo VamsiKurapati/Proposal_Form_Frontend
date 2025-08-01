@@ -155,18 +155,18 @@ const initialProposals = {
     ]
 };
 
-const ProposalCard = ({ proposal, onBookmark, onShare, onGenerate }) => (
+const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate }) => (
     <div className="bg-white rounded-xl border border-[#E5E7EB] p-5 flex flex-col justify-between relative">
         <div>
             <div className="flex items-start justify-between">
-                <h3 className="font-semibold text-[18px] mb-1 text-[#111827]">{proposal.title}</h3>
+                <h3 className="font-semibold text-[18px] mb-1 text-[#111827]">{proposal_info.title}</h3>
                 <div className="flex gap-2">
                     <button
-                        title={proposal.bookmarked ? "Unsave" : "Save"}
+                        title={proposal_info.bookmarked ? "Unsave" : "Save"}
                         onClick={onBookmark}
                         className="text-[#111827]"
                     >
-                        {proposal.bookmarked ? (
+                        {proposal_info.bookmarked ? (
                             <MdOutlineBookmark className="w-5 h-5" />
                         ) : (
                             <MdOutlineBookmarkBorder className="w-5 h-5" />
@@ -181,15 +181,15 @@ const ProposalCard = ({ proposal, onBookmark, onShare, onGenerate }) => (
                     </button>
                 </div>
             </div>
-            <p className="text-[#4B5563] text-[16px] mb-2">{proposal.description}</p>
+            <p className="text-[#4B5563] text-[16px] mb-2">{proposal_info.description}</p>
             <div className="flex items-center text-[14px] text-[#4B5563CC] mb-2">
                 <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563]" />
-                Deadline: {proposal.deadline}
+                Deadline: {proposal_info.deadline}
             </div>
         </div>
         <div className="flex justify-between items-center mt-2">
             <div className="flex items-center">
-                <span className="text-[#2563EB] text-[14px] font-semibold">{proposal.budget}</span>
+                <span className="text-[#2563EB] text-[14px] font-semibold">{proposal_info.budget}</span>
             </div>
             <div>
                 <button
@@ -299,7 +299,7 @@ const Proposals = () => {
                             {savedProposals.length > 0 ? savedProposals.map((proposal, idx) => (
                                 <ProposalCard
                                     key={proposal._id}
-                                    proposal={{
+                                    proposal_info={{
                                         proposal,
                                         bookmarked: true
                                     }}
@@ -316,7 +316,7 @@ const Proposals = () => {
                             {draftProposals.length > 0 ? draftProposals.map((proposal, idx) => (
                                 <ProposalCard
                                     key={proposal._id}
-                                    proposal={{
+                                    proposal_info={{
                                         proposal,
                                         bookmarked: false
                                     }}
