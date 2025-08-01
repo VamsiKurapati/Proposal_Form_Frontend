@@ -297,6 +297,7 @@ const Proposals = () => {
                         <h2 className="text-[24px] font-semibold mb-2">Saved Proposals</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
                             {savedProposals.length > 0 ? savedProposals.map((proposal, idx) => (
+                                console.log(proposal),
                                 <ProposalCard
                                     key={proposal._id}
                                     proposal={{
