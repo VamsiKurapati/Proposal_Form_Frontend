@@ -140,7 +140,7 @@ const Proposals = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentSavedPage, setCurrentSavedPage] = useState(1);
     const [currentDraftPage, setCurrentDraftPage] = useState(1);
-    const [itemsPerPage] = useState(6);
+    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 640 ? 1 : (window.innerWidth < 768 ? 2 : 3));
     const navigate = useNavigate();
 
     // Calculate pagination for saved proposals
@@ -180,6 +180,11 @@ const Proposals = () => {
         };
         fetchProposals();
     }, []);
+
+    useEffect(() => {
+        setItemsPerPage(window.innerWidth < 640 ? 1 : (window.innerWidth < 768 ? 2 : 3));
+        console.log("itemsPerPage", itemsPerPage);
+    }, [window.innerWidth]);
 
     const handleSave = async (rfp) => {
         try {
