@@ -269,7 +269,7 @@ const DiscoverRFPs = () => {
   const handleGenerateProposal = (rfp) => {
     console.log("Generating proposal for:", rfp.title);
     // navigate, open modal, or call backend here
-    navigate("/proposal_page", { state: { proposalData: rfp } });
+    navigate("/proposal_page", { state: { proposal: rfp } });
   };
 
   const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
