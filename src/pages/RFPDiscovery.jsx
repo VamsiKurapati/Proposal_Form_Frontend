@@ -330,12 +330,12 @@ const DiscoverRFPs = () => {
   );
 
   const RecentRFPCard = ({ rfp, isSaved }) => (
-    <div className="bg-white rounded-xl p-4 shadow-sm w-[500px] mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0">
+    <div className="bg-white rounded-xl p-4 shadow-sm w-[355px] mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0">
       {/* Top Row: Title and Actions */}
       <div>
         <div className="flex justify-between items-center gap-8 mb-2">
           <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
-          <div className="flex gap-2 text-lg text-[#111827]">
+          <div className="flex top-2 gap-2 text-lg text-[#111827]">
             {isSaved ? (
               <MdOutlineBookmark
                 onClick={() => handleUnsave(rfp._id)}
