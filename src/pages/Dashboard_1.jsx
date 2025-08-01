@@ -35,6 +35,7 @@ const PAGE_SIZE = 5;
 const Dashboard = () => {
     const user = localStorage.getItem("user");
     const userName = user ? (JSON.parse(user).name || JSON.parse(user).companyName || "Unknown User") : "Unknown User";
+    const userEmail = user ? (JSON.parse(user).email) : "No email found";
 
     // State for backend data
     const [proposalsState, setProposalsState] = useState([]);
@@ -144,6 +145,7 @@ const Dashboard = () => {
         if (res.status === 200) {
             setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: editorId } : p));
             setShowAddPersonIdx(null);
+            alert("Editor set successfully");
         }
     };
 
@@ -530,7 +532,7 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">{p.client}</td>
-                                            {p.currentEditor && p.currentEditor.name === userName ? (
+                                            {p.currentEditor && p.currentEditor.email === userEmail ? (
                                                 <td className="px-4 py-2 flex items-center gap-2">
                                                     <span>{userName} (You)</span>
                                                     <button
