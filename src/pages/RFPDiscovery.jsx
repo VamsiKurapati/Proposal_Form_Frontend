@@ -368,10 +368,10 @@ const DiscoverRFPs = () => {
             <MdOutlineCalendarMonth className="text-[16px]" />
             <span>Deadline: {rfp.deadline}</span>
           </div>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <MdOutlineAccountBalance className="text-[16px]" />
             <span>{rfp.organization}</span>
-          </div>
+          </div> */}
         </div>
       </div>
 
