@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import NavbarComponent from './NavbarComponent';
-import { MdOutlineBookmark, MdOutlineBookmarkBorder, MdOutlineShare, MdOutlineCalendarMonth } from 'react-icons/md';
+import { MdOutlineBookmark, MdOutlineBookmarkBorder, MdOutlineShare, MdOutlineCalendarMonth, MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,11 +53,107 @@ const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate }) => (
     </div>
 );
 
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (currentPage <= 3) {
+                for (let i = 1; i <= 4; i++) {
+                    pages.push(i);
+                }
+                pages.push('...');
+                pages.push(totalPages);
+            } else if (currentPage >= totalPages - 2) {
+                pages.push(1);
+                pages.push('...');
+                for (let i = totalPages - 3; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                pages.push(1);
+                pages.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pages.push(i);
+                }
+                pages.push('...');
+                pages.push(totalPages);
+            }
+        }
+
+        return pages;
+    };
+
+    return (
+        <div className="flex justify-center items-center gap-2 mt-6">
+            <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${currentPage === 1
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-[#2563EB] hover:bg-[#2563EB] hover:text-white'
+                    }`}
+            >
+                <MdOutlineChevronLeft className="w-4 h-4" />
+                Previous
+            </button>
+
+            {getPageNumbers().map((page, index) => (
+                <button
+                    key={index}
+                    onClick={() => typeof page === 'number' && onPageChange(page)}
+                    disabled={page === '...'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium ${page === '...'
+                        ? 'text-gray-400 cursor-default'
+                        : page === currentPage
+                            ? 'bg-[#2563EB] text-white'
+                            : 'text-[#6B7280] hover:bg-gray-100'
+                        }`}
+                >
+                    {page}
+                </button>
+            ))}
+
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${currentPage === totalPages
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-[#2563EB] hover:bg-[#2563EB] hover:text-white'
+                    }`}
+            >
+                Next
+                <MdOutlineChevronRight className="w-4 h-4" />
+            </button>
+        </div>
+    );
+};
+
 const Proposals = () => {
     const [savedProposals, setSavedProposals] = useState([]);
     const [draftProposals, setDraftProposals] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentSavedPage, setCurrentSavedPage] = useState(1);
+    const [currentDraftPage, setCurrentDraftPage] = useState(1);
+    const [itemsPerPage] = useState(6);
     const navigate = useNavigate();
+
+    // Calculate pagination for saved proposals
+    const savedProposalsStartIndex = (currentSavedPage - 1) * itemsPerPage;
+    const savedProposalsEndIndex = savedProposalsStartIndex + itemsPerPage;
+    const currentSavedProposals = savedProposals.slice(savedProposalsStartIndex, savedProposalsEndIndex);
+    const totalSavedPages = Math.ceil(savedProposals.length / itemsPerPage);
+
+    // Calculate pagination for draft proposals
+    const draftProposalsStartIndex = (currentDraftPage - 1) * itemsPerPage;
+    const draftProposalsEndIndex = draftProposalsStartIndex + itemsPerPage;
+    const currentDraftProposals = draftProposals.slice(draftProposalsStartIndex, draftProposalsEndIndex);
+    const totalDraftPages = Math.ceil(draftProposals.length / itemsPerPage);
 
     useEffect(() => {
         const fetchProposals = async () => {
@@ -134,6 +230,14 @@ const Proposals = () => {
         return savedProposals.some((rfp) => rfp.rfpId === rfpId);
     };
 
+    const handleSavedPageChange = (page) => {
+        setCurrentSavedPage(page);
+    };
+
+    const handleDraftPageChange = (page) => {
+        setCurrentDraftPage(page);
+    };
+
     return (
         <>
             <div>
@@ -146,9 +250,14 @@ const Proposals = () => {
                     </div>
                 ) : (
                     <>
-                        <h2 className="text-[24px] font-semibold mb-2">Saved Proposals</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
-                            {savedProposals.length > 0 ? savedProposals.map((proposal, idx) => (
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-[24px] font-semibold">Saved Proposals</h2>
+                            <span className="text-[#6B7280] text-sm">
+                                {savedProposals.length} total proposals
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                            {currentSavedProposals.length > 0 ? currentSavedProposals.map((proposal, idx) => (
                                 <ProposalCard
                                     key={proposal._id}
                                     proposal_info={{
@@ -163,9 +272,23 @@ const Proposals = () => {
                                 No saved proposals yet
                             </div>}
                         </div>
-                        <h2 className="text-[24px] font-semibold mb-2">Drafts</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {draftProposals.length > 0 ? draftProposals.map((proposal, idx) => (
+
+                        {totalSavedPages > 1 && (
+                            <Pagination
+                                currentPage={currentSavedPage}
+                                totalPages={totalSavedPages}
+                                onPageChange={handleSavedPageChange}
+                            />
+                        )}
+
+                        <div className="flex justify-between items-center mb-4 mt-10">
+                            <h2 className="text-[24px] font-semibold">Drafts</h2>
+                            <span className="text-[#6B7280] text-sm">
+                                {draftProposals.length} total proposals
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                            {currentDraftProposals.length > 0 ? currentDraftProposals.map((proposal, idx) => (
                                 <ProposalCard
                                     key={proposal._id}
                                     proposal_info={{
@@ -180,6 +303,14 @@ const Proposals = () => {
                                 No draft proposals yet
                             </div>}
                         </div>
+
+                        {totalDraftPages > 1 && (
+                            <Pagination
+                                currentPage={currentDraftPage}
+                                totalPages={totalDraftPages}
+                                onPageChange={handleDraftPageChange}
+                            />
+                        )}
                     </>
                 )}
             </div>
