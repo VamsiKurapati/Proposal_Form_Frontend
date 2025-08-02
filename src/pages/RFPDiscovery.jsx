@@ -10,14 +10,15 @@ import {
   MdOutlineAccountBalance,
   MdOutlineSearch,
   MdOutlineUpload,
+  MdOutlineClose,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 
 // Sidebar Component
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
   const categories = {
-    fundingType: ["Infrastructure", "Education", "Healthcare", "Research & Development"],
-    deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months"],
+    category: ["Infrastructure", "Education", "Healthcare", "Research & Development", "Government", "Non-Profit", "Private Sector", "Other"],
+    deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months", "Not Disclosed"],
   };
 
   const handleChange = (type, value) => {
@@ -33,12 +34,12 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   const content = (
     <div className="p-4 w-64 bg-white h-full overflow-y-auto border-r">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-[#111827]">Filters</h3>
+        <h3 className="text-[22px] font-semibold text-[#000000]">Filters</h3>
         <button
           onClick={onClose}
-          className="text-[#2563EB] hover:text-[#1D4ED8] font-medium"
+          className="hover:cursor-pointer"
         >
-          ✕
+          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827]" />
         </button>
       </div>
 
@@ -101,7 +102,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   );
 
   return (
-    <>
+    <div className="relative">
       {/* Desktop Sidebar */}
       {isOpen && (
         <div className="hidden lg:block fixed top-20 left-0 h-[calc(100vh-4rem)] z-40">
@@ -111,7 +112,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
 
       {/* Mobile Sidebar */}
       {isOpen && (
-        <div className="fixed top-4 z-40">
+        <div className="fixed top-20 z-40">
           <div
             className="fixed inset-0 bg-black opacity-50 z-30"
             onClick={onClose}
@@ -127,8 +128,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
 
 // Main Component
 const DiscoverRFPs = () => {
-  const [filters, setFilters] = useState({ fundingType: [], deadline: [] });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [filters, setFilters] = useState({ category: [], deadline: [] });
   const [allRFPs, setAllRFPs] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [recent, setRecent] = useState([]);
@@ -211,15 +211,15 @@ const DiscoverRFPs = () => {
   const applyFilters = (rfps) => {
     return rfps.filter((rfp) => {
       if (
-        filters.fundingType.length &&
-        !filters.fundingType.includes(rfp.fundingType)
+        filters.category.length &&
+        (filters.category.includes("None") ? false : !filters.category.includes(rfp.fundingType))
       )
         return false;
 
       // Handle deadline filtering based on the deadline values
       if (filters.deadline.length) {
-        const deadlineDate = new Date(rfp.deadline);
         const now = new Date();
+        const deadlineDate = rfp.deadline === "Not Disclosed" ? new Date(now.getFullYear(), now.getMonth() + 6, now.getDate()) : new Date(rfp.deadline);
         const hasMatchingDeadline = filters.deadline.some(filter => {
           switch (filter) {
             case "This Week":
@@ -234,6 +234,8 @@ const DiscoverRFPs = () => {
             case "Next 6 Months":
               const sixMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
               return deadlineDate <= sixMonthsFromNow;
+            case "Not Disclosed":
+              return deadlineDate <= now;
             default:
               return true;
           }
@@ -615,6 +617,7 @@ const DiscoverRFPs = () => {
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
+
       <LeftSidebar
         isOpen={isSearchFocused}
         onClose={() => setIsSearchFocused(false)}
@@ -624,12 +627,13 @@ const DiscoverRFPs = () => {
         setSearchQuery={setSearchQuery}
         searchResults={searchResults}
       />
-      <main className="pt-20 px-6 py-6 ml-0 lg:ml-0">
+
+      <main className="pt-20 px-6 py-6 ml-0">
         {/* Search Bar Section */}
         <div className="mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
             {/* Search Input with Advanced Search Button */}
-            <div className="relative flex-1 max-w-[90%]">
+            <div className="relative flex-1 w-full md:max-w-[90%]">
               <div className="relative">
                 <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                 <input
@@ -659,19 +663,6 @@ const DiscoverRFPs = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Filter Button */}
-        {/* <div className="lg:hidden flex justify-end mb-6">
-          <button
-            onClick={() => setIsSearchFocused(true)}
-            className="flex items-center gap-2 text-sm text-white bg-[#2563EB] px-3 py-2 rounded-md"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17V13.414L3.293 6.707A1 1 0 013 6V4z" />
-            </svg>
-            Filter
-          </button>
-        </div> */}
 
         <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
         {recommended.length ? (
