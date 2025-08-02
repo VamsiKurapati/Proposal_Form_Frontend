@@ -18,7 +18,7 @@ import NavbarComponent from "./NavbarComponent";
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
   const categories = {
     category: ["Infrastructure", "Education", "Healthcare", "Research & Development", "Government", "Non-Profit", "Private Sector", "Other"],
-    deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months", "Not Disclosed"],
+    deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months"],
   };
 
   const handleChange = (type, value) => {
@@ -105,7 +105,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
     <div className="relative">
       {/* Desktop Sidebar */}
       {isOpen && (
-        <div className="hidden lg:block fixed top-20 left-0 h-[calc(100vh-4rem)] z-40">
+        <div className="hidden lg:block fixed top-20 mt-12 left-0 h-[calc(100vh-4rem)] z-40">
           {content}
         </div>
       )}
