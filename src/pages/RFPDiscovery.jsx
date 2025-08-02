@@ -16,7 +16,7 @@ import NavbarComponent from "./NavbarComponent";
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
   const categories = {
     fundingType: ["Infrastructure", "Education", "Healthcare", "Research & Development"],
-    organizationType: ["Government", "Non-Profit", "Education", "Private Sector"],
+    deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months"],
   };
 
   const handleChange = (type, value) => {
@@ -31,10 +31,20 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
 
   const content = (
     <div className="p-4 w-64 bg-white h-full overflow-y-auto border-r">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-[#111827]">Filters</h3>
+        <button
+          onClick={onClose}
+          className="text-[#2563EB] hover:text-[#1D4ED8] font-medium"
+        >
+          ✕
+        </button>
+      </div>
+
       <div className="relative">
         {/* Search Input */}
         <div className="relative mb-6">
-          <MdOutlineSearch className="absolute w-6 h-6 left-2 top-1/2 transform -translate-y-1/2 text--[#9CA3AF] text-xl" />
+          <MdOutlineSearch className="absolute w-6 h-6 left-2 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xl" />
           <input
             type="text"
             autoFocus
@@ -92,9 +102,11 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed top-16 left-0 h-[calc(100vh-4rem)]">
-        {content}
-      </div>
+      {isOpen && (
+        <div className="hidden lg:block fixed top-16 left-0 h-[calc(100vh-4rem)] z-40">
+          {content}
+        </div>
+      )}
 
       {/* Mobile Sidebar */}
       {isOpen && (
@@ -103,12 +115,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
             className="fixed inset-0 bg-black opacity-50 z-30"
             onClick={onClose}
           />
-          <div className="fixed top-0 left-0 z-40 bg-white w-64 h-full shadow-lg p-4">
-            <div className="text-right mb-4">
-              <button onClick={onClose} className="text-sm text-[#2563EB]">
-                Close
-              </button>
-            </div>
+          <div className="fixed top-0 left-0 z-40 bg-white w-64 h-full shadow-lg">
             {content}
           </div>
         </>
@@ -119,13 +126,14 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
 
 // Main Component
 const DiscoverRFPs = () => {
-  const [filters, setFilters] = useState({ fundingType: [], organizationType: [] });
+  const [filters, setFilters] = useState({ fundingType: [], deadline: [] });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [allRFPs, setAllRFPs] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [recent, setRecent] = useState([]);
   const [saved, setSaved] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -206,11 +214,30 @@ const DiscoverRFPs = () => {
       )
         return false;
 
-      if (
-        filters.organizationType.length &&
-        !filters.organizationType.includes(rfp.organizationType)
-      )
-        return false;
+      // Handle deadline filtering based on the deadline values
+      if (filters.deadline.length) {
+        const deadlineDate = new Date(rfp.deadline);
+        const now = new Date();
+        const hasMatchingDeadline = filters.deadline.some(filter => {
+          switch (filter) {
+            case "This Week":
+              const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+              return deadlineDate <= weekFromNow;
+            case "This Month":
+              const monthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+              return deadlineDate <= monthFromNow;
+            case "Next 3 Months":
+              const threeMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate());
+              return deadlineDate <= threeMonthsFromNow;
+            case "Next 6 Months":
+              const sixMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
+              return deadlineDate <= sixMonthsFromNow;
+            default:
+              return true;
+          }
+        });
+        if (!hasMatchingDeadline) return false;
+      }
 
       return true;
     });
@@ -457,19 +484,54 @@ const DiscoverRFPs = () => {
     <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
       <LeftSidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        isOpen={isSearchFocused}
+        onClose={() => setIsSearchFocused(false)}
         filters={filters}
         setFilters={setFilters}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         searchResults={searchResults}
       />
-      <main className="pt-20 px-6 py-6 ml-0 lg:ml-64">
-        {/* Search & Filter UI */}
+      <main className="pt-20 px-6 py-6 ml-0 lg:ml-0">
+        {/* Search Bar Section */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            {/* Search Input with Advanced Search Button */}
+            <div className="relative flex-1 max-w-2xl">
+              <div className="relative">
+                <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xl" />
+                <input
+                  type="text"
+                  placeholder="Search RFPs by keyword, organization or category"
+                  className="w-full text-[16px] text-[#111827] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                />
+                <button
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#6B7280] text-[14px] font-medium hover:text-[#2563EB] transition-colors"
+                  onClick={() => setIsSearchFocused(true)}
+                >
+                  Advanced Search
+                </button>
+              </div>
+            </div>
+
+            {/* Upload RFP Button */}
+            <button className="flex items-center gap-2 text-white bg-[#2563EB] px-4 py-3 rounded-md hover:bg-[#1D4ED8] transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Upload RFP
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Filter Button */}
         <div className="lg:hidden flex justify-end mb-6">
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => setIsSearchFocused(true)}
             className="flex items-center gap-2 text-sm text-white bg-[#2563EB] px-3 py-2 rounded-md"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
