@@ -32,7 +32,8 @@ export const EmployeeProfileProvider = ({ children }) => {
                 id: 1,
                 title: "Data Analytics Proposal",
                 status: "In Progress",
-                companyName: "ABC Company Inc.",
+                clientName: "ABC Company Inc.",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",
@@ -42,9 +43,10 @@ export const EmployeeProfileProvider = ({ children }) => {
 
             {
                 id: 2,
-                title: "Data Analytics Proposal",
+                title: "Data Analytics Proposal 2",
                 status: "Submitted",
-                companyName: "ABC Company Inc.",
+                clientName: "ABC Company Inc.",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",
@@ -54,9 +56,10 @@ export const EmployeeProfileProvider = ({ children }) => {
 
             {
                 id: 3,
-                title: "Data Analytics Proposal",
+                title: "Data Analytics Proposal 3",
                 status: "Rejected",
-                companyName: "ABC Company Inc.",
+                clientName: "ABC Company Inc.",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",
@@ -66,9 +69,10 @@ export const EmployeeProfileProvider = ({ children }) => {
 
             {
                 id: 4,
-                title: "Data Analytics Proposal",
+                title: "Data Analytics Proposal 4",
                 status: "Completed",
-                companyName: "ABC Company Inc.",
+                clientName: "ABC Company Inc.",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",
@@ -78,9 +82,10 @@ export const EmployeeProfileProvider = ({ children }) => {
 
             {
                 id: 5,
-                title: "Data Analytics Proposal",
+                title: "Data Analytics Proposal 5",
                 status: "Completed",
-                companyName: "ABC Company Inc. 2",
+                clientName: "ABC Company Inc. 2",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",
@@ -90,9 +95,10 @@ export const EmployeeProfileProvider = ({ children }) => {
 
             {
                 id: 6,
-                title: "Data Analytics Proposal",
+                title: "Data Analytics Proposal 6",
                 status: "Completed",
-                companyName: "ABC Company Inc. 3",
+                clientName: "ABC Company Inc. 3",
+                deadline: "2025-01-01",
                 location: "San Francisco, CA",
                 email: "myname@email.com",
                 phone: "+91-5877486484",

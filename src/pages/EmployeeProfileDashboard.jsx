@@ -276,10 +276,10 @@ const EmployeeProfileDashboard = () => {
                     </span>
                   </div>
                   <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                  <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
+                  <p className="text-[#6B7280] text-sm mb-2">{proposal.clientName}</p>
                   <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
                     <MdOutlineCalendarToday className="w-4 h-4" />
-                    <span>{proposal.date}</span>
+                    <span>{proposal.deadline}</span>
                   </div>
                   <div className="flex justify-end">
                     <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors">
@@ -303,16 +303,16 @@ const EmployeeProfileDashboard = () => {
             {completedProposals.length > 0 ? (
               completedProposals.map((proposal) => (
                 <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-1">
                     <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
                       {proposal.status}
                     </span>
                   </div>
                   <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                  <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
+                  <p className="text-[#6B7280] text-sm mb-2">{proposal.clientName}</p>
                   <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
                     <MdOutlineCalendarToday className="w-4 h-4" />
-                    <span>{proposal.date}</span>
+                    <span>{proposal.deadline}</span>
                   </div>
                   <div className="flex justify-end">
                     <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
