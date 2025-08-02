@@ -122,7 +122,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
