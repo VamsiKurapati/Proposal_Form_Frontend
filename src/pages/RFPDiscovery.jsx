@@ -267,7 +267,7 @@ const DiscoverRFPs = () => {
       ? []
       : allRFPs.filter((rfp) => {
         const pattern = new RegExp(`\\b${searchQuery.toLowerCase()}`, "i")
-        return pattern.test(rfp.title.toLowerCase());
+        return pattern.test(rfp.title.toLowerCase()) || pattern.test(rfp.organization.toLowerCase()) || pattern.test(rfp.fundingType.toLowerCase());
       });
 
 
