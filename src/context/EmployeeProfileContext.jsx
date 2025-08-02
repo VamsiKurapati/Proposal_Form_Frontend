@@ -111,23 +111,17 @@ export const EmployeeProfileProvider = ({ children }) => {
             });
             const data = res.data;
 
-            data.forEach(proposal => {
-                if (proposal.status === "In Progress") {
-                    setProposalsInProgress(prev => [...prev, proposal]);
-                } else {
-                    setCompletedProposals(prev => [...prev, proposal]);
-                }
-            });
+            const proposalsInProgress = data.filter(proposal => proposal.status === "In Progress");
+            const completedProposals = data.filter(proposal => proposal.status !== "In Progress");
+            setProposalsInProgress(proposalsInProgress);
+            setCompletedProposals(completedProposals);
         } catch (err) {
             setError(err.message);
             const proposals = getMockProposals().proposals;
-            proposals.forEach(proposal => {
-                if (proposal.status === "In Progress") {
-                    setProposalsInProgress(prev => [...prev, proposal]);
-                } else {
-                    setCompletedProposals(prev => [...prev, proposal]);
-                }
-            });
+            const proposalsInProgress = proposals.filter(proposal => proposal.status === "In Progress");
+            const completedProposals = proposals.filter(proposal => proposal.status !== "In Progress");
+            setProposalsInProgress(proposalsInProgress);
+            setCompletedProposals(completedProposals);
         } finally {
             setLoading(false);
         }
