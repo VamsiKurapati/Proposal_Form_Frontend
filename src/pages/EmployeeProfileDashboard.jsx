@@ -152,7 +152,7 @@ const EmployeeProfileDashboard = () => {
     <div className="h-full relative">
       <NavbarComponent />
 
-      <div className="bg-[#F8F9FA] w-full mt-16 md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px] border-b border-[#2563EB]">
+      <div className="bg-[#F8F9FA] w-full mt-16 md:top-16 left-0 right-0 z-10 px-4 sm:px-6 md:px-12 py-[14px] border-b border-[#2563EB]">
         {/* Profile image and info */}
         <div className="w-full">
           {/* For <lg: Row 1 - image and edit button */}
