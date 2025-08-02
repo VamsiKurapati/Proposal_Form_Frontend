@@ -1,7 +1,7 @@
 // components/NavbarComponent.jsx
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FiSearch, FiBell, FiMenu } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../context/UserContext";
 
@@ -9,7 +9,7 @@ const NavbarComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-
+  const [showDropdown, setShowDropdown] = useState(false);
   const { role } = useUser();
 
   const navItems = [
@@ -18,6 +18,18 @@ const NavbarComponent = () => {
     { name: "Dashboard", path: "/dashboard" },
     { name: "Profile", path: role === "company" ? "/company_profile_dashboard" : "/employee_profile_dashboard" },
   ];
+
+  const handleProfileClick = () => {
+    //Show a dropdown with the following two options:
+    // 1. Change Password
+    // 2. Logout
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b shadow-sm h-16 flex items-center justify-between px-8 z-50">
@@ -56,10 +68,17 @@ const NavbarComponent = () => {
         )}
       </div>
       <div className="flex items-center gap-4">
-        <FiSearch className="text-lg" />
-        <FiBell className="text-lg" />
-        <FaUserCircle className="text-2xl text-gray-700" />
+        <button className="flex items-center gap-2" onClick={() => handleProfileClick()}>
+          <FaUserCircle className="text-2xl text-gray-700" />
+        </button>
       </div>
+
+      {showDropdown && (
+        <div className="absolute top-16 right-0 bg-white shadow-md z-100">
+          <button className="block w-full text-left px-4 py-2 text-[18px] hover:text-[#000000] font-medium" onClick={() => navigate("/change_password")}>Change Password</button>
+          <button className="block w-full text-left px-4 py-2 text-[18px] hover:text-[#000000] font-medium" onClick={() => handleLogout()}>Logout</button>
+        </div>
+      )}
     </nav>
   );
 };
