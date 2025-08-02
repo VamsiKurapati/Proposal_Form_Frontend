@@ -28,6 +28,7 @@ const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
 const App = () => {
   const { role } = useUser();
+  console.log("role : ", role);
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -62,7 +63,7 @@ const App = () => {
 
           <Route path="/dashboard" element={
             <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
-                <Dashboard />
+              <Dashboard />
             </ProtectedRoutes>
           } />
           {/* <Route path="/dashboard" element={ Dashboard } /> */}
