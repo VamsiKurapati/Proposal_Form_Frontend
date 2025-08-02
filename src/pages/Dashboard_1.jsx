@@ -560,7 +560,7 @@ const Dashboard = () => {
                                                     )}
                                                 </td>
                                             ) : (
-                                                <td className="px-4 py-2">{p.currentEditor ? p.currentEditor.name : 'No Editor Assigned'}</td>
+                                                <td className="px-4 py-2">{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</td>
                                             )}
 
                                             <td className="px-4 py-2">

@@ -271,18 +271,18 @@ const EmployeeProfileDashboard = () => {
               proposalsInProgress.map((proposal) => (
                 <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-3">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
+                    <span className={`text-[12px] px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
                       {proposal.status}
                     </span>
                   </div>
-                  <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                  <p className="text-[#6B7280] text-sm mb-2">{proposal.clientName}</p>
-                  <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
-                    <MdOutlineCalendarToday className="w-4 h-4" />
+                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title}</h4>
+                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName}</p>
+                  <div className="flex items-center gap-1 text-[#6B7280] text-[12px] mb-4">
+                    <MdOutlineCalendarToday className="w-4 h-4 shrink-0" />
                     <span>{proposal.deadline}</span>
                   </div>
                   <div className="flex justify-end">
-                    <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors">
+                    <button className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors">
                       Edit
                     </button>
                   </div>
@@ -304,19 +304,19 @@ const EmployeeProfileDashboard = () => {
               completedProposals.map((proposal) => (
                 <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-1">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
+                    <span className={`text-[12px] px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
                       {proposal.status}
                     </span>
                   </div>
-                  <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                  <p className="text-[#6B7280] text-sm mb-2">{proposal.clientName}</p>
-                  <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
-                    <MdOutlineCalendarToday className="w-4 h-4" />
+                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title}</h4>
+                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName}</p>
+                  <div className="flex items-center gap-1 text-[#6B7280] text-[12px] mb-4">
+                    <MdOutlineCalendarToday className="w-4 h-4 shrink-0" />
                     <span>{proposal.deadline}</span>
                   </div>
                   <div className="flex justify-end">
-                    <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
-                      <MdOutlineVisibility className="w-4 h-4" />
+                    <button className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
+                      <MdOutlineVisibility className="w-4 h-4 shrink-0" />
                       View
                     </button>
                   </div>
