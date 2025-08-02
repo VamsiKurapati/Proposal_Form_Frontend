@@ -264,26 +264,32 @@ const EmployeeProfileDashboard = () => {
         <div className="mb-8">
           <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#111827] mb-4">Proposals in Progress</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {proposalsInProgress.map((proposal) => (
-              <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-3">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
-                    {proposal.status}
-                  </span>
+            {proposalsInProgress.length > 0 ? (
+              proposalsInProgress.map((proposal) => (
+                <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
+                      {proposal.status}
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
+                  <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
+                  <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
+                    <MdOutlineCalendarToday className="w-4 h-4" />
+                    <span>{proposal.date}</span>
+                  </div>
+                  <div className="flex justify-end">
+                    <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors">
+                      Edit
+                    </button>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
-                <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
-                  <MdOutlineCalendarToday className="w-4 h-4" />
-                  <span>{proposal.date}</span>
-                </div>
-                <div className="flex justify-end">
-                  <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors">
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="text-center py-4">No proposals found</td>
+              </tr>
+            )}
           </div>
         </div>
 
@@ -291,27 +297,33 @@ const EmployeeProfileDashboard = () => {
         <div>
           <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#111827] mb-4">Completed Proposals</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {completedProposals.map((proposal) => (
-              <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-3">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
-                    {proposal.status}
-                  </span>
+            {completedProposals.length > 0 ? (
+              completedProposals.map((proposal) => (
+                <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
+                      {proposal.status}
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
+                  <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
+                  <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
+                    <MdOutlineCalendarToday className="w-4 h-4" />
+                    <span>{proposal.date}</span>
+                  </div>
+                  <div className="flex justify-end">
+                    <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
+                      <MdOutlineVisibility className="w-4 h-4" />
+                      View
+                    </button>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-[#111827] mb-2">{proposal.title}</h4>
-                <p className="text-[#6B7280] text-sm mb-2">{proposal.company}</p>
-                <div className="flex items-center gap-1 text-[#6B7280] text-sm mb-4">
-                  <MdOutlineCalendarToday className="w-4 h-4" />
-                  <span>{proposal.date}</span>
-                </div>
-                <div className="flex justify-end">
-                  <button className="text-[#2563EB] text-sm font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
-                    <MdOutlineVisibility className="w-4 h-4" />
-                    View
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="text-center py-4">No proposals found</td>
+              </tr>
+            )}
           </div>
         </div>
       </div>

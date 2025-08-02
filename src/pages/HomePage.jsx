@@ -1,16 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlay } from "react-icons/fa";
-import { MdOutlineSearch , MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineVerifiedUser, MdGroupAdd, MdOutlineCheckCircle } from "react-icons/md";
+import { MdOutlineSearch, MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineVerifiedUser, MdGroupAdd, MdOutlineCheckCircle } from "react-icons/md";
 import { BiTrophy } from "react-icons/bi";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 const features = [
-  { title: "AI RFP Discovery", desc: "Find relevant RFPs matched to your business capabilities", image:<MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
-  { title: "Smart Templates", desc: "Industry-specific templates with AI-powered customization", image:<MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
-  { title: "Compliance Check", desc: "Automated compliance against RFP verification", image:<MdOutlineSecurity className="w-10 h-10 text-[#2563EB]" /> },
+  { title: "AI RFP Discovery", desc: "Find relevant RFPs matched to your business capabilities", image: <MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
+  { title: "Smart Templates", desc: "Industry-specific templates with AI-powered customization", image: <MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
+  { title: "Compliance Check", desc: "Automated compliance against RFP verification", image: <MdOutlineSecurity className="w-10 h-10 text-[#2563EB]" /> },
   { title: "Win Probability Score", desc: "AI-powered scoring system to predict proposal success", image: <BiTrophy className="w-10 h-10 text-[#2563EB]" /> },
 ];
 
@@ -123,14 +123,14 @@ export default function HomePage() {
       <div className="fixed top-1/2 sm:top-[60%] lg:top-[70%] right-1 sm:right-4 w-12 sm:w-16 h-12 sm:h-[62px] bg-[#2563EB] rounded-xl">
         <button
           className="w-full h-full flex items-center justify-center"
-          onClick={()=> navigate('/profile')}
+          onClick={() => navigate('/login')}
         >
           <MdChat className="w-12 sm:w-10 h-8 sm:h-10 text-[#FFFFFF]" />
         </button>
       </div>
 
       {/* Hero Section */}
-      <section 
+      <section
         className="mt-12 sm:mt-[62px]"
         style={{ background: "linear-gradient(180deg, #EEF4FF 50%, #FFFFFF 100%)" }} >
         <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-8 md:py-16">
@@ -151,7 +151,7 @@ export default function HomePage() {
             </div>
             <div className="flex gap-4 mt-6">
               <button className="bg-[#2563EB] px-3 sm:px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular"
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate("/login")}
               >
                 Get Started
               </button>
@@ -181,15 +181,15 @@ export default function HomePage() {
           <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
         </div>
         <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
-        {features.map((item, idx) => (
-          <div key={idx} className="bg-[#0000000A] border border-2 border-[#E5E7EB] p-4 rounded-xl shadow hover:shadow-md transition">
-            <div className="flex items-center gap-4 mb-4"> {item.image} </div>
-            <div className="flex flex-col items-start text-left gap-2">
-              <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
-              <p className="font-regular text-[16px] text-[#6B7280]">{item.desc}</p>
+          {features.map((item, idx) => (
+            <div key={idx} className="bg-[#0000000A] border border-2 border-[#E5E7EB] p-4 rounded-xl shadow hover:shadow-md transition">
+              <div className="flex items-center gap-4 mb-4"> {item.image} </div>
+              <div className="flex flex-col items-start text-left gap-2">
+                <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
+                <p className="font-regular text-[16px] text-[#6B7280]">{item.desc}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </section>
 
@@ -217,7 +217,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose AI RFP */}
-      <section className="py-8 md:py-16 bg-white px-8 md:px-16">
+      <section className="py-8 md:py-16 bg-white px-8 md:px-16" id="solutions">
         <h2 className="text-[30px] font-semi-bold mb-4">Why Choose AI RFP?</h2>
         {benefits.map((item, idx) => (
           <div key={idx} className={`flex flex-row items-center justify-center text-left gap-4 xs:gap-8 lg:gap-20 space-y-4 lg:px-8 mb-8 lg:mb-12 ${idx % 2 === 1 ? "flex-row" : "flex-row-reverse"}`}>
@@ -232,7 +232,7 @@ export default function HomePage() {
       </section>
 
       {/* Plans Section */}
-      <section className="pb-20 bg-white px-8 md:px-16">
+      <section className="pb-20 bg-white px-8 md:px-16" id="plans">
         <h2 className="text-[30px] text-[#000000] font-bold mb-8">Choose Your Plan</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, idx) => (
@@ -253,7 +253,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <button className={`mt-4 w-full ${plan.popular ? "bg-[#2563EB] text-[#FFFFFF] " : "bg-[#FFFFFF] text-[#000000]"} border border-1 border-[#00000033] py-2 rounded-lg`}
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/login")}
               >
                 {plan.button}
               </button>

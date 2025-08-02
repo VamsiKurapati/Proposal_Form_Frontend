@@ -14,11 +14,9 @@ export default function Navbar() {
                 <div className="text-2xl font-bold text-blue-600" onClick={() => navigate("/")}>LOGO</div>
 
                 <div className="hidden md:flex space-x-8">
-                    <a href="/product" className="text-gray-700 hover:text-blue-600">Product</a>
-                    <a href="/solutions" className="text-gray-700 hover:text-blue-600">Solutions</a>
-                    <a href="/company" className="text-gray-700 hover:text-blue-600">Company</a>
-                    <a href="/resources" className="text-gray-700 hover:text-blue-600">Resources</a>
-                    <a href="/plans" className="text-gray-700 hover:text-blue-600">Plans</a>
+                    <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
+                    <a href="#features" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
+                    <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
                 </div>
 
                 <div className="hidden md:flex items-center space-x-4">
@@ -44,10 +42,9 @@ export default function Navbar() {
                 {isOpen && (
                     <div className="absolute top-16 right-0 backdrop-blur bg-white/60 shadow-lg w-full md:hidden transition-all duration-300 ease-in-out z-100">
                         <div className="flex flex-col items-center space-y-4 p-4">
-                            <a href="#features" className="text-gray-700 hover:text-blue-600">Features</a>
-                            <a href="#pricing" className="text-gray-700 hover:text-blue-600">Pricing</a>
-                            <a href="#about" className="text-gray-700 hover:text-blue-600">About</a>
-                            <a href="#contact" className="text-gray-700 hover:text-blue-600">Contact</a>
+                            <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
+                            <a href="#features" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
+                            <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
                             <button className="text-gray-700 px-4 py-2">
                                 Login
                             </button>
