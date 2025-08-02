@@ -528,7 +528,7 @@ const DiscoverRFPs = () => {
         </div>
 
         {/* Mobile Filter Button */}
-        <div className="lg:hidden flex justify-end mb-6">
+        {/* <div className="lg:hidden flex justify-end mb-6">
           <button
             onClick={() => setIsSearchFocused(true)}
             className="flex items-center gap-2 text-sm text-white bg-[#2563EB] px-3 py-2 rounded-md"
@@ -538,7 +538,7 @@ const DiscoverRFPs = () => {
             </svg>
             Filter
           </button>
-        </div>
+        </div> */}
 
         <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
         {recommended.length ? (
