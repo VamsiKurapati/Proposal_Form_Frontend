@@ -14,6 +14,20 @@ import {
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 
+
+const triggerRFPDiscovery = async () => {
+  const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  console.log(res.data);
+};
+
+useEffect(() => {
+  triggerRFPDiscovery();
+}, []);
+
 // Sidebar Component
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
   const categories = {
@@ -102,17 +116,17 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   );
 
   return (
-    <div className="relative">
+    <div className="fixed top-20 mt-12 left-0 h-[calc(100vh-4rem)] z-40">
       {/* Desktop Sidebar */}
       {isOpen && (
-        <div className="hidden lg:block fixed top-20 mt-12 left-0 h-[calc(100vh-4rem)] z-40">
+        <div className="hidden lg:block">
           {content}
         </div>
       )}
 
       {/* Mobile Sidebar */}
       {isOpen && (
-        <div className="fixed top-20 z-40">
+        <div className="w-full h-full">
           <div
             className="fixed inset-0 bg-black opacity-50 z-30"
             onClick={onClose}
