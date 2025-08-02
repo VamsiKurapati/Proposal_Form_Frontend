@@ -176,7 +176,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="about" className="bg-white">
+      <section id="about" className="bg-white scroll-mt-20">
         <div className="py-8 md:py-16 px-8 md:px-16">
           <div className="flex items-center justify-between mb-4">
             <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
@@ -219,7 +219,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose AI RFP */}
-      <section className="py-8 md:py-16 bg-white px-8 md:px-16" id="solutions">
+      <section className="py-8 md:py-16 bg-white px-8 md:px-16 scroll-mt-20" id="solutions">
         <h2 className="text-[30px] font-semi-bold mb-4">Why Choose AI RFP?</h2>
         {benefits.map((item, idx) => (
           <div key={idx} className={`flex flex-row items-center justify-center text-left gap-4 xs:gap-8 lg:gap-20 space-y-4 lg:px-8 mb-8 lg:mb-12 ${idx % 2 === 1 ? "flex-row" : "flex-row-reverse"}`}>
@@ -234,7 +234,7 @@ export default function HomePage() {
       </section>
 
       {/* Plans Section */}
-      <section className="pb-20 bg-white px-8 md:px-16" id="plans">
+      <section className="pb-20 bg-white px-8 md:px-16 scroll-mt-20" id="plans">
         <h2 className="text-[30px] text-[#000000] font-bold mb-8">Choose Your Plan</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, idx) => (
