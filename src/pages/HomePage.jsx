@@ -176,7 +176,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-8 md:py-16 px-8 md:px-16">
+      <section className="bg-white py-8 md:py-16 px-8 md:px-16" id="about">
         <div className="flex items-center justify-between mb-4">
           <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
         </div>

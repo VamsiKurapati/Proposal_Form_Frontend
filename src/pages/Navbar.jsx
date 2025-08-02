@@ -14,8 +14,8 @@ export default function Navbar() {
                 <div className="text-2xl font-bold text-blue-600" onClick={() => navigate("/")}>LOGO</div>
 
                 <div className="hidden md:flex space-x-8">
-                    <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
-                    <a href="#features" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
+                    <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
+                    <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
                     <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
                 </div>
 
@@ -42,8 +42,8 @@ export default function Navbar() {
                 {isOpen && (
                     <div className="absolute top-16 right-0 backdrop-blur bg-white/60 shadow-lg w-full md:hidden transition-all duration-300 ease-in-out z-100">
                         <div className="flex flex-col items-center space-y-4 p-4">
-                            <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
-                            <a href="#features" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
+                            <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
+                            <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
                             <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
                             <button className="text-gray-700 px-4 py-2">
                                 Login
