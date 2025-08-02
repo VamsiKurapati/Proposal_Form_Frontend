@@ -135,6 +135,7 @@ const DiscoverRFPs = () => {
   const [saved, setSaved] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -481,6 +482,136 @@ const DiscoverRFPs = () => {
     );
   };
 
+  const UploadRFPModal = ({ isOpen, onClose }) => {
+    const [formData, setFormData] = useState({
+      file: null,
+    });
+
+    const [filePreview, setFilePreview] = useState(null);
+
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Check if file is PDF or TXT
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+          setFormData({ ...formData, file: file });
+          setFilePreview(file.name);
+        } else {
+          alert('Please upload only PDF files.');
+          e.target.value = '';
+        }
+      }
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (!formData.file) {
+        alert('Please upload a file.');
+        return;
+      }
+
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append('file', formData.file);
+
+        const response = await axios.post('https://proposal-form-backend.vercel.app/api/rfp/uploadRFP', formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        //console.log('Response:', response.data.message);
+        alert(response.data.message);
+        onClose();
+      } catch (error) {
+        //console.error('Error adding document:', error);
+        alert('Failed to add document. Please try again.');
+      }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+      <>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Upload RFP File</h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <MdOutlineClose className="w-6 h-6" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload RFP</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#2563EB] transition-colors">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="document-upload"
+                  required
+                />
+                <label htmlFor="document-upload" className="cursor-pointer">
+                  <div className="space-y-2">
+                    <div className="text-gray-600">
+                      <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium text-[#2563EB] hover:text-[#1d4ed8]">Click to upload</span> or drag and drop
+                    </div>
+                    <div className="text-xs text-gray-500">PDF file only</div>
+                  </div>
+                </label>
+              </div>
+              {filePreview && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-green-700">{filePreview}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, file: null });
+                        setFilePreview(null);
+                        document.getElementById('document-upload').value = '';
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <MdOutlineClose className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+              >
+                Upload
+              </button>
+            </div>
+          </form>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
@@ -511,7 +642,7 @@ const DiscoverRFPs = () => {
                   onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 />
                 <button
-                  className="absolute right-2 top-1/2 rounded-xl transform -translate-y-1/2 text-[#6B7280] text-[14px] font-medium hover:text-[#2563EB] transition-colors"
+                  className="absolute right-2 top-1/2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] transition-colors"
                   onClick={() => setIsSearchFocused(true)}
                 >
                   Advanced Search
@@ -520,7 +651,9 @@ const DiscoverRFPs = () => {
             </div>
 
             {/* Upload RFP Button */}
-            <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors">
+            <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+              onClick={() => setUploadModalOpen(true)}
+            >
               <MdOutlineUpload className="w-5 h-5" />
               Upload RFP
             </button>
@@ -605,6 +738,11 @@ const DiscoverRFPs = () => {
           <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
         )}
       </main>
+
+      <UploadRFPModal
+        isOpen={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+      />
     </div>
   );
 };
