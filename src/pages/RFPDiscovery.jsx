@@ -15,19 +15,6 @@ import {
 import NavbarComponent from "./NavbarComponent";
 
 
-const triggerRFPDiscovery = async () => {
-  const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-  console.log(res.data);
-};
-
-useEffect(() => {
-  triggerRFPDiscovery();
-}, []);
-
 // Sidebar Component
 const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
   const categories = {
@@ -151,6 +138,19 @@ const DiscoverRFPs = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const triggerRFPDiscovery = async () => {
+    const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    console.log(res.data);
+  };
+
+  useEffect(() => {
+    triggerRFPDiscovery();
+  }, []);
 
   useEffect(() => {
     const fetchRFPs = async () => {
