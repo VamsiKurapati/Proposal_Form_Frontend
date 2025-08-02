@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineEdit, MdOutlineDomain, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineClose, MdOutlineCheck, MdOutlineCalendarToday, MdOutlineVisibility } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineClose, MdOutlineCheck, MdOutlineCalendarToday, MdOutlineVisibility } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useEmployeeProfile } from "../context/EmployeeProfileContext";
 
@@ -9,7 +9,7 @@ import { useEmployeeProfile } from "../context/EmployeeProfileContext";
 const EmployeeProfileDashboard = () => {
   const navigate = useNavigate();
   // Use context
-  const { employeeData, loading, error, refreshProfile } = useEmployeeProfile();
+  const { employeeData, loading, error, refreshProfile, proposalsInProgress, completedProposals, refreshProposals } = useEmployeeProfile();
 
   // Logo upload state and ref
   const [logoUrl, setLogoUrl] = useState(null);
@@ -18,69 +18,6 @@ const EmployeeProfileDashboard = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-
-  // Mock data for proposals
-  const proposalsInProgress = [
-    {
-      id: 1,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "In Progress"
-    },
-    {
-      id: 2,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "In Progress"
-    },
-    {
-      id: 3,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "In Progress"
-    },
-    {
-      id: 4,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "In Progress"
-    }
-  ];
-
-  const completedProposals = [
-    {
-      id: 1,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "Submitted"
-    },
-    {
-      id: 2,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "Rejected"
-    },
-    {
-      id: 3,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "Won"
-    },
-    {
-      id: 4,
-      title: "Data Analytics Proposal",
-      company: "GlobalTech Corp",
-      date: "Jan 20, 2026",
-      status: "Submitted"
-    }
-  ];
 
   // Set logoUrl from employeeData
   React.useEffect(() => {
@@ -113,13 +50,16 @@ const EmployeeProfileDashboard = () => {
   }
 
   // Error state
-  if (error && !employeeData) {
+  if (error && !employeeData && !proposalsInProgress && !completedProposals) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Error loading company profile: {error}</p>
           <button
-            onClick={refreshProfile}
+            onClick={() => {
+              refreshProfile();
+              refreshProposals();
+            }}
             className="bg-[#2563EB] text-white px-4 py-2 rounded-lg"
           >
             Retry
@@ -209,7 +149,7 @@ const EmployeeProfileDashboard = () => {
     <div className="h-full relative">
       <NavbarComponent />
 
-      <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px] border-b border-[#2563EB]">
+      <div className="bg-[#F8F9FA] w-full mt-16 md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px] border-b border-[#2563EB]">
         {/* Profile image and info */}
         <div className="w-full">
           {/* For <lg: Row 1 - image and edit button */}
