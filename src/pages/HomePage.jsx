@@ -176,42 +176,44 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-8 md:py-16 px-8 md:px-16" id="about">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
-        </div>
-        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
-          {features.map((item, idx) => (
-            <div key={idx} className="bg-[#0000000A] border border-2 border-[#E5E7EB] p-4 rounded-xl shadow hover:shadow-md transition">
-              <div className="flex items-center gap-4 mb-4"> {item.image} </div>
-              <div className="flex flex-col items-start text-left gap-2">
-                <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
-                <p className="font-regular text-[16px] text-[#6B7280]">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Comprehensive Proposal Management */}
-      <section className="py-8 md:py-16 bg-white px-8 md:px-16">
-        <h2 className="text-[30px] font-semi-bold mb-4">Comprehensive Proposal Management</h2>
-        <div className="flex gap-8 flex-col md:flex-row items-center justify-between">
-          <div className="w-full md:w-1/2">
-            <img src="/proposal_management.png" alt="Proposal Management" className="w-full rounded-lg shadow-lg mb-4" />
+      <section id="about" className="bg-white">
+        <div className="py-8 md:py-16 px-8 md:px-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
           </div>
-          <div className="w-full md:w-1/2 flex flex-col justify-center">
-            {proposalManagement.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-4 mb-6">
-                <div className="flex-shrink-0 flex items-center justify-center mt-1">
-                  {item.image}
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <h3 className="text-[24px] font-semibold text-[#111827]">{item.title}</h3>
-                  <p className="text-[16px] text-[#6B7280] font-regular">{item.desc}</p>
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
+            {features.map((item, idx) => (
+              <div key={idx} className="bg-[#0000000A] border border-2 border-[#E5E7EB] p-4 rounded-xl shadow hover:shadow-md transition">
+                <div className="flex items-center gap-4 mb-4"> {item.image} </div>
+                <div className="flex flex-col items-start text-left gap-2">
+                  <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
+                  <p className="font-regular text-[16px] text-[#6B7280]">{item.desc}</p>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Comprehensive Proposal Management */}
+        <div className="py-8 md:py-16 bg-white px-8 md:px-16">
+          <h2 className="text-[30px] font-semi-bold mb-4">Comprehensive Proposal Management</h2>
+          <div className="flex gap-8 flex-col md:flex-row items-center justify-between">
+            <div className="w-full md:w-1/2">
+              <img src="/proposal_management.png" alt="Proposal Management" className="w-full rounded-lg shadow-lg mb-4" />
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col justify-center">
+              {proposalManagement.map((item, idx) => (
+                <div key={idx} className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 flex items-center justify-center mt-1">
+                    {item.image}
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                    <h3 className="text-[24px] font-semibold text-[#111827]">{item.title}</h3>
+                    <p className="text-[16px] text-[#6B7280] font-regular">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
