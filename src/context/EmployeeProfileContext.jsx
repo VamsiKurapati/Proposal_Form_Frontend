@@ -120,8 +120,14 @@ export const EmployeeProfileProvider = ({ children }) => {
             });
         } catch (err) {
             setError(err.message);
-            setProposalsInProgress(getMockProposals().proposals);
-            setCompletedProposals(getMockProposals().proposals);
+            const proposals = getMockProposals().proposals;
+            proposals.forEach(proposal => {
+                if (proposal.status === "In Progress") {
+                    setProposalsInProgress(prev => [...prev, proposal]);
+                } else {
+                    setCompletedProposals(prev => [...prev, proposal]);
+                }
+            });
         } finally {
             setLoading(false);
         }
@@ -132,7 +138,6 @@ export const EmployeeProfileProvider = ({ children }) => {
     }, [fetchProposals]);
 
     const refreshProposals = fetchProposals;
-
 
     // Fetch company data from backend
     const fetchEmployeeData = useCallback(async () => {
