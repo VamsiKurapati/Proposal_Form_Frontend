@@ -629,7 +629,7 @@ const DiscoverRFPs = () => {
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             {/* Search Input with Advanced Search Button */}
-            <div className="relative flex-1 max-w-[80%]">
+            <div className="relative flex-1 max-w-[90%]">
               <div className="relative">
                 <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                 <input
@@ -642,7 +642,7 @@ const DiscoverRFPs = () => {
                   onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 />
                 <button
-                  className="absolute right-2 top-1/2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] transition-colors"
+                  className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] transition-colors"
                   onClick={() => setIsSearchFocused(true)}
                 >
                   Advanced Search
