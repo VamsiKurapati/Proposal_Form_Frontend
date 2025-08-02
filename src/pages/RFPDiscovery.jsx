@@ -9,6 +9,7 @@ import {
   MdOutlineCalendarMonth,
   MdOutlineAccountBalance,
   MdOutlineSearch,
+  MdOutlineUpload,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 
@@ -103,14 +104,14 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
     <>
       {/* Desktop Sidebar */}
       {isOpen && (
-        <div className="hidden lg:block fixed top-16 left-0 h-[calc(100vh-4rem)] z-40">
+        <div className="hidden lg:block fixed top-20 left-0 h-[calc(100vh-4rem)] z-40">
           {content}
         </div>
       )}
 
       {/* Mobile Sidebar */}
       {isOpen && (
-        <>
+        <div className="fixed top-4 z-40">
           <div
             className="fixed inset-0 bg-black opacity-50 z-30"
             onClick={onClose}
@@ -118,7 +119,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
           <div className="fixed top-0 left-0 z-40 bg-white w-64 h-full shadow-lg">
             {content}
           </div>
-        </>
+        </div>
       )}
     </>
   );
@@ -497,20 +498,20 @@ const DiscoverRFPs = () => {
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             {/* Search Input with Advanced Search Button */}
-            <div className="relative flex-1 max-w-2xl">
+            <div className="relative flex-1 max-w-[80%]">
               <div className="relative">
-                <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xl" />
+                <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                 <input
                   type="text"
                   placeholder="Search RFPs by keyword, organization or category"
-                  className="w-full text-[16px] text-[#111827] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB]"
+                  className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 />
                 <button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#6B7280] text-[14px] font-medium hover:text-[#2563EB] transition-colors"
+                  className="absolute right-2 top-1/2 rounded-xl transform -translate-y-1/2 text-[#6B7280] text-[14px] font-medium hover:text-[#2563EB] transition-colors"
                   onClick={() => setIsSearchFocused(true)}
                 >
                   Advanced Search
@@ -519,10 +520,8 @@ const DiscoverRFPs = () => {
             </div>
 
             {/* Upload RFP Button */}
-            <button className="flex items-center gap-2 text-white bg-[#2563EB] px-4 py-3 rounded-md hover:bg-[#1D4ED8] transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
+            <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors">
+              <MdOutlineUpload className="w-5 h-5" />
               Upload RFP
             </button>
           </div>
