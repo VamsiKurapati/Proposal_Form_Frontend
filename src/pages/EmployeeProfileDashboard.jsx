@@ -19,6 +19,9 @@ const EmployeeProfileDashboard = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  console.log("Completed Proposals : ", completedProposals);
+  console.log("Proposals In Progress : ", proposalsInProgress);
+
   // Set logoUrl from employeeData
   React.useEffect(() => {
     if (employeeData && employeeData.logoUrl_1) {
