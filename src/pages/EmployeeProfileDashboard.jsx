@@ -136,15 +136,15 @@ const EmployeeProfileDashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'In Progress':
-        return 'bg-[#DBEAFE] text-[#1E40AF]';
+        return 'bg-[#DBEAFE] text-[#2563EB]';
       case 'Submitted':
-        return 'bg-[#D1FAE5] text-[#065F46]';
+        return 'bg-[#DCFCE7] text-[#15803D]';
       case 'Rejected':
         return 'bg-[#FEE2E2] text-[#DC2626]';
       case 'Won':
-        return 'bg-[#FEF3C7] text-[#D97706]';
+        return 'bg-[#FEF9C3] text-[#CA8A04]';
       default:
-        return 'bg-[#F3F4F6] text-[#6B7280]';
+        return 'bg-[#F3F4F6] text-[#4B5563]';
     }
   };
 
