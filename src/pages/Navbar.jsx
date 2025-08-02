@@ -11,7 +11,7 @@ export default function Navbar() {
         <>
             {/* Navbar */}
             <nav className="fixed top-0 left-0 z-50 w-full flex items-center justify-between bg-white p-4 shadow-md px-8 md:px-16">
-                <div className="text-2xl font-bold text-blue-600" onClick={() => navigate("/")}>LOGO</div>
+                <div className="text-2xl font-bold text-[#2563EB] hover:cursor-pointer" onClick={() => navigate("/")}>LOGO</div>
 
                 <div className="hidden md:flex space-x-8">
                     <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
@@ -20,12 +20,12 @@ export default function Navbar() {
                 </div>
 
                 <div className="hidden md:flex items-center space-x-4">
-                    <button className="text-gray-700 px-4 py-2"
+                    <button className="text-[#6B7280] text-[16px] px-4 py-2"
                         onClick={() => navigate("/login")}
                     >
                         Login
                     </button>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                    <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition"
                         onClick={() => navigate("/request-demo")}
                     >
                         Request Demo
@@ -45,10 +45,14 @@ export default function Navbar() {
                             <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
                             <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
                             <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
-                            <button className="text-gray-700 px-4 py-2">
+                            <button className="text-[#6B7280] text-[16px] px-4 py-2"
+                                onClick={() => navigate("/login")}
+                            >
                                 Login
                             </button>
-                            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition"
+                                onClick={() => navigate("/request-demo")}
+                            >
                                 Request Demo
                             </button>
                         </div>
