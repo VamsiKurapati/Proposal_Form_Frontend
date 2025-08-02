@@ -319,7 +319,7 @@ const EmployeeProfileDashboard = () => {
       </div>
 
       {/* Proposals Sections */}
-      <div className="mt-4 px-4 sm:px-6 md:px-12 pb-8">
+      <div className="mt-4 md:mt-16 px-4 sm:px-6 md:px-12 pb-8">
         {/* Proposals in Progress Section */}
         <div className="mb-8">
           <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#111827] mb-4">Proposals in Progress</h3>

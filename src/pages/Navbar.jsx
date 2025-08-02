@@ -6,13 +6,13 @@ import { FaDashcube } from 'react-icons/fa';
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
-    
+
     return (
         <>
             {/* Navbar */}
             <nav className="fixed top-0 left-0 z-50 w-full flex items-center justify-between bg-white p-4 shadow-md px-8 md:px-16">
-                <div className="text-2xl font-bold text-blue-600">LOGO</div>
-        
+                <div className="text-2xl font-bold text-blue-600" onClick={() => navigate("/")}>LOGO</div>
+
                 <div className="hidden md:flex space-x-8">
                     <a href="/product" className="text-gray-700 hover:text-blue-600">Product</a>
                     <a href="/solutions" className="text-gray-700 hover:text-blue-600">Solutions</a>
@@ -20,7 +20,7 @@ export default function Navbar() {
                     <a href="/resources" className="text-gray-700 hover:text-blue-600">Resources</a>
                     <a href="/plans" className="text-gray-700 hover:text-blue-600">Plans</a>
                 </div>
-        
+
                 <div className="hidden md:flex items-center space-x-4">
                     <button className="text-gray-700 px-4 py-2"
                         onClick={() => navigate("/login")}
@@ -33,16 +33,16 @@ export default function Navbar() {
                         Request Demo
                     </button>
                 </div>
-        
+
                 <div className="md:hidden">
                     <button className="text-gray-700 focus:outline-none"
                         onClick={() => setIsOpen(!isOpen)}>
                         <FaDashcube className="w-6 h-6" />
                     </button>
                 </div>
-        
+
                 {isOpen && (
-                    <div className="absolute top-16 right-0 backdrop-blur bg-white/60 shadow-lg w-full md:hidden transition-all duration-300 ease-in-out">
+                    <div className="absolute top-16 right-0 backdrop-blur bg-white/60 shadow-lg w-full md:hidden transition-all duration-300 ease-in-out z-100">
                         <div className="flex flex-col items-center space-y-4 p-4">
                             <a href="#features" className="text-gray-700 hover:text-blue-600">Features</a>
                             <a href="#pricing" className="text-gray-700 hover:text-blue-600">Pricing</a>
