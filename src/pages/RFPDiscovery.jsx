@@ -140,10 +140,10 @@ const DiscoverRFPs = () => {
   const navigate = useNavigate();
 
   const triggerRFPDiscovery = async () => {
-    const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {
+    const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {}, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     });
     console.log(res.data);
   };

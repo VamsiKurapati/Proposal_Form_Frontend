@@ -46,16 +46,18 @@ const LoginPage = () => {
       const token = res.data.token;
       const role = res.data.user.role;
       localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user data
-      localStorage.setItem("token", token); // Store JWT
-      if (role === "company") {
-        localStorage.setItem("userRole", "company");
-        //console.log("Navigating to company profile dashboard");
-        navigate("/company_profile_dashboard"); // Redirect to company profile page
-      } else {
-        localStorage.setItem("userRole", res.data.user.accessLevel || "viewer");
-        //console.log("Navigating to employee profile dashboard");
-        navigate("/employee_profile_dashboard"); // Redirect to profile page
-      }
+      localStorage.setItem("token", token);
+      setTimeout(() => {
+        if (role === "company") {
+          localStorage.setItem("userRole", "company");
+          //console.log("Navigating to company profile dashboard");
+          navigate("/company_profile_dashboard"); // Redirect to company profile page
+        } else {
+          localStorage.setItem("userRole", res.data.user.accessLevel || "viewer");
+          //console.log("Navigating to employee profile dashboard");
+          navigate("/employee_profile_dashboard"); // Redirect to profile page
+        }
+      }, 1000);
     } catch (error) {
       alert(error.response?.data?.message || "Login failed. Please try again.");
     } finally {

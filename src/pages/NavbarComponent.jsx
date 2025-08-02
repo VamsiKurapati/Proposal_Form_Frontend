@@ -28,8 +28,10 @@ const NavbarComponent = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/");
-    window.location.reload();
+    setTimeout(() => {
+      navigate("/");
+      window.location.reload();
+    }, 1000);
   };
 
   return (
