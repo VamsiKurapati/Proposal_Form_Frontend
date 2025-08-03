@@ -63,8 +63,8 @@ const Dashboard = () => {
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
         setEditForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toLocaleDateString() : "",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toLocaleDateString() : "",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
             status: proposal.status
         });
     };
@@ -577,11 +577,11 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2">
                                                 {editIdx === realIdx ? (
-                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px]" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
-                                                        <option value="In Progress" style={statusBadge("In Progress")}>In Progress</option>
-                                                        <option value="Submitted" style={statusBadge("Submitted")}>Submitted</option>
-                                                        <option value="Won" style={statusBadge("Won")}>Won</option>
-                                                        <option value="Rejected" style={statusBadge("Rejected")}>Rejected</option>
+                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                        <option value="In Progress">In Progress</option>
+                                                        <option value="Submitted">Submitted</option>
+                                                        <option value="Won">Won</option>
+                                                        <option value="Rejected">Rejected</option>
                                                     </select>
                                                 ) : (
                                                     <div className="flex items-center justify-center text-center w-full shrink-0">
