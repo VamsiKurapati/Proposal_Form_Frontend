@@ -583,7 +583,7 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2">
                                                 {editIdx === realIdx ? (
-                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]" value={editForm.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                    <select className="w-full border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB] shrink-0" value={editForm.status} onChange={e => handleEditChange("status", e.target.value)}>
                                                         <option value="In Progress">In Progress</option>
                                                         <option value="Submitted">Submitted</option>
                                                         <option value="Won">Won</option>
