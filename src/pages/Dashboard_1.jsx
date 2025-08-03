@@ -165,9 +165,14 @@ const Dashboard = () => {
                 }
             });
             if (res.status === 200) {
-                setDeletedProposals(prev => prev.filter((_, idx) => selectedProposals.includes(idx)));
-                deletedProposals.map(p => p.restoreIn = "15 days");
-                console.log("deletedProposals", deletedProposals);
+                // Add restoreIn field to proposals being moved to deletedProposals
+                const proposalsToDelete = proposalsState.filter(p => selectedProposals.includes(p._id));
+                const proposalsWithRestoreIn = proposalsToDelete.map(proposal => ({
+                    ...proposal,
+                    restoreIn: "15 days"
+                }));
+
+                setDeletedProposals(prev => [...prev, ...proposalsWithRestoreIn]);
                 setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                 setSelectedProposals([]);
                 setShowDeleteOptions(false);
@@ -190,7 +195,9 @@ const Dashboard = () => {
                 }
             });
             if (res.status === 200) {
-                setProposalsState(prev => [...prev, deletedProposals[idx]]);
+                // Remove restoreIn field when restoring proposal
+                const { restoreIn, ...proposalWithoutRestoreIn } = deletedProposals[idx];
+                setProposalsState(prev => [...prev, proposalWithoutRestoreIn]);
                 setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
             } else {
                 setError('Failed to restore proposal');
