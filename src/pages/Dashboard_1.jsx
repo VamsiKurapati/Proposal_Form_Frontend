@@ -3,7 +3,7 @@ import NavbarComponent from './NavbarComponent';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineVisibility, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose, MdOutlineSave, MdOutlineCancel } from "react-icons/md";
 import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
@@ -62,16 +62,15 @@ const Dashboard = () => {
 
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
-        console.log("proposal", proposal);
         setEditForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "2025-01-01",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "2025-01-01",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
             status: proposal.status
         });
+        console.log("editForm", editForm);
         console.log("deadline", proposal.deadline);
         console.log("submittedAt", proposal.submittedAt);
         console.log("status", proposal.status);
-        console.log("editForm", editForm);
     };
 
     const handleEditChange = (field, value) => {
@@ -575,6 +574,8 @@ const Dashboard = () => {
                                                         type="date"
                                                         value={p.deadline}
                                                         onChange={e => handleEditChange("deadline", e.target.value)}
+                                                        format="YYYY-MM-DD"
+                                                        className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
                                                     new Date(p.deadline).toLocaleDateString()
@@ -600,6 +601,8 @@ const Dashboard = () => {
                                                         type="date"
                                                         value={p.submittedAt}
                                                         onChange={e => handleEditChange("submittedAt", e.target.value)}
+                                                        className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                                                        format="YYYY-MM-DD"
                                                     />
                                                 ) : (
                                                     new Date(p.submittedAt).toLocaleDateString()
