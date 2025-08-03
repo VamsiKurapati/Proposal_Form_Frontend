@@ -578,8 +578,8 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">{p.client}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 relative">
-                                                    <span>{userName} (You)</span>
+                                                <td className="px-4 py-2 relative flex gap-2">
+                                                    <span>{userName.split(" ")[0]} (You)</span>
                                                     <button
                                                         className="text-[#2563EB]"
                                                         title="Assign Editor"
@@ -596,7 +596,7 @@ const Dashboard = () => {
                                                                             className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
                                                                             onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
                                                                         >
-                                                                            {emp.name}
+                                                                            {emp.name.split(" ")[0]}...
                                                                         </button>
                                                                     </li>
                                                                 ))}
