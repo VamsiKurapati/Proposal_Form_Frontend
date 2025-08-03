@@ -452,10 +452,6 @@ const Dashboard = () => {
         );
     }
 
-    if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-    }
-
     useEffect(() => {
         console.log("deletedProposals", deletedProposals);
     }, [deletedProposals]);
@@ -463,6 +459,10 @@ const Dashboard = () => {
     useEffect(() => {
         console.log("proposalsState", proposalsState);
     }, [proposalsState]);
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     return (
         <div className="min-h-screen">
