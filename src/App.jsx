@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { lazy, Suspense } from "react";
 import { ProfileProvider } from './context/ProfileContext';
@@ -28,12 +28,12 @@ const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
 const App = () => {
   const { role } = useUser();
-  console.log("role : ", role);
+
   return (
     <>
       <Suspense fallback={<></>}>
         <Routes>
-          <Route path="/" element={role === null ? <Home /> : <Dashboard />} />
+          <Route path="/" element={role === null ? <Home /> : <Navigate to="/dashboard" replace />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />
