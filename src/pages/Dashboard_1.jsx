@@ -590,7 +590,7 @@ const Dashboard = () => {
                                                         </button>
                                                     </div>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#FFFFFF] border border-[#E5E7EB] rounded-md shadow z-100 mt-8 w-40 p-2">
+                                                        <div className="absolute bg-[#FFFFFF] border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
                                                             <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
                                                             <div>
                                                                 <ul>
