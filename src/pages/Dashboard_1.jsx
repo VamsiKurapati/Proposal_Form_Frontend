@@ -222,7 +222,6 @@ const Dashboard = () => {
                     }
                 });
                 if (res.status === 200) {
-                    setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
                     //Update the stats
                     const deletedProposal = deletedProposals[idx];
                     setSummaryStats(prev => prev.map(stat => {
@@ -243,6 +242,8 @@ const Dashboard = () => {
                         }
                         return stat;
                     }));
+
+                    setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
                 } else {
                     setError('Failed to delete proposal permanently');
                 }
