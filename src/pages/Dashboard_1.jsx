@@ -24,7 +24,7 @@ const statsStyles = {
 
 function statusBadge(status) {
     return (
-        <span className={`px-2 py-1 rounded text-xs font-semibold ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
             {status}
         </span>
     );
@@ -67,9 +67,11 @@ const Dashboard = () => {
             submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
             status: proposal.status
         });
+        console.log(editForm);
     };
 
     const handleEditChange = (field, value) => {
+        console.log(field, value);
         setEditForm(prev => ({ ...prev, [field]: value }));
     };
 
@@ -584,9 +586,7 @@ const Dashboard = () => {
                                                         <option value="Rejected">Rejected</option>
                                                     </select>
                                                 ) : (
-                                                    <div className="flex items-center justify-center text-center w-full shrink-0">
-                                                        <span className="text-[16px]">{statusBadge(p.status)}</span>
-                                                    </div>
+                                                    statusBadge(p.status)
                                                 )}
                                             </td>
 
