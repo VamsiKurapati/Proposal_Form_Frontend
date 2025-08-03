@@ -34,7 +34,7 @@ const PAGE_SIZE = 5;
 
 const Dashboard = () => {
     const user = localStorage.getItem("user");
-    const userName = user ? (JSON.parse(user).name || JSON.parse(user).companyName || "Unknown User") : "Unknown User";
+    const userName = user ? (JSON.parse(user).fullName) : "Unknown User";
     const userEmail = user ? (JSON.parse(user).email) : "No email found";
 
     // State for backend data
