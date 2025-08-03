@@ -144,7 +144,7 @@ const Dashboard = () => {
             }
         });
         if (res.status === 200) {
-            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: editorId } : p));
+            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: employees.find(emp => emp.employeeId === editorId) } : p));
             setShowAddPersonIdx(null);
             alert("Editor set successfully");
         }
@@ -578,7 +578,7 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">{p.client}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 relative flex justify-center items-center gap-2">
+                                                <td className="px-4 py-2 relative flex text-center justify-center items-center gap-2">
                                                     <span>{userName.split(" ")[0]} (You)</span>
                                                     <button
                                                         className="text-[#2563EB]"
@@ -595,7 +595,7 @@ const Dashboard = () => {
                                                                     {employees.filter(emp => emp.name !== userName).map(emp => (
                                                                         <li key={emp.name}>
                                                                             <button
-                                                                                className="block px-4 py-2 bg-[#F3F4F6] border border-[#111827] hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
+                                                                                className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
                                                                                 onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
                                                                             >
                                                                                 {emp.name}
