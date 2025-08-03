@@ -577,16 +577,15 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2">
                                                 {editIdx === realIdx ? (
-                                                    <select className="border rounded px-2 py-1 text-[#111827] text-xs sm:text-base" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
-                                                        <option value="In Progress">In Progress</option>
-                                                        <option value="Submitted">Submitted</option>
-                                                        <option value="Won">Won</option>
-                                                        <option value="Rejected">Rejected</option>
-                                                        <option value="Deadline">Deadline</option>
+                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px]" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                        <option value="In Progress" style={statusBadge("In Progress")}>In Progress</option>
+                                                        <option value="Submitted" style={statusBadge("Submitted")}>Submitted</option>
+                                                        <option value="Won" style={statusBadge("Won")}>Won</option>
+                                                        <option value="Rejected" style={statusBadge("Rejected")}>Rejected</option>
                                                     </select>
                                                 ) : (
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[12px] sm:text-base">{statusBadge(p.status)}</span>
+                                                    <div className="flex items-center justify-center text-center w-full shrink-0">
+                                                        <span className="text-[16px]">{statusBadge(p.status)}</span>
                                                     </div>
                                                 )}
                                             </td>
@@ -606,22 +605,22 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">
                                                 <div className="flex items-center gap-2">
                                                     {editIdx === realIdx ? (
-                                                        <>
+                                                        <div className='gap-4'>
                                                             <button
-                                                                className="text-[#2563EB]"
+                                                                className="text-[16px] text-[#2563EB]"
                                                                 title="Save"
                                                                 onClick={() => handleSaveProposal(p._id)}
                                                             >
                                                                 Save
                                                             </button>
                                                             <button
-                                                                className="text-[#111827]"
+                                                                className="text-[16px] text-[#111827]"
                                                                 title="Cancel"
                                                                 onClick={() => setEditIdx(null)}
                                                             >
                                                                 Cancel
                                                             </button>
-                                                        </>
+                                                        </div>
                                                     ) : (
                                                         <>
                                                             <button
