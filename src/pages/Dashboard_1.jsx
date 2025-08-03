@@ -68,6 +68,9 @@ const Dashboard = () => {
             submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "2025-01-01",
             status: proposal.status
         });
+        console.log("deadline", proposal.deadline);
+        console.log("submittedAt", proposal.submittedAt);
+        console.log("status", proposal.status);
         console.log("editForm", editForm);
     };
 
@@ -604,22 +607,22 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex flex-col md:flex-row items-center gap-2">
                                                     {editIdx === realIdx ? (
                                                         <div className='gap-4'>
                                                             <button
-                                                                className="text-[16px] text-[#2563EB]"
+                                                                className="flex items-center gap-1 text-[16px] text-[#2563EB] hover:text-white hover:bg-[#2563EB] rounded-md px-2 py-1"
                                                                 title="Save"
                                                                 onClick={() => handleSaveProposal(p._id)}
                                                             >
-                                                                Save
+                                                                <MdOutlineSave className="w-5 h-5" /> Save
                                                             </button>
                                                             <button
-                                                                className="text-[16px] text-[#111827]"
+                                                                className="flex items-center gap-1 text-[16px] text-[#111827] hover:text-white hover:bg-[#111827] rounded-md px-2 py-1"
                                                                 title="Cancel"
                                                                 onClick={() => setEditIdx(null)}
                                                             >
-                                                                Cancel
+                                                                <MdOutlineCancel className="w-5 h-5" /> Cancel
                                                             </button>
                                                         </div>
                                                     ) : (
