@@ -578,7 +578,7 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">{p.client}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 relative flex justify-between items-center gap-2">
+                                                <td className="px-4 py-2 relative flex justify-center items-center gap-2">
                                                     <span>{userName.split(" ")[0]} (You)</span>
                                                     <button
                                                         className="text-[#2563EB]"
@@ -588,14 +588,14 @@ const Dashboard = () => {
                                                         <MdPersonAddAlt1 className="w-4 h-4" />
                                                     </button>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-8 w-40 p-2">
+                                                        <div className="absolute bg-[#FFFFFF] border border-[#E5E7EB] rounded-md shadow z-100 mt-8 w-40 p-2">
                                                             <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
                                                             <div>
                                                                 <ul>
                                                                     {employees.filter(emp => emp.name !== userName).map(emp => (
                                                                         <li key={emp.name}>
                                                                             <button
-                                                                                className="block px-4 py-2 border-b border-[#111827] hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
+                                                                                className="block px-4 py-2 bg-[#F3F4F6] border border-[#111827] hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
                                                                                 onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
                                                                             >
                                                                                 {emp.name}
