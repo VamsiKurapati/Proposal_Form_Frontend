@@ -63,8 +63,8 @@ const Dashboard = () => {
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
         setEditForm({
-            deadline: proposal.deadline ? proposal.deadline.split("T")[0] : "",
-            submittedAt: proposal.submittedAt ? proposal.submittedAt.split("T")[0] : "",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toLocaleDateString() : "",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toLocaleDateString() : "",
             status: proposal.status
         });
     };
@@ -585,7 +585,9 @@ const Dashboard = () => {
                                                         <option value="Deadline">Deadline</option>
                                                     </select>
                                                 ) : (
-                                                    statusBadge(p.status)
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[12px] sm:text-base">{statusBadge(p.status)}</span>
+                                                    </div>
                                                 )}
                                             </td>
 
@@ -606,31 +608,28 @@ const Dashboard = () => {
                                                     {editIdx === realIdx ? (
                                                         <>
                                                             <button
-                                                                className="text-green-600"
+                                                                className="text-[#2563EB]"
                                                                 title="Save"
                                                                 onClick={() => handleSaveProposal(p._id)}
                                                             >
-                                                                ✅ Save
+                                                                Save
                                                             </button>
                                                             <button
-                                                                className="text-gray-500"
+                                                                className="text-[#111827]"
                                                                 title="Cancel"
                                                                 onClick={() => setEditIdx(null)}
                                                             >
-                                                                ❌ Cancel
+                                                                Cancel
                                                             </button>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <button
-                                                                className="text-[#2563EB]"
-                                                                title="Edit"
+                                                                className="text-[#2563EB] flex items-center gap-1"
+                                                                title="Edit Details"
                                                                 onClick={() => handleEditClick(realIdx, p)}
                                                             >
-                                                                <MdOutlineEdit className="w-5 h-5" />
-                                                            </button>
-                                                            <button className="text-[#2563EB]" title="View">
-                                                                <MdOutlineVisibility className="w-5 h-5" />
+                                                                <MdOutlineEdit className="w-5 h-5" /> Edit
                                                             </button>
                                                         </>
                                                     )}
