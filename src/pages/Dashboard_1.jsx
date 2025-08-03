@@ -588,15 +588,15 @@ const Dashboard = () => {
                                                         <MdPersonAddAlt1 className="w-4 h-4" />
                                                     </button>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-12">
+                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-2 w-40">
                                                             <ul>
                                                                 {employees.filter(emp => emp.name !== userName).map(emp => (
                                                                     <li key={emp.name}>
                                                                         <button
-                                                                            className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
+                                                                            className="block px-4 py-2 hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
                                                                             onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
                                                                         >
-                                                                            {emp.name.split(" ")[0]}...
+                                                                            {emp.name}
                                                                         </button>
                                                                     </li>
                                                                 ))}
