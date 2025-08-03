@@ -63,8 +63,8 @@ const Dashboard = () => {
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
         setEditForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString() : "",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString() : "",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
             status: proposal.status
         });
         console.log("editForm", editForm);
@@ -572,18 +572,22 @@ const Dashboard = () => {
                                                 {editIdx === realIdx ? (
                                                     <input
                                                         type="date"
-                                                        value={p.deadline}
+                                                        value={editForm.deadline}
                                                         onChange={e => handleEditChange("deadline", e.target.value)}
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    new Date(p.deadline).toLocaleDateString()
+                                                    p.deadline ? new Date(p.deadline).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric'
+                                                    }) : 'No deadline'
                                                 )}
                                             </td>
 
                                             <td className="px-4 py-2">
                                                 {editIdx === realIdx ? (
-                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]" value={p.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                    <select className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]" value={editForm.status} onChange={e => handleEditChange("status", e.target.value)}>
                                                         <option value="In Progress">In Progress</option>
                                                         <option value="Submitted">Submitted</option>
                                                         <option value="Won">Won</option>
@@ -598,46 +602,46 @@ const Dashboard = () => {
                                                 {editIdx === realIdx ? (
                                                     <input
                                                         type="date"
-                                                        value={p.submittedAt}
+                                                        value={editForm.submittedAt}
                                                         onChange={e => handleEditChange("submittedAt", e.target.value)}
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    new Date(p.submittedAt).toLocaleDateString()
+                                                    p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric'
+                                                    }) : 'Not submitted'
                                                 )}
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                <div className="flex flex-col md:flex-row items-center gap-2">
-                                                    {editIdx === realIdx ? (
-                                                        <div className='gap-4'>
-                                                            <button
-                                                                className="flex items-center gap-1 text-[16px] text-[#2563EB] hover:text-white hover:bg-[#2563EB] rounded-md px-2 py-1"
-                                                                title="Save"
-                                                                onClick={() => handleSaveProposal(p._id)}
-                                                            >
-                                                                <MdOutlineSave className="w-5 h-5" /> Save
-                                                            </button>
-                                                            <button
-                                                                className="flex items-center gap-1 text-[16px] text-[#111827] hover:text-white hover:bg-[#111827] rounded-md px-2 py-1"
-                                                                title="Cancel"
-                                                                onClick={() => setEditIdx(null)}
-                                                            >
-                                                                <MdOutlineCancel className="w-5 h-5" /> Cancel
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            <button
-                                                                className="text-[#2563EB] flex items-center gap-1"
-                                                                title="Edit Details"
-                                                                onClick={() => handleEditClick(realIdx, p)}
-                                                            >
-                                                                <MdOutlineEdit className="w-5 h-5" /> Edit
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
+                                                {editIdx === realIdx ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            className="flex items-center gap-1 text-[16px] text-[#2563EB] hover:text-white hover:bg-[#2563EB] rounded-md px-2 py-1 transition-colors"
+                                                            title="Save"
+                                                            onClick={() => handleSaveProposal(p._id)}
+                                                        >
+                                                            <MdOutlineSave className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            className="flex items-center gap-1 text-[16px] text-[#111827] hover:text-white hover:bg-[#111827] rounded-md px-2 py-1 transition-colors"
+                                                            title="Cancel"
+                                                            onClick={() => setEditIdx(null)}
+                                                        >
+                                                            <MdOutlineCancel className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        className="text-[#2563EB] flex items-center gap-1 hover:text-[#1D4ED8] transition-colors"
+                                                        title="Edit Details"
+                                                        onClick={() => handleEditClick(realIdx, p)}
+                                                    >
+                                                        <MdOutlineEdit className="w-5 h-5" /> Edit
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     );
@@ -759,7 +763,11 @@ const Dashboard = () => {
                                 <tr key={idx + (currentDeletedPage - 1) * PAGE_SIZE} className="border-t">
                                     <td className="px-4 py-2 font-semibold">{p.title}</td>
                                     <td className="px-4 py-2">{p.client}</td>
-                                    <td className="px-4 py-2">{new Date(p.deadline).toLocaleDateString()}</td>
+                                    <td className="px-4 py-2">{new Date(p.deadline).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}</td>
                                     <td className="px-4 py-2">{statusBadge(p.status)}</td>
                                     <td className="px-4 py-2">{p.restoreIn}</td>
                                     <td className="px-4 py-2">
