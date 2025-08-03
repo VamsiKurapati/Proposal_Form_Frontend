@@ -3,7 +3,7 @@ import NavbarComponent from './NavbarComponent';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose, MdOutlineSave, MdOutlineCancel } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose } from "react-icons/md";
 import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
@@ -24,7 +24,7 @@ const statsStyles = {
 
 function statusBadge(status) {
     return (
-        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap inline-block ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
             {status}
         </span>
     );
@@ -623,14 +623,14 @@ const Dashboard = () => {
                                                             title="Save"
                                                             onClick={() => handleSaveProposal(p._id)}
                                                         >
-                                                            <MdOutlineSave className="w-4 h-4" />
+                                                            Save
                                                         </button>
                                                         <button
                                                             className="flex items-center gap-1 text-[16px] text-[#111827] hover:text-white hover:bg-[#111827] rounded-md px-2 py-1 transition-colors"
                                                             title="Cancel"
                                                             onClick={() => setEditIdx(null)}
                                                         >
-                                                            <MdOutlineCancel className="w-4 h-4" />
+                                                            Cancel
                                                         </button>
                                                     </div>
                                                 ) : (
