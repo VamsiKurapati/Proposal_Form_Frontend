@@ -166,6 +166,7 @@ const Dashboard = () => {
             });
             if (res.status === 200) {
                 setDeletedProposals(prev => prev.filter((_, idx) => selectedProposals.includes(idx)));
+                deletedProposals.map(p => p.restoreIn = "15 days");
                 setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                 setSelectedProposals([]);
                 setShowDeleteOptions(false);
