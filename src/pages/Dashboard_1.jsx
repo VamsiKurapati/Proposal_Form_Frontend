@@ -62,12 +62,13 @@ const Dashboard = () => {
 
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
+        console.log("proposal", proposal);
         setEditForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "2025-01-01",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "2025-01-01",
             status: proposal.status
         });
-        console.log(editForm);
+        console.log("editForm", editForm);
     };
 
     const handleEditChange = (field, value) => {
