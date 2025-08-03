@@ -63,8 +63,8 @@ const Dashboard = () => {
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
         setEditForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
+            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString() : "",
+            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString() : "",
             status: proposal.status
         });
         console.log("editForm", editForm);
@@ -574,7 +574,6 @@ const Dashboard = () => {
                                                         type="date"
                                                         value={p.deadline}
                                                         onChange={e => handleEditChange("deadline", e.target.value)}
-                                                        format="YYYY-MM-DD"
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
@@ -602,7 +601,6 @@ const Dashboard = () => {
                                                         value={p.submittedAt}
                                                         onChange={e => handleEditChange("submittedAt", e.target.value)}
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                                                        format="YYYY-MM-DD"
                                                     />
                                                 ) : (
                                                     new Date(p.submittedAt).toLocaleDateString()
