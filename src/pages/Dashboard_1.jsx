@@ -67,10 +67,6 @@ const Dashboard = () => {
             submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
             status: proposal.status
         });
-        console.log("editForm", editForm);
-        console.log("deadline", proposal.deadline);
-        console.log("submittedAt", proposal.submittedAt);
-        console.log("status", proposal.status);
     };
 
     const handleEditChange = (field, value) => {
@@ -83,7 +79,7 @@ const Dashboard = () => {
             const token = localStorage.getItem("token");
             const res = await axios.put(
                 `https://proposal-form-backend.vercel.app/api/dashboard/updateProposal`,
-                { proposalId, editForm },
+                { proposalId, updates: editForm },
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
