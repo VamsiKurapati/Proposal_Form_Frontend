@@ -588,19 +588,28 @@ const Dashboard = () => {
                                                         <MdPersonAddAlt1 className="w-4 h-4" />
                                                     </button>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-2 w-40">
-                                                            <ul>
-                                                                {employees.filter(emp => emp.name !== userName).map(emp => (
-                                                                    <li key={emp.name}>
-                                                                        <button
-                                                                            className="block px-4 py-2 hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
-                                                                            onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
-                                                                        >
-                                                                            {emp.name}
-                                                                        </button>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
+                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-8 w-40 p-2">
+                                                            <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
+                                                            <div>
+                                                                <ul>
+                                                                    {employees.filter(emp => emp.name !== userName).map(emp => (
+                                                                        <li key={emp.name}>
+                                                                            <button
+                                                                                className="block px-4 py-2 hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
+                                                                                onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
+                                                                            >
+                                                                                {emp.name}
+                                                                            </button>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                            <button
+                                                                className="text-[#111827] absolute top-2 right-2"
+                                                                onClick={() => setShowAddPersonIdx(null)}
+                                                            >
+                                                                <MdOutlineClose className="w-5 h-5" />
+                                                            </button>
                                                         </div>
                                                     )}
                                                 </td>
@@ -627,7 +636,7 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2">
                                                 {editIdx === realIdx ? (
-                                                    <select className="w-full border border-[#111827] rounded px-3 py-2 text-[#111827] text-[16px] bg-[#F3F4F6] focus:outline-none focus:ring-2 focus:ring-[#2563EB] min-w-[120px]" value={editForm.status} onChange={e => handleEditChange("status", e.target.value)}>
+                                                    <select className="w-full border border-[#111827] rounded px-3 py-2 text-[#111827] text-[16px] bg-[#F3F4F6] focus:outline-none focus:ring-2 focus:ring-[#2563EB] min-w-[140px]" value={editForm.status} onChange={e => handleEditChange("status", e.target.value)}>
                                                         <option value="In Progress">In Progress</option>
                                                         <option value="Submitted">Submitted</option>
                                                         <option value="Won">Won</option>
