@@ -167,6 +167,7 @@ const Dashboard = () => {
             if (res.status === 200) {
                 // Add restoreIn field to proposals being moved to deletedProposals
                 const proposalsToDelete = proposalsState.filter(p => selectedProposals.includes(p._id));
+                console.log("proposalsToDelete", proposalsToDelete);
                 const proposalsWithRestoreIn = proposalsToDelete.map(proposal => ({
                     ...proposal,
                     restoreIn: "15 days"
