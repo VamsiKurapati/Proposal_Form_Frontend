@@ -172,6 +172,8 @@ const Dashboard = () => {
                     restoreIn: "15 days"
                 }));
 
+                console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
+
                 setDeletedProposals(prev => [...prev, ...proposalsWithRestoreIn]);
                 setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                 setSelectedProposals([]);
