@@ -576,8 +576,9 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">{p.client}</td>
+
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 flex items-center gap-2">
+                                                <td className="px-4 py-2 relative">
                                                     <span>{userName} (You)</span>
                                                     <button
                                                         className="text-[#2563EB]"
@@ -587,7 +588,7 @@ const Dashboard = () => {
                                                         <MdPersonAddAlt1 className="w-4 h-4" />
                                                     </button>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-white border rounded shadow z-10 mt-8">
+                                                        <div className="absolute bg-[#F3F4F6] border border-[#111827] rounded-md shadow z-100 mt-12">
                                                             <ul>
                                                                 {employees.filter(emp => emp.name !== userName).map(emp => (
                                                                     <li key={emp.name}>
