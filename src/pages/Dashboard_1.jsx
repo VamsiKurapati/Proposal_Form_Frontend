@@ -456,6 +456,14 @@ const Dashboard = () => {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
 
+    useEffect(() => {
+        console.log("deletedProposals", deletedProposals);
+    }, [deletedProposals]);
+
+    useEffect(() => {
+        console.log("proposalsState", proposalsState);
+    }, [proposalsState]);
+
     return (
         <div className="min-h-screen">
             <NavbarComponent />
