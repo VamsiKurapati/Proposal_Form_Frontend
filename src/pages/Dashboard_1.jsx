@@ -578,7 +578,7 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">{p.client}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 relative flex gap-2">
+                                                <td className="px-4 py-2 relative flex justify-between items-center gap-2">
                                                     <span>{userName.split(" ")[0]} (You)</span>
                                                     <button
                                                         className="text-[#2563EB]"
@@ -595,7 +595,7 @@ const Dashboard = () => {
                                                                     {employees.filter(emp => emp.name !== userName).map(emp => (
                                                                         <li key={emp.name}>
                                                                             <button
-                                                                                className="block px-4 py-2 hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
+                                                                                className="block px-4 py-2 border-b border-[#111827] hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px]"
                                                                                 onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
                                                                             >
                                                                                 {emp.name}
