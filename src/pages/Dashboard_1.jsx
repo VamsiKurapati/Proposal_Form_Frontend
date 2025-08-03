@@ -578,15 +578,17 @@ const Dashboard = () => {
                                             <td className="px-4 py-2">{p.client}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
-                                                <td className="px-4 py-2 relative flex text-center justify-center items-center gap-2">
-                                                    <span>{userName.split(" ")[0]} (You)</span>
-                                                    <button
-                                                        className="text-[#2563EB]"
-                                                        title="Assign Editor"
-                                                        onClick={() => setShowAddPersonIdx(realIdx)}
-                                                    >
-                                                        <MdPersonAddAlt1 className="w-4 h-4" />
-                                                    </button>
+                                                <td className="px-4 py-2 relative">
+                                                    <div className="flex items-center gap-2">
+                                                        <span>{userName.split(" ")[0]} (You)</span>
+                                                        <button
+                                                            className="text-[#2563EB]"
+                                                            title="Assign Editor"
+                                                            onClick={() => setShowAddPersonIdx(realIdx)}
+                                                        >
+                                                            <MdPersonAddAlt1 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
                                                     {showAddPersonIdx === realIdx && (
                                                         <div className="absolute bg-[#FFFFFF] border border-[#E5E7EB] rounded-md shadow z-100 mt-8 w-40 p-2">
                                                             <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
