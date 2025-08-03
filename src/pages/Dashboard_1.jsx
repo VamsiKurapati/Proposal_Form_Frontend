@@ -165,6 +165,7 @@ const Dashboard = () => {
                 }
             });
             if (res.status === 200) {
+                setDeletedProposals(prev => prev.filter((_, idx) => selectedProposals.includes(idx)));
                 setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                 setSelectedProposals([]);
                 setShowDeleteOptions(false);
@@ -187,6 +188,7 @@ const Dashboard = () => {
                 }
             });
             if (res.status === 200) {
+                setProposalsState(prev => [...prev, deletedProposals[idx]]);
                 setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
             } else {
                 setError('Failed to restore proposal');
