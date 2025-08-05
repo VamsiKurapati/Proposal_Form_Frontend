@@ -887,6 +887,18 @@ const DiscoverRFPs = () => {
         )}
 
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+            <p className="text-red-700">{error}</p>
+            <button
+              onClick={handleRetry}
+              className="mt-2 text-red-600 hover:text-red-800 underline"
+            >
+              {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+            </button>
+          </div>
+        )}
+
         {(!error && filteredSaved.length) && (
           <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="overflow-x-auto">

@@ -39,9 +39,11 @@ const App = () => {
           <Route path="/sign_up" element={<SignUpPage />} />
           <Route path="/create-profile" element={<ProfileForm />} />
 
-          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
+          {/* <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <RFPDiscovery />
-          </ProtectedRoutes>} />
+          </ProtectedRoutes>} /> */}
+
+          <Route path="/rfp_discovery" element={<RFPDiscovery />} />
 
           <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <Proposals />
