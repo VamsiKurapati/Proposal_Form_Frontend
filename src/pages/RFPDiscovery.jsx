@@ -45,19 +45,6 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
       </div>
 
       <div className="relative">
-        {/* Search Input */}
-        <div className="relative mb-6">
-          <MdOutlineSearch className="absolute w-6 h-6 left-2 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xl" />
-          <input
-            type="text"
-            autoFocus
-            placeholder="Search RFPs"
-            className="w-full text-[16px] text-[#9CA3AF] bg-[#FFFFFF] pl-10 p-2 border border-1 border-[#E5E7EB] rounded-md"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
         {/* Dropdown Search Results */}
         {searchQuery && (
           <div className="absolute z-50 bg-white border mt-2 rounded-md shadow w-72 max-h-64 overflow-y-auto">
@@ -103,26 +90,8 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   );
 
   return (
-    <div className="fixed top-20 mt-12 left-0 h-[calc(100vh-4rem)] z-40">
-      {/* Desktop Sidebar */}
-      {isOpen && (
-        <div className="hidden lg:block">
-          {content}
-        </div>
-      )}
-
-      {/* Mobile Sidebar */}
-      {isOpen && (
-        <div className="w-full h-full">
-          <div
-            className="fixed inset-0 bg-black opacity-50 z-30"
-            onClick={onClose}
-          />
-          <div className="fixed top-0 left-0 z-40 bg-white w-64 h-full shadow-lg">
-            {content}
-          </div>
-        </div>
-      )}
+    <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] z-40">
+      {isOpen && content}
     </div>
   );
 };
@@ -653,14 +622,14 @@ const DiscoverRFPs = () => {
                 <input
                   type="text"
                   placeholder="Search RFPs by keyword, organization or category"
-                  className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB]"
+                  className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                // onFocus={() => setIsSearchFocused(true)}
+                // onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 />
                 <button
-                  className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] transition-colors"
+                  className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
                   onClick={() => setIsSearchFocused(true)}
                 >
                   Advanced Search
