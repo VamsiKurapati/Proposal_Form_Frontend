@@ -213,6 +213,8 @@ const DiscoverRFPs = () => {
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const navigate = useNavigate();
+  // Add this state for upload loading
+  const [isUploading, setIsUploading] = useState(false);
 
   const triggerRFPDiscovery = async () => {
     const res = await axios.post(`${API_BASE_URL}/triggerRFPDiscovery`, {}, {
@@ -621,29 +623,34 @@ const DiscoverRFPs = () => {
         return;
       }
 
+      setIsUploading(true);
+
       try {
         const formDataToSend = new FormData();
         formDataToSend.append('file', formData.file);
 
-        const response = await axios.post(`${API_BASE_URL}/uploadRFP`, { formData: formDataToSend },
+        const response = await axios.post(`${API_BASE_URL}/uploadRFP`, formDataToSend,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               'Content-Type': 'multipart/form-data'
             }
-          }
-        );
-        ////console.log('Response:', response.data.message);
+          });
+
         if (response.status === 200) {
           alert(response.data.message);
           onClose();
+          // Optionally refresh the RFP list after successful upload
+          // window.location.reload();
         } else {
           alert('Failed to add document. Please try again.');
         }
       } catch (error) {
-        ////console.error('Error adding document:', error);
-        alert('Failed to add document. Please try again.');
-        onClose();
+        console.error('Error adding document:', error);
+        const errorMessage = error.response?.data?.message || 'Failed to add document. Please try again.';
+        alert(errorMessage);
+      } finally {
+        setIsUploading(false);
       }
     };
 
@@ -716,9 +723,17 @@ const DiscoverRFPs = () => {
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
+                disabled={isUploading}
+                className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Upload
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  'Upload'
+                )}
               </button>
             </div>
           </form>
