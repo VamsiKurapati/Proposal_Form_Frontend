@@ -258,7 +258,7 @@ const DiscoverRFPs = () => {
 
     setLoadingOtherRFPs(true);
     try {
-      const res = await axios.get(`${API_BASE_URL}/getOtherRFPs`, {
+      const res = await axios.post(`${API_BASE_URL}/getOtherRFPs`, {
         industries: selectedIndustries
       }, {
         headers: {
