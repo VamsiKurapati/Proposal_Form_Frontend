@@ -171,15 +171,11 @@ const Dashboard = () => {
         });
         if (res.status === 200) {
             const editor = employees.find(emp => emp.employeeId === editorId);
-            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { _id: editorId, fullName: editor.fullName, email: editor.email } } : p));
+            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { _id: editor.employeeId, fullName: editor.name, email: editor.email } } : p));
             setShowAddPersonIdx(null);
             alert("Editor set successfully");
         }
     };
-
-    useEffect(() => {
-        console.log("proposalsState", proposalsState);
-    }, [proposalsState]);
 
     const handleSelectProposal = (idx) => {
         setSelectedProposals(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
