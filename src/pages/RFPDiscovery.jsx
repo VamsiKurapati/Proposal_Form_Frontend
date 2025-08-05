@@ -265,7 +265,7 @@ const DiscoverRFPs = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      const rfps = res.data.rfps || [];
+      const rfps = res.data.otherRFPs || [];
       setOtherRFPs(rfps);
       setOriginalOtherRFPs(rfps);
     } catch (err) {
@@ -281,7 +281,7 @@ const DiscoverRFPs = () => {
     setLoadingRecommended(true);
     setError(null);
     try {
-      const res = await axios.get(`${API_BASE_URL}/getAllRFP`, {
+      const res = await axios.get(`${API_BASE_URL}/getRecommendedAndSavedRFPs`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
