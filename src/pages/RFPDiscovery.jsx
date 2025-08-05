@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaRegBookmark } from "react-icons/fa";
+import PropTypes from "prop-types";
 import {
   MdOutlineShare,
   MdOutlineBookmark,
@@ -11,14 +12,24 @@ import {
   MdOutlineSearch,
   MdOutlineUpload,
   MdOutlineClose,
+  MdOutlineExpandMore,
+  MdOutlineCheck,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 
+// Constants
+const API_BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
+const STATUS_STYLES = {
+  "In Progress": "bg-blue-100 text-blue-600",
+  Submitted: "bg-green-100 text-green-600",
+  Rejected: "bg-red-100 text-red-600",
+  Won: "bg-yellow-100 text-yellow-600",
+};
 
 // Sidebar Component
-const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSearchQuery, searchResults }) => {
+const LeftSidebar = ({ isOpen, onClose, filters, setFilters }) => {
   const categories = {
-    category: ["Infrastructure", "Education", "Healthcare", "Research & Development", "Government", "Non-Profit", "Private Sector", "Other"],
+    category: ["Infrastructure", "Education", "Healthcare", "Research & Development", "Government", "Non-Profit", "Private Sector"],
     deadline: ["This Week", "This Month", "Next 3 Months", "Next 6 Months"],
   };
 
@@ -44,30 +55,6 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
         </button>
       </div>
 
-      <div className="relative">
-        {/* Dropdown Search Results */}
-        {searchQuery && (
-          <div className="absolute z-50 bg-white border mt-2 rounded-md shadow w-72 max-h-64 overflow-y-auto">
-            {searchResults.length ? (
-              searchResults.map((rfp) => (
-                <a
-                  key={rfp._id}
-                  href={rfp.link}
-                  className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800 border-b last:border-b-0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="font-medium">{rfp.title}</div>
-                  <div className="text-gray-500 text-xs">{rfp.organization}</div>
-                  <div className="text-gray-400 text-xs">Deadline: {rfp.deadline}</div>
-                </a>
-              ))
-            ) : (
-              <div className="px-4 py-3 text-gray-500 text-sm">No matches found</div>
-            )}
-          </div>
-        )}
-      </div>
       {Object.entries(categories).map(([category, values]) => (
         <div key={category} className="mb-4">
           <h3 className="text-[16px] font-medium text-[#111827] capitalize mb-2">
@@ -77,7 +64,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
             <div key={value} className="flex items-center mb-2">
               <input
                 type="checkbox"
-                className="mr-2 text-[#4B5563]"
+                className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
                 checked={filters[category]?.includes(value) || false}
                 onChange={() => handleChange(category, value)}
               />
@@ -96,20 +83,139 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters, searchQuery, setSea
   );
 };
 
+// PropTypes for LeftSidebar
+LeftSidebar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  filters: PropTypes.object.isRequired,
+  setFilters: PropTypes.func.isRequired,
+};
+
+// Custom MultiSelect Component for Industries
+const IndustryMultiSelect = ({ selectedIndustries, onIndustryChange, industries }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const containerRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredIndustries = industries.filter(industry =>
+    industry.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleToggleIndustry = (industry) => {
+    if (selectedIndustries.includes(industry)) {
+      onIndustryChange(selectedIndustries.filter(i => i !== industry));
+    } else {
+      onIndustryChange([...selectedIndustries, industry]);
+    }
+  };
+
+  const handleRemoveIndustry = (industry) => {
+    onIndustryChange(selectedIndustries.filter(i => i !== industry));
+  };
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div className="flex flex-wrap gap-2 mb-2">
+        {selectedIndustries.map((industry) => (
+          <span
+            key={industry}
+            className="inline-flex items-center gap-1 px-2 py-1 bg-[#2563EB] text-white text-xs rounded-full"
+          >
+            {industry}
+            <button
+              onClick={() => handleRemoveIndustry(industry)}
+              className="ml-1 hover:text-red-200"
+            >
+              <MdOutlineClose className="w-3 h-3" />
+            </button>
+          </span>
+        ))}
+      </div>
+
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-2 border border-[#E5E7EB] rounded-md bg-white text-left hover:border-[#2563EB] focus:outline-none focus:ring-[2px] focus:ring-[#2563EB]"
+      >
+        <span className={selectedIndustries.length > 0 ? "text-[#111827]" : "text-[#9CA3AF]"}>
+          {selectedIndustries.length > 0
+            ? `${selectedIndustries.length} industr${selectedIndustries.length > 1 ? 'ies' : 'y'} selected`
+            : "Select industries..."
+          }
+        </span>
+        <MdOutlineExpandMore className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-[#E5E7EB] rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <div className="p-2 border-b">
+            <input
+              type="text"
+              placeholder="Search industries..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-2 py-1 border border-[#E5E7EB] rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto">
+            {filteredIndustries.map((industry) => (
+              <div
+                key={industry}
+                onClick={() => handleToggleIndustry(industry)}
+                className="flex items-center justify-between px-3 py-2 hover:bg-[#F3F4F6] cursor-pointer"
+              >
+                <span className="text-sm text-[#111827]">{industry}</span>
+                {selectedIndustries.includes(industry) && (
+                  <MdOutlineCheck className="w-4 h-4 text-[#2563EB]" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// PropTypes for IndustryMultiSelect
+IndustryMultiSelect.propTypes = {
+  selectedIndustries: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onIndustryChange: PropTypes.func.isRequired,
+  industries: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
 // Main Component
 const DiscoverRFPs = () => {
   const [filters, setFilters] = useState({ category: [], deadline: [] });
-  const [allRFPs, setAllRFPs] = useState([]);
   const [recommended, setRecommended] = useState([]);
-  const [recent, setRecent] = useState([]);
+  const [otherRFPs, setOtherRFPs] = useState([]);
   const [saved, setSaved] = useState([]);
+  const [originalRecommended, setOriginalRecommended] = useState([]);
+  const [originalOtherRFPs, setOriginalOtherRFPs] = useState([]);
+  const [originalSaved, setOriginalSaved] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [selectedIndustries, setSelectedIndustries] = useState([]);
+  const [availableIndustries, setAvailableIndustries] = useState([]);
+  const [loadingOtherRFPs, setLoadingOtherRFPs] = useState(false);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
+  const [loadingSave, setLoadingSave] = useState({});
+  const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const navigate = useNavigate();
 
   const triggerRFPDiscovery = async () => {
-    const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery", {}, {
+    const res = await axios.post(`${API_BASE_URL}/triggerRFPDiscovery`, {}, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
@@ -121,73 +227,90 @@ const DiscoverRFPs = () => {
     triggerRFPDiscovery();
   }, []);
 
+  // Set available industries statically
   useEffect(() => {
-    const fetchRFPs = async () => {
-      try {
-        const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getAllRFP", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        const { allRFPs, recommendedRFPs, recentRFPs, savedRFPs } = res.data;
+    setAvailableIndustries([
+      "Information Technology",
+      "Healthcare",
+      "Finance",
+      "Education",
+      "Manufacturing",
+      "Retail",
+      "Construction",
+      "Consulting",
+      "Marketing",
+      "Legal",
+      "Real Estate",
+      "Transportation",
+      "Hospitality",
+      "Government",
+      "Non-Profit",
+      "Research & Development",
+    ]);
+  }, []);
 
-        setAllRFPs(allRFPs ?? []);
-        setRecommended(recommendedRFPs ?? []);
-        setRecent(recentRFPs ?? []);
-        setSaved(savedRFPs ?? []);
-      } catch (err) {
-        console.error("Backend failed, loading dummy data...");
+  // Function to fetch other RFPs based on selected industries
+  const fetchOtherRFPs = async () => {
+    if (selectedIndustries.length === 0) {
+      alert("Please select at least one industry to search for RFPs.");
+      return;
+    }
 
-        const dummyRFPs = [
-          {
-            id: 1,
-            logo: "https://via.placeholder.com/32",
-            title: "AI Research Grant Program",
-            description: "Supporting innovative AI research projects.",
-            match: 95,
-            budget: "$250,000 - $500,000",
-            deadline: "Mar 15, 2025",
-            organization: "Government Agency",
-            fundingType: "Research & Development",
-            organizationType: "Government",
-            link: "#",
-          },
-          {
-            id: 2,
-            logo: "https://via.placeholder.com/32?text=T",
-            title: "Tech Infrastructure Development",
-            description: "Boosting national technology capacity.",
-            match: 92,
-            budget: "$300,000",
-            deadline: "Apr 20, 2025",
-            organization: "TechFund",
-            fundingType: "Infrastructure",
-            organizationType: "Private Sector",
-            link: "#",
-          },
-          {
-            id: 3,
-            logo: "https://via.placeholder.com/32",
-            title: "AI Research Grant Program",
-            description: "Supporting innovative AI research projects.",
-            match: 95,
-            budget: "$250,000 - $500,000",
-            deadline: "Mar 15, 2025",
-            organization: "Government Agency",
-            fundingType: "Research & Development",
-            organizationType: "Government",
-            link: "#",
-          },
+    setLoadingOtherRFPs(true);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/getOtherRFPs`, {
+        industries: selectedIndustries
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const rfps = res.data.rfps || [];
+      setOtherRFPs(rfps);
+      setOriginalOtherRFPs(rfps);
+    } catch (err) {
+      console.error("Failed to fetch other RFPs, using dummy data...");
+      setOtherRFPs([]);
+      setOriginalOtherRFPs([]);
+    } finally {
+      setLoadingOtherRFPs(false);
+    }
+  };
 
-        ];
+  const fetchRFPs = async () => {
+    setLoadingRecommended(true);
+    setError(null);
+    try {
+      const res = await axios.get(`${API_BASE_URL}/getAllRFP`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const { recommendedRFPs, savedRFPs } = res.data;
 
-        setRecommended(dummyRFPs);
-        setRecent(dummyRFPs);
-        setSaved([]);
-        setAllRFPs([...recommended, ...recent, ...saved])
-      }
-    };
+      setRecommended(recommendedRFPs ?? []);
+      setOriginalRecommended(recommendedRFPs ?? []);
+      setSaved(savedRFPs ?? []);
+      setOriginalSaved(savedRFPs ?? []);
+      setRetryCount(0); // Reset retry count on success
+    } catch (err) {
+      console.error("Backend failed, loading dummy data...");
+      setError("Failed to load recommended and saved RFPs. Please try again later.");
+    } finally {
+      setLoadingRecommended(false);
+    }
+  };
 
+  const handleRetry = () => {
+    if (retryCount < 3) {
+      setRetryCount(prev => prev + 1);
+      fetchRFPs();
+    } else {
+      setError("Maximum retry attempts reached. Please refresh the page.");
+    }
+  };
+
+  useEffect(() => {
     fetchRFPs();
   }, []);
 
@@ -231,8 +354,9 @@ const DiscoverRFPs = () => {
   };
 
   const handleSave = async (rfp) => {
+    setLoadingSave(prev => ({ ...prev, [rfp._id]: true }));
     try {
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/saveRFP", { rfpId: rfp._id, rfp: rfp }, {
+      const res = await axios.post(`${API_BASE_URL}/saveRFP`, { rfpId: rfp._id, rfp: rfp }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -241,25 +365,21 @@ const DiscoverRFPs = () => {
         setSaved((prev) => [...prev, rfp]);
         console.log("RFP data:", rfp);
       }
-      return;
     } catch (err) {
       console.error(err);
+      alert("Failed to save RFP. Please try again.");
+    } finally {
+      setLoadingSave(prev => ({ ...prev, [rfp._id]: false }));
     }
   };
 
-  const searchResults =
-    searchQuery.trim() === ""
-      ? []
-      : allRFPs.filter((rfp) => {
-        const pattern = new RegExp(`\\b${searchQuery.toLowerCase()}`, "i")
-        return pattern.test(rfp.title.toLowerCase()) || pattern.test(rfp.organization.toLowerCase()) || pattern.test(rfp.fundingType.toLowerCase());
-      });
-
+  // Removed problematic useEffect that was permanently modifying state
 
   const handleUnsave = async (rfpId) => {
+    setLoadingSave(prev => ({ ...prev, [rfpId]: true }));
     try {
       console.log("sending request...");
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/rfp/unsaveRFP", { rfpId: rfpId }, {
+      const res = await axios.post(`${API_BASE_URL}/unsaveRFP`, { rfpId: rfpId }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -268,15 +388,20 @@ const DiscoverRFPs = () => {
         console.log("Handling Unsave...");
         setSaved((prev) => prev.filter((r) => r._id !== rfpId));
       }
-      return;
     } catch (err) {
       console.error(err);
+      alert("Failed to unsave RFP. Please try again.");
+    } finally {
+      setLoadingSave(prev => ({ ...prev, [rfpId]: false }));
     }
   };
 
   const handleShare = (link) => {
     navigator.clipboard.writeText(link).then(() => {
       alert("Link copied to clipboard!");
+    }).catch((err) => {
+      console.error("Failed to copy link:", err);
+      alert("Failed to copy link to clipboard");
     });
   };
 
@@ -314,7 +439,9 @@ const DiscoverRFPs = () => {
       <div className="mt-auto">
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-3 text-[#111827] text-lg">
-            {isSaved ? (
+            {loadingSave[rfp._id] ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
+            ) : isSaved ? (
               <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
             ) : (
               <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
@@ -350,7 +477,9 @@ const DiscoverRFPs = () => {
         <div className="flex justify-between items-center gap-8 mb-2">
           <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
           <div className="flex top-2 gap-2 text-lg text-[#111827]">
-            {isSaved ? (
+            {loadingSave[rfp._id] ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
+            ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={() => handleUnsave(rfp._id)}
                 className="cursor-pointer"
@@ -383,9 +512,9 @@ const DiscoverRFPs = () => {
             <span>Deadline: {rfp.deadline}</span>
           </div>
           {/* <div className="flex items-center gap-2">
-            <MdOutlineAccountBalance className="text-[16px]" />
-            <span>{rfp.organization}</span>
-          </div> */}
+              <MdOutlineAccountBalance className="text-[16px]" />
+              <span>{rfp.organization}</span>
+            </div> */}
         </div>
       </div>
 
@@ -404,13 +533,7 @@ const DiscoverRFPs = () => {
     </div>
   );
 
-  const SavedRFPCard = ({ rfp, handleSave, handleUnsave, handleShare, isSaved }) => {
-    const statusStyles = {
-      "In Progress": "bg-blue-100 text-blue-600",
-      Submitted: "bg-green-100 text-green-600",
-      Rejected: "bg-red-100 text-red-600",
-      Won: "bg-yellow-100 text-yellow-600",
-    };
+  const SavedRFPCard = ({ rfp, isSaved }) => {
     return (
       <tr className="border-b last:border-none hover:bg-gray-50">
         <td className="px-4 py-3 text-left">
@@ -435,7 +558,7 @@ const DiscoverRFPs = () => {
         </td>
         <td className="px-4 py-3 text-center">
           <span
-            className={`text-[12px] px-3 py-1 rounded-full font-medium ${statusStyles[rfp.status] || "bg-gray-100 text-gray-600"
+            className={`text-[12px] px-3 py-1 rounded-full font-medium ${STATUS_STYLES[rfp.status] || "bg-gray-100 text-gray-600"
               }`}
           >
             {rfp.status || "None"}
@@ -448,7 +571,9 @@ const DiscoverRFPs = () => {
               className="cursor-pointer hover:text-[#2563EB] transition-colors"
               onClick={() => handleShare(rfp.link)}
             />
-            {isSaved ? (
+            {loadingSave[rfp._id] ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563]"></div>
+            ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={() => handleUnsave(rfp._id)}
                 className="cursor-pointer hover:text-[#2563EB] transition-colors"
@@ -500,7 +625,7 @@ const DiscoverRFPs = () => {
         const formDataToSend = new FormData();
         formDataToSend.append('file', formData.file);
 
-        const response = await axios.post('https://proposal-form-backend.vercel.app/api/rfp/uploadRFP', formDataToSend,
+        const response = await axios.post(`${API_BASE_URL}/uploadRFP`, formDataToSend,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -597,6 +722,23 @@ const DiscoverRFPs = () => {
     );
   };
 
+  // Filter data based on search query with memoization
+  const getFilteredData = useCallback((originalData) => {
+    if (!searchQuery.trim()) return originalData;
+
+    return originalData.filter((rfp) => {
+      const pattern = new RegExp(`\\b${searchQuery.toLowerCase()}`, "i");
+      return pattern.test(rfp.title?.toLowerCase() || "") ||
+        pattern.test(rfp.organization?.toLowerCase() || "") ||
+        pattern.test(rfp.fundingType?.toLowerCase() || "");
+    });
+  }, [searchQuery]);
+
+  // Get filtered data for rendering with memoization
+  const filteredRecommended = useMemo(() => getFilteredData(originalRecommended), [getFilteredData, originalRecommended]);
+  const filteredOtherRFPs = useMemo(() => getFilteredData(originalOtherRFPs), [getFilteredData, originalOtherRFPs]);
+  const filteredSaved = useMemo(() => getFilteredData(originalSaved), [getFilteredData, originalSaved]);
+
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
@@ -606,9 +748,6 @@ const DiscoverRFPs = () => {
         onClose={() => setIsSearchFocused(false)}
         filters={filters}
         setFilters={setFilters}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        searchResults={searchResults}
       />
 
       <main className="pt-20 px-6 py-6 ml-0">
@@ -621,12 +760,10 @@ const DiscoverRFPs = () => {
                 <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                 <input
                   type="text"
-                  placeholder="Search RFPs by keyword, organization or category"
+                  placeholder="Search RFPs by title, organization or category"
                   className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                // onFocus={() => setIsSearchFocused(true)}
-                // onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 />
                 <button
                   className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
@@ -648,9 +785,25 @@ const DiscoverRFPs = () => {
         </div>
 
         <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
-        {recommended.length ? (
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+            <p className="text-red-700">{error}</p>
+            <button
+              onClick={handleRetry}
+              className="mt-2 text-red-600 hover:text-red-800 underline"
+            >
+              {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+            </button>
+          </div>
+        )}
+        {loadingRecommended ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+            <span className="ml-3 text-[16px] text-[#4B5563]">Loading recommended RFPs...</span>
+          </div>
+        ) : filteredRecommended.length ? (
           <div className="flex overflow-x-auto pb-2 custom-scroll">
-            {applyFilters(recommended).map((rfp) => (
+            {applyFilters(filteredRecommended).map((rfp) => (
               <RFPCard
                 key={rfp._id}
                 rfp={rfp}
@@ -660,13 +813,60 @@ const DiscoverRFPs = () => {
             ))}
           </div>
         ) : (
-          <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+          (!error && (
+            <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+          ))
         )}
 
-        <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Recently Added RFPs</h2>
-        {recent.length ? (
+        <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other RFPs</h2>
+        <div className="mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+            {/* Industry Selection */}
+            <div>
+              <label className="block text-[16px] font-medium text-[#111827] mb-2">
+                Select Industries to Filter RFPs
+              </label>
+              <IndustryMultiSelect
+                selectedIndustries={selectedIndustries}
+                onIndustryChange={setSelectedIndustries}
+                industries={availableIndustries}
+              />
+            </div>
+
+            {/* Search Button */}
+            <div className="flex justify-start md:justify-end">
+              <button
+                onClick={fetchOtherRFPs}
+                disabled={selectedIndustries.length === 0 || loadingOtherRFPs}
+                className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherRFPs
+                  ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+                  : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
+                  }`}
+              >
+                {loadingOtherRFPs ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Searching...</span>
+                  </>
+                ) : (
+                  <>
+                    <MdOutlineSearch className="w-5 h-5" />
+                    <span>Search RFPs</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {loadingOtherRFPs ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+            <span className="ml-3 text-[16px] text-[#4B5563]">Loading RFPs...</span>
+          </div>
+        ) : filteredOtherRFPs.length > 0 ? (
           <div className="flex overflow-x-auto pb-2 custom-scroll">
-            {applyFilters(recent).map((rfp) => (
+            {applyFilters(filteredOtherRFPs).map((rfp) => (
               <RecentRFPCard
                 key={rfp._id}
                 rfp={rfp}
@@ -674,12 +874,20 @@ const DiscoverRFPs = () => {
               />
             ))}
           </div>
+        ) : filteredOtherRFPs.length === 0 && selectedIndustries.length > 0 ? (
+          <div className="text-center py-8">
+            <p className="text-[16px] text-[#4B5563] mb-2">No RFPs found for the selected industries.</p>
+            <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
+          </div>
         ) : (
-          <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & add some RFPs to view them!</p>
+          <div className="text-center py-8">
+            <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search RFPs" to discover relevant opportunities.</p>
+            <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find RFPs that match your expertise.</p>
+          </div>
         )}
 
         <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
-        {saved.length ? (
+        {(!error && filteredSaved.length) && (
           <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -694,13 +902,10 @@ const DiscoverRFPs = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {saved.map((rfp) => (
+                  {filteredSaved.map((rfp) => (
                     <SavedRFPCard
                       key={rfp._id}
                       rfp={rfp}
-                      handleSave={handleSave}
-                      handleUnsave={handleUnsave}
-                      handleShare={handleShare}
                       isSaved={true}
                     />
                   ))}
@@ -708,7 +913,9 @@ const DiscoverRFPs = () => {
               </table>
             </div>
           </div>
-        ) : (
+        )}
+
+        {(!error && filteredSaved.length === 0) && (
           <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
         )}
       </main>
@@ -722,4 +929,3 @@ const DiscoverRFPs = () => {
 };
 
 export default DiscoverRFPs;
-
