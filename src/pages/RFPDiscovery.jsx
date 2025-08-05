@@ -220,7 +220,7 @@ const DiscoverRFPs = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
     });
-    console.log(res.data);
+    //console.log(res.data);
   };
 
   useEffect(() => {
@@ -269,7 +269,7 @@ const DiscoverRFPs = () => {
       setOtherRFPs(rfps);
       setOriginalOtherRFPs(rfps);
     } catch (err) {
-      console.error("Failed to fetch other RFPs, using dummy data...");
+      //console.error("Failed to fetch other RFPs, using dummy data...");
       setOtherRFPs([]);
       setOriginalOtherRFPs([]);
     } finally {
@@ -294,7 +294,7 @@ const DiscoverRFPs = () => {
       setOriginalSaved(savedRFPs ?? []);
       setRetryCount(0); // Reset retry count on success
     } catch (err) {
-      console.error("Backend failed, loading dummy data...");
+      //console.error("Backend failed, loading dummy data...");
       setError("Failed to load recommended and saved RFPs. Please try again later.");
     } finally {
       setLoadingRecommended(false);
@@ -363,10 +363,10 @@ const DiscoverRFPs = () => {
       });
       if (res.status === 201 || res.status === 200) {
         setSaved((prev) => [...prev, rfp]);
-        console.log("RFP data:", rfp);
+        //console.log("RFP data:", rfp);
       }
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       alert("Failed to save RFP. Please try again.");
     } finally {
       setLoadingSave(prev => ({ ...prev, [rfp._id]: false }));
@@ -378,18 +378,18 @@ const DiscoverRFPs = () => {
   const handleUnsave = async (rfpId) => {
     setLoadingSave(prev => ({ ...prev, [rfpId]: true }));
     try {
-      console.log("sending request...");
+      //console.log("sending request...");
       const res = await axios.post(`${API_BASE_URL}/unsaveRFP`, { rfpId: rfpId }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (res.status === 200) {
-        console.log("Handling Unsave...");
+        //console.log("Handling Unsave...");
         setSaved((prev) => prev.filter((r) => r._id !== rfpId));
       }
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       alert("Failed to unsave RFP. Please try again.");
     } finally {
       setLoadingSave(prev => ({ ...prev, [rfpId]: false }));
@@ -400,13 +400,13 @@ const DiscoverRFPs = () => {
     navigator.clipboard.writeText(link).then(() => {
       alert("Link copied to clipboard!");
     }).catch((err) => {
-      console.error("Failed to copy link:", err);
+      //console.error("Failed to copy link:", err);
       alert("Failed to copy link to clipboard");
     });
   };
 
   const handleGenerateProposal = (rfp) => {
-    console.log("Generating proposal for:", rfp.title);
+    //console.log("Generating proposal for:", rfp.title);
     // navigate, open modal, or call backend here
     navigate("/proposal_page", { state: { proposal: rfp } });
   };
@@ -633,11 +633,11 @@ const DiscoverRFPs = () => {
             }
           }
         );
-        //console.log('Response:', response.data.message);
+        ////console.log('Response:', response.data.message);
         alert(response.data.message);
         onClose();
       } catch (error) {
-        //console.error('Error adding document:', error);
+        ////console.error('Error adding document:', error);
         alert('Failed to add document. Please try again.');
       }
     };
