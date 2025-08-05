@@ -22,6 +22,32 @@ const statsStyles = {
     "Won": "bg-[#FEFCE8] text-[#CA8A04]",
 }
 
+// Helper: bg color map for calendar
+const bgColor = {
+    'In Progress': 'bg-[#DBEAFE] bg-opacity-50',
+    'Submitted': 'bg-[#DCFCE7] bg-opacity-50',
+    'Won': 'bg-[#FEF9C3] bg-opacity-50',
+    'Rejected': 'bg-[#FEE2E2] bg-opacity-50',
+    'Deadline': 'bg-[#FEF3C7] bg-opacity-50',
+}
+
+// Helper: status color map for bg and text, dot
+const statusBgMap = {
+    'In Progress': 'bg-[#DBEAFE] text-[#2563EB]',
+    'Submitted': 'bg-[#DCFCE7] text-[#16A34A]',
+    'Won': 'bg-[#FEF9C3] text-[#CA8A04]',
+    'Rejected': 'bg-[#FEE2E2] text-[#DC2626]',
+    'Deadline': 'bg-[#FEF3C7] text-[#F59E42]',
+};
+
+const statusDotMap = {
+    'In Progress': 'bg-[#2563EB]',
+    'Submitted': 'bg-[#16A34A]',
+    'Won': 'bg-[#CA8A04]',
+    'Rejected': 'bg-[#DC2626]',
+    'Deadline': 'bg-[#F59E42]',
+};
+
 function statusBadge(status) {
     return (
         <span className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap inline-block ${statusStyles[status] || 'bg-gray-100 text-gray-700'}`}>
@@ -149,6 +175,10 @@ const Dashboard = () => {
             alert("Editor set successfully");
         }
     };
+
+    useEffect(() => {
+        console.log("proposalsState", proposalsState);
+    }, [proposalsState]);
 
     const handleSelectProposal = (idx) => {
         setSelectedProposals(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
@@ -395,32 +425,6 @@ const Dashboard = () => {
             moment(ev.startDate).isSameOrBefore(date, 'day') && moment(ev.endDate).isSameOrAfter(date, 'day')
         );
     }
-
-    // Helper: bg color map for calendar
-    const bgColor = {
-        'In Progress': 'bg-[#DBEAFE] bg-opacity-50',
-        'Submitted': 'bg-[#DCFCE7] bg-opacity-50',
-        'Won': 'bg-[#FEF9C3] bg-opacity-50',
-        'Rejected': 'bg-[#FEE2E2] bg-opacity-50',
-        'Deadline': 'bg-[#FEF3C7] bg-opacity-50',
-    }
-
-    // Helper: status color map for bg and text, dot
-    const statusBgMap = {
-        'In Progress': 'bg-[#DBEAFE] text-[#2563EB]',
-        'Submitted': 'bg-[#DCFCE7] text-[#16A34A]',
-        'Won': 'bg-[#FEF9C3] text-[#CA8A04]',
-        'Rejected': 'bg-[#FEE2E2] text-[#DC2626]',
-        'Deadline': 'bg-[#FEF3C7] text-[#F59E42]',
-    };
-
-    const statusDotMap = {
-        'In Progress': 'bg-[#2563EB]',
-        'Submitted': 'bg-[#16A34A]',
-        'Won': 'bg-[#CA8A04]',
-        'Rejected': 'bg-[#DC2626]',
-        'Deadline': 'bg-[#F59E42]',
-    };
 
     // Custom date cell for calendar
     function CustomDateCellWrapper({ value }) {
