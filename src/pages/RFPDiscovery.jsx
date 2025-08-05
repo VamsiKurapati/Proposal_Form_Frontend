@@ -625,7 +625,7 @@ const DiscoverRFPs = () => {
         const formDataToSend = new FormData();
         formDataToSend.append('file', formData.file);
 
-        const response = await axios.post(`${API_BASE_URL}/uploadRFP`, formDataToSend,
+        const response = await axios.post(`${API_BASE_URL}/uploadRFP`, { formData: formDataToSend },
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
