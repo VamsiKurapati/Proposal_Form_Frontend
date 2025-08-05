@@ -899,36 +899,36 @@ const DiscoverRFPs = () => {
           </div>
         )}
 
-        {(!error && filteredSaved.length) && (
-          <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#F8FAFC]">
-                  <tr className="text-[#374151] text-[14px] font-medium">
-                    <th className="px-4 py-3 text-left">RFP Title</th>
-                    <th className="px-4 py-3 text-left">Organisation</th>
-                    <th className="px-4 py-3 text-left">Amount</th>
-                    <th className="px-4 py-3 text-left">Deadline</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredSaved.map((rfp) => (
-                    <SavedRFPCard
-                      key={rfp._id}
-                      rfp={rfp}
-                      isSaved={true}
-                    />
-                  ))}
-                </tbody>
-              </table>
+        {!error && (
+          filteredSaved.length > 0 ? (
+            <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[#F8FAFC]">
+                    <tr className="text-[#374151] text-[14px] font-medium">
+                      <th className="px-4 py-3 text-left">RFP Title</th>
+                      <th className="px-4 py-3 text-left">Organisation</th>
+                      <th className="px-4 py-3 text-left">Amount</th>
+                      <th className="px-4 py-3 text-left">Deadline</th>
+                      <th className="px-4 py-3 text-center">Status</th>
+                      <th className="px-4 py-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSaved.map((rfp) => (
+                      <SavedRFPCard
+                        key={rfp._id}
+                        rfp={rfp}
+                        isSaved={true}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
-
-        {(!error && filteredSaved.length === 0) && (
-          <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
+          ) : (
+            <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
+          )
         )}
       </main>
 
