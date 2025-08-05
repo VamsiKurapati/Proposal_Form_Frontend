@@ -484,14 +484,6 @@ const Dashboard = () => {
         );
     }
 
-    useEffect(() => {
-        console.log("deletedProposals", deletedProposals);
-    }, [deletedProposals]);
-
-    useEffect(() => {
-        console.log("proposalsState", proposalsState);
-    }, [proposalsState]);
-
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
