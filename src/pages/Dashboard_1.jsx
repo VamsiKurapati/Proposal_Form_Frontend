@@ -171,7 +171,7 @@ const Dashboard = () => {
         });
         if (res.status === 200) {
             const editor = employees.find(emp => emp.employeeId === editorId);
-            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { employeeId: editorId, fullName: editor.fullName, email: editor.email } } : p));
+            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { _id: editorId, fullName: editor.fullName, email: editor.email } } : p));
             setShowAddPersonIdx(null);
             alert("Editor set successfully");
         }
