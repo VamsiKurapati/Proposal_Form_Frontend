@@ -603,11 +603,11 @@ const DiscoverRFPs = () => {
       const file = e.target.files[0];
       if (file) {
         // Check if file is PDF or TXT
-        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf') || file.name.endsWith('.txt')) {
           setFormData({ ...formData, file: file });
           setFilePreview(file.name);
         } else {
-          alert('Please upload only PDF files.');
+          alert('Please upload only PDF or TXT files.');
           e.target.value = '';
         }
       }
@@ -634,11 +634,16 @@ const DiscoverRFPs = () => {
           }
         );
         ////console.log('Response:', response.data.message);
-        alert(response.data.message);
-        onClose();
+        if (response.status === 200) {
+          alert(response.data.message);
+          onClose();
+        } else {
+          alert('Failed to add document. Please try again.');
+        }
       } catch (error) {
         ////console.error('Error adding document:', error);
         alert('Failed to add document. Please try again.');
+        onClose();
       }
     };
 
@@ -661,7 +666,7 @@ const DiscoverRFPs = () => {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#2563EB] transition-colors">
                 <input
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf, .txt"
                   onChange={handleFileChange}
                   className="hidden"
                   id="document-upload"
@@ -677,7 +682,7 @@ const DiscoverRFPs = () => {
                     <div className="text-sm text-gray-600">
                       <span className="font-medium text-[#2563EB] hover:text-[#1d4ed8]">Click to upload</span> or drag and drop
                     </div>
-                    <div className="text-xs text-gray-500">PDF file only</div>
+                    <div className="text-xs text-gray-500">PDF or TXT file only</div>
                   </div>
                 </label>
               </div>
