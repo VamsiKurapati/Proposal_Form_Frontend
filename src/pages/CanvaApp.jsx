@@ -8,16 +8,16 @@ import SidePanel from '../components/SidePanel';
 import DesignPanel from '../components/DesignPanel';
 
 import ElementsPanel from '../components/ElementsPanel';
-import TextPanel from '../components/TextPanel';
-import Canvas from '../components/Canvas/Canvas';
-import GridView from '../components/Canvas/GridView';
-import FloatingToolbar from '../components/Toolbar/FloatingToolbar';
-import Footer from '../components/Footer';
+import TextPanel from '../components/TextPanel.jsx';
+import Canvas from '../components/Canvas/Canvas.jsx';
+import GridView from '../components/Canvas/GridView.jsx';
+import FloatingToolbar from '../components/Toolbar/FloatingToolbar.jsx';
+import Footer from '../components/Footer.jsx';
 import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON } from '../utils/export';
 import { getTemplateSets } from '../utils/loadTemplates';
 
 import PropertiesPanel from '../components/PropertiesPanel.jsx';
-import HistoryPanel from '../components/HistoryPanel.js';
+import HistoryPanel from '../components/HistoryPanel.jsx';
 import UploadsPanel from '../components/UploadsPanel.jsx';
 import ToolsPanel from '../components/ToolsPanel.jsx';
 import ProjectsPanel from '../components/ProjectsPanel.jsx';
