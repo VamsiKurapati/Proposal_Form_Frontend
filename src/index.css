@@ -43,167 +43,85 @@
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-/* .ql-header option[value="1"]::before { content: "Heading 1"; }
-.ql-header option[value="2"]::before { content: "Heading 2"; }
-.ql-header option[value="3"]::before { content: "Heading 3"; }
-.ql-header option[value="4"]::before { content: "Heading 4"; }
-.ql-header option[value="5"]::before { content: "Heading 5"; }
-.ql-header option[value=""]::before { content: "Paragraph"; }
-
-.ql-snow .ql-picker.ql-size .ql-picker-label::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item::before {
-  content: attr(data-value);
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-.ql-color-picker .ql-picker-item::before {
-  content: attr(data-value);
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.ql-background-picker .ql-picker-item::before {
-  content: attr(data-value);
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
-.ql-size-8px { font-size: 8px; }
-.ql-size-10px { font-size: 10px; }
-.ql-size-12px { font-size: 12px; }
-.ql-size-14px { font-size: 14px; }
-.ql-size-16px { font-size: 16px; }
-.ql-size-18px { font-size: 18px; }
-.ql-size-20px { font-size: 20px; }
-.ql-size-24px { font-size: 24px; }
-.ql-size-28px { font-size: 28px; }
-.ql-size-32px { font-size: 32px; }
-.ql-size-36px { font-size: 36px; }
-.ql-size-48px { font-size: 48px; }
-.ql-size-64px { font-size: 64px; }
-.ql-size-72px { font-size: 72px; }
-.ql-size-96px { font-size: 96px; }
-.ql-size-128px { font-size: 128px; }
-
-.ql-toolbar {
-  border-radius: 0.5rem 0.5rem 0 0;
-  padding: 6px 8px;
-  gap: 4px;
-  flex-wrap: wrap;
+* {
+  box-sizing: border-box;
 }
 
-.ql-container {
-  min-height: 120px;
-  border-radius: 0 0 0.5rem 0.5rem;
-} */
-
-/* Header dropdown labels */
-.ql-header option[value="1"]::before {
-  content: "Heading 1";
+/* Prevent bleeding edges during scrolling */
+#root {
+  height: 100%;
+  overflow: hidden;
 }
 
-.ql-header option[value="2"]::before {
-  content: "Heading 2";
+.canvas-container {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
-.ql-header option[value="3"]::before {
-  content: "Heading 3";
+/* Prevent over-scroll behavior */
+html {
+  overscroll-behavior: none;
 }
 
-.ql-header option[value="4"]::before {
-  content: "Heading 4";
+body {
+  overscroll-behavior: none;
 }
 
-.ql-header option[value="5"]::before {
-  content: "Heading 5";
+/* Ensure scroll containers don't allow over-scroll */
+.overflow-auto {
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
 }
 
-.ql-header option[value=""]::before {
-  content: "Paragraph";
+.element {
+  user-select: none;
 }
 
-/* Size picker display */
-.ql-snow .ql-picker.ql-size .ql-picker-label::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item::before {
-  content: attr(value);
+.resize-handle {
+  border: 1px solid #3b82f6;
+  border-radius: 1px;
 }
 
-/* Optional: fallback for color/background items */
-.ql-picker-item {
-  min-width: 1rem;
-  min-height: 1rem;
+.selection-outline {
+  border-style: dashed;
+  animation: dash 1s linear infinite;
 }
 
-/* Font size styles */
-.ql-size-8px {
-  font-size: 8px;
+@keyframes dash {
+  to {
+    stroke-dashoffset: -8;
+  }
 }
 
-.ql-size-10px {
-  font-size: 10px;
+/* Page number element styles */
+.page-number-element {
+  border: 2px dashed #3b82f6;
+  border-radius: 4px;
+  padding: 2px;
 }
 
-.ql-size-12px {
-  font-size: 12px;
-}
-
-.ql-size-14px {
-  font-size: 14px;
-}
-
-.ql-size-16px {
-  font-size: 16px;
-}
-
-.ql-size-18px {
-  font-size: 18px;
-}
-
-.ql-size-20px {
-  font-size: 20px;
-}
-
-.ql-size-24px {
-  font-size: 24px;
-}
-
-.ql-size-28px {
-  font-size: 28px;
-}
-
-.ql-size-32px {
-  font-size: 32px;
-}
-
-.ql-size-36px {
-  font-size: 36px;
-}
-
-.ql-size-48px {
-  font-size: 48px;
-}
-
-.ql-size-64px {
-  font-size: 64px;
-}
-
-.ql-size-72px {
-  font-size: 72px;
-}
-
-.ql-size-96px {
-  font-size: 96px;
-}
-
-.ql-size-128px {
-  font-size: 128px;
-}
-
-/* Compact toolbar */
-.ql-toolbar {
-  border-radius: 0.5rem 0.5rem 0 0;
-  padding: 6px 8px;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-/* Styled editor box */
-.ql-container {
-  min-height: 120px;
-  border-radius: 0 0 0.5rem 0.5rem;
+.page-number-element:hover {
+  border-color: #1d4ed8;
+  background-color: rgba(59, 130, 246, 0.05);
 }

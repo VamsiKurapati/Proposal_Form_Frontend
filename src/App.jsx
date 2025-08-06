@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { lazy, Suspense } from "react";
 import { useUser } from './context/UserContext';
-
+import CanvaApp from './pages/CanvaApp';
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
 
 const Home = lazy(() => import("./pages/HomePage"));
@@ -87,6 +87,8 @@ const App = () => {
               <EmployeeProfileUpdate />
             </ProtectedRoutes>
           } />
+
+          <Route path="/canva" element={<CanvaApp />} />
 
           <Route path="*" element={<Home />} />
         </Routes>
