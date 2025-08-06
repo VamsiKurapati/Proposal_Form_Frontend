@@ -210,6 +210,7 @@ export const ProfileProvider = ({ children }) => {
                     successRate: response.data.successRate,
                     activeProposals: response.data.activeProposals
                 },
+                proposalList: response.data.proposals,
                 logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
             };
             setCompanyData(data);

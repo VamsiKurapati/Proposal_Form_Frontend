@@ -868,6 +868,7 @@ const CompanyProfileDashboard = () => {
   const [showAddCaseStudyModal, setShowAddCaseStudyModal] = useState(false);
   const [showAddCertificateModal, setShowAddCertificateModal] = useState(false);
   const [showAddDocumentModal, setShowAddDocumentModal] = useState(false);
+  const [filteredProposals, setFilteredProposals] = useState([]);
 
   // Remove useEffect for fetching company data
   // useEffect(() => { ... }, []);
@@ -879,6 +880,10 @@ const CompanyProfileDashboard = () => {
     } else if (companyData && companyData.logoUrl) {
       setLogoUrl(companyData.logoUrl);
     }
+  }, [companyData]);
+
+  React.useEffect(() => {
+    setFilteredProposals(companyData?.proposalList || []);
   }, [companyData]);
 
   // Updated Button handlers
@@ -961,9 +966,11 @@ const CompanyProfileDashboard = () => {
   };
 
   const handleSearchProposals = (searchTerm) => {
-    // Implement search functionality
-    //console.log("Searching proposals:", searchTerm);
-    // You could filter the proposals list based on search term
+    const filtered = companyData?.proposalList.filter(proposal =>
+      proposal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      proposal.client.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProposals(filtered);
   };
 
   const handleAddCaseStudy = () => {
@@ -1495,7 +1502,7 @@ const CompanyProfileDashboard = () => {
                   <div className="relative flex-1">
                     <input
                       type="text"
-                      placeholder="Search proposals"
+                      placeholder="Search proposals by title or client"
                       className="w-full md:w-1/2 border border-[#E5E7EB] rounded-lg px-4 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-[#2563EB] pl-10"
                       onChange={(e) => handleSearchProposals(e.target.value)}
                     />
@@ -1504,17 +1511,16 @@ const CompanyProfileDashboard = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 lg:gap-6">
-                {companyData?.proposalList && companyData.proposalList.length > 0 ? (
-                  companyData.proposalList.map((proposal, i) => (
+                {filteredProposals && filteredProposals.length > 0 ? (
+                  filteredProposals.map((proposal, i) => (
                     <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow">
                       <span className={`absolute top-4 right-4 px-2 py-1 text-xs rounded-full font-medium ${badgeStyles[proposal.status]}`}>{proposal.status}</span>
                       <div className="font-semibold text-[16px] text-[#111827] mb-1 truncate">{proposal.title}</div>
-                      <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.company}</div>
+                      <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.client}</div>
                       <div className="flex items-center gap-2 text-[13px] text-[#6B7280] mb-1">
                         <MdOutlineCalendarToday className="w-4 h-4 text-[#9CA3AF]" />
-                        <span>{proposal.date}</span>
+                        <span>{proposal.deadline.toLocaleDateString()}</span>
                       </div>
-                      <div className="font-semibold text-[#2563EB] text-[17px] mt-2">$ {proposal.amount.toLocaleString()}</div>
                     </div>
                   ))
                 ) : (
@@ -1632,9 +1638,6 @@ const CompanyProfileDashboard = () => {
                 )}
               </div>
             </div>
-          )}
-          {activeTab === "Settings" && (
-            <div>Settings section content here.</div>
           )}
         </div>
       </main>
