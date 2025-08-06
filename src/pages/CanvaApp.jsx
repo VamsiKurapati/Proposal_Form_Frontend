@@ -481,6 +481,62 @@ const CanvaApp = () => {
     }
   };
 
+  // Handle SVG icon upload
+  const handleSVGIconUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const svgContent = e.target.result;
+        // Create a new SVG element
+        const newElement = {
+          id: generateId(),
+          type: 'svg',
+          x: 100,
+          y: 100,
+          width: 100,
+          height: 100,
+          rotation: 0,
+          zIndex: 1,
+          properties: {
+            svgContent: svgContent
+          }
+        };
+
+        // Add to current page
+        setProject(prev => {
+          const newProject = {
+            ...prev,
+            pages: prev.pages.map((page, idx) =>
+              idx === currentEditingPage
+                ? {
+                  ...page,
+                  elements: [...page.elements, newElement]
+                }
+                : page
+            )
+          };
+          return newProject;
+        });
+
+        // Select the new element
+        setSelectedElement({
+          pageIndex: currentEditingPage,
+          elementId: newElement.id
+        });
+
+        // Save to history
+        if (saveToHistory) {
+          saveToHistory('SVG Icon Added', 'Added SVG icon', null, project);
+        }
+
+        // Clear the input
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+  };
+
   // Import from JSON
   const handleImportFromJSON = (event) => {
     importFromJSON(event, setProject, setSelectedElement);
@@ -603,7 +659,7 @@ const CanvaApp = () => {
           imageInputRef={imageInputRef}
           addShapeElement={addShapeElementWithHistory}
           svgIconInputRef={svgIconInputRef}
-          handleSVGIconUpload={() => { }}
+          handleSVGIconUpload={handleSVGIconUpload}
         />
 
         <TextPanel
