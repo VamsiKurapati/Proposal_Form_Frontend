@@ -1,26 +1,26 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useProject } from './hooks/useProject';
-import { useElements } from './hooks/useElements';
-import { useInteraction } from './hooks/useInteraction';
-import { usePanelState } from './hooks/usePanelState';
-import { useHistory } from './hooks/useHistory';
-import SidePanel from './components/SidePanel';
-import DesignPanel from './components/DesignPanel';
+import { useProject } from '../hooks/useProject';
+import { useElements } from '../hooks/useElements';
+import { useInteraction } from '../hooks/useInteraction';
+import { usePanelState } from '../hooks/usePanelState';
+import { useHistory } from '../hooks/useHistory';
+import SidePanel from '../components/SidePanel';
+import DesignPanel from '../components/DesignPanel';
 
-import ElementsPanel from './components/ElementsPanel';
-import TextPanel from './components/TextPanel';
-import Canvas from './components/Canvas/Canvas';
-import GridView from './components/Canvas/GridView';
-import FloatingToolbar from './components/Toolbar/FloatingToolbar';
-import Footer from './components/Footer';
-import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON } from './utils/export';
-import { getTemplateSets } from './utils/loadTemplates';
+import ElementsPanel from '../components/ElementsPanel';
+import TextPanel from '../components/TextPanel';
+import Canvas from '../components/Canvas/Canvas';
+import GridView from '../components/Canvas/GridView';
+import FloatingToolbar from '../components/Toolbar/FloatingToolbar';
+import Footer from '../components/Footer';
+import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON } from '../utils/export';
+import { getTemplateSets } from '../utils/loadTemplates';
 
-import PropertiesPanel from './components/PropertiesPanel.jsx';
-import HistoryPanel from './components/HistoryPanel.js';
-import UploadsPanel from './components/UploadsPanel.jsx';
-import ToolsPanel from './components/ToolsPanel.jsx';
-import ProjectsPanel from './components/ProjectsPanel.jsx';
+import PropertiesPanel from '../components/PropertiesPanel.jsx';
+import HistoryPanel from '../components/HistoryPanel.js';
+import UploadsPanel from '../components/UploadsPanel.jsx';
+import ToolsPanel from '../components/ToolsPanel.jsx';
+import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
 const CanvaApp = () => {
   const [zoom, setZoom] = React.useState(100);
