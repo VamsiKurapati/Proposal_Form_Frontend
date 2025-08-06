@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const EmployeeProfileContext = createContext();
@@ -11,6 +11,7 @@ export const EmployeeProfileProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const [proposalsInProgress, setProposalsInProgress] = useState([]);
     const [completedProposals, setCompletedProposals] = useState([]);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockEmployeeData = useCallback(() => ({
@@ -109,6 +110,11 @@ export const EmployeeProfileProvider = ({ children }) => {
     }), []);
 
     const fetchProposals = useCallback(async () => {
+        // Only fetch if we haven't initialized yet or if we don't have proposals data
+        if (hasInitialized && proposalsInProgress.length > 0) {
+            return;
+        }
+
         try {
             const res = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProposals', {
                 headers: {
@@ -131,7 +137,7 @@ export const EmployeeProfileProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [hasInitialized, proposalsInProgress.length, getMockProposals]);
 
     useEffect(() => {
         fetchProposals();
@@ -141,6 +147,11 @@ export const EmployeeProfileProvider = ({ children }) => {
 
     // Fetch company data from backend
     const fetchEmployeeData = useCallback(async () => {
+        // Only fetch if we haven't initialized yet or if we don't have data
+        if (hasInitialized && employeeData) {
+            return;
+        }
+
         try {
             setLoading(true);
             setError(null);
@@ -162,13 +173,15 @@ export const EmployeeProfileProvider = ({ children }) => {
                 logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
             };
             setEmployeeData(data);
+            setHasInitialized(true);
         } catch (err) {
             setError(err.message);
             setEmployeeData(getMockEmployeeData());
+            setHasInitialized(true);
         } finally {
             setLoading(false);
         }
-    }, [getMockEmployeeData]);
+    }, [hasInitialized, employeeData, getMockEmployeeData]);
 
     useEffect(() => {
         fetchEmployeeData();
@@ -176,8 +189,19 @@ export const EmployeeProfileProvider = ({ children }) => {
 
     const refreshEmployeeProfile = fetchEmployeeData;
 
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        employeeData,
+        loading,
+        error,
+        refreshEmployeeProfile,
+        proposalsInProgress,
+        completedProposals,
+        refreshProposals
+    }), [employeeData, loading, error, refreshEmployeeProfile, proposalsInProgress, completedProposals, refreshProposals]);
+
     return (
-        <EmployeeProfileContext.Provider value={{ employeeData, loading, error, refreshEmployeeProfile, proposalsInProgress, completedProposals, refreshProposals }}>
+        <EmployeeProfileContext.Provider value={contextValue}>
             {children}
         </EmployeeProfileContext.Provider>
     );

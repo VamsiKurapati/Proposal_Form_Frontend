@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 export const UserContext = createContext();
 
@@ -8,8 +8,27 @@ export const UserProvider = ({ children }) => {
     const [role, setRole] = useState(localStorage.getItem("userRole") || "");
 
     useEffect(() => {
-        setRole(localStorage.getItem("userRole"));
-    }, [localStorage.getItem("userRole")]);
+        const handleStorageChange = () => {
+            const newRole = localStorage.getItem("userRole");
+            if (newRole !== role) {
+                setRole(newRole);
+            }
+        };
 
-    return <UserContext.Provider value={{ role, setRole }}>{children}</UserContext.Provider>;
+        // Listen for storage changes
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also check for changes on focus (in case localStorage was changed in another tab)
+        window.addEventListener('focus', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('focus', handleStorageChange);
+        };
+    }, [role]);
+
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({ role, setRole }), [role]);
+
+    return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };

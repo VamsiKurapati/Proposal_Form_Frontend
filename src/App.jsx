@@ -1,8 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { lazy, Suspense } from "react";
-import { ProfileProvider } from './context/ProfileContext';
-import { EmployeeProfileProvider } from './context/EmployeeProfileContext';
 import { useUser } from './context/UserContext';
 
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
@@ -51,9 +49,7 @@ const App = () => {
 
           <Route path="/proposal_page" element={
             <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
-              <ProfileProvider>
-                <GenerateProposalPage />
-              </ProfileProvider>
+              <GenerateProposalPage />
             </ProtectedRoutes>
           } />
           <Route path="/basic-compliance-check" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
@@ -72,31 +68,23 @@ const App = () => {
 
           <Route path="/company_profile_dashboard" element={
             <ProtectedRoutes allowedRoles={["company"]}>
-              <ProfileProvider>
-                <CompanyProfileDashboard />
-              </ProfileProvider>
+              <CompanyProfileDashboard />
             </ProtectedRoutes>
           } />
           <Route path="/company-profile-update" element={
             <ProtectedRoutes allowedRoles={["company"]}>
-              <ProfileProvider>
-                <CompanyProfileUpdate />
-              </ProfileProvider>
+              <CompanyProfileUpdate />
             </ProtectedRoutes>
           } />
 
           <Route path="/employee_profile_dashboard" element={
             <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
-              <EmployeeProfileProvider>
-                <EmployeeProfileDashboard />
-              </EmployeeProfileProvider>
+              <EmployeeProfileDashboard />
             </ProtectedRoutes>
           } />
           <Route path="/employee-profile-update" element={
             <ProtectedRoutes allowedRoles={["Editor", "Viewer"]}>
-              <EmployeeProfileProvider>
-                <EmployeeProfileUpdate />
-              </EmployeeProfileProvider>
+              <EmployeeProfileUpdate />
             </ProtectedRoutes>
           } />
 

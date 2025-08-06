@@ -11,11 +11,17 @@ import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
 
 import { UserProvider } from './context/UserContext';
+import { ProfileProvider } from './context/ProfileContext';
+import { EmployeeProfileProvider } from './context/EmployeeProfileContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <UserProvider>
-      <App />
+      <ProfileProvider>
+        <EmployeeProfileProvider>
+          <App />
+        </EmployeeProfileProvider>
+      </ProfileProvider>
     </UserProvider>
   </BrowserRouter>
 );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const ProfileContext = createContext();
@@ -9,6 +9,7 @@ export const ProfileProvider = ({ children }) => {
     const [companyData, setCompanyData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockCompanyData = useCallback(() => ({
@@ -172,6 +173,11 @@ export const ProfileProvider = ({ children }) => {
 
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
+        // Only fetch if we haven't initialized yet or if we don't have data
+        if (hasInitialized && companyData) {
+            return;
+        }
+
         try {
             setLoading(true);
             setError(null);
@@ -214,23 +220,30 @@ export const ProfileProvider = ({ children }) => {
                 logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
             };
             setCompanyData(data);
+            setHasInitialized(true);
         } catch (err) {
             setError(err.message);
             setCompanyData(getMockCompanyData());
+            setHasInitialized(true);
         } finally {
             setLoading(false);
         }
-    }, [getMockCompanyData]);
+    }, [hasInitialized, companyData, getMockCompanyData]);
 
     useEffect(() => {
         fetchCompanyData();
     }, [fetchCompanyData]);
 
-    // Optionally, expose a refresh function
-    const refreshProfile = fetchCompanyData;
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        companyData,
+        loading,
+        error,
+        refreshProfile: fetchCompanyData
+    }), [companyData, loading, error, fetchCompanyData]);
 
     return (
-        <ProfileContext.Provider value={{ companyData, loading, error, refreshProfile }}>
+        <ProfileContext.Provider value={contextValue}>
             {children}
         </ProfileContext.Provider>
     );
