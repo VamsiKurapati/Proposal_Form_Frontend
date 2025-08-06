@@ -1,7 +1,7 @@
 import React from 'react';
-import { HelpIcon } from './icons/help.svg';
-import { FullscreenIcon } from './icons/fullscreen.svg';
-import { GridIcon } from './icons/grid.svg';
+import HelpIcon from './icons/help.svg';
+import FullscreenIcon from './icons/fullscreen.svg';
+import GridIcon from './icons/grid.svg';
 import './Footer.css';
 
 const Footer = ({
