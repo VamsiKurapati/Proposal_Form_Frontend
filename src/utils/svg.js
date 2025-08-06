@@ -7,7 +7,7 @@ export function optimizeSVG(svgContent) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgContent, 'image/svg+xml');
     const svg = doc.querySelector('svg');
-    
+
     if (!svg) {
       console.warn('No SVG element found in content');
       return svgContent;
@@ -71,7 +71,7 @@ export function optimizeSVG(svgContent) {
     // Convert back to string and clean up whitespace
     const serializer = new XMLSerializer();
     let optimized = serializer.serializeToString(doc);
-    
+
     // Remove unnecessary whitespace
     optimized = optimized.replace(/>\s+</g, '><');
     optimized = optimized.replace(/\s+/g, ' ');
@@ -87,7 +87,7 @@ export function optimizeSVG(svgContent) {
 // Optimize color values
 function optimizeColor(color) {
   if (!color) return color;
-  
+
   // Convert color names to hex
   const colorMap = {
     'black': '#000',
@@ -156,7 +156,7 @@ export function getOptimizationStats(originalSVG, optimizedSVG) {
   const optimizedSize = new Blob([optimizedSVG]).size;
   const reduction = originalSize - optimizedSize;
   const reductionPercent = ((reduction / originalSize) * 100).toFixed(2);
-  
+
   return {
     originalSize,
     optimizedSize,
@@ -198,7 +198,7 @@ export function optimizeSVGForA4(svgContent) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgContent, 'image/svg+xml');
     const svg = doc.querySelector('svg');
-    
+
     if (!svg) {
       console.warn('No SVG element found in content');
       return svgContent;
@@ -249,22 +249,18 @@ export function encodeSVGToBase64(svgString) {
 
 // Get all SVGs in subfolders of design/
 export function getTemplateSets() {
-  const req = require.context(
-    '../components/design',
-    true,
-    /\.svg$/
-  );
+  const svgModules = import.meta.glob('../components/design/**/*.svg', { eager: true });
   const sets = {};
-  req.keys().forEach((key) => {
-    const match = key.match(/^\.\/([^/]+)\//);
+  Object.entries(svgModules).forEach(([key, module]) => {
+    const match = key.match(/design\/([^/]+)\//);
     if (!match) return;
     const folder = match[1];
     if (!sets[folder]) sets[folder] = [];
-    sets[folder].push(req(key).default);
+    sets[folder].push(module.default || module);
   });
   Object.values(sets).forEach(arr => arr.sort());
   return sets;
-} 
+}
 
 // Function to scale SVG template to fit page dimensions
 export function scaleSVGToFitPage(svgContent, pageWidth, pageHeight) {
@@ -273,57 +269,57 @@ export function scaleSVGToFitPage(svgContent, pageWidth, pageHeight) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgContent, 'image/svg+xml');
     const svgElement = doc.querySelector('svg');
-    
+
     if (!svgElement) {
       console.warn('No SVG element found in template');
       return svgContent;
     }
-    
+
     // Get original dimensions
     const originalWidth = parseFloat(svgElement.getAttribute('width') || svgElement.getAttribute('viewBox')?.split(' ')[2] || 794);
     const originalHeight = parseFloat(svgElement.getAttribute('height') || svgElement.getAttribute('viewBox')?.split(' ')[3] || 1123);
-    
+
     // Calculate scale to fit the page
     const scaleX = pageWidth / originalWidth;
     const scaleY = pageHeight / originalHeight;
     const scale = Math.min(scaleX, scaleY); // Use the smaller scale to ensure it fits
-    
+
     // Apply scaling transformation
     const transform = `scale(${scale})`;
-    
+
     // Create a wrapper group with the transformation
     const wrapperGroup = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
     wrapperGroup.setAttribute('transform', transform);
-    
+
     // Move all child elements to the wrapper group
     const children = Array.from(svgElement.children);
     children.forEach(child => {
       svgElement.removeChild(child);
       wrapperGroup.appendChild(child);
     });
-    
+
     // Add the wrapper group back to the SVG
     svgElement.appendChild(wrapperGroup);
-    
+
     // Update SVG dimensions to match page
     svgElement.setAttribute('width', pageWidth);
     svgElement.setAttribute('height', pageHeight);
     svgElement.setAttribute('viewBox', `0 0 ${pageWidth} ${pageHeight}`);
-    
+
     // Center the content if it doesn't fill the entire page
     if (scaleX !== scaleY) {
       const scaledWidth = originalWidth * scale;
       const scaledHeight = originalHeight * scale;
       const translateX = (pageWidth - scaledWidth) / 2;
       const translateY = (pageHeight - scaledHeight) / 2;
-      
+
       wrapperGroup.setAttribute('transform', `translate(${translateX}, ${translateY}) scale(${scale})`);
     }
-    
+
     // Convert back to string
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
-    
+
   } catch (error) {
     console.error('Error scaling SVG template:', error);
     return svgContent; // Return original if scaling fails
