@@ -1,11 +1,11 @@
 import React from 'react';
-import { ReactComponent as HelpIcon } from './icons/help.svg';
-import { ReactComponent as FullscreenIcon } from './icons/fullscreen.svg';
-import { ReactComponent as GridIcon } from './icons/grid.svg';
+import { HelpIcon } from './icons/help.svg';
+import { FullscreenIcon } from './icons/fullscreen.svg';
+import { GridIcon } from './icons/grid.svg';
 import './Footer.css';
 
-const Footer = ({ 
-  onHelpClick, 
+const Footer = ({
+  onHelpClick,
   onFullscreenClick,
   onGridClick,
   currentPage = 1,
@@ -46,16 +46,15 @@ const Footer = ({
       <div className="flex items-center space-x-2">
         <button
           onClick={onGridClick}
-          className={`p-2 rounded-md transition-colors ${
-            isGridView 
-              ? 'bg-blue-100 text-blue-600' 
-              : 'hover:bg-gray-100 text-gray-600'
-          }`}
+          className={`p-2 rounded-md transition-colors ${isGridView
+            ? 'bg-blue-100 text-blue-600'
+            : 'hover:bg-gray-100 text-gray-600'
+            }`}
           title={isGridView ? "Exit Grid View" : "Grid View"}
         >
           <GridIcon className="w-5 h-5" />
         </button>
-        
+
         <button
           onClick={onFullscreenClick}
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
@@ -63,7 +62,7 @@ const Footer = ({
         >
           <FullscreenIcon className="w-5 h-5 text-gray-600" />
         </button>
-        
+
         <button
           onClick={onHelpClick}
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
