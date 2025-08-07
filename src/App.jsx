@@ -24,6 +24,8 @@ const EmployeeProfileUpdate = lazy(() => import("./pages/EmployeeProfileUpdate")
 const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboard"));
 const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
+const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
+
 const App = () => {
   const { role } = useUser();
 
@@ -89,6 +91,8 @@ const App = () => {
           } />
 
           <Route path="/canva" element={<CanvaApp />} />
+
+          <Route path="/super-admin" element={<SuperAdmin />} />
 
           <Route path="*" element={<Home />} />
         </Routes>
