@@ -38,7 +38,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('cloudImagesUpdated', handleCloudImagesUpdate);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('cloudImagesUpdated', handleCloudImagesUpdate);
@@ -67,7 +67,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
   const handleFileUpload = async (files) => {
     const fileArray = Array.from(files);
     const validFiles = fileArray.filter(validateFile);
-    
+
     if (validFiles.length === 0) return;
 
     setIsUploading(true);
@@ -116,7 +116,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
     if (onImageSelect) {
       // Use the actual filename from the API response, or fall back to original name
       const filename = upload.filename || upload.name;
-      
+
       // Use appropriate prefix based on image type
       const imageUrl = upload.isTemplate ? `template://${filename}` : `cloud://${filename}`;
       onImageSelect(imageUrl);
@@ -129,7 +129,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
       window.alert('Template images cannot be deleted.');
       return;
     }
-    
+
     try {
       await cloudImageService.deleteImage(upload.filename || upload.name);
       // Refresh uploads from cloud service
@@ -148,7 +148,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
   };
 
   if (!show) return null;
-  
+
   return (
     <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
       <div className="p-4">
@@ -166,7 +166,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
         </div>
 
         {/* Debug Info */}
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.DEV && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mb-4 text-xs">
             <p>Debug: Uploads count: {uploads.length}</p>
             <p>Debug: Uploads: {JSON.stringify(uploads.map(u => ({ name: u.name, isTemplate: u.isTemplate })))}</p>
@@ -176,11 +176,10 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
         {/* Upload Area */}
         <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
           <div
-            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-              isDragging 
-                ? 'border-blue-500 bg-blue-100' 
+            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${isDragging
+                ? 'border-blue-500 bg-blue-100'
                 : 'border-gray-300 hover:border-gray-400 bg-white'
-            }`}
+              }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -198,7 +197,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
               browse files
             </button>
             <p className="text-xs text-gray-500 mt-2">
-              PNG, JPG, JPEG, SVG • Max {process.env.REACT_APP_MAX_IMAGES || 15} images
+              PNG, JPG, JPEG, SVG • Max {import.meta.env.VITE_MAX_IMAGES || 15} images
             </p>
           </div>
           <input
@@ -216,7 +215,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
           <h4 className="text-sm font-medium text-gray-700 mb-3">
             Uploaded Images ({uploads.length})
           </h4>
-          
+
           {uploads.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
               <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,11 +260,10 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
                         </h3>
                         <button
                           onClick={() => handleDeleteUpload(upload)}
-                          className={`transition-colors ${
-                            upload.isTemplate 
-                              ? 'text-gray-300 cursor-not-allowed' 
+                          className={`transition-colors ${upload.isTemplate
+                              ? 'text-gray-300 cursor-not-allowed'
                               : 'text-gray-400 hover:text-red-500'
-                          }`}
+                            }`}
                           title={upload.isTemplate ? 'Template images cannot be deleted' : 'Delete image'}
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,11 +295,10 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className={`w-full px-4 py-3 text-white rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                isUploading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
+              className={`w-full px-4 py-3 text-white rounded-lg transition-colors flex items-center justify-center gap-2 ${isUploading
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-blue-500 hover:bg-blue-600'
-              }`}
+                }`}
             >
               {isUploading ? (
                 <>

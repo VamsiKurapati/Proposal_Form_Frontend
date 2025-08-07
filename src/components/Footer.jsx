@@ -52,7 +52,7 @@ const Footer = ({
             }`}
           title={isGridView ? "Exit Grid View" : "Grid View"}
         >
-          <GridIcon className="w-5 h-5" />
+          <img src={GridIcon} alt="Grid" className="w-5 h-5" />
         </button>
 
         <button
@@ -60,7 +60,7 @@ const Footer = ({
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
           title="Fullscreen"
         >
-          <FullscreenIcon className="w-5 h-5 text-gray-600" />
+          <img src={FullscreenIcon} alt="Fullscreen" className="w-5 h-5" />
         </button>
 
         <button
@@ -68,7 +68,7 @@ const Footer = ({
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
           title="Help"
         >
-          <HelpIcon className="w-5 h-5 text-gray-600" />
+          <img src={HelpIcon} alt="Help" className="w-5 h-5" />
         </button>
       </div>
     </div>
