@@ -10,7 +10,7 @@ const GridView = ({
 }) => {
   // Calculate grid layout based on screen size
   const [itemsPerRow, setItemsPerRow] = React.useState(3);
-  
+
   // Ensure proper scroll positioning
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -19,7 +19,7 @@ const GridView = ({
     // Ensure scroll starts at the top
     scrollContainer.scrollTop = 0;
   }, []);
-  
+
   React.useEffect(() => {
     const updateGridLayout = () => {
       const width = window.innerWidth;
@@ -33,12 +33,12 @@ const GridView = ({
         setItemsPerRow(4);
       }
     };
-    
+
     updateGridLayout();
     window.addEventListener('resize', updateGridLayout);
     return () => window.removeEventListener('resize', updateGridLayout);
   }, []);
-  
+
   const gridGap = 12;
 
   return (
@@ -54,8 +54,8 @@ const GridView = ({
           <p className="text-sm text-gray-600 mb-1">View all pages in a grid layout. Click the grid icon to return to edit mode.</p>
           <p className="text-xs text-gray-500">Showing {project.pages.length} page{project.pages.length !== 1 ? 's' : ''}</p>
         </div>
-        
-        <div 
+
+        <div
           className="grid flex-1 px-4 pb-4"
           style={{
             gridTemplateColumns: `repeat(${itemsPerRow}, 1fr)`,
@@ -68,11 +68,10 @@ const GridView = ({
           {project.pages.map((page, pageIndex) => (
             <div
               key={page.id}
-              className={`rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-200 ${
-                currentEditingPage === pageIndex 
-                  ? 'bg-blue-50 border-2 border-blue-500' 
+              className={`rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-200 ${currentEditingPage === pageIndex
+                  ? 'bg-blue-50 border-2 border-blue-500'
                   : 'bg-white'
-              }`}
+                }`}
               style={{
                 transition: 'transform 0.2s',
                 width: 'fit-content',
@@ -82,14 +81,12 @@ const GridView = ({
               title={`Click to edit Page ${pageIndex + 1}`}
             >
               {/* Page Header */}
-              <div className={`px-2 py-1 border-b border-gray-200 ${
-                currentEditingPage === pageIndex ? 'bg-blue-100' : 'bg-gray-50'
-              }`}>
+              <div className={`px-2 py-1 border-b border-gray-200 ${currentEditingPage === pageIndex ? 'bg-blue-100' : 'bg-gray-50'
+                }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <span className={`text-xs font-medium ${
-                      currentEditingPage === pageIndex ? 'text-blue-700' : 'text-gray-700'
-                    }`}>
+                    <span className={`text-xs font-medium ${currentEditingPage === pageIndex ? 'text-blue-700' : 'text-gray-700'
+                      }`}>
                       Page {pageIndex + 1}
                     </span>
                     {currentEditingPage === pageIndex && (
@@ -124,11 +121,18 @@ const GridView = ({
                 {page.pageSettings.background.type === 'svg' && (
                   <div
                     className="absolute inset-0 pointer-events-none"
-                    style={{ width: '100%', height: '100%', zIndex: 0 }}
-                    dangerouslySetInnerHTML={{ __html: page.pageSettings.background.value }}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 0,
+                      backgroundImage: `url('data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.pageSettings.background.value)}')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }}
                   />
                 )}
-                
+
                 {/* Elements - Read Only */}
                 {page.elements.map((element) => {
                   // Create a scaled version of the element for grid view
@@ -139,7 +143,7 @@ const GridView = ({
                     width: element.width * 0.3,
                     height: element.height * 0.3
                   };
-                  
+
                   return (
                     <div
                       key={element.id}

@@ -27,9 +27,8 @@ const CanvasPage = ({
   return (
     <div
       ref={el => canvasRefs.current[pageIndex] = el}
-      className={`mx-auto mb-12 relative shadow-lg bg-white transition-all duration-200 ${
-        currentEditingPage === pageIndex ? 'border-4 border-blue-500' : 'border-2 border-gray-300'
-      }`}
+      className={`mx-auto mb-12 relative shadow-lg bg-white transition-all duration-200 ${currentEditingPage === pageIndex ? 'border-4 border-blue-500' : 'border-2 border-gray-300'
+        }`}
       style={{
         width: `${page.pageSettings.width}px`,
         height: `${page.pageSettings.height}px`,
@@ -61,11 +60,18 @@ const CanvasPage = ({
       {page.pageSettings.background.type === 'svg' && (
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ width: '100%', height: '100%', zIndex: 0 }}
-          dangerouslySetInnerHTML={{ __html: page.pageSettings.background.value }}
+          style={{
+            width: '100%',
+            height: '100%',
+            zIndex: 0,
+            backgroundImage: `url('data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.pageSettings.background.value)}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
         />
       )}
-      
+
       {/* Alignment Guides */}
       {draggedElement && (
         <AlignmentGuides
@@ -76,12 +82,12 @@ const CanvasPage = ({
           zoom={zoom}
         />
       )}
-      
+
       {/* Elements */}
       {page.elements.map((element) => {
         const isHovered = hoveredElement === element.id;
         const isSelected = selectedElement.pageIndex === pageIndex && selectedElement.elementId === element.id;
-        
+
         return (
           <div
             key={element.id}
@@ -110,7 +116,7 @@ const CanvasPage = ({
               pageIndex={pageIndex}
               project={project}
             />
-            
+
             {/* Selection handles */}
             {isSelected && (
               <SelectionHandles
