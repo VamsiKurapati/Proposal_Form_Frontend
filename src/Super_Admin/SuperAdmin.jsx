@@ -22,7 +22,8 @@ import {
     MdOutlineKeyboardArrowDown,
     MdOutlineShoppingBag,
     MdOutlineHeadphones,
-    MdOutlineAccountCircle
+    MdOutlineAccountCircle,
+    MdOutlineMenu
 } from 'react-icons/md';
 
 const SuperAdmin = () => {
@@ -42,6 +43,7 @@ const SuperAdmin = () => {
     const [notificationSearchTerm, setNotificationSearchTerm] = useState('');
 
     const [showProfile, setShowProfile] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     const [editUser, setEditUser] = useState(false);
     const [editTransaction, setEditTransaction] = useState(false);
@@ -984,6 +986,13 @@ const SuperAdmin = () => {
             <div className="bg-white border-b border-[#0000001A] px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6">
+                        {/* Mobile Menu Button - Only visible on small screens */}
+                        <button
+                            className="lg:hidden p-2 transition-colors"
+                            onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        >
+                            <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
+                        </button>
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
                                 <span className="text-[#2563eb] font-bold text-sm">LOGO</span>
@@ -1024,9 +1033,71 @@ const SuperAdmin = () => {
                 </div>
             </div>
 
+            {/* Mobile Menu Overlay - Only visible on small screens */}
+            {showMobileMenu && (
+                <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                    <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+                        <div className="p-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-medium text-gray-900">Menu</h2>
+                                <button
+                                    className="p-2 transition-colors"
+                                    onClick={() => setShowMobileMenu(false)}
+                                >
+                                    <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="p-4">
+                            <nav className="space-y-2">
+                                <button
+                                    className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'user-management'
+                                        ? 'bg-[#2563eb] text-white'
+                                        : 'text-[#4B5563]'
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab('user-management');
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlineManageAccounts className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">User Management</span>
+                                </button>
+                                <button
+                                    className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'payments'
+                                        ? 'bg-[#2563eb] text-white'
+                                        : 'text-[#4B5563]'
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab('payments');
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlinePayments className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Payments & Subscriptions</span>
+                                </button>
+                                <button
+                                    className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'support'
+                                        ? 'bg-[#2563eb] text-white'
+                                        : 'text-[#4B5563]'
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab('support');
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlineHeadsetMic className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Support</span>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex h-[calc(100vh-64px)]">
-                {/* Left Sidebar */}
-                <div className="w-64 bg-white border-r border-[#0000001A] flex-shrink-0">
+                {/* Left Sidebar - Hidden on small screens, visible on large screens */}
+                <div className="hidden lg:block w-64 bg-white border-r border-[#0000001A] flex-shrink-0">
                     <div className="p-4">
                         <nav className="space-y-2">
                             <button
