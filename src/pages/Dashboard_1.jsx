@@ -491,7 +491,7 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen">
             <NavbarComponent />
-            <main className="w-full mx-auto py-8 px-4 md:px-8 mt-12">
+            <main className="w-full mx-auto py-8 px-4 md:px-12 mt-12">
                 <h2 className="text-[24px] font-semibold mb-4">Tracking Dashboard</h2>
 
                 {/* Summary Cards */}

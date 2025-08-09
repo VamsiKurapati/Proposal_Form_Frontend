@@ -498,7 +498,7 @@ const CompanyProfileUpdate = () => {
             </div>
 
             {/* Form */}
-            <div className="w-full mx-auto px-4 py-8">
+            <div className="w-full mx-auto px-4 sm:px-8 md:px-12 py-8">
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Basic Information */}
                     <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6">
@@ -824,7 +824,7 @@ const CompanyProfileUpdate = () => {
                 </form>
             </div>
 
-            <div className="flex gap-3 justify-center items-center w-full mx-auto pb-8">
+            <div className="flex gap-3 justify-center items-center w-full mx-auto pb-8 px-4 sm:px-8 md:px-12">
                 <button
                     onClick={handleCancel}
                     disabled={loading}

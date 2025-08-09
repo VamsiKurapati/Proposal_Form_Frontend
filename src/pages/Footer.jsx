@@ -4,7 +4,7 @@ import { LuInstagram, LuLinkedin, LuTwitter } from "react-icons/lu";
 
 export default function Footer() {
     const navigate = useNavigate();
-    
+
     return (
         <>
             {/* Footer */}

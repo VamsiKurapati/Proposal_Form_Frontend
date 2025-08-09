@@ -47,7 +47,7 @@ const GenerateProposalPage = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FB] pb-10">
       <NavbarComponent />
-      <div className="w-full mx-auto px-8 mt-20">
+      <div className="w-full mx-auto px-8 md:px-12 mt-20">
         <h1 className="text-[32px] font-semibold mb-1">{proposal?.title}</h1>
 
         <p className="text-[#4B5563] text-[20px] mb-6">1. Edit & preview user information</p>

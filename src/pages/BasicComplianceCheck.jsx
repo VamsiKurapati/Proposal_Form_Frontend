@@ -37,7 +37,7 @@ const BasicComplianceCheck = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen overflow-y-auto">
             <NavbarComponent />
             <div className="w-full mx-auto p-8 mt-16">
                 {/* Compliance Check Title */}

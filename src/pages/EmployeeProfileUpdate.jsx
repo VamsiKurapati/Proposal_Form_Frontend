@@ -165,7 +165,7 @@ const EmployeeProfileUpdate = () => {
 
         if (!form.phone.trim()) newErrors.phone = "Phone number is required";
         else if (!phoneNumber || !phoneNumber.isValid()) newErrors.phone = "Enter a valid phone number (7-15 digits, numbers only)";
-    
+
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (form.email && !emailRegex.test(form.email)) {
@@ -239,7 +239,7 @@ const EmployeeProfileUpdate = () => {
             </div>
 
             {/* Form */}
-            <div className="w-full mx-auto px-4 py-8">
+            <div className="w-full mx-auto px-8 md:px-12 py-8">
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Basic Information */}
                     <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6">
@@ -338,7 +338,7 @@ const EmployeeProfileUpdate = () => {
                 </form>
             </div>
 
-            <div className="flex gap-3 justify-center items-center w-full mx-auto pb-8">
+            <div className="flex gap-3 justify-center items-center w-full mx-auto pb-8 px-8 md:px-12">
                 <button
                     onClick={handleCancel}
                     disabled={loading}

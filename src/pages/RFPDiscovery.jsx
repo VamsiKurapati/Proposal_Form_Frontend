@@ -770,7 +770,7 @@ const DiscoverRFPs = () => {
         setFilters={setFilters}
       />
 
-      <main className="pt-20 px-6 py-6 ml-0">
+      <main className="pt-20 px-8 md:px-12 py-6 ml-0">
         {/* Search Bar Section */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-center">

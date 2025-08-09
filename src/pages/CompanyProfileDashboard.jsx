@@ -1078,7 +1078,7 @@ const CompanyProfileDashboard = () => {
     <div className="h-full relative">
       <NavbarComponent />
 
-      <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-4 sm:px-6 md:px-12 py-[14px]">
+      <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-8 md:px-12 py-[14px]">
         {/* Profile image and info */}
         <div className="w-full">
           {/* For <lg: Row 1 - image and edit button */}
@@ -1313,7 +1313,7 @@ const CompanyProfileDashboard = () => {
         Activity
       </button>
 
-      <main className="flex-1 md:-mt-7 py-16 px-4 sm:px-6 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
+      <main className="flex-1 md:-mt-7 py-16 px-4 sm:px-8 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
         <div className="bg-[#FFFFFF] ml-3">
           {/* Mobile Dropdown */}
           <div className="relative md:hidden right-0 -mt-12 mb-4"><MobileDropdown activeTab={activeTab} onSelect={setActiveTab} /></div>

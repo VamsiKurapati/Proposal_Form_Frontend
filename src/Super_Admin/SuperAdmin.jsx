@@ -998,7 +998,7 @@ const SuperAdmin = () => {
     return (
         <div className="min-h-screen bg-[#F8F9FA]">
             {/* Top Header Bar */}
-            <div className="bg-white border-b border-[#0000001A] px-6 py-4">
+            <div className="bg-white border-b border-[#0000001A] px-8 md:px-12 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6">
                         {/* Mobile Menu Button - Only visible on small screens */}
