@@ -104,6 +104,61 @@ const SuperAdmin = () => {
         ));
     };
 
+    // Save handlers: call backend then update local state on success
+    const saveUserStatus = async (userId) => {
+        const user = (filteredUsers || []).find(u => u._id === userId);
+        if (!user) return setEditUser(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateCompanyStatus`, {
+                companyId: userId,
+                status: user.status || 'Active'
+            });
+            if (res.status === 200) {
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setEditUser(null);
+            }
+        } catch (e) {
+            alert('Failed to update user status');
+        }
+    };
+
+    const saveTransactionStatus = async (transactionId, rowId) => {
+        const tx = (filteredTransactions || []).find(t => t.transaction_id === transactionId || t._id === rowId);
+        if (!tx) return setEditTransaction(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updatePaymentStatus`, {
+                transaction_id: tx.transaction_id,
+                status: tx.status
+            });
+            if (res.status === 200) {
+                setPaymentsData(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
+                setFilteredTransactions(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
+                setEditTransaction(null);
+            }
+        } catch (e) {
+            alert('Failed to update transaction status');
+        }
+    };
+
+    const saveSupportStatus = async (ticketRowId) => {
+        const ticket = (filteredSupport || []).find(t => t._id === ticketRowId);
+        if (!ticket) return setEditSupport(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateTicketStatus`, {
+                ticketId: ticketRowId,
+                status: ticket.status
+            });
+            if (res.status === 200) {
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
+                setEditSupport(null);
+            }
+        } catch (e) {
+            alert('Failed to update ticket status');
+        }
+    };
+
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => setUserStatusFilter(value);
 
@@ -560,7 +615,7 @@ const SuperAdmin = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
                                     {editUser === user._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                            onClick={() => setEditUser(null)}
+                                            onClick={() => saveUserStatus(user._id)}
                                         >
                                             Save
                                         </button>
@@ -841,7 +896,7 @@ const SuperAdmin = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
                                     {editTransaction === transaction._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
-                                            onClick={() => setEditTransaction(null)}
+                                            onClick={() => saveTransactionStatus(transaction.transaction_id, transaction._id)}
                                         >
                                             Save
                                         </button>
@@ -1127,7 +1182,7 @@ const SuperAdmin = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
                                     {editSupport === ticket._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
-                                            onClick={() => setEditSupport(null)}
+                                            onClick={() => saveSupportStatus(ticket._id)}
                                         >
                                             Save
                                         </button>
