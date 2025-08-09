@@ -440,8 +440,8 @@ const SuperAdmin = () => {
 
             {/* Search and Filter Bar */}
             <div className="mb-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="relative">
                             <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
@@ -449,10 +449,10 @@ const SuperAdmin = () => {
                                 placeholder="Search"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-64 text-[#9CA3AF]"
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF]"
                             />
                         </div>
-                        <button className="flex items-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors"
+                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
                             onClick={() => setUserFilterModal(true)}
                         >
                             <MdOutlineFilterList className="w-5 h-5" />
@@ -492,8 +492,8 @@ const SuperAdmin = () => {
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors">
+                    <div className="flex items-center justify-center sm:justify-end">
+                        <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors w-full sm:w-auto">
                             <MdOutlineFileUpload className="w-5 h-5" />
                             <span className="text-[16px] text-white">Export</span>
                         </button>
@@ -656,8 +656,8 @@ const SuperAdmin = () => {
 
             {/* Search and Filter Bar */}
             <div className="mb-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="relative">
                             <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
                             <input
@@ -665,10 +665,10 @@ const SuperAdmin = () => {
                                 placeholder="Search"
                                 value={transactionSearchTerm}
                                 onChange={(e) => setTransactionSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-64"
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
-                        <button className="flex items-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors"
+                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
                             onClick={() => setTransactionFilterModal(true)}
                         >
                             <MdOutlineFilterList className="w-5 h-5" />
@@ -731,8 +731,8 @@ const SuperAdmin = () => {
                         )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors">
+                    <div className="flex items-center justify-center sm:justify-end">
+                        <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
                             <MdOutlineFileDownload className="w-5 h-5" />
                             <span>Export</span>
                         </button>
@@ -874,8 +874,8 @@ const SuperAdmin = () => {
 
             {/* Search and Filter Bar */}
             <div className="mb-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="relative">
                             <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
                             <input
@@ -883,10 +883,10 @@ const SuperAdmin = () => {
                                 placeholder="Search"
                                 value={supportSearchTerm}
                                 onChange={(e) => setSupportSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-64"
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
-                        <button className="flex items-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors"
+                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
                             onClick={() => setSupportFilterModal(true)}
                         >
                             <MdOutlineFilterList className="w-5 h-5" />
@@ -1109,10 +1109,10 @@ const SuperAdmin = () => {
             <div className="h-full">
                 {/* Filters and Search */}
                 <div className="pb-4 mb-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="relative">
-                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
                                     onClick={() => setNotificationTimeFilterModal(true)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
@@ -1161,7 +1161,7 @@ const SuperAdmin = () => {
                                 )}
                             </div>
                             <div className="relative">
-                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(true)}
                                 >
                                     <span>{notificationCategoryFilter !== "" ? notificationCategoryFilter : "All Categories"}</span>
@@ -1225,7 +1225,7 @@ const SuperAdmin = () => {
                                 placeholder="Search"
                                 value={notificationSearchTerm}
                                 onChange={(e) => setNotificationSearchTerm(e.target.value)}
-                                className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
