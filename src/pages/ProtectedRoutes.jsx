@@ -1,8 +1,13 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 
 const ProtectedRoutes = ({ children, allowedRoles }) => {
-    const { role } = useUser();
+    const [role, setRole] = useState(localStorage.getItem("role") || null);
+
+    useEffect(() => {
+        const role = localStorage.getItem("role") || null;
+        setRole(role);
+    }, []);
 
     if (!role) {
         return <Navigate to="/login" replace />;
