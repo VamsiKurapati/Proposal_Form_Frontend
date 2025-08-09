@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import { lazy, Suspense } from "react";
-import { useUser } from './context/UserContext';
+import { lazy, Suspense, useEffect } from "react";
 import CanvaApp from './pages/CanvaApp';
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
 
@@ -27,7 +26,10 @@ const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
 
 const App = () => {
-  const { role } = useUser();
+  let role = localStorage.getItem("userRole");
+  useEffect(() => {
+    role = localStorage.getItem("userRole");
+  }, []);
 
   return (
     <>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import ToastContainer from "./ToastContainer";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -43,23 +45,26 @@ const LoginPage = () => {
     setIsSubmitting(true);
     try {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
-      const token = res.data.token;
-      const role = res.data.user.role;
-      localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user data
-      localStorage.setItem("token", token);
-      setTimeout(() => {
-        if (role === "company") {
-          localStorage.setItem("userRole", "company");
-          //console.log("Navigating to company profile dashboard");
-          navigate("/company_profile_dashboard"); // Redirect to company profile page
-        } else {
-          localStorage.setItem("userRole", res.data.user.accessLevel || "viewer");
-          //console.log("Navigating to employee profile dashboard");
-          navigate("/employee_profile_dashboard"); // Redirect to profile page
-        }
-      }, 1000);
+      if (res.status === 200) {
+        toast.success("Login successful");
+        const token = res.data.token;
+        const role = res.data.user.role;
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("token", token);
+        setTimeout(() => {
+          if (role === "company") {
+            localStorage.setItem("userRole", "company");
+            navigate("/company_profile_dashboard");
+          } else {
+            localStorage.setItem("userRole", res.data.user.accessLevel || "Viewer");
+            navigate("/employee_profile_dashboard");
+          }
+        }, 1000);
+      } else {
+        toast.error(res.data.message);
+      }
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed. Please try again.");
+      toast.error(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,6 +72,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 bg-white">
+      <ToastContainer />
       {/* Left Image */}
       <div className="w-full md:w-1/2 flex justify-center mb-10 md:mb-0">
         <img src="/Login.png" alt="Login Illustration" className="w-2/3 max-w-sm" />

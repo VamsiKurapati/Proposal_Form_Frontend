@@ -13,6 +13,11 @@ export const EmployeeProfileProvider = ({ children }) => {
     const [completedProposals, setCompletedProposals] = useState([]);
     const [hasInitialized, setHasInitialized] = useState(false);
 
+    const [role, setRole] = useState(localStorage.getItem("userRole") || null);
+    useEffect(() => {
+        setRole(localStorage.getItem("userRole"));
+    }, [localStorage.getItem("userRole")]);
+
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockEmployeeData = useCallback(() => ({
         name: "John Doe",
@@ -110,8 +115,8 @@ export const EmployeeProfileProvider = ({ children }) => {
     }), []);
 
     const fetchProposals = useCallback(async () => {
-        // Only fetch if we haven't initialized yet or if we don't have proposals data
-        if (hasInitialized && proposalsInProgress.length > 0) {
+        // Only fetch if we haven't initialized yet or if we don't have proposals data or if role is null
+        if (role === null || (hasInitialized && proposalsInProgress.length > 0)) {
             return;
         }
 
@@ -137,7 +142,7 @@ export const EmployeeProfileProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, [hasInitialized, proposalsInProgress.length, getMockProposals]);
+    }, [role, hasInitialized, proposalsInProgress.length, getMockProposals]);
 
     useEffect(() => {
         fetchProposals();
@@ -147,8 +152,8 @@ export const EmployeeProfileProvider = ({ children }) => {
 
     // Fetch company data from backend
     const fetchEmployeeData = useCallback(async () => {
-        // Only fetch if we haven't initialized yet or if we don't have data
-        if (hasInitialized && employeeData) {
+        // Only fetch if we haven't initialized yet or if we don't have data or if role is null
+        if (role === null || (hasInitialized && employeeData)) {
             return;
         }
 
@@ -181,7 +186,7 @@ export const EmployeeProfileProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, [hasInitialized, employeeData, getMockEmployeeData]);
+    }, [role, hasInitialized, employeeData, getMockEmployeeData]);
 
     useEffect(() => {
         fetchEmployeeData();

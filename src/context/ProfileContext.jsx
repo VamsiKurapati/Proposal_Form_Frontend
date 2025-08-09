@@ -11,6 +11,11 @@ export const ProfileProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const [hasInitialized, setHasInitialized] = useState(false);
 
+    const [role, setRole] = useState(localStorage.getItem("userRole") || null);
+    useEffect(() => {
+        setRole(localStorage.getItem("userRole"));
+    }, [localStorage.getItem("userRole")]);
+
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockCompanyData = useCallback(() => ({
         companyName: "ABC Company Inc.",
@@ -173,8 +178,8 @@ export const ProfileProvider = ({ children }) => {
 
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
-        // Only fetch if we haven't initialized yet or if we don't have data
-        if (hasInitialized && companyData) {
+        // Only fetch if we haven't initialized yet or if we don't have data or if role is null
+        if (role === null || (hasInitialized && companyData)) {
             return;
         }
 
@@ -228,7 +233,7 @@ export const ProfileProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, [hasInitialized, companyData, getMockCompanyData]);
+    }, [role, hasInitialized, companyData, getMockCompanyData]);
 
     useEffect(() => {
         fetchCompanyData();

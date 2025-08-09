@@ -10,7 +10,6 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
 
-import { UserProvider } from './context/UserContext';
 import { ProfileProvider } from './context/ProfileContext';
 import { EmployeeProfileProvider } from './context/EmployeeProfileContext';
 
@@ -19,12 +18,10 @@ import './utils/clearStorage';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <UserProvider>
-      <ProfileProvider>
-        <EmployeeProfileProvider>
-          <App />
-        </EmployeeProfileProvider>
-      </ProfileProvider>
-    </UserProvider>
+    <ProfileProvider>
+      <EmployeeProfileProvider>
+        <App />
+      </EmployeeProfileProvider>
+    </ProfileProvider>
   </BrowserRouter>
 );
