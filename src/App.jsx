@@ -29,6 +29,10 @@ const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
 const App = () => {
   const { role } = useUser();
 
+  useEffect(() => {
+    console.log("Role in App: ", role);
+  }, [role]);
+
   return (
     <>
       <Suspense fallback={<></>}>

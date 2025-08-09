@@ -51,15 +51,13 @@ const LoginPage = () => {
         const role = res.data.user.role;
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("token", token);
-        setTimeout(() => {
-          if (role === "company") {
-            localStorage.setItem("userRole", "company");
-            navigate("/company_profile_dashboard");
-          } else {
-            localStorage.setItem("userRole", res.data.user.accessLevel || "Viewer");
-            navigate("/employee_profile_dashboard");
-          }
-        }, 1000);
+        if (role === "company") {
+          localStorage.setItem("userRole", "company");
+        } else {
+          localStorage.setItem("userRole", res.data.user.accessLevel || "Viewer");
+        }
+        console.log("Role in LoginPage: ", role);
+        role === "company" ? navigate("/company_profile_dashboard") : navigate("/employee_profile_dashboard");
       } else {
         toast.error(res.data.message);
       }
