@@ -25,368 +25,243 @@ import {
     MdOutlineAccountCircle,
     MdOutlineMenu
 } from 'react-icons/md';
+import axios from 'axios';
 
 const SuperAdmin = () => {
     const [activeTab, setActiveTab] = useState('user-management');
 
+    // Search Terms
     const [searchTerm, setSearchTerm] = useState('');
     const [transactionSearchTerm, setTransactionSearchTerm] = useState('');
     const [supportSearchTerm, setSupportSearchTerm] = useState('');
-
-    const [supportTab, setSupportTab] = useState('active');
-    const [paymentsTab, setPaymentsTab] = useState('payments');
-    const [completedTickets, setCompletedTickets] = useState(false);
-
-    // Notifications state
-    const [notificationTimeFilter, setNotificationTimeFilter] = useState('Last 14 days');
-    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState('All Categories');
     const [notificationSearchTerm, setNotificationSearchTerm] = useState('');
 
+    // Tabs
+    const [supportTab, setSupportTab] = useState('active');
+    const [paymentsTab, setPaymentsTab] = useState('payments');
+
+    // Completed Tickets
+    const [completedTickets, setCompletedTickets] = useState(false);
+
+    // Profile
     const [showProfile, setShowProfile] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+    // Edit
     const [editUser, setEditUser] = useState(false);
     const [editTransaction, setEditTransaction] = useState(false);
     const [editSupport, setEditSupport] = useState(false);
 
+    // Filters
+    const [userFilter, setUserFilter] = useState("All");
+    const [transactionFilter, setTransactionFilter] = useState("All");
+    const [supportFilter, setSupportFilter] = useState("All");
+    const [notificationTimeFilter, setNotificationTimeFilter] = useState("All Time");
+    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState("All Categories");
+
+    // Filter Modals
     const [userFilterModal, setUserFilterModal] = useState(false);
     const [transactionFilterModal, setTransactionFilterModal] = useState(false);
     const [supportFilterModal, setSupportFilterModal] = useState(false);
+    const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
+    const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
 
-    // Mock data for users
-    const users = [
-        {
-            id: '43672749',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Active'
-        },
-        {
-            id: '43672750',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Blocked'
-        },
-        {
-            id: '43672751',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Inactive'
-        },
-        {
-            id: '43672752',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Active'
-        },
-        {
-            id: '43672753',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Blocked'
-        },
-        {
-            id: '43672754',
-            name: 'ABC Company',
-            email: 'name@mail.com',
-            registrationDate: 'Mar 15, 2024',
-            lastActive: 'Mar 15, 2024',
-            status: 'Inactive'
+    // Data
+    const [usersStats, setUsersStats] = useState({});
+    const [companiesData, setCompaniesData] = useState([]);
+    const [paymentsStats, setPaymentsStats] = useState({});
+    const [paymentsData, setPaymentsData] = useState([]);
+    let planManagementStats = { "Active Users": 0, "Revenue This Month": 0 };
+    const [supportTicketsStats, setSupportTicketsStats] = useState({});
+    const [supportTicketsData, setSupportTicketsData] = useState([]);
+    const [notificationsData, setNotificationsData] = useState([]);
+
+    const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`);
+            const stats = response.data.stats;
+            setUsersStats(stats);
+            const companiesData = response.data.companyData;
+            setCompaniesData(companiesData);
+            planManagementStats["Active Users"] = stats["Active Users"];
+        } catch (error) {
+            console.log("error", error);
         }
-    ];
+    }, []);
 
-    const transactions = [
-        {
-            id: 1,
-            transactionId: '43672749',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Successful'
-        },
-        {
-            id: 2,
-            transactionId: '43672750',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Pending'
-        },
-        {
-            id: 3,
-            transactionId: '43672751',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Failed'
-        },
-        {
-            id: 4,
-            transactionId: '43672752',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Successful'
-        },
-        {
-            id: 5,
-            transactionId: '43672753',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Pending'
-        },
-        {
-            id: 6,
-            transactionId: '43672754',
-            company: 'ABC Company',
-            type: 'Billing & Payment',
-            amount: '$100',
-            created: 'Mar 15, 2024',
-            status: 'Failed'
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`);
+            const paymentsData = response.data.PaymentData;
+            setPaymentsData(paymentsData);
+            const paymentsStats = response.data.PaymentStats;
+            setPaymentsStats(paymentsStats);
+            planManagementStats["Revenue This Month"] = paymentsStats["Revenue This Month"];
+        } catch (error) {
+            console.log("error", error);
         }
-    ];
+    }, []);
 
-    const support = [
-        {
-            id: 1,
-            type: 'Billing & Payments',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-
-        },
-        {
-            id: 2,
-            type: 'Proposal Issues',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 3,
-            type: 'Account & Access',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 4,
-            type: 'Technical Errors',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 5,
-            type: 'Feature Requests',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 6,
-            type: 'Others',
-            subject: 'A new proposal has been submitted',
-            status: 'Active',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 7,
-            type: 'Others',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-        {
-            id: 8,
-            type: 'Others',
-            subject: 'A new proposal has been submitted',
-            status: 'Resolved',
-            priority: 'Low',
-            created: 'Mar 15, 2024',
-            user: 'John Doe',
-        },
-    ];
-
-    const notification = [
-        {
-            id: 1,
-            category: 'User',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'user'
-        },
-        {
-            id: 2,
-            category: 'Payments',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'payment'
-        },
-        {
-            id: 3,
-            category: 'Support',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'support'
-        },
-        {
-            id: 4,
-            category: 'Subscriptions',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'subscription'
-        },
-        {
-            id: 5,
-            category: 'User',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'user'
-        },
-        {
-            id: 6,
-            category: 'Subscriptions',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'subscription'
-        },
-        {
-            id: 7,
-            category: 'Payments',
-            title: 'System Maintenance Scheduled',
-            description: 'System Maintenance is scheduled for tomorrow at 2AM UTC.',
-            timestamp: '2 hours ago',
-            icon: 'payment'
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getSupportStatsAndData`);
+            const supportTicketsData = response.data.TicketData;
+            setSupportTicketsData(supportTicketsData);
+            const supportTicketsStats = response.data.TicketStats;
+            setSupportTicketsStats(supportTicketsStats);
+        } catch (error) {
+            console.log("error", error);
         }
-    ]
+    }, []);
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getNotificationsData`);
+            const notificationsData = response.data;
+            setNotificationsData(notificationsData);
+        } catch (error) {
+            console.log("error", error);
+        }
+    }, []);
 
     const getStatusColor = (status) => {
         switch (status) {
             case 'Active':
-                return 'bg-green-100 text-green-800';
+                return 'bg-[#DCFCE7] text-[#15803D]';
             case 'Blocked':
-                return 'bg-red-100 text-red-800';
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Inactive':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Successful':
-                return 'bg-green-100 text-green-800';
+                return 'bg-[#DCFCE7] text-[#15803D]';
             case 'Pending':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Failed':
-                return 'bg-red-100 text-red-800';
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'In Progress':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Completed':
-                return 'bg-green-100 text-green-800';
+                return 'bg-[#DCFCE7] text-[#15803D]';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-[#F3F4F6] text-[#6B7280]';
         }
     };
 
     const getPriorityColor = (priority) => {
         switch (priority) {
             case 'Low':
-                return 'bg-green-100 text-green-800';
+                return 'bg-[#DCFCE7] text-[#15803D]';
             case 'Medium':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'High':
-                return 'bg-red-100 text-red-800';
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-[#F3F4F6] text-[#6B7280]';
         }
     };
 
-    const [filteredUsers, setFilteredUsers] = useState(users);
-    const [filteredTransactions, setFilteredTransactions] = useState(transactions);
-    const [filteredSupport, setFilteredSupport] = useState(support);
+    const [filteredUsers, setFilteredUsers] = useState(companiesData);
+    const [filteredTransactions, setFilteredTransactions] = useState(paymentsData);
+    const [filteredSupport, setFilteredSupport] = useState(supportTicketsData);
+    const [filteredNotifications, setFilteredNotifications] = useState(notificationsData);
 
     useEffect(() => {
         console.log("searchTerm", searchTerm);
-        console.log("users", users);
+        console.log("companies", companiesData);
         if (searchTerm) {
-            setFilteredUsers(users.filter(user =>
+            setFilteredUsers(companiesData.filter(user =>
                 user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email.toLowerCase().includes(searchTerm.toLowerCase())
             ));
         } else {
-            setFilteredUsers(users);
+            setFilteredUsers(companiesData);
         }
-    }, [searchTerm, users]);
+    }, [searchTerm]);
 
     useEffect(() => {
         console.log("transactionSearchTerm", transactionSearchTerm);
-        console.log("transactions", transactions);
+        console.log("payments", paymentsData);
         if (transactionSearchTerm) {
-            setFilteredTransactions(transactions.filter(transaction =>
+            setFilteredTransactions(paymentsData.filter(transaction =>
                 transaction.company.toLowerCase().includes(transactionSearchTerm.toLowerCase()) ||
                 transaction.type.toLowerCase().includes(transactionSearchTerm.toLowerCase())
             ));
         } else {
-            setFilteredTransactions(transactions);
+            setFilteredTransactions(paymentsData);
         }
-    }, [transactionSearchTerm, transactions]);
+    }, [transactionSearchTerm]);
 
     useEffect(() => {
         console.log("supportSearchTerm", supportSearchTerm);
-        console.log("support", support);
+        console.log("support", supportTicketsData);
         if (supportSearchTerm) {
-            setFilteredSupport(support.filter(support =>
+            setFilteredSupport(supportTicketsData.filter(support =>
                 support.type.toLowerCase().includes(supportSearchTerm.toLowerCase()) ||
                 support.subject.toLowerCase().includes(supportSearchTerm.toLowerCase())
             ));
         } else {
-            setFilteredSupport(support);
+            setFilteredSupport(supportTicketsData);
         }
-    }, [supportSearchTerm, support]);
+    }, [supportSearchTerm]);
 
-    const userCards = ["Total Proposals", "Total Users", "Active Users", "Inactive Users"];
-    const userCardsData = [156, 156, 142, 14];
+    useEffect(() => {
+        console.log("notificationSearchTerm", notificationSearchTerm);
+        console.log("notifications", notificationsData);
 
-    const paymentsCards = ["Total Revenue", "Successful Payments", "Failed Payments", "Revenue this month", "Total Refunds", "Pending Refunds"];
-    const paymentsCardsData = [156, 156, 156, 156, 156, 156];
+        if (notificationSearchTerm) {
+            setFilteredNotifications(notificationsData.filter(notification =>
+                notification.title.toLowerCase().includes(notificationSearchTerm.toLowerCase()) ||
+                notification.message.toLowerCase().includes(notificationSearchTerm.toLowerCase())
+            ));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+    }, [notificationSearchTerm]);
 
-    const planManagementCards = ["Active Subscriptions", "Revenue this month"];
-    const planManagementCardsData = [156, 156];
+    useEffect(() => {
+        console.log("notificationSearchTerm", notificationSearchTerm);
+        console.log("notifications", notificationsData);
+        if (notificationTimeFilter !== "All Time") {
+            setFilteredNotifications(notificationsData.filter(notification => {
+                const time = new Date(notification.time);
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                const last7Days = new Date(today);
+                last7Days.setDate(today.getDate() - 7);
+                const last14Days = new Date(today);
+                last14Days.setDate(today.getDate() - 14);
+                const last30Days = new Date(today);
+                last30Days.setDate(today.getDate() - 30);
+                if (notificationTimeFilter === "Today") {
+                    return time.toDateString() === today.toDateString();
+                } else if (notificationTimeFilter === "Yesterday") {
+                    return time.toDateString() === yesterday.toDateString();
+                } else if (notificationTimeFilter === "Last 7 Days") {
+                    return time >= last7Days;
+                } else if (notificationTimeFilter === "Last 14 Days") {
+                    return time >= last14Days;
+                } else if (notificationTimeFilter === "Last 30 Days") {
+                    return time >= last30Days;
+                } else {
+                    return true;
+                }
+            }));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
 
-    const supportCards = ["Billing & Payments", "Proposal Issues", "Account & Access", "Technical Errors", "Feature Requests", "Others"];
-    const supportCardsData = [156, 156, 156, 156, 156, 156];
+        if (notificationCategoryFilter !== "All Categories") {
+            setFilteredNotifications(notificationsData.filter(notification =>
+                notification.category === notificationCategoryFilter
+            ));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+    }, [notificationTimeFilter, notificationCategoryFilter]);
+
 
     const handleUserStatusChange = (id, status) => {
         console.log(id, status);
@@ -409,28 +284,155 @@ const SuperAdmin = () => {
         ));
     };
 
+    const handleUserFilter = (filter) => {
+        if (filter === "all") {
+            setUserFilter([]);
+        } else {
+            setUserFilter((prev) => {
+                if (prev.includes(filter)) {
+                    return prev.filter(item => item !== filter);
+                } else {
+                    return [...prev, filter];
+                }
+            });
+        }
+    };
+
+    const handleTransactionFilter = (filter) => {
+        if (filter === "all") {
+            setTransactionFilter([]);
+        } else {
+            setTransactionFilter((prev) => {
+                if (prev.includes(filter)) {
+                    return prev.filter(item => item !== filter);
+                } else {
+                    return [...prev, filter];
+                }
+            });
+        }
+    };
+
+    const handleSupportFilter = (filter) => {
+        if (filter === "all") {
+            setSupportFilter([]);
+        } else {
+            setSupportFilter((prev) => {
+                if (prev.includes(filter)) {
+                    return prev.filter(item => item !== filter);
+                } else {
+                    return [...prev, filter];
+                }
+            });
+        }
+    };
+
+    const handleNotificationCategoryFilter = (filter) => {
+        if (filter === "All Categories") {
+            setNotificationCategoryFilter([]);
+        } else {
+            setNotificationCategoryFilter((prev) => {
+                if (prev.includes(filter)) {
+                    return prev.filter(item => item !== filter);
+                } else {
+                    return [...prev, filter];
+                }
+            });
+        }
+    };
+
+    useEffect(() => {
+        console.log("userFilter", userFilter);
+        console.log("filteredUsers", filteredUsers);
+        console.log("companiesData", companiesData);
+        if (userFilter.length > 0) {
+            setFilteredUsers(companiesData.filter(user => userFilter.includes(user.status)));
+        } else {
+            setFilteredUsers(companiesData);
+        }
+    }, [userFilter]);
+
+    useEffect(() => {
+        console.log("transactionFilter", transactionFilter);
+        console.log("filteredTransactions", filteredTransactions);
+        console.log("paymentsData", paymentsData);
+        if (transactionFilter.length > 0) {
+            setFilteredTransactions(paymentsData.filter(transaction => transactionFilter.includes(transaction.status)));
+            if (transactionFilter.includes("last7Days")) {
+                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 7))));
+            } else if (transactionFilter.includes("last15Days")) {
+                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 15))));
+            } else if (transactionFilter.includes("last30Days")) {
+                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 30))));
+            }
+        } else {
+            setFilteredTransactions(paymentsData);
+        }
+    }, [transactionFilter]);
+
+    useEffect(() => {
+        console.log("supportFilter", supportFilter);
+        console.log("filteredSupport", filteredSupport);
+        console.log("supportTicketsData", supportTicketsData);
+        if (supportFilter.length > 0) {
+            setFilteredSupport(supportTicketsData.filter(support => supportFilter.includes(support.status) || supportFilter.includes(support.type) || supportFilter.includes(support.priority)));
+        } else {
+            setFilteredSupport(supportTicketsData);
+        }
+    }, [supportFilter]);
+
+    useEffect(() => {
+        console.log("notificationCategoryFilter", notificationCategoryFilter);
+        console.log("filteredNotifications", filteredNotifications);
+        console.log("notificationsData", notificationsData);
+        if (notificationCategoryFilter.length > 0 || notificationTimeFilter.length > 0) {
+            if (notificationCategoryFilter.includes("All Categories") && notificationTimeFilter.includes("All Time")) {
+                setFilteredNotifications(notificationsData);
+            }
+            else if (notificationCategoryFilter.includes("All Categories")) {
+                setFilteredNotifications(notificationsData);
+                if (notificationCategoryFilter.includes("Today")) {
+                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 1))));
+                } else if (notificationCategoryFilter.includes("Yesterday")) {
+                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 2))));
+                } else if (notificationCategoryFilter.includes("Last 7 Days")) {
+                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 7))));
+                } else if (notificationCategoryFilter.includes("Last 14 Days")) {
+                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 14))));
+                } else if (notificationCategoryFilter.includes("Last 30 Days")) {
+                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 30))));
+                } else {
+                    setFilteredNotifications(notificationsData);
+                }
+            } else if (notificationTimeFilter.includes("All Time")) {
+                setFilteredNotifications(notificationsData.filter(notification => notificationCategoryFilter.includes(notification.category)));
+            }
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+    }, [notificationCategoryFilter, notificationTimeFilter]);
+
     useEffect(() => {
         if (completedTickets) {
-            setFilteredSupport(support.filter(support => support.status === 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Resolved'));
             console.log("resolved", filteredSupport);
         } else {
-            setFilteredSupport(support.filter(support => support.status !== 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Resolved'));
             console.log("not resolved", filteredSupport);
         }
-    }, [completedTickets, support]);
+    }, [completedTickets, supportTicketsData]);
 
     const renderUserManagement = () => (
         <div className='h-full'>
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                {userCards.map((card, index) => (
+                {Object.keys(usersStats).map((key, index) => (
                     <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-4 hover:shadow-md transition-shadow">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg mb-2 ${card === "Total Proposals" ? "bg-[#E5E7EB]" : card === "Total Users" ? "bg-[#EBF4FF]" : card === "Active Users" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
-                            {card === "Total Proposals" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#4B5563]" /> : card === "Total Users" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB]" /> : card === "Active Users" ? <MdOutlineGroup className="w-6 h-6 text-[#22C55E]" /> : <MdOutlineGroup className="w-6 h-6 text-[#EF4444]" />}
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg mb-2 ${key === "Total Proposals" ? "bg-[#E5E7EB]" : key === "Total Users" ? "bg-[#EBF4FF]" : key === "Active Users" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
+                            {key === "Total Proposals" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#4B5563]" /> : key === "Total Users" ? <MdOutlineGroup className="w-6 h-6 text-[#2563EB]" /> : key === "Active Users" ? <MdOutlineGroup className="w-6 h-6 text-[#22C55E]" /> : <MdOutlineGroup className="w-6 h-6 text-[#EF4444]" />}
                         </div>
                         <div className="flex flex-col items-left">
-                            <p className="text-[16px] text-[#6B7280]">{card}</p>
-                            <p className="text-[24px] font-semibold text-[#2563EB]">{userCardsData[index]}</p>
+                            <p className="text-[16px] text-[#6B7280]">{key}</p>
+                            <p className="text-[24px] font-semibold text-[#2563EB]">{usersStats[key]}</p>
                         </div>
                     </div>
                 ))}
@@ -456,6 +458,39 @@ const SuperAdmin = () => {
                             <MdOutlineFilterList className="w-5 h-5" />
                             <span className="text-[16px] text-[#9CA3AF]">Filter</span>
                         </button>
+
+                        {userFilterModal && (
+                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                <div className="flex items-center space-x-2">
+                                    <input type="radio" name="userFilter" id="all" value="all"
+                                        onChange={(e) => handleUserFilter(e.target.value)}
+                                    />
+                                    <label htmlFor="all">All</label>
+                                </div>
+                                {/* Status */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="userFilter" id="active" value="active"
+                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="active">Active</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="userFilter" id="blocked" value="blocked"
+                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="blocked">Blocked</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="userFilter" id="inactive" value="inactive"
+                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="inactive">Inactive</label>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center space-x-2">
                         <button className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors">
@@ -587,14 +622,14 @@ const SuperAdmin = () => {
                 <>
                     {/* Payments Summary Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-                        {paymentsCards.map((card, index) => (
+                        {Object.keys(paymentsStats).map((key, index) => (
                             <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
-                                <div className={`p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 ${card === "Total Revenue" ? "bg-[#EBF4FF]" : card === "Successful Payments" ? "bg-[#F0FDF4]" : card === "Failed Payments" ? "bg-[#FEF2F2]" : card === "Revenue this month" ? "bg-[#EBF4FF]" : card === "Total Refunds" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
-                                    {card === "Total Revenue" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : card === "Successful Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#22C55E]" /> : card === "Failed Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#EF4444]" /> : card === "Revenue this month" ? <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" /> : card === "Total Refunds" ? <MdOutlinePaid className="w-6 h-6 text-[#22C55E]" /> : <MdOutlinePaid className="w-6 h-6 text-[#EF4444]" />}
+                                <div className={`p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 ${key === "Total Revenue" ? "bg-[#EBF4FF]" : key === "Successful Payments" ? "bg-[#F0FDF4]" : key === "Failed Payments" ? "bg-[#FEF2F2]" : key === "Revenue this month" ? "bg-[#EBF4FF]" : key === "Total Refunds" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
+                                    {key === "Total Revenue" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Successful Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#22C55E]" /> : key === "Failed Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#EF4444]" /> : key === "Revenue this month" ? <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" /> : key === "Total Refunds" ? <MdOutlinePaid className="w-6 h-6 text-[#22C55E]" /> : <MdOutlinePaid className="w-6 h-6 text-[#EF4444]" />}
                                 </div>
                                 <div className="flex flex-col items-left">
-                                    <p className="text-[16px] font-medium text-[#4B5563]">{card}</p>
-                                    <p className="text-[24px] font-semibold text-[#2563EB]">{paymentsCardsData[index]}</p>
+                                    <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
+                                    <p className="text-[24px] font-semibold text-[#2563EB]">{paymentsStats[key]}</p>
                                 </div>
                             </div>
                         ))}
@@ -604,14 +639,14 @@ const SuperAdmin = () => {
                 <>
                     {/* Plan Management Summary Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        {planManagementCards.map((card, index) => (
+                        {Object.keys(planManagementStats).map((key, index) => (
                             <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
                                 <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
-                                    {card === "Active Subscriptions" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" />}
+                                    {key === "Active Subscriptions" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" />}
                                 </div>
                                 <div className="flex flex-col items-left">
-                                    <p className="text-[16px] font-medium text-[#4B5563]">{card}</p>
-                                    <p className="text-[24px] font-semibold text-[#2563EB]">{planManagementCardsData[index]}</p>
+                                    <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
+                                    <p className="text-[24px] font-semibold text-[#2563EB]">{planManagementStats[key]}</p>
                                 </div>
                             </div>
                         ))}
@@ -639,7 +674,63 @@ const SuperAdmin = () => {
                             <MdOutlineFilterList className="w-5 h-5" />
                             <span>Filter</span>
                         </button>
+                        {transactionFilterModal && (
+                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                {/* All */}
+                                <div className="flex items-center space-x-2">
+                                    <input type="radio" name="transactionFilter" id="all" value="all"
+                                        onChange={(e) => handleTransactionFilter(e.target.value)}
+                                    />
+                                    <label htmlFor="all">All</label>
+                                </div>
+                                {/* Status */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="successful" value="successful"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="successful">Successful</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="pending" value="pending"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="pending">Pending</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="failed" value="failed"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="failed">Failed</label>
+                                    </div>
+                                </div>
+                                {/* Date */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="last7Days" value="last7Days"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="last7Days">Last 7 Days</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="last15Days" value="last15Days"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="last15Days">Last 15 Days</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="last30Days" value="last30Days"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="last30Days">Last 30 Days</label>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
+
                     <div className="flex items-center space-x-2">
                         <button className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors">
                             <MdOutlineFileDownload className="w-5 h-5" />
@@ -768,14 +859,14 @@ const SuperAdmin = () => {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {supportCards.map((card, index) => (
+                {Object.keys(supportTicketsStats).map((key, index) => (
                     <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
                         <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
-                            {card === "Billing & Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : card === "Proposal Issues" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" /> : card === "Account & Access" ? <MdOutlinePerson className="w-6 h-6 text-[#2563EB]" /> : card === "Technical Errors" ? <MdOutlinePriorityHigh className="w-6 h-6 text-[#2563EB]" /> : card === "Feature Requests" ? <MdOutlinePayment className="w-6 h-6 text-[#2563EB]" /> : <MdOutlineMoreVert className="w-6 h-6 text-[#2563EB]" />}
+                            {key === "Billing & Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Proposal Issues" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" /> : key === "Account & Access" ? <MdOutlinePerson className="w-6 h-6 text-[#2563EB]" /> : key === "Technical Errors" ? <MdOutlinePriorityHigh className="w-6 h-6 text-[#2563EB]" /> : key === "Feature Requests" ? <MdOutlinePayment className="w-6 h-6 text-[#2563EB]" /> : <MdOutlineMoreVert className="w-6 h-6 text-[#2563EB]" />}
                         </div>
                         <div className="flex flex-col items-left">
-                            <span className="text-[16px] font-medium text-[#4B5563]">{card}</span>
-                            <span className="text-[12px] font-medium text-[#4B5563]">{supportCardsData[index]}</span>
+                            <span className="text-[16px] font-medium text-[#4B5563]">{key}</span>
+                            <span className="text-[12px] font-medium text-[#4B5563]">{supportTicketsStats[key]}</span>
                         </div>
                     </div>
                 ))}
@@ -801,6 +892,102 @@ const SuperAdmin = () => {
                             <MdOutlineFilterList className="w-5 h-5" />
                             <span>Filter</span>
                         </button>
+
+                        {supportFilterModal && (
+                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                {/* All */}
+                                <div className="flex items-center space-x-2">
+                                    <input type="radio" name="supportFilter" id="all" value="all"
+                                        onChange={(e) => handleSupportFilter(e.target.value)}
+                                    />
+                                    <label htmlFor="all">All</label>
+                                </div>
+                                {/* Status */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="inProgress" value="inProgress"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="inProgress">In Progress</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="pending" value="pending"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="pending">Pending</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="completed" value="completed"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="completed">Completed</label>
+                                    </div>
+                                </div>
+                                {/* Priority */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="low" value="low"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="low">Low</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="medium" value="medium"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="medium">Medium</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="high" value="high"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="high">High</label>
+                                    </div>
+                                </div>
+                                {/* Type */}
+                                <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
+                                <div className="ml-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="billing" value="billing"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="billing">Billing</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="technical" value="technical"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="technical">Technical</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="feature" value="feature"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="feature">Feature</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="account" value="account"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="account">Account</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="proposal" value="proposal"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="proposal">Proposal</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="other" value="other"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="other">Other</label>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -925,16 +1112,108 @@ const SuperAdmin = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <div className="relative">
-                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
+                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100"
+                                    onClick={() => setNotificationTimeFilterModal(true)}
+                                >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
-                                    <span>{notificationTimeFilter}</span>
+                                    <span>{notificationTimeFilter !== "" ? notificationTimeFilter : "All Time"}</span>
                                 </button>
+
+                                {notificationTimeFilterModal && (
+                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="allTime" value="allTime"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="allTime">All Time</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="today" value="today"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="today">Today</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="yesterday">Yesterday</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last7Days">Last 7 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last14Days">Last 14 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
+                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last30Days">Last 30 Days</label>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="relative">
-                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
-                                    <span>{notificationCategoryFilter}</span>
+                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100"
+                                    onClick={() => setNotificationCategoryFilterModal(true)}
+                                >
+                                    <span>{notificationCategoryFilter !== "" ? notificationCategoryFilter : "All Categories"}</span>
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                 </button>
+
+                                {notificationCategoryFilterModal && (
+                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="allCategories" value="allCategories"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="allCategories">All Categories</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="accountAccess"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="accountAccess">Account & Access</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billingPayments"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="billingPayments">Billing & Payments</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technicalErrors"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="technicalErrors">Technical Errors</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="featureRequests"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="featureRequests">Feature Requests</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposalIssues"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="proposalIssues">Proposal Issues</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="notificationCategoryFilter" id="others" value="others"
+                                                onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="others">Others</label>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="relative">
@@ -953,7 +1232,7 @@ const SuperAdmin = () => {
                 </div>
 
                 {/* Notifications List */}
-                {notification.length > 0 ? notification.map((item) => (
+                {filteredNotifications.length > 0 ? filteredNotifications.map((item) => (
                     <div key={item.id} className="p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
                         <div className="flex items-start space-x-4">
                             {/* Icon */}
@@ -1019,7 +1298,7 @@ const SuperAdmin = () => {
                             onClick={() => setActiveTab('notifications')}
                         >
                             <MdOutlineNotifications className="relative w-6 h-6 text-[#4B5563]" />
-                            {notification.length > 0 && (
+                            {notificationsData.length > 0 && (
                                 <span className="absolute top-[1px] right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                             )}
                         </button>
