@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ToastContainer from "./ToastContainer";
+import { useUser } from "../context/UserContext";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { setRole } = useUser();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -51,12 +53,8 @@ const LoginPage = () => {
         const role = res.data.user.role;
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("token", token);
-        if (role === "company") {
-          localStorage.setItem("userRole", "company");
-        } else {
-          localStorage.setItem("userRole", res.data.user.accessLevel || "Viewer");
-        }
-        console.log("Role in LoginPage: ", role);
+        setRole(role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
+        console.log("Role in LoginPage: ", role === "company" ? "company" : res.data.user.accessLevel || "Viewer Access");
         role === "company" ? navigate("/company_profile_dashboard") : navigate("/employee_profile_dashboard");
       } else {
         toast.error(res.data.message);
