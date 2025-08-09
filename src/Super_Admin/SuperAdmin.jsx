@@ -1156,13 +1156,13 @@ const SuperAdmin = () => {
     const renderNotifications = () => {
         const getNotificationIcon = (icon) => {
             switch (icon) {
-                case 'user':
+                case 'User':
                     return <MdOutlineAccountCircle className="w-5 h-5" />;
-                case 'payment':
+                case 'Payment':
                     return <MdOutlineShoppingBag className="w-5 h-5" />;
-                case 'support':
+                case 'Support':
                     return <MdOutlineHeadphones className="w-5 h-5" />;
-                case 'subscription':
+                case 'Subscription':
                     return <MdOutlineMoney className="w-5 h-5" />;
                 default:
                     return <MdOutlineAccountCircle className="w-5 h-5" />;
@@ -1339,12 +1339,12 @@ const SuperAdmin = () => {
 
                 {/* Notifications List */}
                 {filteredNotifications.length > 0 ? filteredNotifications.map((item) => (
-                    <div key={item.id} className="p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
+                    <div key={item.id} className="bg-white p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
                         <div className="flex items-start space-x-4">
                             {/* Icon */}
                             <div className="flex-shrink-0">
                                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    {getNotificationIcon(item.icon)}
+                                    {getNotificationIcon(item.category)}
                                 </div>
                             </div>
 
