@@ -344,10 +344,12 @@ const SuperAdmin = () => {
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Failed':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'In Progress':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Completed':
+            case 'Resolved':
                 return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'In Progress':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'New':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -1191,12 +1193,20 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="active" value="active"
-                                                checked={supportStatusFilter === 'active'}
+                                            <input type="radio" name="supportStatusFilter" id="new" value="new"
+                                                checked={supportStatusFilter === 'new'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="active">Active</label>
+                                            <label htmlFor="new">New</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
+                                                checked={supportStatusFilter === 'in progress'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="inProgress">In Progress</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
@@ -1355,7 +1365,8 @@ const SuperAdmin = () => {
                                                 onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
                                                 value={ticket.status}
                                             >
-                                                <option value="Active">Active</option>
+                                                <option value="New">New</option>
+                                                <option value="In Progress">In Progress</option>
                                                 <option value="Resolved">Resolved</option>
                                             </select>
                                         ) : (
