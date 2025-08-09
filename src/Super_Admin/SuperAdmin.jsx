@@ -7,7 +7,6 @@ import {
     MdOutlinePayments,
     MdOutlineHeadsetMic,
     MdOutlineFilterList,
-    MdOutlineFileDownload,
     MdOutlineMoreVert,
     MdOutlineGroup,
     MdOutlineLogout,
@@ -55,11 +54,14 @@ const SuperAdmin = () => {
     const [editSupport, setEditSupport] = useState(false);
 
     // Filters
-    const [userFilter, setUserFilter] = useState("All");
-    const [transactionFilter, setTransactionFilter] = useState("All");
-    const [supportFilter, setSupportFilter] = useState("All");
-    const [notificationTimeFilter, setNotificationTimeFilter] = useState("All Time");
-    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState("All Categories");
+    const [userStatusFilter, setUserStatusFilter] = useState('all');
+    const [transactionStatusFilter, setTransactionStatusFilter] = useState('all');
+    const [transactionDateFilter, setTransactionDateFilter] = useState('all');
+    const [supportStatusFilter, setSupportStatusFilter] = useState('all');
+    const [supportPriorityFilter, setSupportPriorityFilter] = useState('all');
+    const [supportTypeFilter, setSupportTypeFilter] = useState('all');
+    const [notificationTimeFilter, setNotificationTimeFilter] = useState('All Time');
+    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState('All Categories');
 
     // Filter Modals
     const [userFilterModal, setUserFilterModal] = useState(false);
@@ -102,47 +104,17 @@ const SuperAdmin = () => {
         ));
     };
 
-    const handleUserFilter = (filter) => {
-        if (filter === "all") {
-            setUserFilter([]);
-        } else {
-            setUserFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
-            });
-        }
-    };
+    // User filter: single select with toggle back to 'all'
+    const handleUserStatusChangeFilter = (value) => setUserStatusFilter(value);
 
-    const handleTransactionFilter = (filter) => {
-        if (filter === "all") {
-            setTransactionFilter([]);
-        } else {
-            setTransactionFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
-            });
-        }
-    };
+    // Transaction filters are split by group
+    const handleTransactionStatusChangeFilter = (value) => setTransactionStatusFilter(value);
+    const handleTransactionDateChangeFilter = (value) => setTransactionDateFilter(value);
 
-    const handleSupportFilter = (filter) => {
-        if (filter === "all") {
-            setSupportFilter([]);
-        } else {
-            setSupportFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
-            });
-        }
-    };
+    // Support filters split by group
+    const handleSupportStatusChangeFilter = (value) => setSupportStatusFilter(value);
+    const handleSupportPriorityChangeFilter = (value) => setSupportPriorityFilter(value);
+    const handleSupportTypeChangeFilter = (value) => setSupportTypeFilter(value);
 
     // Export helpers
     const exportArrayToCSV = (filename, headers, rows) => {
@@ -190,19 +162,7 @@ const SuperAdmin = () => {
         exportArrayToCSV('transactions.csv', headers, rows);
     };
 
-    const handleNotificationCategoryFilter = (filter) => {
-        if (filter === "All Categories") {
-            setNotificationCategoryFilter([]);
-        } else {
-            setNotificationCategoryFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
-            });
-        }
-    };
+    const handleNotificationCategoryFilter = (value) => setNotificationCategoryFilter(value);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -360,118 +320,72 @@ const SuperAdmin = () => {
     }, [notificationSearchTerm]);
 
     useEffect(() => {
-        //console.log("notificationSearchTerm", notificationSearchTerm);
-        //console.log("notifications", notificationsData);
-        if (notificationTimeFilter !== "All Time") {
-            setFilteredNotifications((notificationsData || []).filter(notification => {
-                const time = new Date(notification.created_at || notification.createdAt || notification.time);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-                const last7Days = new Date(today);
-                last7Days.setDate(today.getDate() - 7);
-                const last14Days = new Date(today);
-                last14Days.setDate(today.getDate() - 14);
-                const last30Days = new Date(today);
-                last30Days.setDate(today.getDate() - 30);
-                if (notificationTimeFilter === "Today") {
-                    return time.toDateString() === today.toDateString();
-                } else if (notificationTimeFilter === "Yesterday") {
-                    return time.toDateString() === yesterday.toDateString();
-                } else if (notificationTimeFilter === "Last 7 Days") {
-                    return time >= last7Days;
-                } else if (notificationTimeFilter === "Last 14 Days") {
-                    return time >= last14Days;
-                } else if (notificationTimeFilter === "Last 30 Days") {
-                    return time >= last30Days;
-                } else {
-                    return true;
-                }
-            }));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
+        const base = notificationsData || [];
+        const filtered = base.filter(notification => {
+            // time filter
+            const time = new Date(notification.created_at || notification.createdAt || notification.time);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const last7Days = new Date(today);
+            last7Days.setDate(today.getDate() - 7);
+            const last14Days = new Date(today);
+            last14Days.setDate(today.getDate() - 14);
+            const last30Days = new Date(today);
+            last30Days.setDate(today.getDate() - 30);
 
-        if (notificationCategoryFilter !== "All Categories") {
-            setFilteredNotifications((notificationsData || []).filter(notification =>
-                (notification.type === notificationCategoryFilter) ||
-                (notification.type && notification.type.toLowerCase() === notificationCategoryFilter.toLowerCase())
-            ));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationTimeFilter, notificationCategoryFilter]);
+            let timeOk = true;
+            if (notificationTimeFilter === 'today') timeOk = time.toDateString() === today.toDateString();
+            else if (notificationTimeFilter === 'yesterday') timeOk = time.toDateString() === yesterday.toDateString();
+            else if (notificationTimeFilter === 'last7Days') timeOk = time >= last7Days;
+            else if (notificationTimeFilter === 'last14Days') timeOk = time >= last14Days;
+            else if (notificationTimeFilter === 'last30Days') timeOk = time >= last30Days;
+
+            // category filter
+            const type = (notification.type || '').toLowerCase();
+            const cat = (notificationCategoryFilter || 'All Categories').toLowerCase();
+            const categoryOk = cat === 'all categories' ? true : type === cat;
+
+            return timeOk && categoryOk;
+        });
+        setFilteredNotifications(filtered);
+    }, [notificationsData, notificationTimeFilter, notificationCategoryFilter]);
 
     useEffect(() => {
-        //console.log("userFilter", userFilter);
-        //console.log("filteredUsers", filteredUsers);
-        //console.log("companiesData", companiesData);
-        if (userFilter.length > 0) {
-            setFilteredUsers(companiesData.filter(user => userFilter.includes(user.status)));
+        const base = companiesData || [];
+        if (userStatusFilter === 'all') {
+            setFilteredUsers(base);
         } else {
-            setFilteredUsers(companiesData);
+            setFilteredUsers(base.filter(u => (u.status || '').toLowerCase() === userStatusFilter));
         }
-    }, [userFilter]);
+    }, [companiesData, userStatusFilter]);
 
     useEffect(() => {
-        //console.log("transactionFilter", transactionFilter);
-        //console.log("filteredTransactions", filteredTransactions);
-        //console.log("paymentsData", paymentsData);
-        if (transactionFilter.length > 0) {
-            setFilteredTransactions((paymentsData || []).filter(transaction => transactionFilter.includes(transaction.status)));
-            if (transactionFilter.includes("last7Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
-            } else if (transactionFilter.includes("last15Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 15))));
-            } else if (transactionFilter.includes("last30Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
+        const base = paymentsData || [];
+        const byStatus = transactionStatusFilter === 'all' ? base : base.filter(t => t.status === transactionStatusFilter);
+        let result = byStatus;
+        if (transactionDateFilter !== 'all') {
+            const now = new Date();
+            let since = null;
+            if (transactionDateFilter === 'last7Days') since = new Date(now.setDate((new Date()).getDate() - 7));
+            else if (transactionDateFilter === 'last15Days') since = new Date(now.setDate((new Date()).getDate() - 15));
+            else if (transactionDateFilter === 'last30Days') since = new Date(now.setDate((new Date()).getDate() - 30));
+            if (since) {
+                result = result.filter(t => new Date(t.created_at || t.createdAt) >= since);
             }
-        } else {
-            setFilteredTransactions(paymentsData);
         }
-    }, [transactionFilter]);
+        setFilteredTransactions(result);
+    }, [paymentsData, transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
-        //console.log("supportFilter", supportFilter);
-        //console.log("filteredSupport", filteredSupport);
-        //console.log("supportTicketsData", supportTicketsData);
-        if (supportFilter.length > 0) {
-            setFilteredSupport((supportTicketsData || []).filter(ticket => supportFilter.includes(ticket.status) || supportFilter.includes(ticket.type) || supportFilter.includes(ticket.priority)));
-        } else {
-            setFilteredSupport(supportTicketsData);
-        }
-    }, [supportFilter]);
+        const base = supportTicketsData || [];
+        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status || '').toLowerCase() === supportStatusFilter.toLowerCase());
+        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
+        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type || '').toLowerCase() === supportTypeFilter.toLowerCase());
+        setFilteredSupport(byType);
+    }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
-    useEffect(() => {
-        //console.log("notificationCategoryFilter", notificationCategoryFilter);
-        //console.log("filteredNotifications", filteredNotifications);
-        //console.log("notificationsData", notificationsData);
-        if (notificationCategoryFilter.length > 0 || notificationTimeFilter.length > 0) {
-            if (notificationCategoryFilter.includes("All Categories") && notificationTimeFilter.includes("All Time")) {
-                setFilteredNotifications(notificationsData);
-            }
-            else if (notificationCategoryFilter.includes("All Categories")) {
-                setFilteredNotifications(notificationsData);
-                if (notificationCategoryFilter.includes("Today")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 1))));
-                } else if (notificationCategoryFilter.includes("Yesterday")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 2))));
-                } else if (notificationCategoryFilter.includes("Last 7 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
-                } else if (notificationCategoryFilter.includes("Last 14 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 14))));
-                } else if (notificationCategoryFilter.includes("Last 30 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
-                } else {
-                    setFilteredNotifications(notificationsData);
-                }
-            } else if (notificationTimeFilter.includes("All Time")) {
-                setFilteredNotifications((notificationsData || []).filter(notification => notificationCategoryFilter.includes(notification.type)));
-            }
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationCategoryFilter, notificationTimeFilter]);
+    // Removed duplicate notifications filter effect; combined above
 
     useEffect(() => {
         if (completedTickets) {
@@ -524,30 +438,46 @@ const SuperAdmin = () => {
 
                             {userFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => setUserStatusFilter('all')}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="userFilter" id="all" value="all"
-                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        <input type="radio" name="userStatusFilter" id="user_all" value="all"
+                                            checked={userStatusFilter === 'all'}
+                                            onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="user_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="active" value="active"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="active" value="active"
+                                                checked={userStatusFilter === 'active'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="active">Active</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="blocked" value="blocked"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="blocked" value="blocked"
+                                                checked={userStatusFilter === 'blocked'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="blocked">Blocked</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="inactive" value="inactive"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="inactive" value="inactive"
+                                                checked={userStatusFilter === 'inactive'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="inactive">Inactive</label>
                                         </div>
@@ -645,7 +575,7 @@ const SuperAdmin = () => {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                     No users found
                                 </td>
                             </tr>
@@ -741,53 +671,91 @@ const SuperAdmin = () => {
                             </button>
                             {transactionFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     {/* All */}
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="all" value="all"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        <input type="radio" name="transactionAll" id="txn_all" value="all"
+                                            checked={transactionStatusFilter === 'all' && transactionDateFilter === 'all'}
+                                            onChange={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="txn_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="successful" value="successful"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="succeeded" value="succeeded"
+                                                checked={transactionStatusFilter === 'succeeded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="successful">Successful</label>
+                                            <label htmlFor="succeeded">Succeeded</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="pending" value="pending"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="pending" value="pending"
+                                                checked={transactionStatusFilter === 'pending'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="pending">Pending</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="failed" value="failed"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="failed" value="failed"
+                                                checked={transactionStatusFilter === 'failed'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="failed">Failed</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="refunded" value="refunded"
+                                                checked={transactionStatusFilter === 'refunded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="refunded">Refunded</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pending_refund" value="pending refund"
+                                                checked={transactionStatusFilter === 'pending refund'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending_refund">Pending Refund</label>
                                         </div>
                                     </div>
                                     {/* Date */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last7Days" value="last7Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last7Days" value="last7Days"
+                                                checked={transactionDateFilter === 'last7Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last15Days" value="last15Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last15Days" value="last15Days"
+                                                checked={transactionDateFilter === 'last15Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last15Days">Last 15 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last30Days" value="last30Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last30Days" value="last30Days"
+                                                checked={transactionDateFilter === 'last30Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
                                         </div>
@@ -799,7 +767,7 @@ const SuperAdmin = () => {
 
                     <div className="flex items-center justify-center sm:justify-end">
                         <button onClick={handleExportTransactions} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
-                            <MdOutlineFileDownload className="w-5 h-5" />
+                            <MdOutlineFileUpload className="w-5 h-5" />
                             <span>Export</span>
                         </button>
                     </div>
@@ -888,7 +856,7 @@ const SuperAdmin = () => {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                     No transactions found
                                 </td>
                             </tr>
@@ -964,53 +932,67 @@ const SuperAdmin = () => {
 
                             {supportFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     {/* All */}
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="all" value="all"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        <input type="radio" name="supportAll" id="support_all" value="all"
+                                            checked={supportStatusFilter === 'all' && supportPriorityFilter === 'all' && supportTypeFilter === 'all'}
+                                            onChange={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="support_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="inProgress" value="inProgress"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportStatusFilter" id="active" value="active"
+                                                checked={supportStatusFilter === 'active'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="inProgress">In Progress</label>
+                                            <label htmlFor="active">Active</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="pending" value="pending"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
+                                                checked={supportStatusFilter === 'resolved'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="pending">Pending</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="completed" value="completed"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
-                                            />
-                                            <label htmlFor="completed">Completed</label>
+                                            <label htmlFor="resolved">Resolved</label>
                                         </div>
                                     </div>
                                     {/* Priority */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="low" value="low"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="low" value="low"
+                                                checked={supportPriorityFilter === 'low'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="low">Low</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="medium" value="medium"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="medium" value="medium"
+                                                checked={supportPriorityFilter === 'medium'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="medium">Medium</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="high" value="high"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="high" value="high"
+                                                checked={supportPriorityFilter === 'high'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="high">High</label>
                                         </div>
@@ -1019,40 +1001,52 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="billing" value="billing"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="billingPayments" value="billing & payments"
+                                                checked={supportTypeFilter === 'billing & payments'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="billing">Billing</label>
+                                            <label htmlFor="billingPayments">Billing & Payments</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="technical" value="technical"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="technicalErrors" value="technical errors"
+                                                checked={supportTypeFilter === 'technical errors'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="technical">Technical</label>
+                                            <label htmlFor="technicalErrors">Technical Errors</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="feature" value="feature"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="featureRequests" value="feature requests"
+                                                checked={supportTypeFilter === 'feature requests'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="feature">Feature</label>
+                                            <label htmlFor="featureRequests">Feature Requests</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="account" value="account"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="accountAccess" value="account & access"
+                                                checked={supportTypeFilter === 'account & access'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="account">Account</label>
+                                            <label htmlFor="accountAccess">Account & Access</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="proposal" value="proposal"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="proposalIssues" value="proposal issues"
+                                                checked={supportTypeFilter === 'proposal issues'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="proposal">Proposal</label>
+                                            <label htmlFor="proposalIssues">Proposal Issues</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="other" value="other"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="others" value="others"
+                                                checked={supportTypeFilter === 'others'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="other">Other</label>
+                                            <label htmlFor="others">Others</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1148,7 +1142,7 @@ const SuperAdmin = () => {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                     No tickets found
                                 </td>
                             </tr>
@@ -1186,43 +1180,63 @@ const SuperAdmin = () => {
                                     onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
-                                    <span>{notificationTimeFilter !== "" ? notificationTimeFilter : "All Time"}</span>
+                                    <span>{notificationTimeFilter || 'All Time'}</span>
                                 </button>
 
                                 {notificationTimeFilterModal && (
                                     <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[14px] font-medium text-[#111827]">Time</span>
+                                            <button
+                                                className="text-[12px] text-[#2563EB] hover:underline"
+                                                onClick={() => setNotificationTimeFilter('all')}
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationTimeFilter" id="allTime" value="allTime"
+                                            <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
+                                                checked={notificationTimeFilter === 'All Time'}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="allTime">All Time</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
+                                                checked={notificationTimeFilter === 'today'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="today">Today</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
+                                                checked={notificationTimeFilter === 'yesterday'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="yesterday">Yesterday</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
+                                                checked={notificationTimeFilter === 'last7Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
+                                                checked={notificationTimeFilter === 'last14Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last14Days">Last 14 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
+                                                checked={notificationTimeFilter === 'last30Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
@@ -1234,50 +1248,72 @@ const SuperAdmin = () => {
                                 <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
-                                    <span>{notificationCategoryFilter !== "" ? notificationCategoryFilter : "All Categories"}</span>
+                                    <span>{notificationCategoryFilter || 'All Categories'}</span>
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                 </button>
 
                                 {notificationCategoryFilterModal && (
                                     <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[14px] font-medium text-[#111827]">Category</span>
+                                            <button
+                                                className="text-[12px] text-[#2563EB] hover:underline"
+                                                onClick={() => handleNotificationCategoryFilter('all')}
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="allCategories" value="allCategories"
+                                            <input type="radio" name="notificationCategoryFilter" id="allCategories" value="All Categories"
+                                                checked={notificationCategoryFilter === 'All Categories'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="allCategories">All Categories</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="accountAccess"
+                                            <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
+                                                checked={notificationCategoryFilter === 'account access'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="accountAccess">Account & Access</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billingPayments"
+                                            <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
+                                                checked={notificationCategoryFilter === 'billing & payments'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="billingPayments">Billing & Payments</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technicalErrors"
+                                            <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
+                                                checked={notificationCategoryFilter === 'technical errors'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="technicalErrors">Technical Errors</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="featureRequests"
+                                            <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
+                                                checked={notificationCategoryFilter === 'feature requests'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="featureRequests">Feature Requests</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposalIssues"
+                                            <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
+                                                checked={notificationCategoryFilter === 'proposal issues'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="proposalIssues">Proposal Issues</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
+                                                checked={notificationCategoryFilter === 'others'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="others">Others</label>
@@ -1328,7 +1364,7 @@ const SuperAdmin = () => {
                         </div>
                     </div>
                 )) : (
-                    <div className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                    <div className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                         No notifications found
                     </div>
                 )}
