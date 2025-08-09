@@ -80,209 +80,15 @@ const SuperAdmin = () => {
 
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
-    useEffect(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`);
-            const stats = response.data.stats;
-            setUsersStats(stats);
-            const companiesData = response.data.CompanyData;
-            setCompaniesData(companiesData);
-            planManagementStats["Active Users"] = stats["Active Users"];
-        } catch (error) {
-            console.log("error", error);
-        }
-    }, []);
-
-    useEffect(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`);
-            const paymentsData = response.data.PaymentData;
-            setPaymentsData(paymentsData);
-            const paymentsStats = response.data.PaymentStats;
-            setPaymentsStats(paymentsStats);
-            planManagementStats["Revenue This Month"] = paymentsStats["Revenue This Month"];
-        } catch (error) {
-            console.log("error", error);
-        }
-    }, []);
-
-    useEffect(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/getSupportStatsAndData`);
-            const supportTicketsData = response.data.TicketData;
-            setSupportTicketsData(supportTicketsData);
-            const supportTicketsStats = response.data.TicketStats;
-            setSupportTicketsStats(supportTicketsStats);
-        } catch (error) {
-            console.log("error", error);
-        }
-    }, []);
-
-    useEffect(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/getNotificationsData`);
-            const notificationsData = response.data;
-            setNotificationsData(notificationsData);
-        } catch (error) {
-            console.log("error", error);
-        }
-    }, []);
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Active':
-                return 'bg-[#DCFCE7] text-[#15803D]';
-            case 'Blocked':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Inactive':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Successful':
-                return 'bg-[#DCFCE7] text-[#15803D]';
-            case 'Pending':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Failed':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'In Progress':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Completed':
-                return 'bg-[#DCFCE7] text-[#15803D]';
-            default:
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
-        }
-    };
-
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case 'Low':
-                return 'bg-[#DCFCE7] text-[#15803D]';
-            case 'Medium':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'High':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            default:
-                return 'bg-[#F3F4F6] text-[#6B7280]';
-        }
-    };
-
-    const [filteredUsers, setFilteredUsers] = useState(companiesData || []);
-    const [filteredTransactions, setFilteredTransactions] = useState(paymentsData || []);
-    const [filteredSupport, setFilteredSupport] = useState(supportTicketsData || []);
-    const [filteredNotifications, setFilteredNotifications] = useState(notificationsData || []);
-
-    useEffect(() => {
-        console.log("searchTerm", searchTerm);
-        console.log("companies", companiesData);
-        if (searchTerm) {
-            setFilteredUsers((companiesData || []).filter(user =>
-                (user.companyName && user.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
-            ));
-        } else {
-            setFilteredUsers(companiesData);
-        }
-    }, [searchTerm]);
-
-    useEffect(() => {
-        console.log("transactionSearchTerm", transactionSearchTerm);
-        console.log("payments", paymentsData);
-        if (transactionSearchTerm) {
-            setFilteredTransactions((paymentsData || []).filter(transaction => {
-                const term = transactionSearchTerm.toLowerCase();
-                return (
-                    (transaction.transaction_id && transaction.transaction_id.toLowerCase().includes(term)) ||
-                    (transaction.user_id && transaction.user_id.toLowerCase().includes(term)) ||
-                    (transaction.payment_method && String(transaction.payment_method).toLowerCase().includes(term))
-                );
-            }));
-        } else {
-            setFilteredTransactions(paymentsData);
-        }
-    }, [transactionSearchTerm]);
-
-    useEffect(() => {
-        console.log("supportSearchTerm", supportSearchTerm);
-        console.log("support", supportTicketsData);
-        if (supportSearchTerm) {
-            const term = supportSearchTerm.toLowerCase();
-            setFilteredSupport((supportTicketsData || []).filter(ticket =>
-                (ticket.type && ticket.type.toLowerCase().includes(term)) ||
-                (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
-                (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term))
-            ));
-        } else {
-            setFilteredSupport(supportTicketsData);
-        }
-    }, [supportSearchTerm]);
-
-    useEffect(() => {
-        console.log("notificationSearchTerm", notificationSearchTerm);
-        console.log("notifications", notificationsData);
-
-        if (notificationSearchTerm) {
-            const term = notificationSearchTerm.toLowerCase();
-            setFilteredNotifications((notificationsData || []).filter(notification =>
-                (notification.title && notification.title.toLowerCase().includes(term)) ||
-                (notification.description && notification.description.toLowerCase().includes(term)) ||
-                (notification.type && notification.type.toLowerCase().includes(term))
-            ));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationSearchTerm]);
-
-    useEffect(() => {
-        console.log("notificationSearchTerm", notificationSearchTerm);
-        console.log("notifications", notificationsData);
-        if (notificationTimeFilter !== "All Time") {
-            setFilteredNotifications((notificationsData || []).filter(notification => {
-                const time = new Date(notification.created_at || notification.createdAt || notification.time);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-                const last7Days = new Date(today);
-                last7Days.setDate(today.getDate() - 7);
-                const last14Days = new Date(today);
-                last14Days.setDate(today.getDate() - 14);
-                const last30Days = new Date(today);
-                last30Days.setDate(today.getDate() - 30);
-                if (notificationTimeFilter === "Today") {
-                    return time.toDateString() === today.toDateString();
-                } else if (notificationTimeFilter === "Yesterday") {
-                    return time.toDateString() === yesterday.toDateString();
-                } else if (notificationTimeFilter === "Last 7 Days") {
-                    return time >= last7Days;
-                } else if (notificationTimeFilter === "Last 14 Days") {
-                    return time >= last14Days;
-                } else if (notificationTimeFilter === "Last 30 Days") {
-                    return time >= last30Days;
-                } else {
-                    return true;
-                }
-            }));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-
-        if (notificationCategoryFilter !== "All Categories") {
-            setFilteredNotifications((notificationsData || []).filter(notification =>
-                (notification.type === notificationCategoryFilter) ||
-                (notification.type && notification.type.toLowerCase() === notificationCategoryFilter.toLowerCase())
-            ));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationTimeFilter, notificationCategoryFilter]);
-
-
     const handleUserStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredUsers(prev => prev.map(user =>
             user.id === id ? { ...user, status } : user
         ));
     };
 
     const handleTransactionStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredTransactions(prev => prev.map(transaction => {
             const matches = transaction.transactionId === id || transaction.id === id;
             return matches ? { ...transaction, status } : transaction;
@@ -290,7 +96,7 @@ const SuperAdmin = () => {
     };
 
     const handleSupportStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredSupport(prev => prev.map(support =>
             support.id === id ? { ...support, status } : support
         ));
@@ -398,10 +204,208 @@ const SuperAdmin = () => {
         }
     };
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Active':
+                return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'Blocked':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'Inactive':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'Successful':
+                return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'Pending':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'Failed':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'In Progress':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'Completed':
+                return 'bg-[#DCFCE7] text-[#15803D]';
+            default:
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+        }
+    };
+
+    const getPriorityColor = (priority) => {
+        switch (priority) {
+            case 'Low':
+                return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'Medium':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'High':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
+            default:
+                return 'bg-[#F3F4F6] text-[#6B7280]';
+        }
+    };
+
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [filteredTransactions, setFilteredTransactions] = useState([]);
+    const [filteredSupport, setFilteredSupport] = useState([]);
+    const [filteredNotifications, setFilteredNotifications] = useState([]);
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`);
+            const stats = response.data.stats;
+            setUsersStats(stats);
+            const companiesData = response.data.CompanyData;
+            setCompaniesData(companiesData);
+            setFilteredUsers(companiesData);
+            planManagementStats["Active Users"] = stats["Active Users"];
+        } catch (error) {
+            //console.log("error", error);
+        }
+    }, []);
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`);
+            const paymentsData = response.data.PaymentData;
+            setPaymentsData(paymentsData);
+            const ps = response.data.PaymentStats || {};
+            const { ["Revenue This Month"]: revenueThisMonth, ...otherStats } = ps;
+            setPaymentsStats(otherStats);
+            planManagementStats["Revenue This Month"] = revenueThisMonth ?? 0;
+            setFilteredTransactions(paymentsData);
+        } catch (error) {
+            //console.log("error", error);
+        }
+    }, []);
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getSupportStatsAndData`);
+            const supportTicketsData = response.data.TicketData;
+            setSupportTicketsData(supportTicketsData);
+            const supportTicketsStats = response.data.TicketStats;
+            setSupportTicketsStats(supportTicketsStats);
+            setFilteredSupport(supportTicketsData);
+        } catch (error) {
+            //console.log("error", error);
+        }
+    }, []);
+
+    useEffect(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/getNotificationsData`);
+            const notificationsData = response.data;
+            setNotificationsData(notificationsData);
+            setFilteredNotifications(notificationsData);
+        } catch (error) {
+            //console.log("error", error);
+        }
+    }, []);
+
     useEffect(() => {
-        console.log("userFilter", userFilter);
-        console.log("filteredUsers", filteredUsers);
-        console.log("companiesData", companiesData);
+        //console.log("searchTerm", searchTerm);
+        //console.log("companies", companiesData);
+        if (searchTerm) {
+            setFilteredUsers((companiesData || []).filter(user =>
+                (user.companyName && user.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+            ));
+        } else {
+            setFilteredUsers(companiesData);
+        }
+    }, [searchTerm]);
+
+    useEffect(() => {
+        //console.log("transactionSearchTerm", transactionSearchTerm);
+        //console.log("payments", paymentsData);
+        if (transactionSearchTerm) {
+            setFilteredTransactions((paymentsData || []).filter(transaction => {
+                const term = transactionSearchTerm.toLowerCase();
+                return (
+                    (transaction.transaction_id && transaction.transaction_id.toLowerCase().includes(term)) ||
+                    (transaction.user_id && transaction.user_id.toLowerCase().includes(term)) ||
+                    (transaction.payment_method && String(transaction.payment_method).toLowerCase().includes(term))
+                );
+            }));
+        } else {
+            setFilteredTransactions(paymentsData);
+        }
+    }, [transactionSearchTerm]);
+
+    useEffect(() => {
+        //console.log("supportSearchTerm", supportSearchTerm);
+        //console.log("support", supportTicketsData);
+        if (supportSearchTerm) {
+            const term = supportSearchTerm.toLowerCase();
+            setFilteredSupport((supportTicketsData || []).filter(ticket =>
+                (ticket.type && ticket.type.toLowerCase().includes(term)) ||
+                (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
+                (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term))
+            ));
+        } else {
+            setFilteredSupport(supportTicketsData);
+        }
+    }, [supportSearchTerm]);
+
+    useEffect(() => {
+        //console.log("notificationSearchTerm", notificationSearchTerm);
+        //console.log("notifications", notificationsData);
+
+        if (notificationSearchTerm) {
+            const term = notificationSearchTerm.toLowerCase();
+            setFilteredNotifications((notificationsData || []).filter(notification =>
+                (notification.title && notification.title.toLowerCase().includes(term)) ||
+                (notification.description && notification.description.toLowerCase().includes(term)) ||
+                (notification.type && notification.type.toLowerCase().includes(term))
+            ));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+    }, [notificationSearchTerm]);
+
+    useEffect(() => {
+        //console.log("notificationSearchTerm", notificationSearchTerm);
+        //console.log("notifications", notificationsData);
+        if (notificationTimeFilter !== "All Time") {
+            setFilteredNotifications((notificationsData || []).filter(notification => {
+                const time = new Date(notification.created_at || notification.createdAt || notification.time);
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                const last7Days = new Date(today);
+                last7Days.setDate(today.getDate() - 7);
+                const last14Days = new Date(today);
+                last14Days.setDate(today.getDate() - 14);
+                const last30Days = new Date(today);
+                last30Days.setDate(today.getDate() - 30);
+                if (notificationTimeFilter === "Today") {
+                    return time.toDateString() === today.toDateString();
+                } else if (notificationTimeFilter === "Yesterday") {
+                    return time.toDateString() === yesterday.toDateString();
+                } else if (notificationTimeFilter === "Last 7 Days") {
+                    return time >= last7Days;
+                } else if (notificationTimeFilter === "Last 14 Days") {
+                    return time >= last14Days;
+                } else if (notificationTimeFilter === "Last 30 Days") {
+                    return time >= last30Days;
+                } else {
+                    return true;
+                }
+            }));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+
+        if (notificationCategoryFilter !== "All Categories") {
+            setFilteredNotifications((notificationsData || []).filter(notification =>
+                (notification.type === notificationCategoryFilter) ||
+                (notification.type && notification.type.toLowerCase() === notificationCategoryFilter.toLowerCase())
+            ));
+        } else {
+            setFilteredNotifications(notificationsData);
+        }
+    }, [notificationTimeFilter, notificationCategoryFilter]);
+
+    useEffect(() => {
+        //console.log("userFilter", userFilter);
+        //console.log("filteredUsers", filteredUsers);
+        //console.log("companiesData", companiesData);
         if (userFilter.length > 0) {
             setFilteredUsers(companiesData.filter(user => userFilter.includes(user.status)));
         } else {
@@ -410,9 +414,9 @@ const SuperAdmin = () => {
     }, [userFilter]);
 
     useEffect(() => {
-        console.log("transactionFilter", transactionFilter);
-        console.log("filteredTransactions", filteredTransactions);
-        console.log("paymentsData", paymentsData);
+        //console.log("transactionFilter", transactionFilter);
+        //console.log("filteredTransactions", filteredTransactions);
+        //console.log("paymentsData", paymentsData);
         if (transactionFilter.length > 0) {
             setFilteredTransactions((paymentsData || []).filter(transaction => transactionFilter.includes(transaction.status)));
             if (transactionFilter.includes("last7Days")) {
@@ -428,9 +432,9 @@ const SuperAdmin = () => {
     }, [transactionFilter]);
 
     useEffect(() => {
-        console.log("supportFilter", supportFilter);
-        console.log("filteredSupport", filteredSupport);
-        console.log("supportTicketsData", supportTicketsData);
+        //console.log("supportFilter", supportFilter);
+        //console.log("filteredSupport", filteredSupport);
+        //console.log("supportTicketsData", supportTicketsData);
         if (supportFilter.length > 0) {
             setFilteredSupport((supportTicketsData || []).filter(ticket => supportFilter.includes(ticket.status) || supportFilter.includes(ticket.type) || supportFilter.includes(ticket.priority)));
         } else {
@@ -439,9 +443,9 @@ const SuperAdmin = () => {
     }, [supportFilter]);
 
     useEffect(() => {
-        console.log("notificationCategoryFilter", notificationCategoryFilter);
-        console.log("filteredNotifications", filteredNotifications);
-        console.log("notificationsData", notificationsData);
+        //console.log("notificationCategoryFilter", notificationCategoryFilter);
+        //console.log("filteredNotifications", filteredNotifications);
+        //console.log("notificationsData", notificationsData);
         if (notificationCategoryFilter.length > 0 || notificationTimeFilter.length > 0) {
             if (notificationCategoryFilter.includes("All Categories") && notificationTimeFilter.includes("All Time")) {
                 setFilteredNotifications(notificationsData);
@@ -472,10 +476,10 @@ const SuperAdmin = () => {
     useEffect(() => {
         if (completedTickets) {
             setFilteredSupport(supportTicketsData.filter(support => support.status === 'Resolved'));
-            console.log("resolved", filteredSupport);
+            //console.log("resolved", filteredSupport);
         } else {
             setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Resolved'));
-            console.log("not resolved", filteredSupport);
+            //console.log("not resolved", filteredSupport);
         }
     }, [completedTickets, supportTicketsData]);
 
@@ -510,45 +514,47 @@ const SuperAdmin = () => {
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF]"
                             />
                         </div>
-                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
-                            onClick={() => setUserFilterModal(true)}
-                        >
-                            <MdOutlineFilterList className="w-5 h-5" />
-                            <span className="text-[16px] text-[#9CA3AF]">Filter</span>
-                        </button>
+                        <div className="relative">
+                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
+                                onClick={() => setUserFilterModal(!userFilterModal)}
+                            >
+                                <MdOutlineFilterList className="w-5 h-5" />
+                                <span className="text-[16px] text-[#9CA3AF]">Filter</span>
+                            </button>
 
-                        {userFilterModal && (
-                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
-                                <div className="flex items-center space-x-2">
-                                    <input type="radio" name="userFilter" id="all" value="all"
-                                        onChange={(e) => handleUserFilter(e.target.value)}
-                                    />
-                                    <label htmlFor="all">All</label>
+                            {userFilterModal && (
+                                <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="userFilter" id="all" value="all"
+                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="all">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="userFilter" id="active" value="active"
+                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="active">Active</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="userFilter" id="blocked" value="blocked"
+                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="blocked">Blocked</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="userFilter" id="inactive" value="inactive"
+                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="inactive">Inactive</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                {/* Status */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="userFilter" id="active" value="active"
-                                            onChange={(e) => handleUserFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="active">Active</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="userFilter" id="blocked" value="blocked"
-                                            onChange={(e) => handleUserFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="blocked">Blocked</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="userFilter" id="inactive" value="inactive"
-                                            onChange={(e) => handleUserFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="inactive">Inactive</label>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                     <div className="flex items-center justify-center sm:justify-end">
                         <button onClick={handleExportUsers} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors w-full sm:w-auto">
@@ -726,67 +732,69 @@ const SuperAdmin = () => {
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
-                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
-                            onClick={() => setTransactionFilterModal(true)}
-                        >
-                            <MdOutlineFilterList className="w-5 h-5" />
-                            <span>Filter</span>
-                        </button>
-                        {transactionFilterModal && (
-                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
-                                {/* All */}
-                                <div className="flex items-center space-x-2">
-                                    <input type="radio" name="transactionFilter" id="all" value="all"
-                                        onChange={(e) => handleTransactionFilter(e.target.value)}
-                                    />
-                                    <label htmlFor="all">All</label>
+                        <div className="relative">
+                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                                onClick={() => setTransactionFilterModal(!transactionFilterModal)}
+                            >
+                                <MdOutlineFilterList className="w-5 h-5" />
+                                <span>Filter</span>
+                            </button>
+                            {transactionFilterModal && (
+                                <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionFilter" id="all" value="all"
+                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="all">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="successful" value="successful"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="successful">Successful</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="pending" value="pending"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending">Pending</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="failed" value="failed"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="failed">Failed</label>
+                                        </div>
+                                    </div>
+                                    {/* Date */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="last7Days" value="last7Days"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last7Days">Last 7 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="last15Days" value="last15Days"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last15Days">Last 15 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionFilter" id="last30Days" value="last30Days"
+                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last30Days">Last 30 Days</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                {/* Status */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="successful" value="successful"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="successful">Successful</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="pending" value="pending"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="pending">Pending</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="failed" value="failed"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="failed">Failed</label>
-                                    </div>
-                                </div>
-                                {/* Date */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="last7Days" value="last7Days"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="last7Days">Last 7 Days</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="last15Days" value="last15Days"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="last15Days">Last 15 Days</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="last30Days" value="last30Days"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="last30Days">Last 30 Days</label>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-center sm:justify-end">
@@ -946,108 +954,110 @@ const SuperAdmin = () => {
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
-                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
-                            onClick={() => setSupportFilterModal(true)}
-                        >
-                            <MdOutlineFilterList className="w-5 h-5" />
-                            <span>Filter</span>
-                        </button>
+                        <div className="relative">
+                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                                onClick={() => setSupportFilterModal(!supportFilterModal)}
+                            >
+                                <MdOutlineFilterList className="w-5 h-5" />
+                                <span>Filter</span>
+                            </button>
 
-                        {supportFilterModal && (
-                            <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
-                                {/* All */}
-                                <div className="flex items-center space-x-2">
-                                    <input type="radio" name="supportFilter" id="all" value="all"
-                                        onChange={(e) => handleSupportFilter(e.target.value)}
-                                    />
-                                    <label htmlFor="all">All</label>
+                            {supportFilterModal && (
+                                <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportFilter" id="all" value="all"
+                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="all">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="inProgress" value="inProgress"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="inProgress">In Progress</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="pending" value="pending"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending">Pending</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="completed" value="completed"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="completed">Completed</label>
+                                        </div>
+                                    </div>
+                                    {/* Priority */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="low" value="low"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="low">Low</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="medium" value="medium"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="medium">Medium</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="high" value="high"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="high">High</label>
+                                        </div>
+                                    </div>
+                                    {/* Type */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="billing" value="billing"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="billing">Billing</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="technical" value="technical"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="technical">Technical</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="feature" value="feature"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="feature">Feature</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="account" value="account"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="account">Account</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="proposal" value="proposal"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="proposal">Proposal</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportFilter" id="other" value="other"
+                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="other">Other</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                {/* Status */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="inProgress" value="inProgress"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="inProgress">In Progress</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="pending" value="pending"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="pending">Pending</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="completed" value="completed"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="completed">Completed</label>
-                                    </div>
-                                </div>
-                                {/* Priority */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="low" value="low"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="low">Low</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="medium" value="medium"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="medium">Medium</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="high" value="high"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="high">High</label>
-                                    </div>
-                                </div>
-                                {/* Type */}
-                                <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
-                                <div className="ml-4">
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="billing" value="billing"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="billing">Billing</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="technical" value="technical"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="technical">Technical</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="feature" value="feature"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="feature">Feature</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="account" value="account"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="account">Account</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="proposal" value="proposal"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="proposal">Proposal</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="other" value="other"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
-                                        />
-                                        <label htmlFor="other">Other</label>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1173,7 +1183,7 @@ const SuperAdmin = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="relative">
                                 <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
-                                    onClick={() => setNotificationTimeFilterModal(true)}
+                                    onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                     <span>{notificationTimeFilter !== "" ? notificationTimeFilter : "All Time"}</span>
@@ -1222,7 +1232,7 @@ const SuperAdmin = () => {
                             </div>
                             <div className="relative">
                                 <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
-                                    onClick={() => setNotificationCategoryFilterModal(true)}
+                                    onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
                                     <span>{notificationCategoryFilter !== "" ? notificationCategoryFilter : "All Categories"}</span>
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
