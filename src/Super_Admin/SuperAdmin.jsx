@@ -26,8 +26,10 @@ import {
     MdOutlineMenu
 } from 'react-icons/md';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const SuperAdmin = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('user-management');
 
     // Search Terms
@@ -145,7 +147,7 @@ const SuperAdmin = () => {
             case 'Completed':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             default:
-                return 'bg-[#F3F4F6] text-[#6B7280]';
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
     };
 
@@ -171,9 +173,9 @@ const SuperAdmin = () => {
         console.log("searchTerm", searchTerm);
         console.log("companies", companiesData);
         if (searchTerm) {
-            setFilteredUsers(companiesData.filter(user =>
-                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchTerm.toLowerCase())
+            setFilteredUsers((companiesData || []).filter(user =>
+                (user.companyName && user.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
             ));
         } else {
             setFilteredUsers(companiesData);
@@ -184,10 +186,14 @@ const SuperAdmin = () => {
         console.log("transactionSearchTerm", transactionSearchTerm);
         console.log("payments", paymentsData);
         if (transactionSearchTerm) {
-            setFilteredTransactions(paymentsData.filter(transaction =>
-                transaction.company.toLowerCase().includes(transactionSearchTerm.toLowerCase()) ||
-                transaction.type.toLowerCase().includes(transactionSearchTerm.toLowerCase())
-            ));
+            setFilteredTransactions((paymentsData || []).filter(transaction => {
+                const term = transactionSearchTerm.toLowerCase();
+                return (
+                    (transaction.transaction_id && transaction.transaction_id.toLowerCase().includes(term)) ||
+                    (transaction.user_id && transaction.user_id.toLowerCase().includes(term)) ||
+                    (transaction.payment_method && String(transaction.payment_method).toLowerCase().includes(term))
+                );
+            }));
         } else {
             setFilteredTransactions(paymentsData);
         }
@@ -197,9 +203,11 @@ const SuperAdmin = () => {
         console.log("supportSearchTerm", supportSearchTerm);
         console.log("support", supportTicketsData);
         if (supportSearchTerm) {
-            setFilteredSupport(supportTicketsData.filter(support =>
-                support.type.toLowerCase().includes(supportSearchTerm.toLowerCase()) ||
-                support.subject.toLowerCase().includes(supportSearchTerm.toLowerCase())
+            const term = supportSearchTerm.toLowerCase();
+            setFilteredSupport((supportTicketsData || []).filter(ticket =>
+                (ticket.type && ticket.type.toLowerCase().includes(term)) ||
+                (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
+                (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term))
             ));
         } else {
             setFilteredSupport(supportTicketsData);
@@ -211,9 +219,11 @@ const SuperAdmin = () => {
         console.log("notifications", notificationsData);
 
         if (notificationSearchTerm) {
-            setFilteredNotifications(notificationsData.filter(notification =>
-                notification.title.toLowerCase().includes(notificationSearchTerm.toLowerCase()) ||
-                notification.message.toLowerCase().includes(notificationSearchTerm.toLowerCase())
+            const term = notificationSearchTerm.toLowerCase();
+            setFilteredNotifications((notificationsData || []).filter(notification =>
+                (notification.title && notification.title.toLowerCase().includes(term)) ||
+                (notification.description && notification.description.toLowerCase().includes(term)) ||
+                (notification.type && notification.type.toLowerCase().includes(term))
             ));
         } else {
             setFilteredNotifications(notificationsData);
@@ -224,8 +234,8 @@ const SuperAdmin = () => {
         console.log("notificationSearchTerm", notificationSearchTerm);
         console.log("notifications", notificationsData);
         if (notificationTimeFilter !== "All Time") {
-            setFilteredNotifications(notificationsData.filter(notification => {
-                const time = new Date(notification.time);
+            setFilteredNotifications((notificationsData || []).filter(notification => {
+                const time = new Date(notification.created_at || notification.createdAt || notification.time);
                 const today = new Date();
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
@@ -254,8 +264,9 @@ const SuperAdmin = () => {
         }
 
         if (notificationCategoryFilter !== "All Categories") {
-            setFilteredNotifications(notificationsData.filter(notification =>
-                notification.category === notificationCategoryFilter
+            setFilteredNotifications((notificationsData || []).filter(notification =>
+                (notification.type === notificationCategoryFilter) ||
+                (notification.type && notification.type.toLowerCase() === notificationCategoryFilter.toLowerCase())
             ));
         } else {
             setFilteredNotifications(notificationsData);
@@ -272,9 +283,10 @@ const SuperAdmin = () => {
 
     const handleTransactionStatusChange = (id, status) => {
         console.log(id, status);
-        setFilteredTransactions(prev => prev.map(transaction =>
-            transaction.id === id ? { ...transaction, status } : transaction
-        ));
+        setFilteredTransactions(prev => prev.map(transaction => {
+            const matches = transaction.transactionId === id || transaction.id === id;
+            return matches ? { ...transaction, status } : transaction;
+        }));
     };
 
     const handleSupportStatusChange = (id, status) => {
@@ -326,6 +338,52 @@ const SuperAdmin = () => {
         }
     };
 
+    // Export helpers
+    const exportArrayToCSV = (filename, headers, rows) => {
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => headers.map(h => {
+                const val = row[h] ?? '';
+                const escaped = String(val).replace(/"/g, '""');
+                return `"${escaped}"`;
+            }).join(','))
+        ].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExportUsers = () => {
+        const headers = ['_id', 'companyName', 'email', 'establishedYear', 'location'];
+        const rows = (filteredUsers || []).map(u => ({
+            _id: u._id,
+            companyName: u.companyName,
+            email: u.email,
+            establishedYear: u.establishedYear,
+            location: u.location
+        }));
+        exportArrayToCSV('companies.csv', headers, rows);
+    };
+
+    const handleExportTransactions = () => {
+        const headers = ['transaction_id', 'user_id', 'payment_method', 'price', 'created_at', 'status'];
+        const rows = (filteredTransactions || []).map(t => ({
+            transaction_id: t.transaction_id,
+            user_id: t.user_id,
+            payment_method: t.payment_method,
+            price: t.price,
+            created_at: t.created_at || t.createdAt,
+            status: t.status
+        }));
+        exportArrayToCSV('transactions.csv', headers, rows);
+    };
+
     const handleNotificationCategoryFilter = (filter) => {
         if (filter === "All Categories") {
             setNotificationCategoryFilter([]);
@@ -356,13 +414,13 @@ const SuperAdmin = () => {
         console.log("filteredTransactions", filteredTransactions);
         console.log("paymentsData", paymentsData);
         if (transactionFilter.length > 0) {
-            setFilteredTransactions(paymentsData.filter(transaction => transactionFilter.includes(transaction.status)));
+            setFilteredTransactions((paymentsData || []).filter(transaction => transactionFilter.includes(transaction.status)));
             if (transactionFilter.includes("last7Days")) {
-                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 7))));
+                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
             } else if (transactionFilter.includes("last15Days")) {
-                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 15))));
+                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 15))));
             } else if (transactionFilter.includes("last30Days")) {
-                setFilteredTransactions(paymentsData.filter(transaction => transaction.date >= new Date(new Date().setDate(new Date().getDate() - 30))));
+                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
             }
         } else {
             setFilteredTransactions(paymentsData);
@@ -374,7 +432,7 @@ const SuperAdmin = () => {
         console.log("filteredSupport", filteredSupport);
         console.log("supportTicketsData", supportTicketsData);
         if (supportFilter.length > 0) {
-            setFilteredSupport(supportTicketsData.filter(support => supportFilter.includes(support.status) || supportFilter.includes(support.type) || supportFilter.includes(support.priority)));
+            setFilteredSupport((supportTicketsData || []).filter(ticket => supportFilter.includes(ticket.status) || supportFilter.includes(ticket.type) || supportFilter.includes(ticket.priority)));
         } else {
             setFilteredSupport(supportTicketsData);
         }
@@ -391,20 +449,20 @@ const SuperAdmin = () => {
             else if (notificationCategoryFilter.includes("All Categories")) {
                 setFilteredNotifications(notificationsData);
                 if (notificationCategoryFilter.includes("Today")) {
-                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 1))));
+                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 1))));
                 } else if (notificationCategoryFilter.includes("Yesterday")) {
-                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 2))));
+                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 2))));
                 } else if (notificationCategoryFilter.includes("Last 7 Days")) {
-                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 7))));
+                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
                 } else if (notificationCategoryFilter.includes("Last 14 Days")) {
-                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 14))));
+                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 14))));
                 } else if (notificationCategoryFilter.includes("Last 30 Days")) {
-                    setFilteredNotifications(notificationsData.filter(notification => notification.date >= new Date(new Date().setDate(new Date().getDate() - 30))));
+                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
                 } else {
                     setFilteredNotifications(notificationsData);
                 }
             } else if (notificationTimeFilter.includes("All Time")) {
-                setFilteredNotifications(notificationsData.filter(notification => notificationCategoryFilter.includes(notification.category)));
+                setFilteredNotifications((notificationsData || []).filter(notification => notificationCategoryFilter.includes(notification.type)));
             }
         } else {
             setFilteredNotifications(notificationsData);
@@ -493,7 +551,7 @@ const SuperAdmin = () => {
                         )}
                     </div>
                     <div className="flex items-center justify-center sm:justify-end">
-                        <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors w-full sm:w-auto">
+                        <button onClick={handleExportUsers} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg transition-colors w-full sm:w-auto">
                             <MdOutlineFileUpload className="w-5 h-5" />
                             <span className="text-[16px] text-white">Export</span>
                         </button>
@@ -533,38 +591,38 @@ const SuperAdmin = () => {
                         {filteredUsers.length > 0 ? filteredUsers.map((user, index) => (
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {user.id}
+                                    {user._id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="text-[16px] font-medium text-[#4B5563]">{user.name}</span>
+                                    <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                     {user.email}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
-                                    {user.registrationDate}
+                                    {user.establishedYear}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
-                                    {user.lastActive}
+                                    {user.location}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    {editUser === user.id ? (
+                                    {editUser === user._id ? (
                                         <select className="px-2 py-1 text-[12px] rounded-full"
-                                            onChange={(e) => handleUserStatusChange(user.id, e.target.value)}
-                                            value={user.status}
+                                            onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
+                                            value={user.status || 'Active'}
                                         >
                                             <option value="Active">Active</option>
                                             <option value="Blocked">Blocked</option>
                                             <option value="Inactive">Inactive</option>
                                         </select>
                                     ) : (
-                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status)}`}>
-                                            {user.status}
+                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status || 'Active')}`}>
+                                            {user.status || 'Active'}
                                         </span>
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editUser === user.id ? (
+                                    {editUser === user._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
                                             onClick={() => setEditUser(null)}
                                         >
@@ -572,7 +630,7 @@ const SuperAdmin = () => {
                                         </button>
                                     ) : (
                                         <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditUser(user.id)}
+                                            onClick={() => setEditUser(user._id)}
                                         >
                                             <MdOutlineEdit className="w-5 h-5 text-[#2563EB]" />
                                         </button>
@@ -732,7 +790,7 @@ const SuperAdmin = () => {
                     </div>
 
                     <div className="flex items-center justify-center sm:justify-end">
-                        <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
+                        <button onClick={handleExportTransactions} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
                             <MdOutlineFileDownload className="w-5 h-5" />
                             <span>Export</span>
                         </button>
@@ -771,30 +829,32 @@ const SuperAdmin = () => {
                         {filteredTransactions.length > 0 ? filteredTransactions.map((transaction, index) => (
                             <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.transactionId}
+                                    {transaction.transaction_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.company}
+                                    {transaction.user_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.type}
+                                    {transaction.payment_method}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.amount}
+                                    {transaction.price}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.created}
+                                    {transaction.created_at || transaction.createdAt}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    {editTransaction === transaction.id ? (
+                                    {editTransaction === transaction._id ? (
                                         <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
-                                            onChange={(e) => handleTransactionStatusChange(transaction.transactionId, e.target.value)}
+                                            onChange={(e) => handleTransactionStatusChange(transaction.transaction_id, e.target.value)}
                                             value={transaction.status}
                                             defaultValue={transaction.status}
                                         >
-                                            <option value="Successful">Successful</option>
-                                            <option value="Pending">Pending</option>
-                                            <option value="Failed">Failed</option>
+                                            <option value="succeeded">Succeeded</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="failed">Failed</option>
+                                            <option value="refunded">Refunded</option>
+                                            <option value="pending refund">Pending Refund</option>
                                         </select>
                                     ) : (
                                         <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
@@ -803,7 +863,7 @@ const SuperAdmin = () => {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editTransaction === transaction.id ? (
+                                    {editTransaction === transaction._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
                                             onClick={() => setEditTransaction(null)}
                                         >
@@ -811,7 +871,7 @@ const SuperAdmin = () => {
                                         </button>
                                     ) : (
                                         <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditTransaction(transaction.id)}
+                                            onClick={() => setEditTransaction(transaction._id)}
                                         >
                                             <MdOutlineMoreVert className="w-5 h-5" />
                                         </button>
@@ -1026,7 +1086,7 @@ const SuperAdmin = () => {
                         {filteredSupport.length > 0 ? filteredSupport.map((ticket, index) => (
                             <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {ticket.id}
+                                    {ticket.ticket_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                     {ticket.type}
@@ -1035,7 +1095,7 @@ const SuperAdmin = () => {
                                     {ticket.subject}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.user}
+                                    {ticket.user_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
@@ -1043,12 +1103,12 @@ const SuperAdmin = () => {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.created}
+                                    {ticket.created_at}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    {editSupport === ticket.id ? (
+                                    {editSupport === ticket._id ? (
                                         <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
-                                            onChange={(e) => handleSupportStatusChange(ticket.id, e.target.value)}
+                                            onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
                                             value={ticket.status}
                                         >
                                             <option value="Active">Active</option>
@@ -1061,7 +1121,7 @@ const SuperAdmin = () => {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editSupport === ticket.id ? (
+                                    {editSupport === ticket._id ? (
                                         <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
                                             onClick={() => setEditSupport(null)}
                                         >
@@ -1069,7 +1129,7 @@ const SuperAdmin = () => {
                                         </button>
                                     ) : (
                                         <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditSupport(ticket.id)}
+                                            onClick={() => setEditSupport(ticket._id)}
                                         >
                                             <MdOutlineMoreVert className="w-5 h-5" />
                                         </button>
