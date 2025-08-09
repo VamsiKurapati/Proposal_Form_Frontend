@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { useUser } from './UserContext';
 
 const EmployeeProfileContext = createContext();
 
@@ -13,10 +14,7 @@ export const EmployeeProfileProvider = ({ children }) => {
     const [completedProposals, setCompletedProposals] = useState([]);
     const [hasInitialized, setHasInitialized] = useState(false);
 
-    const [role, setRole] = useState(localStorage.getItem("userRole") || null);
-    useEffect(() => {
-        setRole(localStorage.getItem("userRole"));
-    }, [localStorage.getItem("userRole")]);
+    const { role } = useUser();
 
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockEmployeeData = useCallback(() => ({

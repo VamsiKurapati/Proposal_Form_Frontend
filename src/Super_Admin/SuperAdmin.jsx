@@ -333,18 +333,20 @@ const SuperAdmin = () => {
         }
     };
 
-    let filteredUsers = users;
-    let filteredTransactions = transactions;
-    let filteredSupport = support;
+    const [filteredUsers, setFilteredUsers] = useState(users);
+    const [filteredTransactions, setFilteredTransactions] = useState(transactions);
+    const [filteredSupport, setFilteredSupport] = useState(support);
 
     useEffect(() => {
         console.log("searchTerm", searchTerm);
         console.log("users", users);
         if (searchTerm) {
-            filteredUsers = users.filter(user =>
+            setFilteredUsers(users.filter(user =>
                 user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            ));
+        } else {
+            setFilteredUsers(users);
         }
     }, [searchTerm, users]);
 
@@ -352,10 +354,12 @@ const SuperAdmin = () => {
         console.log("transactionSearchTerm", transactionSearchTerm);
         console.log("transactions", transactions);
         if (transactionSearchTerm) {
-            filteredTransactions = transactions.filter(transaction =>
+            setFilteredTransactions(transactions.filter(transaction =>
                 transaction.company.toLowerCase().includes(transactionSearchTerm.toLowerCase()) ||
                 transaction.type.toLowerCase().includes(transactionSearchTerm.toLowerCase())
-            );
+            ));
+        } else {
+            setFilteredTransactions(transactions);
         }
     }, [transactionSearchTerm, transactions]);
 
@@ -363,10 +367,12 @@ const SuperAdmin = () => {
         console.log("supportSearchTerm", supportSearchTerm);
         console.log("support", support);
         if (supportSearchTerm) {
-            filteredSupport = support.filter(support =>
+            setFilteredSupport(support.filter(support =>
                 support.type.toLowerCase().includes(supportSearchTerm.toLowerCase()) ||
                 support.subject.toLowerCase().includes(supportSearchTerm.toLowerCase())
-            );
+            ));
+        } else {
+            setFilteredSupport(support);
         }
     }, [supportSearchTerm, support]);
 
@@ -382,25 +388,36 @@ const SuperAdmin = () => {
     const supportCards = ["Billing & Payments", "Proposal Issues", "Account & Access", "Technical Errors", "Feature Requests", "Others"];
     const supportCardsData = [156, 156, 156, 156, 156, 156];
 
+    const handleUserStatusChange = (id, status) => {
+        console.log(id, status);
+        setFilteredUsers(prev => prev.map(user =>
+            user.id === id ? { ...user, status } : user
+        ));
+    };
+
     const handleTransactionStatusChange = (id, status) => {
         console.log(id, status);
-        filteredTransactions.forEach(transaction => {
-            if (transaction.id === id) {
-                transaction.status = status;
-                return;
-            }
-        });
+        setFilteredTransactions(prev => prev.map(transaction =>
+            transaction.id === id ? { ...transaction, status } : transaction
+        ));
+    };
+
+    const handleSupportStatusChange = (id, status) => {
+        console.log(id, status);
+        setFilteredSupport(prev => prev.map(support =>
+            support.id === id ? { ...support, status } : support
+        ));
     };
 
     useEffect(() => {
         if (completedTickets) {
-            filteredSupport = support.filter(support => support.status === 'Resolved');
+            setFilteredSupport(support.filter(support => support.status === 'Resolved'));
             console.log("resolved", filteredSupport);
         } else {
-            filteredSupport = support.filter(support => support.status !== 'Resolved');
+            setFilteredSupport(support.filter(support => support.status !== 'Resolved'));
             console.log("not resolved", filteredSupport);
         }
-    }, [completedTickets, support, filteredSupport]);
+    }, [completedTickets, support]);
 
     const renderUserManagement = () => (
         <div className='h-full'>
@@ -497,7 +514,10 @@ const SuperAdmin = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     {editUser === user.id ? (
-                                        <select className="px-2 py-1 text-[12px] rounded-full">
+                                        <select className="px-2 py-1 text-[12px] rounded-full"
+                                            onChange={(e) => handleUserStatusChange(user.id, e.target.value)}
+                                            value={user.status}
+                                        >
                                             <option value="Active">Active</option>
                                             <option value="Blocked">Blocked</option>
                                             <option value="Inactive">Inactive</option>
@@ -843,7 +863,6 @@ const SuperAdmin = () => {
                                         <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
                                             onChange={(e) => handleSupportStatusChange(ticket.id, e.target.value)}
                                             value={ticket.status}
-                                            defaultValue={ticket.status}
                                         >
                                             <option value="Active">Active</option>
                                             <option value="Resolved">Resolved</option>
@@ -901,73 +920,69 @@ const SuperAdmin = () => {
 
         return (
             <div className="h-full">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-                    <div className="p-4 border-b border-gray-200">
-                        <h2 className="text-lg font-medium text-gray-900">Notifications</h2>
-                    </div>
-
-                    {/* Filters and Search */}
-                    <div className="p-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
-                                <div className="relative">
-                                    <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
-                                        <MdOutlineKeyboardArrowDown className="w-4 h-4" />
-                                        <span>{notificationTimeFilter}</span>
-                                    </button>
-                                </div>
-                                <div className="relative">
-                                    <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
-                                        <span>{notificationCategoryFilter}</span>
-                                        <MdOutlineKeyboardArrowDown className="w-4 h-4" />
-                                    </button>
-                                </div>
+                {/* Filters and Search */}
+                <div className="pb-4 mb-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <div className="relative">
+                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
+                                    <MdOutlineKeyboardArrowDown className="w-4 h-4" />
+                                    <span>{notificationTimeFilter}</span>
+                                </button>
                             </div>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <MdOutlineSearch className="h-4 w-4 text-gray-400" />
+                                <button className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100">
+                                    <span>{notificationCategoryFilter}</span>
+                                    <MdOutlineKeyboardArrowDown className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <MdOutlineSearch className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={notificationSearchTerm}
+                                onChange={(e) => setNotificationSearchTerm(e.target.value)}
+                                className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Notifications List */}
+                {notification.length > 0 ? notification.map((item) => (
+                    <div key={item.id} className="p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
+                        <div className="flex items-start space-x-4">
+                            {/* Icon */}
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    {getNotificationIcon(item.icon)}
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    value={notificationSearchTerm}
-                                    onChange={(e) => setNotificationSearchTerm(e.target.value)}
-                                    className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <p className="text-sm text-gray-500 mb-1">{item.category}</p>
+                                        <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
+                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                    </div>
+                                    <div className="flex-shrink-0 ml-4">
+                                        <p className="text-sm text-gray-500">{item.timestamp}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Notifications List */}
-                    <div className="divide-y divide-gray-200">
-                        {notification.map((item) => (
-                            <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors">
-                                <div className="flex items-start space-x-4">
-                                    {/* Icon */}
-                                    <div className="flex-shrink-0">
-                                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                            {getNotificationIcon(item.icon)}
-                                        </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <p className="text-sm text-gray-500 mb-1">{item.category}</p>
-                                                <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
-                                                <p className="text-sm text-gray-600">{item.description}</p>
-                                            </div>
-                                            <div className="flex-shrink-0 ml-4">
-                                                <p className="text-sm text-gray-500">{item.timestamp}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                )) : (
+                    <div className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                        No notifications found
                     </div>
-                </div>
+                )}
             </div>
         );
     };
