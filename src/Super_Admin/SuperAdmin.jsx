@@ -83,7 +83,7 @@ const SuperAdmin = () => {
             const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`);
             const stats = response.data.stats;
             setUsersStats(stats);
-            const companiesData = response.data.companyData;
+            const companiesData = response.data.CompanyData;
             setCompaniesData(companiesData);
             planManagementStats["Active Users"] = stats["Active Users"];
         } catch (error) {
@@ -162,10 +162,10 @@ const SuperAdmin = () => {
         }
     };
 
-    const [filteredUsers, setFilteredUsers] = useState(companiesData);
-    const [filteredTransactions, setFilteredTransactions] = useState(paymentsData);
-    const [filteredSupport, setFilteredSupport] = useState(supportTicketsData);
-    const [filteredNotifications, setFilteredNotifications] = useState(notificationsData);
+    const [filteredUsers, setFilteredUsers] = useState(companiesData || []);
+    const [filteredTransactions, setFilteredTransactions] = useState(paymentsData || []);
+    const [filteredSupport, setFilteredSupport] = useState(supportTicketsData || []);
+    const [filteredNotifications, setFilteredNotifications] = useState(notificationsData || []);
 
     useEffect(() => {
         console.log("searchTerm", searchTerm);
