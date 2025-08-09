@@ -7,7 +7,6 @@ import {
     MdOutlinePayments,
     MdOutlineHeadsetMic,
     MdOutlineFilterList,
-    MdOutlineFileDownload,
     MdOutlineMoreVert,
     MdOutlineGroup,
     MdOutlineLogout,
@@ -55,11 +54,14 @@ const SuperAdmin = () => {
     const [editSupport, setEditSupport] = useState(false);
 
     // Filters
-    const [userFilter, setUserFilter] = useState("All");
-    const [transactionFilter, setTransactionFilter] = useState("All");
-    const [supportFilter, setSupportFilter] = useState("All");
-    const [notificationTimeFilter, setNotificationTimeFilter] = useState("All Time");
-    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState("All Categories");
+    const [userStatusFilter, setUserStatusFilter] = useState('all');
+    const [transactionStatusFilter, setTransactionStatusFilter] = useState('all');
+    const [transactionDateFilter, setTransactionDateFilter] = useState('all');
+    const [supportStatusFilter, setSupportStatusFilter] = useState('all');
+    const [supportPriorityFilter, setSupportPriorityFilter] = useState('all');
+    const [supportTypeFilter, setSupportTypeFilter] = useState('all');
+    const [notificationTimeFilter, setNotificationTimeFilter] = useState('All Time');
+    const [notificationCategoryFilter, setNotificationCategoryFilter] = useState('All Categories');
 
     // Filter Modals
     const [userFilterModal, setUserFilterModal] = useState(false);
@@ -77,6 +79,13 @@ const SuperAdmin = () => {
     const [supportTicketsStats, setSupportTicketsStats] = useState({});
     const [supportTicketsData, setSupportTicketsData] = useState([]);
     const [notificationsData, setNotificationsData] = useState([]);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPageTransactions, setCurrentPageTransactions] = useState(1);
+    const [currentPageSupport, setCurrentPageSupport] = useState(1);
+    const [currentPageNotifications, setCurrentPageNotifications] = useState(1);
 
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
@@ -102,47 +111,72 @@ const SuperAdmin = () => {
         ));
     };
 
-    const handleUserFilter = (filter) => {
-        if (filter === "all") {
-            setUserFilter([]);
-        } else {
-            setUserFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
+    // Save handlers: call backend then update local state on success
+    const saveUserStatus = async (userId) => {
+        const user = (filteredUsers || []).find(u => u._id === userId);
+        if (!user) return setEditUser(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateCompanyStatus`, {
+                companyId: userId,
+                status: user.status || 'Active'
             });
+            if (res.status === 200) {
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setEditUser(null);
+            }
+        } catch (e) {
+            alert('Failed to update user status');
         }
     };
 
-    const handleTransactionFilter = (filter) => {
-        if (filter === "all") {
-            setTransactionFilter([]);
-        } else {
-            setTransactionFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
+    const saveTransactionStatus = async (transactionId, rowId) => {
+        const tx = (filteredTransactions || []).find(t => t.transaction_id === transactionId || t._id === rowId);
+        if (!tx) return setEditTransaction(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updatePaymentStatus`, {
+                transaction_id: tx.transaction_id,
+                status: tx.status
             });
+            if (res.status === 200) {
+                setPaymentsData(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
+                setFilteredTransactions(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
+                setEditTransaction(null);
+            }
+        } catch (e) {
+            alert('Failed to update transaction status');
         }
     };
 
-    const handleSupportFilter = (filter) => {
-        if (filter === "all") {
-            setSupportFilter([]);
-        } else {
-            setSupportFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
+    const saveSupportStatus = async (ticketRowId) => {
+        const ticket = (filteredSupport || []).find(t => t._id === ticketRowId);
+        if (!ticket) return setEditSupport(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateTicketStatus`, {
+                ticketId: ticketRowId,
+                status: ticket.status
             });
+            if (res.status === 200) {
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
+                setEditSupport(null);
+            }
+        } catch (e) {
+            alert('Failed to update ticket status');
         }
     };
+
+    // User filter: single select with toggle back to 'all'
+    const handleUserStatusChangeFilter = (value) => setUserStatusFilter(value);
+
+    // Transaction filters are split by group
+    const handleTransactionStatusChangeFilter = (value) => setTransactionStatusFilter(value);
+    const handleTransactionDateChangeFilter = (value) => setTransactionDateFilter(value);
+
+    // Support filters split by group
+    const handleSupportStatusChangeFilter = (value) => setSupportStatusFilter(value);
+    const handleSupportPriorityChangeFilter = (value) => setSupportPriorityFilter(value);
+    const handleSupportTypeChangeFilter = (value) => setSupportTypeFilter(value);
 
     // Export helpers
     const exportArrayToCSV = (filename, headers, rows) => {
@@ -190,18 +224,110 @@ const SuperAdmin = () => {
         exportArrayToCSV('transactions.csv', headers, rows);
     };
 
-    const handleNotificationCategoryFilter = (filter) => {
-        if (filter === "All Categories") {
-            setNotificationCategoryFilter([]);
-        } else {
-            setNotificationCategoryFilter((prev) => {
-                if (prev.includes(filter)) {
-                    return prev.filter(item => item !== filter);
-                } else {
-                    return [...prev, filter];
-                }
-            });
+    const handleNotificationCategoryFilter = (value) => setNotificationCategoryFilter(value);
+
+    // Pagination utility functions
+    const paginateData = (data, currentPage, rowsPerPage) => {
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        return data.slice(startIndex, endIndex);
+    };
+
+    const getTotalPages = (data, rowsPerPage) => {
+        return Math.ceil(data.length / rowsPerPage);
+    };
+
+    const PaginationComponent = ({ currentPage, totalPages, onPageChange, totalItems, rowsPerPage, onRowsPerPageChange }) => {
+        const pageNumbers = [];
+        const maxVisiblePages = 5;
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(i);
+        }
+
+        return (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 p-4 border-t border-[#E5E7EB]">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-[#6B7280]">Rows per page:</span>
+                    <select
+                        value={rowsPerPage}
+                        onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
+                        className="border border-[#E5E7EB] rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                    <span className="text-sm text-[#6B7280]">
+                        {((currentPage - 1) * rowsPerPage) + 1}-{Math.min(currentPage * rowsPerPage, totalItems)} of {totalItems}
+                    </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => onPageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 text-sm border border-[#E5E7EB] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F3F4F6]"
+                    >
+                        Previous
+                    </button>
+
+                    {startPage > 1 && (
+                        <>
+                            <button
+                                onClick={() => onPageChange(1)}
+                                className="px-3 py-1 text-sm border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6]"
+                            >
+                                1
+                            </button>
+                            {startPage > 2 && <span className="px-2 text-[#6B7280]">...</span>}
+                        </>
+                    )}
+
+                    {pageNumbers.map(number => (
+                        <button
+                            key={number}
+                            onClick={() => onPageChange(number)}
+                            className={`px-3 py-1 text-sm border rounded-lg ${currentPage === number
+                                ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                                : 'border-[#E5E7EB] hover:bg-[#F3F4F6]'
+                                }`}
+                        >
+                            {number}
+                        </button>
+                    ))}
+
+                    {endPage < totalPages && (
+                        <>
+                            {endPage < totalPages - 1 && <span className="px-2 text-[#6B7280]">...</span>}
+                            <button
+                                onClick={() => onPageChange(totalPages)}
+                                className="px-3 py-1 text-sm border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6]"
+                            >
+                                {totalPages}
+                            </button>
+                        </>
+                    )}
+
+                    <button
+                        onClick={() => onPageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1 text-sm border border-[#E5E7EB] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F3F4F6]"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+        );
     };
 
     const getStatusColor = (status) => {
@@ -218,10 +344,12 @@ const SuperAdmin = () => {
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Failed':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'In Progress':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Completed':
+            case 'Resolved':
                 return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'In Progress':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'New':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -360,118 +488,72 @@ const SuperAdmin = () => {
     }, [notificationSearchTerm]);
 
     useEffect(() => {
-        //console.log("notificationSearchTerm", notificationSearchTerm);
-        //console.log("notifications", notificationsData);
-        if (notificationTimeFilter !== "All Time") {
-            setFilteredNotifications((notificationsData || []).filter(notification => {
-                const time = new Date(notification.created_at || notification.createdAt || notification.time);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-                const last7Days = new Date(today);
-                last7Days.setDate(today.getDate() - 7);
-                const last14Days = new Date(today);
-                last14Days.setDate(today.getDate() - 14);
-                const last30Days = new Date(today);
-                last30Days.setDate(today.getDate() - 30);
-                if (notificationTimeFilter === "Today") {
-                    return time.toDateString() === today.toDateString();
-                } else if (notificationTimeFilter === "Yesterday") {
-                    return time.toDateString() === yesterday.toDateString();
-                } else if (notificationTimeFilter === "Last 7 Days") {
-                    return time >= last7Days;
-                } else if (notificationTimeFilter === "Last 14 Days") {
-                    return time >= last14Days;
-                } else if (notificationTimeFilter === "Last 30 Days") {
-                    return time >= last30Days;
-                } else {
-                    return true;
-                }
-            }));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
+        const base = notificationsData || [];
+        const filtered = base.filter(notification => {
+            // time filter
+            const time = new Date(notification.created_at || notification.createdAt || notification.time);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const last7Days = new Date(today);
+            last7Days.setDate(today.getDate() - 7);
+            const last14Days = new Date(today);
+            last14Days.setDate(today.getDate() - 14);
+            const last30Days = new Date(today);
+            last30Days.setDate(today.getDate() - 30);
 
-        if (notificationCategoryFilter !== "All Categories") {
-            setFilteredNotifications((notificationsData || []).filter(notification =>
-                (notification.type === notificationCategoryFilter) ||
-                (notification.type && notification.type.toLowerCase() === notificationCategoryFilter.toLowerCase())
-            ));
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationTimeFilter, notificationCategoryFilter]);
+            let timeOk = true;
+            if (notificationTimeFilter === 'today') timeOk = time.toDateString() === today.toDateString();
+            else if (notificationTimeFilter === 'yesterday') timeOk = time.toDateString() === yesterday.toDateString();
+            else if (notificationTimeFilter === 'last7Days') timeOk = time >= last7Days;
+            else if (notificationTimeFilter === 'last14Days') timeOk = time >= last14Days;
+            else if (notificationTimeFilter === 'last30Days') timeOk = time >= last30Days;
+
+            // category filter
+            const type = (notification.type || '').toLowerCase();
+            const cat = (notificationCategoryFilter || 'All Categories').toLowerCase();
+            const categoryOk = cat === 'all categories' ? true : type === cat;
+
+            return timeOk && categoryOk;
+        });
+        setFilteredNotifications(filtered);
+    }, [notificationsData, notificationTimeFilter, notificationCategoryFilter]);
 
     useEffect(() => {
-        //console.log("userFilter", userFilter);
-        //console.log("filteredUsers", filteredUsers);
-        //console.log("companiesData", companiesData);
-        if (userFilter.length > 0) {
-            setFilteredUsers(companiesData.filter(user => userFilter.includes(user.status)));
+        const base = companiesData || [];
+        if (userStatusFilter === 'all') {
+            setFilteredUsers(base);
         } else {
-            setFilteredUsers(companiesData);
+            setFilteredUsers(base.filter(u => (u.status || '').toLowerCase() === userStatusFilter));
         }
-    }, [userFilter]);
+    }, [companiesData, userStatusFilter]);
 
     useEffect(() => {
-        //console.log("transactionFilter", transactionFilter);
-        //console.log("filteredTransactions", filteredTransactions);
-        //console.log("paymentsData", paymentsData);
-        if (transactionFilter.length > 0) {
-            setFilteredTransactions((paymentsData || []).filter(transaction => transactionFilter.includes(transaction.status)));
-            if (transactionFilter.includes("last7Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
-            } else if (transactionFilter.includes("last15Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 15))));
-            } else if (transactionFilter.includes("last30Days")) {
-                setFilteredTransactions((paymentsData || []).filter(transaction => new Date(transaction.created_at || transaction.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
+        const base = paymentsData || [];
+        const byStatus = transactionStatusFilter === 'all' ? base : base.filter(t => t.status === transactionStatusFilter);
+        let result = byStatus;
+        if (transactionDateFilter !== 'all') {
+            const now = new Date();
+            let since = null;
+            if (transactionDateFilter === 'last7Days') since = new Date(now.setDate((new Date()).getDate() - 7));
+            else if (transactionDateFilter === 'last15Days') since = new Date(now.setDate((new Date()).getDate() - 15));
+            else if (transactionDateFilter === 'last30Days') since = new Date(now.setDate((new Date()).getDate() - 30));
+            if (since) {
+                result = result.filter(t => new Date(t.created_at || t.createdAt) >= since);
             }
-        } else {
-            setFilteredTransactions(paymentsData);
         }
-    }, [transactionFilter]);
+        setFilteredTransactions(result);
+    }, [paymentsData, transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
-        //console.log("supportFilter", supportFilter);
-        //console.log("filteredSupport", filteredSupport);
-        //console.log("supportTicketsData", supportTicketsData);
-        if (supportFilter.length > 0) {
-            setFilteredSupport((supportTicketsData || []).filter(ticket => supportFilter.includes(ticket.status) || supportFilter.includes(ticket.type) || supportFilter.includes(ticket.priority)));
-        } else {
-            setFilteredSupport(supportTicketsData);
-        }
-    }, [supportFilter]);
+        const base = supportTicketsData || [];
+        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status || '').toLowerCase() === supportStatusFilter.toLowerCase());
+        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
+        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type || '').toLowerCase() === supportTypeFilter.toLowerCase());
+        setFilteredSupport(byType);
+    }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
-    useEffect(() => {
-        //console.log("notificationCategoryFilter", notificationCategoryFilter);
-        //console.log("filteredNotifications", filteredNotifications);
-        //console.log("notificationsData", notificationsData);
-        if (notificationCategoryFilter.length > 0 || notificationTimeFilter.length > 0) {
-            if (notificationCategoryFilter.includes("All Categories") && notificationTimeFilter.includes("All Time")) {
-                setFilteredNotifications(notificationsData);
-            }
-            else if (notificationCategoryFilter.includes("All Categories")) {
-                setFilteredNotifications(notificationsData);
-                if (notificationCategoryFilter.includes("Today")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 1))));
-                } else if (notificationCategoryFilter.includes("Yesterday")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 2))));
-                } else if (notificationCategoryFilter.includes("Last 7 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 7))));
-                } else if (notificationCategoryFilter.includes("Last 14 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 14))));
-                } else if (notificationCategoryFilter.includes("Last 30 Days")) {
-                    setFilteredNotifications((notificationsData || []).filter(notification => new Date(notification.created_at || notification.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))));
-                } else {
-                    setFilteredNotifications(notificationsData);
-                }
-            } else if (notificationTimeFilter.includes("All Time")) {
-                setFilteredNotifications((notificationsData || []).filter(notification => notificationCategoryFilter.includes(notification.type)));
-            }
-        } else {
-            setFilteredNotifications(notificationsData);
-        }
-    }, [notificationCategoryFilter, notificationTimeFilter]);
+    // Removed duplicate notifications filter effect; combined above
 
     useEffect(() => {
         if (completedTickets) {
@@ -482,6 +564,46 @@ const SuperAdmin = () => {
             //console.log("not resolved", filteredSupport);
         }
     }, [completedTickets, supportTicketsData]);
+
+    useEffect(() => {
+        // Reset pagination when search terms change
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        // Reset pagination when transaction search terms change
+        setCurrentPageTransactions(1);
+    }, [transactionSearchTerm]);
+
+    useEffect(() => {
+        // Reset pagination when support search terms change
+        setCurrentPageSupport(1);
+    }, [supportSearchTerm]);
+
+    useEffect(() => {
+        // Reset pagination when notification search terms change
+        setCurrentPageNotifications(1);
+    }, [notificationSearchTerm]);
+
+    useEffect(() => {
+        // Reset pagination when user filters change
+        setCurrentPage(1);
+    }, [userStatusFilter]);
+
+    useEffect(() => {
+        // Reset pagination when transaction filters change
+        setCurrentPageTransactions(1);
+    }, [transactionStatusFilter, transactionDateFilter]);
+
+    useEffect(() => {
+        // Reset pagination when support filters change
+        setCurrentPageSupport(1);
+    }, [supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
+
+    useEffect(() => {
+        // Reset pagination when notification filters change
+        setCurrentPageNotifications(1);
+    }, [notificationTimeFilter, notificationCategoryFilter]);
 
     const renderUserManagement = () => (
         <div className='h-full'>
@@ -524,30 +646,46 @@ const SuperAdmin = () => {
 
                             {userFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => setUserStatusFilter('all')}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="userFilter" id="all" value="all"
-                                            onChange={(e) => handleUserFilter(e.target.value)}
+                                        <input type="radio" name="userStatusFilter" id="user_all" value="all"
+                                            checked={userStatusFilter === 'all'}
+                                            onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="user_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="active" value="active"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="active" value="active"
+                                                checked={userStatusFilter === 'active'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="active">Active</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="blocked" value="blocked"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="blocked" value="blocked"
+                                                checked={userStatusFilter === 'blocked'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="blocked">Blocked</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="userFilter" id="inactive" value="inactive"
-                                                onChange={(e) => handleUserFilter(e.target.value)}
+                                            <input type="radio" name="userStatusFilter" id="inactive" value="inactive"
+                                                checked={userStatusFilter === 'inactive'}
+                                                onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="inactive">Inactive</label>
                                         </div>
@@ -594,64 +732,80 @@ const SuperAdmin = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredUsers.length > 0 ? filteredUsers.map((user, index) => (
-                            <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {user._id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {user.email}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
-                                    {user.establishedYear}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
-                                    {user.location}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {editUser === user._id ? (
-                                        <select className="px-2 py-1 text-[12px] rounded-full"
-                                            onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
-                                            value={user.status || 'Active'}
-                                        >
-                                            <option value="Active">Active</option>
-                                            <option value="Blocked">Blocked</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
-                                    ) : (
-                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status || 'Active')}`}>
-                                            {user.status || 'Active'}
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editUser === user._id ? (
-                                        <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                            onClick={() => setEditUser(null)}
-                                        >
-                                            Save
-                                        </button>
-                                    ) : (
-                                        <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditUser(user._id)}
-                                        >
-                                            <MdOutlineEdit className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    No users found
-                                </td>
-                            </tr>
-                        )}
+                        {(() => {
+                            const paginatedUsers = paginateData(filteredUsers, currentPage, rowsPerPage);
+                            return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
+                                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {user._id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {user.email}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
+                                        {user.establishedYear}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
+                                        {user.location}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editUser === user._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full"
+                                                onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
+                                                value={user.status || 'Active'}
+                                            >
+                                                <option value="Active">Active</option>
+                                                <option value="Blocked">Blocked</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status || 'Active')}`}>
+                                                {user.status || 'Active'}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editUser === user._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                onClick={() => saveUserStatus(user._id)}
+                                            >
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditUser(user._id)}
+                                            >
+                                                <MdOutlineEdit className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan={7} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                        No users found
+                                    </td>
+                                </tr>
+                            );
+                        })()}
                     </tbody>
                 </table>
+                {filteredUsers.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        totalPages={getTotalPages(filteredUsers, rowsPerPage)}
+                        onPageChange={(page) => setCurrentPage(page)}
+                        totalItems={filteredUsers.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => {
+                            setRowsPerPage(newRowsPerPage);
+                            setCurrentPage(1); // Reset to first page when changing rows per page
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
@@ -741,53 +895,91 @@ const SuperAdmin = () => {
                             </button>
                             {transactionFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     {/* All */}
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="transactionFilter" id="all" value="all"
-                                            onChange={(e) => handleTransactionFilter(e.target.value)}
+                                        <input type="radio" name="transactionAll" id="txn_all" value="all"
+                                            checked={transactionStatusFilter === 'all' && transactionDateFilter === 'all'}
+                                            onChange={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="txn_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="successful" value="successful"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="succeeded" value="succeeded"
+                                                checked={transactionStatusFilter === 'succeeded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="successful">Successful</label>
+                                            <label htmlFor="succeeded">Succeeded</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="pending" value="pending"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="pending" value="pending"
+                                                checked={transactionStatusFilter === 'pending'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="pending">Pending</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="failed" value="failed"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionStatusFilter" id="failed" value="failed"
+                                                checked={transactionStatusFilter === 'failed'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="failed">Failed</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="refunded" value="refunded"
+                                                checked={transactionStatusFilter === 'refunded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="refunded">Refunded</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pending_refund" value="pending refund"
+                                                checked={transactionStatusFilter === 'pending refund'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending_refund">Pending Refund</label>
                                         </div>
                                     </div>
                                     {/* Date */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last7Days" value="last7Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last7Days" value="last7Days"
+                                                checked={transactionDateFilter === 'last7Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last15Days" value="last15Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last15Days" value="last15Days"
+                                                checked={transactionDateFilter === 'last15Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last15Days">Last 15 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionFilter" id="last30Days" value="last30Days"
-                                                onChange={(e) => handleTransactionFilter(e.target.value)}
+                                            <input type="radio" name="transactionDateFilter" id="last30Days" value="last30Days"
+                                                checked={transactionDateFilter === 'last30Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
                                         </div>
@@ -799,7 +991,7 @@ const SuperAdmin = () => {
 
                     <div className="flex items-center justify-center sm:justify-end">
                         <button onClick={handleExportTransactions} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
-                            <MdOutlineFileDownload className="w-5 h-5" />
+                            <MdOutlineFileUpload className="w-5 h-5" />
                             <span>Export</span>
                         </button>
                     </div>
@@ -834,67 +1026,83 @@ const SuperAdmin = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white">
-                        {filteredTransactions.length > 0 ? filteredTransactions.map((transaction, index) => (
-                            <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.transaction_id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.user_id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.payment_method}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.price}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {transaction.created_at || transaction.createdAt}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {editTransaction === transaction._id ? (
-                                        <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
-                                            onChange={(e) => handleTransactionStatusChange(transaction.transaction_id, e.target.value)}
-                                            value={transaction.status}
-                                            defaultValue={transaction.status}
-                                        >
-                                            <option value="succeeded">Succeeded</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="failed">Failed</option>
-                                            <option value="refunded">Refunded</option>
-                                            <option value="pending refund">Pending Refund</option>
-                                        </select>
-                                    ) : (
-                                        <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                                            {transaction.status}
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editTransaction === transaction._id ? (
-                                        <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
-                                            onClick={() => setEditTransaction(null)}
-                                        >
-                                            Save
-                                        </button>
-                                    ) : (
-                                        <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditTransaction(transaction._id)}
-                                        >
-                                            <MdOutlineMoreVert className="w-5 h-5" />
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    No transactions found
-                                </td>
-                            </tr>
-                        )}
+                        {(() => {
+                            const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
+                            return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
+                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.transaction_id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.user_id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.payment_method}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.price}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.created_at || transaction.createdAt}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editTransaction === transaction._id ? (
+                                            <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
+                                                onChange={(e) => handleTransactionStatusChange(transaction.transaction_id, e.target.value)}
+                                                value={transaction.status}
+                                                defaultValue={transaction.status}
+                                            >
+                                                <option value="succeeded">Succeeded</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="failed">Failed</option>
+                                                <option value="refunded">Refunded</option>
+                                                <option value="pending refund">Pending Refund</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                                                {transaction.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editTransaction === transaction._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
+                                                onClick={() => saveTransactionStatus(transaction.transaction_id, transaction._id)}
+                                            >
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditTransaction(transaction._id)}
+                                            >
+                                                <MdOutlineMoreVert className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan={7} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                        No transactions found
+                                    </td>
+                                </tr>
+                            );
+                        })()}
                     </tbody>
                 </table>
+                {filteredTransactions.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageTransactions}
+                        totalPages={getTotalPages(filteredTransactions, rowsPerPage)}
+                        onPageChange={(page) => setCurrentPageTransactions(page)}
+                        totalItems={filteredTransactions.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => {
+                            setRowsPerPage(newRowsPerPage);
+                            setCurrentPageTransactions(1); // Reset to first page when changing rows per page
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
@@ -964,53 +1172,75 @@ const SuperAdmin = () => {
 
                             {supportFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
                                     {/* All */}
                                     <div className="flex items-center space-x-2">
-                                        <input type="radio" name="supportFilter" id="all" value="all"
-                                            onChange={(e) => handleSupportFilter(e.target.value)}
+                                        <input type="radio" name="supportAll" id="support_all" value="all"
+                                            checked={supportStatusFilter === 'all' && supportPriorityFilter === 'all' && supportTypeFilter === 'all'}
+                                            onChange={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
                                         />
-                                        <label htmlFor="all">All</label>
+                                        <label htmlFor="support_all">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="inProgress" value="inProgress"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportStatusFilter" id="new" value="new"
+                                                checked={supportStatusFilter === 'new'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="new">New</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
+                                                checked={supportStatusFilter === 'in progress'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="inProgress">In Progress</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="pending" value="pending"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
+                                                checked={supportStatusFilter === 'resolved'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="pending">Pending</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="completed" value="completed"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
-                                            />
-                                            <label htmlFor="completed">Completed</label>
+                                            <label htmlFor="resolved">Resolved</label>
                                         </div>
                                     </div>
                                     {/* Priority */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="low" value="low"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="low" value="low"
+                                                checked={supportPriorityFilter === 'low'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="low">Low</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="medium" value="medium"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="medium" value="medium"
+                                                checked={supportPriorityFilter === 'medium'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="medium">Medium</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="high" value="high"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportPriorityFilter" id="high" value="high"
+                                                checked={supportPriorityFilter === 'high'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="high">High</label>
                                         </div>
@@ -1019,40 +1249,52 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="billing" value="billing"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="billingPayments" value="billing & payments"
+                                                checked={supportTypeFilter === 'billing & payments'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="billing">Billing</label>
+                                            <label htmlFor="billingPayments">Billing & Payments</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="technical" value="technical"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="technicalErrors" value="technical errors"
+                                                checked={supportTypeFilter === 'technical errors'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="technical">Technical</label>
+                                            <label htmlFor="technicalErrors">Technical Errors</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="feature" value="feature"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="featureRequests" value="feature requests"
+                                                checked={supportTypeFilter === 'feature requests'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="feature">Feature</label>
+                                            <label htmlFor="featureRequests">Feature Requests</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="account" value="account"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="accountAccess" value="account & access"
+                                                checked={supportTypeFilter === 'account & access'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="account">Account</label>
+                                            <label htmlFor="accountAccess">Account & Access</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="proposal" value="proposal"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="proposalIssues" value="proposal issues"
+                                                checked={supportTypeFilter === 'proposal issues'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="proposal">Proposal</label>
+                                            <label htmlFor="proposalIssues">Proposal Issues</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportFilter" id="other" value="other"
-                                                onChange={(e) => handleSupportFilter(e.target.value)}
+                                            <input type="radio" name="supportTypeFilter" id="others" value="others"
+                                                checked={supportTypeFilter === 'others'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="other">Other</label>
+                                            <label htmlFor="others">Others</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1093,68 +1335,85 @@ const SuperAdmin = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white">
-                        {filteredSupport.length > 0 ? filteredSupport.map((ticket, index) => (
-                            <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    {ticket.ticket_id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.type}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.subject}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.user_id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                        {ticket.priority}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                    {ticket.created_at}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {editSupport === ticket._id ? (
-                                        <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
-                                            onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
-                                            value={ticket.status}
-                                        >
-                                            <option value="Active">Active</option>
-                                            <option value="Resolved">Resolved</option>
-                                        </select>
-                                    ) : (
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                            {ticket.status}
+                        {(() => {
+                            const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
+                            return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
+                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {ticket.ticket_id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.type}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.subject}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.user_id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                            {ticket.priority}
                                         </span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
-                                    {editSupport === ticket._id ? (
-                                        <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
-                                            onClick={() => setEditSupport(null)}
-                                        >
-                                            Save
-                                        </button>
-                                    ) : (
-                                        <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
-                                            onClick={() => setEditSupport(ticket._id)}
-                                        >
-                                            <MdOutlineMoreVert className="w-5 h-5" />
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                    No tickets found
-                                </td>
-                            </tr>
-                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.created_at}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editSupport === ticket._id ? (
+                                            <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
+                                                onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
+                                                value={ticket.status}
+                                            >
+                                                <option value="New">New</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Resolved">Resolved</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editSupport === ticket._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
+                                                onClick={() => saveSupportStatus(ticket._id)}
+                                            >
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditSupport(ticket._id)}
+                                            >
+                                                <MdOutlineMoreVert className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan={8} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                        No tickets found
+                                    </td>
+                                </tr>
+                            );
+                        })()}
                     </tbody>
                 </table>
+                {filteredSupport.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageSupport}
+                        totalPages={getTotalPages(filteredSupport, rowsPerPage)}
+                        onPageChange={(page) => setCurrentPageSupport(page)}
+                        totalItems={filteredSupport.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => {
+                            setRowsPerPage(newRowsPerPage);
+                            setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
@@ -1162,13 +1421,13 @@ const SuperAdmin = () => {
     const renderNotifications = () => {
         const getNotificationIcon = (icon) => {
             switch (icon) {
-                case 'user':
+                case 'User':
                     return <MdOutlineAccountCircle className="w-5 h-5" />;
-                case 'payment':
+                case 'Payment':
                     return <MdOutlineShoppingBag className="w-5 h-5" />;
-                case 'support':
+                case 'Support':
                     return <MdOutlineHeadphones className="w-5 h-5" />;
-                case 'subscription':
+                case 'Subscription':
                     return <MdOutlineMoney className="w-5 h-5" />;
                 default:
                     return <MdOutlineAccountCircle className="w-5 h-5" />;
@@ -1186,43 +1445,63 @@ const SuperAdmin = () => {
                                     onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
-                                    <span>{notificationTimeFilter !== "" ? notificationTimeFilter : "All Time"}</span>
+                                    <span>{notificationTimeFilter || 'All Time'}</span>
                                 </button>
 
                                 {notificationTimeFilterModal && (
                                     <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[14px] font-medium text-[#111827]">Time</span>
+                                            <button
+                                                className="text-[12px] text-[#2563EB] hover:underline"
+                                                onClick={() => setNotificationTimeFilter('all')}
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationTimeFilter" id="allTime" value="allTime"
+                                            <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
+                                                checked={notificationTimeFilter === 'All Time'}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="allTime">All Time</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
+                                                checked={notificationTimeFilter === 'today'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="today">Today</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
+                                                checked={notificationTimeFilter === 'yesterday'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="yesterday">Yesterday</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
+                                                checked={notificationTimeFilter === 'last7Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
+                                                checked={notificationTimeFilter === 'last14Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last14Days">Last 14 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
+                                                checked={notificationTimeFilter === 'last30Days'}
+                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
                                                 onChange={(e) => setNotificationTimeFilter(e.target.value)}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
@@ -1234,50 +1513,72 @@ const SuperAdmin = () => {
                                 <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
-                                    <span>{notificationCategoryFilter !== "" ? notificationCategoryFilter : "All Categories"}</span>
+                                    <span>{notificationCategoryFilter || 'All Categories'}</span>
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                 </button>
 
                                 {notificationCategoryFilterModal && (
                                     <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[14px] font-medium text-[#111827]">Category</span>
+                                            <button
+                                                className="text-[12px] text-[#2563EB] hover:underline"
+                                                onClick={() => handleNotificationCategoryFilter('all')}
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="allCategories" value="allCategories"
+                                            <input type="radio" name="notificationCategoryFilter" id="allCategories" value="All Categories"
+                                                checked={notificationCategoryFilter === 'All Categories'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="allCategories">All Categories</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="accountAccess"
+                                            <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
+                                                checked={notificationCategoryFilter === 'account access'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="accountAccess">Account & Access</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billingPayments"
+                                            <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
+                                                checked={notificationCategoryFilter === 'billing & payments'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="billingPayments">Billing & Payments</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technicalErrors"
+                                            <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
+                                                checked={notificationCategoryFilter === 'technical errors'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="technicalErrors">Technical Errors</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="featureRequests"
+                                            <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
+                                                checked={notificationCategoryFilter === 'feature requests'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="featureRequests">Feature Requests</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposalIssues"
+                                            <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
+                                                checked={notificationCategoryFilter === 'proposal issues'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="proposalIssues">Proposal Issues</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
+                                                checked={notificationCategoryFilter === 'others'}
+                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="others">Others</label>
@@ -1302,34 +1603,54 @@ const SuperAdmin = () => {
                 </div>
 
                 {/* Notifications List */}
-                {filteredNotifications.length > 0 ? filteredNotifications.map((item) => (
-                    <div key={item.id} className="p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
-                        <div className="flex items-start space-x-4">
-                            {/* Icon */}
-                            <div className="flex-shrink-0">
-                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    {getNotificationIcon(item.icon)}
-                                </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-500 mb-1">{item.category}</p>
-                                        <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
-                                        <p className="text-sm text-gray-600">{item.description}</p>
+                {(() => {
+                    const paginatedNotifications = paginateData(filteredNotifications, currentPageNotifications, rowsPerPage);
+                    return paginatedNotifications.length > 0 ? paginatedNotifications.map((item) => (
+                        <div key={item.id} className="bg-white p-4 transition-colors border border-[#E5E7EB] rounded-lg mb-4">
+                            <div className="flex items-start space-x-4">
+                                {/* Icon */}
+                                <div className="flex-shrink-0">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        {getNotificationIcon(item.category)}
                                     </div>
-                                    <div className="flex-shrink-0 ml-4">
-                                        <p className="text-sm text-gray-500">{item.timestamp}</p>
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <p className="text-sm text-gray-500 mb-1">{item.category}</p>
+                                            <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
+                                            <p className="text-sm text-gray-600">{item.description}</p>
+                                        </div>
+                                        <div className="flex-shrink-0 ml-4">
+                                            <p className="text-sm text-gray-500">{item.timestamp}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )) : (
-                    <div className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                        No notifications found
+                    )) : (
+                        <div className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                            No notifications found
+                        </div>
+                    );
+                })()}
+
+                {/* Pagination for notifications */}
+                {filteredNotifications.length > 0 && (
+                    <div className="mt-6">
+                        <PaginationComponent
+                            currentPage={currentPageNotifications}
+                            totalPages={getTotalPages(filteredNotifications, rowsPerPage)}
+                            onPageChange={(page) => setCurrentPageNotifications(page)}
+                            totalItems={filteredNotifications.length}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(newRowsPerPage) => {
+                                setRowsPerPage(newRowsPerPage);
+                                setCurrentPageNotifications(1); // Reset to first page when changing rows per page
+                            }}
+                        />
                     </div>
                 )}
             </div>
