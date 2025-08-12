@@ -772,13 +772,11 @@ const DiscoverRFPs = () => {
       />
       <main className="pt-20 px-8 md:px-12 py-6 ml-0">
         {/* Search Bar Section */}
-
-
-        <div className="flex space-x-6 border-b border-gray-200 p-4">
+        <div className="flex  justify-center mx-auto text-lg space-x-6 border-b border-gray-200 p-4">
           <button
-            className={`pb-2 ${activeTab === "rfp"
-              ? "text-blue-600 font-bold border-b-2 border-blue-600"
-              : "font-bold text-gray-600"
+            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "rfp"
+              ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
+              : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
               }`}
             onClick={() => setActiveTab("rfp")}
           >
@@ -786,9 +784,9 @@ const DiscoverRFPs = () => {
           </button>
 
           <button
-            className={`pb-2 ${activeTab === "grants"
-              ? "text-blue-600 font-bold border-b-2 border-blue-600"
-              : "font-bold text-gray-600"
+            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "grants"
+              ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
+              : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
               }`}
             onClick={() => setActiveTab("grants")}
           >
@@ -985,35 +983,6 @@ const DiscoverRFPs = () => {
         {activeTab === "grants" && (
           <div>
             <div>
-              {/* <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1 w-full md:max-w-[90%]">
-              <div className="relative">
-                <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
-                <input
-                  type="text"
-                  placeholder="Search RFPs by title, organization or category"
-                  className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
-                  onClick={() => setIsSearchFocused(true)}
-                >
-                  Advanced Search
-                </button>
-              </div>
-            </div>
-            <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
-              onClick={() => setUploadModalOpen(true)}
-            >
-              <MdOutlineUpload className="w-5 h-5" />
-              Upload RFP
-            </button>
-          </div>
-        </div> */}
-
               <h2 className="text-[24px] text-[#000000] font-semibold mb-4">Recently Added Grant's</h2>
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
