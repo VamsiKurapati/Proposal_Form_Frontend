@@ -137,8 +137,8 @@ const SuperAdmin = () => {
             });
             if (res.status === 200) {
                 //console.log("res", res);
-                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
-                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status } : u));
                 setEditUser(null);
                 toast.success("User status updated successfully");
             }
@@ -368,12 +368,14 @@ const SuperAdmin = () => {
                 return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Inactive':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Successful':
+            case 'Success':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'Pending':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Failed':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'Pending Refund':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Resolved':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'In Progress':
@@ -1110,11 +1112,11 @@ const SuperAdmin = () => {
                                                 value={transaction.status}
                                                 defaultValue={transaction.status}
                                             >
-                                                <option value="succeeded">Succeeded</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="failed">Failed</option>
-                                                <option value="refunded">Refunded</option>
-                                                <option value="pending refund">Pending Refund</option>
+                                                <option value="Success">Success</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Failed">Failed</option>
+                                                <option value="Refunded">Refunded</option>
+                                                <option value="Pending Refund">Pending Refund</option>
                                             </select>
                                         ) : (
                                             <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
