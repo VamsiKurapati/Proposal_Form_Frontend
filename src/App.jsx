@@ -35,10 +35,10 @@ const App = () => {
 
   return (
     <>
-    
+
       <Suspense fallback={<></>}>
         <Routes>
-          <Route path="/" element={role === null ? <Home /> : <Navigate to="/dashboard" replace />} />
+          <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/super_admin" replace /> : <Navigate to="/dashboard" replace />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />
@@ -97,7 +97,11 @@ const App = () => {
 
           <Route path="/canva" element={<CanvaApp />} />
 
-          <Route path="/super-admin" element={<SuperAdmin />} />
+          <Route path="/admin" element={
+            <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
+              <SuperAdmin />
+            </ProtectedRoutes>
+          } />
 
           <Route path="*" element={<Home />} />
         </Routes>

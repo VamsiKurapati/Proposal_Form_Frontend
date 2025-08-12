@@ -111,16 +111,26 @@ const SuperAdmin = () => {
         ));
     };
 
+    const handleSupportPriorityChange = (id, priority) => {
+        //console.log(id, priority);
+        setFilteredSupport(prev => prev.map(support =>
+            support._id === id ? { ...support, priority } : support
+        ));
+    };
+
     // Save handlers: call backend then update local state on success
     const saveUserStatus = async (userId) => {
         const user = (filteredUsers || []).find(u => u._id === userId);
         if (!user) return setEditUser(null);
         try {
-            const res = await axios.put(`${baseUrl}/updateCompanyStatus`, {
-                companyId: userId,
-                status: user.status || 'Active'
+            const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
+                status: user.status || 'Inactive',
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
             });
-            if (res.status === 200) {
+            if (res.ok) {
                 setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setEditUser(null);
@@ -130,17 +140,20 @@ const SuperAdmin = () => {
         }
     };
 
-    const saveTransactionStatus = async (transactionId, rowId) => {
-        const tx = (filteredTransactions || []).find(t => t.transaction_id === transactionId || t._id === rowId);
+    const saveTransactionStatus = async (transactionId) => {
+        const tx = (filteredTransactions || []).find(t => t._id === transactionId);
         if (!tx) return setEditTransaction(null);
         try {
-            const res = await axios.put(`${baseUrl}/updatePaymentStatus`, {
-                transaction_id: tx.transaction_id,
+            const res = await axios.put(`${baseUrl}/updatePaymentStatus/${tx._id}`, {
                 status: tx.status
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
             });
-            if (res.status === 200) {
-                setPaymentsData(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
-                setFilteredTransactions(prev => (prev || []).map(t => (t.transaction_id === tx.transaction_id || t._id === rowId) ? { ...t, status: tx.status } : t));
+            if (res.ok) {
+                setPaymentsData(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
+                setFilteredTransactions(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setEditTransaction(null);
             }
         } catch (e) {
@@ -148,17 +161,21 @@ const SuperAdmin = () => {
         }
     };
 
-    const saveSupportStatus = async (ticketRowId) => {
-        const ticket = (filteredSupport || []).find(t => t._id === ticketRowId);
+    const saveSupportStatus = async (ticketId) => {
+        const ticket = (filteredSupport || []).find(t => t._id === ticketId);
         if (!ticket) return setEditSupport(null);
         try {
-            const res = await axios.put(`${baseUrl}/updateTicketStatus`, {
-                ticketId: ticketRowId,
-                status: ticket.status
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
+                status: ticket.status,
+                priority: ticket.priority
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
             });
-            if (res.status === 200) {
-                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
-                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketRowId ? { ...t, status: ticket.status } : t));
+            if (res.ok) {
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setEditSupport(null);
             }
         } catch (e) {
@@ -375,7 +392,11 @@ const SuperAdmin = () => {
 
     useEffect(async () => {
         try {
-            const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`);
+            const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
             const stats = response.data.stats;
             setUsersStats(stats);
             const companiesData = response.data.CompanyData;
@@ -389,7 +410,11 @@ const SuperAdmin = () => {
 
     useEffect(async () => {
         try {
-            const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`);
+            const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
             const paymentsData = response.data.PaymentData;
             setPaymentsData(paymentsData);
             const ps = response.data.PaymentStats || {};
@@ -404,7 +429,11 @@ const SuperAdmin = () => {
 
     useEffect(async () => {
         try {
-            const response = await axios.get(`${baseUrl}/getSupportStatsAndData`);
+            const response = await axios.get(`${baseUrl}/getSupportStatsAndData`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
             const supportTicketsData = response.data.TicketData;
             setSupportTicketsData(supportTicketsData);
             const supportTicketsStats = response.data.TicketStats;
@@ -417,7 +446,11 @@ const SuperAdmin = () => {
 
     useEffect(async () => {
         try {
-            const response = await axios.get(`${baseUrl}/getNotificationsData`);
+            const response = await axios.get(`${baseUrl}/getNotificationsData`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
             const notificationsData = response.data;
             setNotificationsData(notificationsData);
             setFilteredNotifications(notificationsData);
@@ -753,7 +786,7 @@ const SuperAdmin = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {editUser === user._id ? (
-                                            <select className="px-2 py-1 text-[12px] rounded-full"
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
                                                 onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
                                                 value={user.status || 'Active'}
                                             >
@@ -1047,7 +1080,7 @@ const SuperAdmin = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {editTransaction === transaction._id ? (
-                                            <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
                                                 onChange={(e) => handleTransactionStatusChange(transaction.transaction_id, e.target.value)}
                                                 value={transaction.status}
                                                 defaultValue={transaction.status}
@@ -1067,7 +1100,7 @@ const SuperAdmin = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
                                         {editTransaction === transaction._id ? (
                                             <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
-                                                onClick={() => saveTransactionStatus(transaction.transaction_id, transaction._id)}
+                                                onClick={() => saveTransactionStatus(transaction._id)}
                                             >
                                                 Save
                                             </button>
@@ -1352,16 +1385,27 @@ const SuperAdmin = () => {
                                         {ticket.user_id}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                            {ticket.priority}
-                                        </span>
+                                        {editSupport === ticket._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
+                                                onChange={(e) => handleSupportPriorityChange(ticket._id, e.target.value)}
+                                                value={ticket.priority}
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                {ticket.priority}
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                         {ticket.created_at}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {editSupport === ticket._id ? (
-                                            <select className="px-4 py-2 text-[12px] rounded-lg border border-[#E5E7EB] focus:outline-none w-24"
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
                                                 onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
                                                 value={ticket.status}
                                             >
