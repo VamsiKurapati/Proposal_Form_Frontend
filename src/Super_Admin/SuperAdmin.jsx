@@ -94,29 +94,29 @@ const SuperAdmin = () => {
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
     const handleUserStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredUsers(prev => prev.map(user =>
-            user.id === id ? { ...user, status } : user
+            user._id === id ? { ...user, status } : user
         ));
     };
 
     const handleTransactionStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredTransactions(prev => prev.map(transaction => {
-            const matches = transaction.transactionId === id || transaction.id === id;
+            const matches = transaction._id === id;
             return matches ? { ...transaction, status } : transaction;
         }));
     };
 
     const handleSupportStatusChange = (id, status) => {
-        console.log(id, status);
+        //console.log(id, status);
         setFilteredSupport(prev => prev.map(support =>
-            support.id === id ? { ...support, status } : support
+            support._id === id ? { ...support, status } : support
         ));
     };
 
     const handleSupportPriorityChange = (id, priority) => {
-        console.log(id, priority);
+        //console.log(id, priority);
         setFilteredSupport(prev => prev.map(support =>
             support._id === id ? { ...support, priority } : support
         ));
@@ -126,7 +126,7 @@ const SuperAdmin = () => {
     const saveUserStatus = async (userId) => {
         const user = (filteredUsers || []).find(u => u._id === userId);
         if (!user) return setEditUser(null);
-        console.log("user", user);
+        //console.log("user", user);
         try {
             const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
                 status: user.status || 'Inactive',
@@ -136,7 +136,7 @@ const SuperAdmin = () => {
                 }
             });
             if (res.status === 200) {
-                console.log("res", res);
+                //console.log("res", res);
                 setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setEditUser(null);
@@ -150,7 +150,7 @@ const SuperAdmin = () => {
     const saveTransactionStatus = async (transactionId) => {
         const tx = (filteredTransactions || []).find(t => t._id === transactionId);
         if (!tx) return setEditTransaction(null);
-        console.log("tx", tx);
+        //console.log("tx", tx);
         try {
             const res = await axios.put(`${baseUrl}/updatePaymentStatus/${tx._id}`, {
                 status: tx.status
@@ -160,7 +160,7 @@ const SuperAdmin = () => {
                 }
             });
             if (res.status === 200) {
-                console.log("res", res);
+                //console.log("res", res);
                 setPaymentsData(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setFilteredTransactions(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setEditTransaction(null);
@@ -174,7 +174,7 @@ const SuperAdmin = () => {
     const saveSupportStatus = async (ticketId) => {
         const ticket = (filteredSupport || []).find(t => t._id === ticketId);
         if (!ticket) return setEditSupport(null);
-        console.log("ticket", ticket);
+        //console.log("ticket", ticket);
         try {
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
                 status: ticket.status,
@@ -185,7 +185,7 @@ const SuperAdmin = () => {
                 }
             });
             if (res.status === 200) {
-                console.log("res", res);
+                //console.log("res", res);
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setEditSupport(null);
@@ -813,15 +813,15 @@ const SuperAdmin = () => {
                                         {editUser === user._id ? (
                                             <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
                                                 onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
-                                                value={user.status || 'Active'}
+                                                value={user.status}
                                             >
                                                 <option value="Active">Active</option>
                                                 <option value="Blocked">Blocked</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
                                         ) : (
-                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status || 'Active')}`}>
-                                                {user.status || 'Active'}
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status)}`}>
+                                                {user.status}
                                             </span>
                                         )}
                                     </td>
