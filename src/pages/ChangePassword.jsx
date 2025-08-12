@@ -105,7 +105,7 @@ export default function ChangePassword() {
 
             {/* Right Form */}
             <div className="w-full md:w-1/2 max-w-lg">
-                <div className="bg-[#F8F9FA] border border-[#0000001A] rounded-lg p-8 w-full max-w-md shadow-lg">
+                <div className="bg-[#F8F9FA] border border-[#0000001A] rounded-lg p-8 w-full shadow-lg">
                     <h1 className="text-[20px] font-semibold mb-4">Change Password</h1>
                     <form onSubmit={handleChangePassword}>
                         <div className="mb-4 relative">
