@@ -795,7 +795,11 @@ const DiscoverRFPs = () => {
         </div>
 
 
-        {activeTab === "rfp" && (
+
+
+
+      {activeTab === "rfp" && (
+        <div>
           <div>
             <div>
               <div className="mb-8">
