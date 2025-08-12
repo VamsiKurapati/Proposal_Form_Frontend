@@ -67,7 +67,7 @@ export default function ChangePassword() {
             }
 
             setLoading(true);
-            const response = await axios.post(`${baseUrl}/change-password`, {
+            const response = await axios.put(`${baseUrl}/change-password`, {
                 oldPassword,
                 newPassword
             }, {
