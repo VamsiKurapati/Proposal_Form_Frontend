@@ -104,62 +104,63 @@ export default function ChangePassword() {
             </div>
 
             {/* Right Form */}
-            <div className="w-full md:w-1/2 max-w-lg">
-                <div className="bg-[#F8F9FA] border border-[#0000001A] rounded-lg p-8 w-full shadow-lg">
-                    <h1 className="text-[20px] font-semibold mb-4">Change Password</h1>
-                    <form onSubmit={handleChangePassword}>
-                        <div className="mb-4 relative">
-                            <label htmlFor="oldPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
-                                <FaLock className="text-[#2563EB] text-[18px]" />
-                                Old Password
-                            </label>
-                            <input type={showOldPassword ? "text" : "password"} id="oldPassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
-                            <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowOldPassword(!showOldPassword)}>
-                                {showOldPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
-                            </button>
-                        </div>
-                        <div className="mb-4 relative">
-                            <label htmlFor="newPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
-                                <FaLock className="text-[#2563EB] text-[18px]" />
-                                New Password
-                            </label>
-                            <input type={showNewPassword ? "text" : "password"} id="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
-                            <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowNewPassword(!showNewPassword)}>
-                                {showNewPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
-                            </button>
-                        </div>
-                        <div className="mb-4 relative">
-                            <label htmlFor="confirmNewPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
-                                <FaLock className="text-[#2563EB] text-[18px]" />
-                                Confirm New Password
-                            </label>
-                            <input type={showConfirmNewPassword ? "text" : "password"} id="confirmNewPassword" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
-                            <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}>
-                                {showConfirmNewPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
-                            </button>
-                        </div>
+            <div className="w-full md:w-1/2 max-w-lg bg-[#F8F9FA] p-8 rounded-xl shadow-lg">
+                <h1 className="text-[32px] font-semibold text-[#2563EB] mb-2">Change Password</h1>
+                <p className="font-normal text-[16px] text-[#6B7280] mb-6">
+                    Enter your old password and new password to change your password
+                </p>
+                <form onSubmit={handleChangePassword}>
+                    <div className="mb-4 relative">
+                        <label htmlFor="oldPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
+                            <FaLock className="text-[#2563EB] text-[18px]" />
+                            Old Password
+                        </label>
+                        <input type={showOldPassword ? "text" : "password"} id="oldPassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
+                        <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowOldPassword(!showOldPassword)}>
+                            {showOldPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
+                        </button>
+                    </div>
+                    <div className="mb-4 relative">
+                        <label htmlFor="newPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
+                            <FaLock className="text-[#2563EB] text-[18px]" />
+                            New Password
+                        </label>
+                        <input type={showNewPassword ? "text" : "password"} id="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
+                        <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowNewPassword(!showNewPassword)}>
+                            {showNewPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
+                        </button>
+                    </div>
+                    <div className="mb-4 relative">
+                        <label htmlFor="confirmNewPassword" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
+                            <FaLock className="text-[#2563EB] text-[18px]" />
+                            Confirm New Password
+                        </label>
+                        <input type={showConfirmNewPassword ? "text" : "password"} id="confirmNewPassword" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} className="w-full px-3 py-2 pr-10 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent" required />
+                        <button type="button" className="absolute right-3 top-10 text-gray-500 hover:text-gray-700" onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}>
+                            {showConfirmNewPassword ? <FaEyeSlash className="text-[#2563EB] text-[18px]" /> : <FaEye className="text-[#2563EB] text-[18px]" />}
+                        </button>
+                    </div>
 
-                        <div className="mb-4">
-                            <ul className="list-disc list-inside text-[14px] font-medium text-[#374151] mb-2">
-                                <li>Password must be at least 8 characters long</li>
-                                <li>Password must contain at least one uppercase letter</li>
-                                <li>Password must contain at least one lowercase letter</li>
-                                <li>Password must contain at least one number</li>
-                                <li>Password must contain at least one special character</li>
-                            </ul>
-                        </div>
+                    <div className="mb-4">
+                        <ul className="list-disc list-inside text-[14px] font-medium text-[#374151] mb-2">
+                            <li>Password must be at least 8 characters long</li>
+                            <li>Password must contain at least one uppercase letter</li>
+                            <li>Password must contain at least one lowercase letter</li>
+                            <li>Password must contain at least one number</li>
+                            <li>Password must contain at least one special character</li>
+                        </ul>
+                    </div>
 
-                        <div className="flex justify-end gap-2">
-                            <button type="button" className="w-1/2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 flex items-center justify-center gap-2" onClick={() => navigate("/")}>
-                                Cancel
-                            </button>
-                            <button type="submit" className="w-1/2 bg-[#2563EB] text-white px-4 py-2 rounded-md hover:bg-[#1D4ED8] flex items-center justify-center gap-2" disabled={loading}>
-                                {loading ? <FaSpinner className="animate-spin" /> : <FaLock className="text-[#2563EB] text-[18px]" />}
-                                {loading ? "Changing Password..." : "Change Password"}
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div className="flex justify-end gap-2">
+                        <button type="button" className="w-1/2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 flex items-center justify-center gap-2" onClick={() => navigate("/")}>
+                            Cancel
+                        </button>
+                        <button type="submit" className="w-1/2 bg-[#2563EB] text-white px-4 py-2 rounded-md hover:bg-[#1D4ED8] flex items-center justify-center gap-2" disabled={loading}>
+                            {loading ? <FaSpinner className="animate-spin" /> : <FaLock className="text-[#2563EB] text-[18px]" />}
+                            {loading ? "Changing Password..." : "Change Password"}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
