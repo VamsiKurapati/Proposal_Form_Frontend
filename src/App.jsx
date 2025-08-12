@@ -38,7 +38,7 @@ const App = () => {
 
       <Suspense fallback={<></>}>
         <Routes>
-          <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/super_admin" replace /> : <Navigate to="/dashboard" replace />} />
+          <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />

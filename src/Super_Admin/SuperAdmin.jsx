@@ -87,6 +87,8 @@ const SuperAdmin = () => {
     const [currentPageSupport, setCurrentPageSupport] = useState(1);
     const [currentPageNotifications, setCurrentPageNotifications] = useState(1);
 
+    const [loading, setLoading] = useState(false);
+
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
     const handleUserStatusChange = (id, status) => {
@@ -391,6 +393,7 @@ const SuperAdmin = () => {
     const [filteredNotifications, setFilteredNotifications] = useState([]);
 
     useEffect(async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`, {
                 headers: {
@@ -405,10 +408,13 @@ const SuperAdmin = () => {
             planManagementStats["Active Users"] = stats["Active Users"];
         } catch (error) {
             //console.log("error", error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`, {
                 headers: {
@@ -424,10 +430,13 @@ const SuperAdmin = () => {
             setFilteredTransactions(paymentsData);
         } catch (error) {
             //console.log("error", error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getSupportStatsAndData`, {
                 headers: {
@@ -441,10 +450,13 @@ const SuperAdmin = () => {
             setFilteredSupport(supportTicketsData);
         } catch (error) {
             //console.log("error", error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getNotificationsData`, {
                 headers: {
@@ -456,6 +468,8 @@ const SuperAdmin = () => {
             setFilteredNotifications(notificationsData);
         } catch (error) {
             //console.log("error", error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
@@ -1708,6 +1722,12 @@ const SuperAdmin = () => {
             navigate('/');
         }, 1000);
     };
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>;
+    }
 
     return (
         <div className="min-h-screen bg-[#F8F9FA]">

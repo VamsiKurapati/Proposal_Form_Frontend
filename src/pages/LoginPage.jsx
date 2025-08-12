@@ -11,8 +11,11 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
+
   const { setRole } = useUser();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -37,6 +40,14 @@ const LoginPage = () => {
     return newErrors;
   };
 
+  const triggerRFPDiscovery = () => {
+    axios.post(`https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery`, {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+  };
+
   const handleLogin = async () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -48,6 +59,7 @@ const LoginPage = () => {
     try {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       if (res.status === 200) {
+        triggerRFPDiscovery();
         toast.success("Login successful");
         const token = res.data.token;
         const role = res.data.user.role;

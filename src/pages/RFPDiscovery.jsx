@@ -16,6 +16,7 @@ import {
   MdOutlineCheck,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
+import { useUser } from "../context/UserContext";
 
 // Constants
 const API_BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
@@ -215,19 +216,8 @@ const DiscoverRFPs = () => {
   const navigate = useNavigate();
   // Add this state for upload loading
   const [isUploading, setIsUploading] = useState(false);
-
-  const triggerRFPDiscovery = async () => {
-    const res = await axios.post(`${API_BASE_URL}/triggerRFPDiscovery`, {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
-    //console.log(res.data);
-  };
-
-  useEffect(() => {
-    triggerRFPDiscovery();
-  }, []);
+  const [fetchedRFPs, setFetchedRFPs] = useState(false);
+  const { role } = useUser();
 
   // Set available industries statically
   useEffect(() => {
@@ -313,8 +303,11 @@ const DiscoverRFPs = () => {
   };
 
   useEffect(() => {
-    fetchRFPs();
-  }, []);
+    if (!fetchedRFPs) {
+      fetchRFPs();
+      setFetchedRFPs(true);
+    }
+  }, [fetchedRFPs]);
 
   const applyFilters = (rfps) => {
     return rfps.filter((rfp) => {
@@ -374,8 +367,6 @@ const DiscoverRFPs = () => {
       setLoadingSave(prev => ({ ...prev, [rfp._id]: false }));
     }
   };
-
-  // Removed problematic useEffect that was permanently modifying state
 
   const handleUnsave = async (rfpId) => {
     setLoadingSave(prev => ({ ...prev, [rfpId]: true }));
@@ -444,7 +435,11 @@ const DiscoverRFPs = () => {
             {loadingSave[rfp._id] ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
             ) : isSaved ? (
-              <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
+              <MdOutlineBookmark
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} text-[#111827]`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
+              />
             ) : (
               <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
             )}
@@ -483,9 +478,9 @@ const DiscoverRFPs = () => {
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
-                onClick={() => handleUnsave(rfp._id)}
-                className="cursor-pointer"
-                title="Unsave"
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
@@ -577,9 +572,9 @@ const DiscoverRFPs = () => {
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563]"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
-                onClick={() => handleUnsave(rfp._id)}
-                className="cursor-pointer hover:text-[#2563EB] transition-colors"
-                title="Unsave"
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"}`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
