@@ -26,6 +26,8 @@ import {
 } from 'react-icons/md';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ToastContainer from '../pages/ToastContainer';
+import { toast } from 'react-toastify';
 
 const SuperAdmin = () => {
     const navigate = useNavigate();
@@ -124,6 +126,7 @@ const SuperAdmin = () => {
     const saveUserStatus = async (userId) => {
         const user = (filteredUsers || []).find(u => u._id === userId);
         if (!user) return setEditUser(null);
+        console.log("user", user);
         try {
             const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
                 status: user.status || 'Inactive',
@@ -137,6 +140,7 @@ const SuperAdmin = () => {
                 setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setEditUser(null);
+                toast.success("User status updated successfully");
             }
         } catch (e) {
             alert('Failed to update user status');
@@ -146,6 +150,7 @@ const SuperAdmin = () => {
     const saveTransactionStatus = async (transactionId) => {
         const tx = (filteredTransactions || []).find(t => t._id === transactionId);
         if (!tx) return setEditTransaction(null);
+        console.log("tx", tx);
         try {
             const res = await axios.put(`${baseUrl}/updatePaymentStatus/${tx._id}`, {
                 status: tx.status
@@ -159,6 +164,7 @@ const SuperAdmin = () => {
                 setPaymentsData(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setFilteredTransactions(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setEditTransaction(null);
+                toast.success("Transaction status updated successfully");
             }
         } catch (e) {
             alert('Failed to update transaction status');
@@ -168,6 +174,7 @@ const SuperAdmin = () => {
     const saveSupportStatus = async (ticketId) => {
         const ticket = (filteredSupport || []).find(t => t._id === ticketId);
         if (!ticket) return setEditSupport(null);
+        console.log("ticket", ticket);
         try {
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
                 status: ticket.status,
@@ -182,6 +189,7 @@ const SuperAdmin = () => {
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setEditSupport(null);
+                toast.success("Ticket status updated successfully");
             }
         } catch (e) {
             alert('Failed to update ticket status');
@@ -1734,6 +1742,7 @@ const SuperAdmin = () => {
 
     return (
         <div className="min-h-screen bg-[#F8F9FA]">
+            <ToastContainer />
             {/* Top Header Bar */}
             <div className="bg-white border-b border-[#0000001A] px-8 md:px-12 py-4">
                 <div className="flex items-center justify-between">
