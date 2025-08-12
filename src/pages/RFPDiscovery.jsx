@@ -776,12 +776,14 @@ const DiscoverRFPs = () => {
         {/* Search Bar Section */}
 
 
-        <div className="flex space-x-6 border-b border-gray-200 p-4">
+
+        <div className="flex  justify-center mx-auto text-lg space-x-6 border-b border-gray-200 p-4">
+
   <button
-    className={`pb-2 ${
+    className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${
       activeTab === "rfp"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600"
-        : "font-bold text-gray-600"
+        ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
+        : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
     }`}
     onClick={() => setActiveTab("rfp")}
   >
@@ -789,10 +791,10 @@ const DiscoverRFPs = () => {
   </button>
 
   <button
-    className={`pb-2 ${
+    className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${
       activeTab === "grants"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600"
-        : "font-bold text-gray-600"
+        ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
+        : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
     }`}
     onClick={() => setActiveTab("grants")}
   >
