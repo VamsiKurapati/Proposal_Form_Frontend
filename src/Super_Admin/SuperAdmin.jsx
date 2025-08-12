@@ -92,14 +92,14 @@ const SuperAdmin = () => {
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
     const handleUserStatusChange = (id, status) => {
-        //console.log(id, status);
+        console.log(id, status);
         setFilteredUsers(prev => prev.map(user =>
             user.id === id ? { ...user, status } : user
         ));
     };
 
     const handleTransactionStatusChange = (id, status) => {
-        //console.log(id, status);
+        console.log(id, status);
         setFilteredTransactions(prev => prev.map(transaction => {
             const matches = transaction.transactionId === id || transaction.id === id;
             return matches ? { ...transaction, status } : transaction;
@@ -107,14 +107,14 @@ const SuperAdmin = () => {
     };
 
     const handleSupportStatusChange = (id, status) => {
-        //console.log(id, status);
+        console.log(id, status);
         setFilteredSupport(prev => prev.map(support =>
             support.id === id ? { ...support, status } : support
         ));
     };
 
     const handleSupportPriorityChange = (id, priority) => {
-        //console.log(id, priority);
+        console.log(id, priority);
         setFilteredSupport(prev => prev.map(support =>
             support._id === id ? { ...support, priority } : support
         ));
@@ -132,7 +132,8 @@ const SuperAdmin = () => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            if (res.ok) {
+            if (res.status === 200) {
+                console.log("res", res);
                 setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
                 setEditUser(null);
@@ -153,7 +154,8 @@ const SuperAdmin = () => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            if (res.ok) {
+            if (res.status === 200) {
+                console.log("res", res);
                 setPaymentsData(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setFilteredTransactions(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
                 setEditTransaction(null);
@@ -175,7 +177,8 @@ const SuperAdmin = () => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            if (res.ok) {
+            if (res.status === 200) {
+                console.log("res", res);
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
                 setEditSupport(null);
