@@ -1398,8 +1398,8 @@ const SuperAdmin = () => {
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                             {ticket.subCategory}
                                         </td>
-                                        <td className="px-4 py-4 truncate whitespace-nowrap text-[16px] text-[#4B5563]">
-                                            {ticket.description}
+                                        <td className="px-4 py-4 text-[16px] text-[#4B5563]">
+                                            <span className="line-clamp-2 truncate text-ellipsis">{ticket.description}</span>
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
@@ -1780,7 +1780,7 @@ const SuperAdmin = () => {
 
     // Modal Components
     const UserViewModal = () => (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
@@ -1792,7 +1792,7 @@ const SuperAdmin = () => {
                     </button>
                 </div>
                 {selectedUser && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
                         {/* Basic Information */}
                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
                             <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
@@ -2109,7 +2109,7 @@ const SuperAdmin = () => {
     );
 
     const SupportViewModal = () => (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
@@ -2121,14 +2121,14 @@ const SuperAdmin = () => {
                     </button>
                 </div>
                 {selectedSupport && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
                         {/* Basic Information */}
                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
                             <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
+                                    <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
@@ -2493,9 +2493,9 @@ const SuperAdmin = () => {
             <div className="hidden lg:flex h-[calc(100vh-64px)]">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
-                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-20 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
+                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
                 >
-                    <div className="p-4">
+                    <div className="p-4 ml-4">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
                             <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
                         </div>
