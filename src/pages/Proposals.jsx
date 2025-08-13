@@ -3,18 +3,17 @@ import NavbarComponent from './NavbarComponent';
 import { MdOutlineBookmark, MdOutlineBookmarkBorder, MdOutlineShare, MdOutlineCalendarMonth, MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../context/UserContext';
 
-const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole }) => (
+const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate }) => (
     <div className="bg-white rounded-xl border border-[#E5E7EB] p-5 flex flex-col justify-between relative">
         <div>
             <div className="flex items-start justify-between">
                 <h3 className="font-semibold text-[18px] mb-1 text-[#111827]">{proposal_info.title}</h3>
                 <div className="flex gap-2">
                     <button
-                        title={proposal_info.bookmarked ? (userRole === "Viewer" ? "Viewer cannot unsave" : "Unsave") : "Save"}
-                        onClick={proposal_info.bookmarked && userRole === "Viewer" ? undefined : onBookmark}
-                        className={`${proposal_info.bookmarked && userRole === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} text-[#111827]`}
+                        title={proposal_info.bookmarked ? "Unsave" : "Save"}
+                        onClick={onBookmark}
+                        className="text-[#111827]"
                     >
                         {proposal_info.bookmarked ? (
                             <MdOutlineBookmark className="w-5 h-5" />
@@ -142,7 +141,6 @@ const Proposals = () => {
     const [currentSavedPage, setCurrentSavedPage] = useState(1);
     const [currentDraftPage, setCurrentDraftPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 640 ? 1 : (window.innerWidth < 768 ? 2 : 4));
-    const [fetchedProposals, setFetchedProposals] = useState(false);
     const navigate = useNavigate();
 
     // Calculate pagination for saved proposals
@@ -157,39 +155,31 @@ const Proposals = () => {
     const currentDraftProposals = draftProposals.slice(draftProposalsStartIndex, draftProposalsEndIndex);
     const totalDraftPages = Math.ceil(draftProposals.length / itemsPerPage);
 
-    const { role } = useUser();
-
-    const fetchProposals = async () => {
-        setIsLoading(true);
-        try {
-            const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getSavedAndDraftRFPs", {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            console.log("res.data", res.data);
-            setSavedProposals(res.data.savedRFPs);
-            setDraftProposals(res.data.draftRFPs);
-            console.log("savedProposals", savedProposals);
-            console.log("draftProposals", draftProposals);
-            console.log("res.data.savedRFPs", res.data.savedRFPs);
-            console.log("res.data.draftRFPs", res.data.draftRFPs);
-        } catch (error) {
-            console.error('Error fetching proposals:', error);
-            alert("Error fetching proposals");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (!fetchedProposals) {
-            fetchProposals();
-            setFetchedProposals(true);
-        } else {
-            setFetchedProposals(false);
-        }
-    }, [fetchedProposals]);
+        const fetchProposals = async () => {
+            setIsLoading(true);
+            try {
+                const res = await axios.get("https://proposal-form-backend.vercel.app/api/rfp/getSavedAndDraftRFPs", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                console.log("res.data", res.data);
+                setSavedProposals(res.data.savedRFPs);
+                setDraftProposals(res.data.draftRFPs);
+                console.log("savedProposals", savedProposals);
+                console.log("draftProposals", draftProposals);
+                console.log("res.data.savedRFPs", res.data.savedRFPs);
+                console.log("res.data.draftRFPs", res.data.draftRFPs);
+            } catch (error) {
+                console.error('Error fetching proposals:', error);
+                alert("Error fetching proposals");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProposals();
+    }, []);
 
     useEffect(() => {
         setItemsPerPage(window.innerWidth < 640 ? 1 : (window.innerWidth < 768 ? 2 : 4));
@@ -276,7 +266,6 @@ const Proposals = () => {
                                     onBookmark={() => handleUnsave(proposal._id)}
                                     onShare={() => handleShare(proposal.link)}
                                     onGenerate={() => handleGenerate(proposal)}
-                                    userRole={role}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No saved proposals yet
@@ -303,7 +292,6 @@ const Proposals = () => {
                                     onBookmark={() => isSaved(proposal._id) ? handleUnsave(proposal._id) : handleSave(proposal)}
                                     onShare={() => handleShare(proposal.link)}
                                     onGenerate={() => handleGenerate(proposal)}
-                                    userRole={role}
                                 />
                             )) : <div className="col-span-2 text-center text-[#4B5563] py-8">
                                 No draft proposals yet

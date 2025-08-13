@@ -22,17 +22,10 @@ import {
     MdOutlineShoppingBag,
     MdOutlineHeadphones,
     MdOutlineAccountCircle,
-    MdOutlineMenu,
-    MdOutlineVisibility,
-    MdOutlineClose,
-    MdOutlineSend,
-    MdOutlineCheckCircle,
-    MdOutlineCancel
+    MdOutlineMenu
 } from 'react-icons/md';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import ToastContainer from '../pages/ToastContainer';
-import { toast } from 'react-toastify';
 
 const SuperAdmin = () => {
     const navigate = useNavigate();
@@ -55,20 +48,10 @@ const SuperAdmin = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-    // Edit (kept for backward compatibility but not used in new design)
+    // Edit
     const [editUser, setEditUser] = useState(false);
     const [editTransaction, setEditTransaction] = useState(false);
     const [editSupport, setEditSupport] = useState(false);
-
-    // View Modals
-    const [viewUserModal, setViewUserModal] = useState(false);
-    const [viewPaymentModal, setViewPaymentModal] = useState(false);
-    const [viewSupportModal, setViewSupportModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedPayment, setSelectedPayment] = useState(null);
-    const [selectedSupport, setSelectedSupport] = useState(null);
-    const [supportMessage, setSupportMessage] = useState('');
-    const [supportChat, setSupportChat] = useState([]);
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -104,156 +87,100 @@ const SuperAdmin = () => {
     const [currentPageSupport, setCurrentPageSupport] = useState(1);
     const [currentPageNotifications, setCurrentPageNotifications] = useState(1);
 
-    const [loading, setLoading] = useState(false);
-
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
-    // New functions for user blocking/unblocking
-    const handleUserBlockToggle = async (userId, currentBlockedStatus) => {
-        try {
-            const newBlockedStatus = !currentBlockedStatus;
-            const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
-                blocked: newBlockedStatus,
-                status: newBlockedStatus ? 'Blocked' : 'Active'
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            if (res.status === 200) {
-                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
-                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
-                toast.success(`User ${newBlockedStatus ? 'blocked' : 'unblocked'} successfully`);
-            }
-        } catch (e) {
-            toast.error('Failed to update user status');
-        }
-    };
-
-    // New functions for support ticket management
-    const handleSupportStatusUpdate = async (ticketId, newStatus) => {
-        try {
-            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
-                status: newStatus
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            if (res.status === 200) {
-                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
-                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
-                toast.success(`Ticket status updated to ${newStatus}`);
-                if (newStatus === 'In Progress') {
-                    setSupportChat(prev => [...prev, {
-                        id: Date.now(),
-                        message: `Status changed to ${newStatus}`,
-                        sender: 'admin',
-                        timestamp: new Date().toLocaleString()
-                    }]);
-                }
-            }
-        } catch (e) {
-            toast.error('Failed to update ticket status');
-        }
-    };
-
-    const sendSupportMessage = async () => {
-        if (!supportMessage.trim()) return;
-
-        const newMessage = {
-            id: Date.now(),
-            message: supportMessage,
-            sender: 'admin',
-            timestamp: new Date().toLocaleString()
-        };
-
-        setSupportChat(prev => [...prev, newMessage]);
-        setSupportMessage('');
-
-        // Here you would typically send the message to the backend
-        // For now, we'll just add it to the local state
-    };
-
-    // View modal functions
-    const openUserModal = (user) => {
-        setSelectedUser(user);
-        setViewUserModal(true);
-    };
-
-    const openPaymentModal = (payment) => {
-        setSelectedPayment(payment);
-        setViewPaymentModal(true);
-    };
-
-    const openSupportModal = (support) => {
-        setSelectedSupport(support);
-        setViewSupportModal(true);
-        // Initialize chat with existing messages
-        setSupportChat([
-            {
-                id: 1,
-                message: support.description || 'No description provided',
-                sender: 'user',
-                timestamp: support.created_at || new Date().toLocaleString()
-            }
-        ]);
-    };
-
-    // Close modals when clicking outside
-    const handleModalBackdropClick = (e) => {
-        if (e.target === e.currentTarget) {
-            setViewUserModal(false);
-            setViewPaymentModal(false);
-            setViewSupportModal(false);
-        }
-    };
-
-    // Close modals with Escape key
-    useEffect(() => {
-        const handleEscapeKey = (e) => {
-            if (e.key === 'Escape') {
-                setViewUserModal(false);
-                setViewPaymentModal(false);
-                setViewSupportModal(false);
-            }
-        };
-
-        document.addEventListener('keydown', handleEscapeKey);
-        return () => document.removeEventListener('keydown', handleEscapeKey);
-    }, []);
-
-    // Legacy status change handlers (kept for backward compatibility but not used in new design)
     const handleUserStatusChange = (id, status) => {
-        // This function is no longer used in the new design
+        //console.log(id, status);
+        setFilteredUsers(prev => prev.map(user =>
+            user.id === id ? { ...user, status } : user
+        ));
     };
 
     const handleTransactionStatusChange = (id, status) => {
-        // This function is no longer used in the new design
+        //console.log(id, status);
+        setFilteredTransactions(prev => prev.map(transaction => {
+            const matches = transaction.transactionId === id || transaction.id === id;
+            return matches ? { ...transaction, status } : transaction;
+        }));
     };
 
     const handleSupportStatusChange = (id, status) => {
-        // This function is no longer used in the new design
+        //console.log(id, status);
+        setFilteredSupport(prev => prev.map(support =>
+            support.id === id ? { ...support, status } : support
+        ));
     };
 
     const handleSupportPriorityChange = (id, priority) => {
-        // This function is no longer used in the new design
+        //console.log(id, priority);
+        setFilteredSupport(prev => prev.map(support =>
+            support._id === id ? { ...support, priority } : support
+        ));
     };
 
-    // Legacy save handlers (kept for backward compatibility but not used in new design)
+    // Save handlers: call backend then update local state on success
     const saveUserStatus = async (userId) => {
-        // This function is no longer used in the new design
-        // User status is now managed through the block/unblock functionality
+        const user = (filteredUsers || []).find(u => u._id === userId);
+        if (!user) return setEditUser(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
+                status: user.status || 'Inactive',
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, status: user.status || 'Active' } : u));
+                setEditUser(null);
+            }
+        } catch (e) {
+            alert('Failed to update user status');
+        }
     };
 
     const saveTransactionStatus = async (transactionId) => {
-        // This function is no longer used in the new design
-        // Transaction status is now read-only
+        const tx = (filteredTransactions || []).find(t => t._id === transactionId);
+        if (!tx) return setEditTransaction(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updatePaymentStatus/${tx._id}`, {
+                status: tx.status
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
+                setPaymentsData(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
+                setFilteredTransactions(prev => (prev || []).map(t => (t._id === transactionId) ? { ...t, status: tx.status } : t));
+                setEditTransaction(null);
+            }
+        } catch (e) {
+            alert('Failed to update transaction status');
+        }
     };
 
     const saveSupportStatus = async (ticketId) => {
-        // This function is no longer used in the new design
-        // Support status is now managed through the view modal
+        const ticket = (filteredSupport || []).find(t => t._id === ticketId);
+        if (!ticket) return setEditSupport(null);
+        try {
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
+                status: ticket.status,
+                priority: ticket.priority
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: ticket.status } : t));
+                setEditSupport(null);
+            }
+        } catch (e) {
+            alert('Failed to update ticket status');
+        }
     };
 
     // User filter: single select with toggle back to 'all'
@@ -428,23 +355,17 @@ const SuperAdmin = () => {
                 return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Inactive':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Success':
+            case 'Successful':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'Pending':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Failed':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Pending Refund':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Refunded':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Resolved':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'In Progress':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'New':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
-            case 'Cancelled':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
@@ -470,7 +391,6 @@ const SuperAdmin = () => {
     const [filteredNotifications, setFilteredNotifications] = useState([]);
 
     useEffect(async () => {
-        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getCompanyStatsAndData`, {
                 headers: {
@@ -485,13 +405,10 @@ const SuperAdmin = () => {
             planManagementStats["Active Users"] = stats["Active Users"];
         } catch (error) {
             //console.log("error", error);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
-        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getPaymentStatsAndData`, {
                 headers: {
@@ -507,13 +424,10 @@ const SuperAdmin = () => {
             setFilteredTransactions(paymentsData);
         } catch (error) {
             //console.log("error", error);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
-        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getSupportStatsAndData`, {
                 headers: {
@@ -527,13 +441,10 @@ const SuperAdmin = () => {
             setFilteredSupport(supportTicketsData);
         } catch (error) {
             //console.log("error", error);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
     useEffect(async () => {
-        setLoading(true);
         try {
             const response = await axios.get(`${baseUrl}/getNotificationsData`, {
                 headers: {
@@ -545,8 +456,6 @@ const SuperAdmin = () => {
             setFilteredNotifications(notificationsData);
         } catch (error) {
             //console.log("error", error);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
@@ -647,10 +556,8 @@ const SuperAdmin = () => {
         const base = companiesData || [];
         if (userStatusFilter === 'all') {
             setFilteredUsers(base);
-        } else if (userStatusFilter === 'blocked') {
-            setFilteredUsers(base.filter(u => u.blocked === true));
         } else {
-            setFilteredUsers(base.filter(u => !u.blocked && (u.status || '').toLowerCase() === userStatusFilter));
+            setFilteredUsers(base.filter(u => (u.status || '').toLowerCase() === userStatusFilter));
         }
     }, [companiesData, userStatusFilter]);
 
@@ -831,20 +738,29 @@ const SuperAdmin = () => {
 
             {/* Users Table */}
             <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
-                <table className="w-full rounded-2xl">
+                <table className="min-w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
-                                Company Name
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                User ID
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
-                                Email
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Name/Company
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Email ID
+                            </th>
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Registration Date
+                            </th>
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Last Active
+                            </th>
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
-                                Actions
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Action
                             </th>
                         </tr>
                     </thead>
@@ -853,43 +769,56 @@ const SuperAdmin = () => {
                             const paginatedUsers = paginateData(filteredUsers, currentPage, rowsPerPage);
                             return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
                                 <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {user._id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                         <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                         {user.email}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : (user.status || 'Active'))}`}>
-                                            {user.blocked ? 'Blocked' : (user.status || 'Active')}
-                                        </span>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
+                                        {user.establishedYear}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <div className="flex items-center space-x-2">
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => openUserModal(user)}
-                                                title="View Details"
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#111827]">
+                                        {user.location}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editUser === user._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
+                                                onChange={(e) => handleUserStatusChange(user._id, e.target.value)}
+                                                value={user.status || 'Active'}
                                             >
-                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                            </button>
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-50"
-                                                onClick={() => handleUserBlockToggle(user._id, user.blocked || false)}
-                                                title={user.blocked ? 'Unblock User' : 'Block User'}
+                                                <option value="Active">Active</option>
+                                                <option value="Blocked">Blocked</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.status || 'Active')}`}>
+                                                {user.status || 'Active'}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editUser === user._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                onClick={() => saveUserStatus(user._id)}
                                             >
-                                                {user.blocked ? (
-                                                    <MdOutlineCheckCircle className="w-5 h-5 text-[#22C55E]" />
-                                                ) : (
-                                                    <MdOutlineCancel className="w-5 h-5 text-[#EF4444]" />
-                                                )}
+                                                Save
                                             </button>
-                                        </div>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditUser(user._id)}
+                                            >
+                                                <MdOutlineEdit className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                    <td colSpan={7} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                         No users found
                                     </td>
                                 </tr>
@@ -917,7 +846,7 @@ const SuperAdmin = () => {
     const renderPayments = () => (
         <div className='h-full'>
             {/* Payments Inner Tabs */}
-            <div className="bg-white mb-6 py-4">
+            <div className="mb-6 py-4">
                 <nav className="flex space-x-8">
                     <button
                         onClick={() => setPaymentsTab('payments')}
@@ -1103,22 +1032,28 @@ const SuperAdmin = () => {
             </div>
 
             <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
-                <table className="w-full rounded-2xl">
+                <table className="min-w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Transaction ID
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Company/User
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Type
+                            </th>
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Amount
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
+                                Created
+                            </th>
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
+                            <th className="px-6 py-4 text-left text-[16px] font-medium text-[#4B5563]">
                                 Action
                             </th>
                         </tr>
@@ -1128,33 +1063,59 @@ const SuperAdmin = () => {
                             const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
                             return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
                                 <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                         {transaction.transaction_id}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                         {transaction.user_id}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        ${transaction.price}
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.payment_method}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                                            {transaction.status}
-                                        </span>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.price}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openPaymentModal(transaction)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        {transaction.created_at || transaction.createdAt}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editTransaction === transaction._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
+                                                onChange={(e) => handleTransactionStatusChange(transaction.transaction_id, e.target.value)}
+                                                value={transaction.status}
+                                                defaultValue={transaction.status}
+                                            >
+                                                <option value="succeeded">Succeeded</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="failed">Failed</option>
+                                                <option value="refunded">Refunded</option>
+                                                <option value="pending refund">Pending Refund</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                                                {transaction.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editTransaction === transaction._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
+                                                onClick={() => saveTransactionStatus(transaction._id)}
+                                            >
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditTransaction(transaction._id)}
+                                            >
+                                                <MdOutlineMoreVert className="w-5 h-5" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                    <td colSpan={7} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                         No transactions found
                                     </td>
                                 </tr>
@@ -1377,25 +1338,31 @@ const SuperAdmin = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
-                <table className="w-full rounded-2xl">
+                <table className="min-w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Ticket ID
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Type
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Subject
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                User
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Priority
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Created
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Action
                             </th>
                         </tr>
@@ -1405,38 +1372,72 @@ const SuperAdmin = () => {
                             const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
                             return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
                                 <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                         {ticket.ticket_id}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                         {ticket.type}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                         {ticket.subject}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                            {ticket.priority}
-                                        </span>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.user_id}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                            {ticket.status}
-                                        </span>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editSupport === ticket._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
+                                                onChange={(e) => handleSupportPriorityChange(ticket._id, e.target.value)}
+                                                value={ticket.priority}
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                {ticket.priority}
+                                            </span>
+                                        )}
                                     </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openSupportModal(ticket)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        {ticket.created_at}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {editSupport === ticket._id ? (
+                                            <select className="px-2 py-1 text-[12px] rounded-full border border-[#E5E7EB] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-[#F9FAFB] w-24"
+                                                onChange={(e) => handleSupportStatusChange(ticket._id, e.target.value)}
+                                                value={ticket.status}
+                                            >
+                                                <option value="New">New</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Resolved">Resolved</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        {editSupport === ticket._id ? (
+                                            <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 mr-2"
+                                                onClick={() => saveSupportStatus(ticket._id)}
+                                            >
+                                                Save
+                                            </button>
+                                        ) : (
+                                            <button className="p-1 rounded-lg transition-colors flex items-center justify-center"
+                                                onClick={() => setEditSupport(ticket._id)}
+                                            >
+                                                <MdOutlineMoreVert className="w-5 h-5" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                    <td colSpan={8} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
                                         No tickets found
                                     </td>
                                 </tr>
@@ -1708,264 +1709,8 @@ const SuperAdmin = () => {
         }, 1000);
     };
 
-    // Modal Components
-    const UserViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
-                    <button
-                        onClick={() => setViewUserModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedUser && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                                <p className="text-gray-900">{selectedUser.companyName}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <p className="text-gray-900">{selectedUser.email}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
-                                <p className="text-gray-900">{selectedUser._id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
-                                <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                                <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
-                                    {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="flex justify-end space-x-3 pt-4 border-t">
-                            <button
-                                onClick={() => handleUserBlockToggle(selectedUser._id, selectedUser.blocked || false)}
-                                className={`px-4 py-2 rounded-lg transition-colors ${selectedUser.blocked
-                                        ? 'bg-green-600 text-white hover:bg-green-700'
-                                        : 'bg-red-600 text-white hover:bg-red-700'
-                                    }`}
-                            >
-                                {selectedUser.blocked ? 'Unblock User' : 'Block User'}
-                            </button>
-                            <button
-                                onClick={() => setViewUserModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    const PaymentViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Transaction Details</h2>
-                    <button
-                        onClick={() => setViewPaymentModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedPayment && (
-                    <div className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Invoice</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Transaction ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedPayment.transaction_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                                    <p className="text-gray-900 text-lg font-semibold">${selectedPayment.price}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                                    <p className="text-gray-900">{selectedPayment.payment_method || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedPayment.status)}`}>
-                                        {selectedPayment.status}
-                                    </span>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900">{selectedPayment.user_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                                    <p className="text-gray-900">{selectedPayment.created_at || selectedPayment.createdAt || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-end pt-4 border-t">
-                            <button
-                                onClick={() => setViewPaymentModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    const SupportViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
-                    <button
-                        onClick={() => setViewSupportModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedSupport && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                <p className="text-gray-900">{selectedSupport.ticket_id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                                <p className="text-gray-900">{selectedSupport.type}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
-                                    {selectedSupport.priority}
-                                </span>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
-                                    {selectedSupport.status}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Subject</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.subject}</p>
-
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Description</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.description || 'No description provided'}</p>
-                        </div>
-
-                        {/* Chat Interface */}
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Conversation</h3>
-                            <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
-                                {supportChat.map((message) => (
-                                    <div key={message.id} className={`mb-3 ${message.sender === 'admin' ? 'text-right' : 'text-left'}`}>
-                                        <div className={`inline-block p-3 rounded-lg max-w-xs ${message.sender === 'admin'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-900 border'
-                                            }`}>
-                                            <p className="text-sm">{message.message}</p>
-                                            <p className="text-xs opacity-75 mt-1">{message.timestamp}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex space-x-2 mb-4">
-                                <input
-                                    type="text"
-                                    value={supportMessage}
-                                    onChange={(e) => setSupportMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    onKeyPress={(e) => e.key === 'Enter' && sendSupportMessage()}
-                                />
-                                <button
-                                    onClick={sendSupportMessage}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <MdOutlineSend className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex justify-between items-center pt-4 border-t">
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'In Progress')}
-                                    disabled={selectedSupport.status === 'In Progress'}
-                                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Set In Progress
-                                </button>
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Resolved')}
-                                    disabled={selectedSupport.status === 'Resolved'}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Resolve
-                                </button>
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Cancelled')}
-                                    disabled={selectedSupport.status === 'Cancelled'}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                            <button
-                                onClick={() => setViewSupportModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>;
-    }
-
     return (
         <div className="min-h-screen bg-[#F8F9FA]">
-            <ToastContainer />
-
-            {/* Modals */}
-            {viewUserModal && <UserViewModal />}
-            {viewPaymentModal && <PaymentViewModal />}
-            {viewSupportModal && <SupportViewModal />}
-
             {/* Top Header Bar */}
             <div className="bg-white border-b border-[#0000001A] px-8 md:px-12 py-4">
                 <div className="flex items-center justify-between">

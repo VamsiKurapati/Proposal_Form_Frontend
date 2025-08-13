@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MdOutlineEdit, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineClose, MdOutlineCheck, MdOutlineCalendarToday, MdOutlineVisibility } from "react-icons/md";
@@ -10,6 +10,7 @@ const EmployeeProfileDashboard = () => {
   const navigate = useNavigate();
   // Use context
   const { employeeData, loading, error, refreshProfile, proposalsInProgress, completedProposals, refreshProposals } = useEmployeeProfile();
+
   // Logo upload state and ref
   const [logoUrl, setLogoUrl] = useState(null);
   const fileInputRef = useRef(null);
@@ -22,7 +23,7 @@ const EmployeeProfileDashboard = () => {
   console.log("Proposals In Progress : ", proposalsInProgress);
 
   // Set logoUrl from employeeData
-  useEffect(() => {
+  React.useEffect(() => {
     if (employeeData && employeeData.logoUrl_1) {
       setLogoUrl(employeeData.logoUrl_1);
     } else if (employeeData && employeeData.logoUrl) {

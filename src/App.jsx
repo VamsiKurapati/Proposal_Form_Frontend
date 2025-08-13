@@ -9,7 +9,6 @@ const Home = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
-const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
 
@@ -39,14 +38,11 @@ const App = () => {
 
       <Suspense fallback={<></>}>
         <Routes>
-          <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />} />
+          <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/super_admin" replace /> : <Navigate to="/dashboard" replace />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />
           <Route path="/create-profile" element={<ProfileForm />} />
-          <Route path="/change-password" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer", "SuperAdmin"]}>
-            <ChangePassword />
-          </ProtectedRoutes>} />
 
           <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <RFPDiscovery />

@@ -5,7 +5,6 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose } from "react-icons/md";
 import axios from 'axios';
-import { useUser } from '../context/UserContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -63,7 +62,6 @@ const Dashboard = () => {
     const user = localStorage.getItem("user");
     const userName = user ? (JSON.parse(user).fullName) : "Unknown User";
     const userEmail = user ? (JSON.parse(user).email) : "No email found";
-    const { role } = useUser();
 
     // State for backend data
     const [proposalsState, setProposalsState] = useState([]);
@@ -84,7 +82,7 @@ const Dashboard = () => {
     const [addEventModalOpen, setAddEventModalOpen] = useState(false);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const [fetchedDashboardData, setFetchedDashboardData] = useState(false);
+
     const [editIdx, setEditIdx] = useState(null);
     const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
 
@@ -130,42 +128,36 @@ const Dashboard = () => {
         }
     };
 
-    const fetchDashboardData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const token = localStorage.getItem('token'); // Adjust if you store token differently
-            const res = await axios.get('https://proposal-form-backend.vercel.app/api/dashboard/getDashboardData', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            const data = res.data;
-            setProposalsState(data.proposals || []);
-            setDeletedProposals(data.deletedProposals || []);
-            setSummaryStats([
-                { label: 'All Proposals', value: data.totalProposals || 0 },
-                { label: 'In Progress', value: data.inProgressProposals || 0 },
-                { label: 'Submitted', value: data.submittedProposals || 0 },
-                { label: 'Won', value: data.wonProposals || 0 },
-            ]);
-            setCalendarEvents(data.calendarEvents || []);
-            setEmployees(data.employees || []);
-        } catch (err) {
-            setError('Failed to load dashboard data');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (!fetchedDashboardData) {
-            fetchDashboardData();
-            setFetchedDashboardData(true);
-        } else {
-            setFetchedDashboardData(false);
-        }
-    }, [fetchedDashboardData]);
+        const fetchDashboardData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const token = localStorage.getItem('token'); // Adjust if you store token differently
+                const res = await axios.get('https://proposal-form-backend.vercel.app/api/dashboard/getDashboardData', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                const data = res.data;
+                setProposalsState(data.proposals || []);
+                setDeletedProposals(data.deletedProposals || []);
+                setSummaryStats([
+                    { label: 'All Proposals', value: data.totalProposals || 0 },
+                    { label: 'In Progress', value: data.inProgressProposals || 0 },
+                    { label: 'Submitted', value: data.submittedProposals || 0 },
+                    { label: 'Won', value: data.wonProposals || 0 },
+                ]);
+                setCalendarEvents(data.calendarEvents || []);
+                setEmployees(data.employees || []);
+            } catch (err) {
+                setError('Failed to load dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDashboardData();
+    }, []);
 
     const handleSetCurrentEditor = async (idx, editorId) => {
         const token = localStorage.getItem('token');
@@ -526,15 +518,10 @@ const Dashboard = () => {
                     </div>
                     <div className="justify-end group flex gap-2">
                         <button
-                            className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
-                                ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
-                                : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
-                                }`}
-                            onClick={role === "Viewer" ? undefined : () => setShowDeleteOptions(true)}
-                            disabled={role === "Viewer"}
-                            title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete proposals"}
+                            className="flex items-center gap-1 px-4 py-2 border rounded text-[#2563EB] border-[#2563EB] text-[14px] md:text-[16px] group-hover:bg-[#2563EB] group-hover:text-white"
+                            onClick={() => setShowDeleteOptions(true)}
                         >
-                            <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete
+                            <MdOutlineDeleteForever className="w-5 h-5 group-hover:text-white" /> Delete
                         </button>
                     </div>
                 </div>
@@ -622,45 +609,7 @@ const Dashboard = () => {
                                                     )}
                                                 </td>
                                             ) : (
-                                                <td className="px-4 py-2 relative">
-                                                    <div className="flex items-center gap-2">
-                                                        <span>{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</span>
-                                                        {role === "Company" && (
-                                                            <button
-                                                                className="text-[#2563EB]"
-                                                                title="Assign Editor"
-                                                                onClick={() => setShowAddPersonIdx(realIdx)}
-                                                            >
-                                                                <MdPersonAddAlt1 className="w-4 h-4" />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                    {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#FFFFFF] border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
-                                                            <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
-                                                            <div>
-                                                                <ul>
-                                                                    {employees.filter(emp => emp.name !== userName).map(emp => (
-                                                                        <li key={emp.name}>
-                                                                            <button
-                                                                                className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
-                                                                                onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
-                                                                            >
-                                                                                {emp.name}
-                                                                            </button>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                            <button
-                                                                className="text-[#111827] absolute top-2 right-2"
-                                                                onClick={() => setShowAddPersonIdx(null)}
-                                                            >
-                                                                <MdOutlineClose className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </td>
+                                                <td className="px-4 py-2">{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</td>
                                             )}
 
                                             <td className="px-4 py-2">
@@ -730,13 +679,9 @@ const Dashboard = () => {
                                                     </div>
                                                 ) : (
                                                     <button
-                                                        className={`flex items-center gap-1 transition-colors ${role === "Viewer"
-                                                            ? "text-[#9CA3AF] cursor-not-allowed opacity-50"
-                                                            : "text-[#2563EB] hover:text-[#1D4ED8]"
-                                                            }`}
-                                                        title={role === "Viewer" ? "Viewer cannot edit proposals" : "Edit Details"}
-                                                        onClick={role === "Viewer" ? undefined : () => handleEditClick(realIdx, p)}
-                                                        disabled={role === "Viewer"}
+                                                        className="text-[#2563EB] flex items-center gap-1 hover:text-[#1D4ED8] transition-colors"
+                                                        title="Edit Details"
+                                                        onClick={() => handleEditClick(realIdx, p)}
                                                     >
                                                         <MdOutlineEdit className="w-5 h-5" /> Edit
                                                     </button>
@@ -874,12 +819,7 @@ const Dashboard = () => {
                                             <button className="text-[#2563EB]" title="Restore" onClick={() => handleRestoreProposal(idx)}>
                                                 <MdOutlineRotateLeft className="w-5 h-5" />
                                             </button>
-                                            <button
-                                                className={`${role === "Viewer" ? "text-[#9CA3AF] cursor-not-allowed opacity-50" : "text-[#2563EB]"}`}
-                                                title={role === "Viewer" ? "Viewer cannot delete permanently" : "Delete Permanently"}
-                                                onClick={role === "Viewer" ? undefined : () => handleDeletePermanently(idx)}
-                                                disabled={role === "Viewer"}
-                                            >
+                                            <button className="text-[#2563EB]" title="Delete Permanently" onClick={() => handleDeletePermanently(idx)}>
                                                 <MdOutlineDeleteForever className="w-5 h-5" />
                                             </button>
                                         </div>

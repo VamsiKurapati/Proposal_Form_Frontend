@@ -78,7 +78,7 @@ const NavbarComponent = () => {
 
       {showDropdown && (
         <div className="absolute top-16 right-0 bg-[#F8F9FA] shadow-md z-100">
-          <button className="block w-full text-left px-4 py-2 text-[18px] hover:text-[#000000] font-medium" onClick={() => navigate("/change-password")}>Change Password</button>
+          <button className="block w-full text-left px-4 py-2 text-[18px] hover:text-[#000000] font-medium" onClick={() => navigate("/change_password")}>Change Password</button>
           <button className="block w-full text-left px-4 py-2 text-[18px] hover:text-[#000000] font-medium" onClick={() => handleLogout()}>Logout</button>
         </div>
       )}
