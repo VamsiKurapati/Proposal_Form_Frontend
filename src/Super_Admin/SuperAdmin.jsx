@@ -1783,10 +1783,10 @@ const SuperAdmin = () => {
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-[#000000]">Company Information</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
                     <button
                         onClick={() => setViewUserModal(false)}
-                        className="text-[#4B5563] hover:text-[#4B5563]"
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
@@ -1794,76 +1794,76 @@ const SuperAdmin = () => {
                 {selectedUser && (
                     <div className="space-y-6">
                         {/* Basic Information */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Basic Information</h3>
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Company Name</label>
-                                    <p className="text-[#000000] font-medium">{selectedUser.companyName}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.companyName}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Email</label>
-                                    <p className="text-[#000000] font-medium">{selectedUser.email}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.email}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Company ID</label>
-                                    <p className="text-[#000000] font-mono text-sm">{selectedUser._id}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Status</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
                                         {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">User ID</label>
-                                    <p className="text-[#000000] font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Admin Name</label>
-                                    <p className="text-[#000000]">{selectedUser.adminName || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin Name</label>
+                                    <p className="text-gray-900">{selectedUser.adminName || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Company Details */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Company Details</h3>
+                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Company Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Industry</label>
-                                    <p className="text-[#000000]">{selectedUser.industry || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Location</label>
-                                    <p className="text-[#000000]">{selectedUser.location || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Established Year</label>
-                                    <p className="text-[#000000]">{selectedUser.establishedYear || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Number of Employees</label>
-                                    <p className="text-[#000000]">{selectedUser.numberOfEmployees || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                                    <p className="text-gray-900">{selectedUser.numberOfEmployees || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Team Size</label>
-                                    <p className="text-[#000000]">{selectedUser.teamSize || '0'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
+                                    <p className="text-gray-900">{selectedUser.teamSize || '0'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Departments</label>
-                                    <p className="text-[#000000]">{selectedUser.departments || '0'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Departments</label>
+                                    <p className="text-gray-900">{selectedUser.departments || '0'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Contact & Links */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Contact & Links</h3>
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Contact & Links</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Website</label>
-                                    <p className="text-[#000000]">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                                    <p className="text-gray-900">
                                         {selectedUser.website ? (
                                             <a href={selectedUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                                 {selectedUser.website}
@@ -1872,8 +1872,8 @@ const SuperAdmin = () => {
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">LinkedIn</label>
-                                    <p className="text-[#000000]">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                                    <p className="text-gray-900">
                                         {selectedUser.linkedIn ? (
                                             <a href={selectedUser.linkedIn} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                                 {selectedUser.linkedIn}
@@ -1885,11 +1885,11 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Services & Industries */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Services & Industries</h3>
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Services & Industries</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Services</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Services</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.services && selectedUser.services.length > 0 ? (
                                             selectedUser.services.map((service, index) => (
@@ -1898,12 +1898,12 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-[#4B5563]">No services listed</p>
+                                            <p className="text-gray-500">No services listed</p>
                                         )}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Preferred Industries</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Industries</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.preferredIndustries && selectedUser.preferredIndustries.length > 0 ? (
                                             selectedUser.preferredIndustries.map((industry, index) => (
@@ -1912,7 +1912,7 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-[#4B5563]">No preferred industries</p>
+                                            <p className="text-gray-500">No preferred industries</p>
                                         )}
                                     </div>
                                 </div>
@@ -1920,11 +1920,11 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Awards & Clients */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Awards & Clients</h3>
+                        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Awards & Clients</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Awards</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Awards</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.awards && selectedUser.awards.length > 0 ? (
                                             selectedUser.awards.map((award, index) => (
@@ -1933,12 +1933,12 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-[#4B5563]">No awards listed</p>
+                                            <p className="text-gray-500">No awards listed</p>
                                         )}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Clients</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Clients</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.clients && selectedUser.clients.length > 0 ? (
                                             selectedUser.clients.map((client, index) => (
@@ -1947,7 +1947,7 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-[#4B5563]">No clients listed</p>
+                                            <p className="text-gray-500">No clients listed</p>
                                         )}
                                     </div>
                                 </div>
@@ -1956,23 +1956,23 @@ const SuperAdmin = () => {
 
                         {/* Licenses & Certifications */}
                         {selectedUser.licensesAndCertifications && selectedUser.licensesAndCertifications.length > 0 && (
-                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-[#000000] mb-3">Licenses & Certifications</h3>
+                            <div className="bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Licenses & Certifications</h3>
                                 <div className="space-y-3">
                                     {selectedUser.licensesAndCertifications.map((license, index) => (
                                         <div key={index} className="border-l-4 border-blue-500 pl-4">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Name</label>
-                                                    <p className="text-[#000000]">{license.name}</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{license.name}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Issuer</label>
-                                                    <p className="text-[#000000]">{license.issuer}</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
+                                                    <p className="text-gray-900">{license.issuer}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Valid Till</label>
-                                                    <p className="text-[#000000]">{license.validTill}</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till</label>
+                                                    <p className="text-gray-900">{license.validTill}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1983,26 +1983,26 @@ const SuperAdmin = () => {
 
                         {/* Documents */}
                         {selectedUser.documents && selectedUser.documents.length > 0 && (
-                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-[#000000] mb-3">Documents</h3>
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Documents</h3>
                                 <div className="space-y-3">
                                     {selectedUser.documents.map((doc, index) => (
                                         <div key={index} className="border-l-4 border-green-500 pl-4">
                                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Name</label>
-                                                    <p className="text-[#000000]">{doc.name}</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{doc.name}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Type</label>
-                                                    <p className="text-[#000000]">{doc.type}</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                                    <p className="text-gray-900">{doc.type}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Size</label>
-                                                    <p className="text-[#000000]">{(doc.size / 1024).toFixed(2)} KB</p>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                                                    <p className="text-gray-900">{(doc.size / 1024).toFixed(2)} KB</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Download</label>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Download</label>
                                                     <a
                                                         href={doc.url}
                                                         target="_blank"
@@ -2021,8 +2021,8 @@ const SuperAdmin = () => {
 
                         {/* Employees */}
                         {selectedUser.employees && selectedUser.employees.length > 0 && (
-                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-[#000000] mb-3">Employees ({selectedUser.employees.length})</h3>
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Employees ({selectedUser.employees.length})</h3>
                                 <div className="max-h-64 overflow-y-auto">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {selectedUser.employees.map((employee, index) => (
@@ -2063,23 +2063,23 @@ const SuperAdmin = () => {
 
                         {/* Company Bio */}
                         {selectedUser.bio && (
-                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-[#000000] mb-3">Company Bio</h3>
-                                <p className="text-[#111827] whitespace-pre-line">{selectedUser.bio}</p>
+                            <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Company Bio</h3>
+                                <p className="text-gray-700 whitespace-pre-line">{selectedUser.bio}</p>
                             </div>
                         )}
 
                         {/* Account Information */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Account Information</h3>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Account Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Account Created</label>
-                                    <p className="text-[#000000]">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                                    <p className="text-gray-900">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Last Updated</label>
-                                    <p className="text-[#000000]">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -2112,10 +2112,10 @@ const SuperAdmin = () => {
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-[#000000]">Support Ticket Details</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
                     <button
                         onClick={() => setViewSupportModal(false)}
-                        className="text-[#4B5563] hover:text-[#4B5563]"
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
@@ -2123,19 +2123,19 @@ const SuperAdmin = () => {
                 {selectedSupport && (
                     <div className="space-y-6">
                         {/* Basic Information */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Basic Information</h3>
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Ticket ID</label>
-                                    <p className="text-[#000000] font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">User ID</label>
-                                    <p className="text-[#000000] font-mono">{selectedSupport.userId}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Status</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
                                         {selectedSupport.status}
                                     </span>
@@ -2144,23 +2144,23 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Ticket Details */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Ticket Details</h3>
+                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Ticket Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Type</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                                         {selectedSupport.type}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Sub Category</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
                                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                                         {selectedSupport.subCategory || 'N/A'}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Priority</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
                                         {selectedSupport.priority}
                                     </span>
@@ -2169,15 +2169,15 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Description */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Description</h3>
-                            <p className="text-[#111827] whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Description</h3>
+                            <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
                         </div>
 
                         {/* Attachments */}
                         {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
-                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-[#000000] mb-3">Attachments ({selectedSupport.attachments.length})</h3>
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {selectedSupport.attachments.map((attachment, index) => (
                                         <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
@@ -2217,19 +2217,19 @@ const SuperAdmin = () => {
                         )}
 
                         {/* Timestamps */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-[#000000] mb-3">Timestamps</h3>
+                        <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Timestamps</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Created At</label>
-                                    <p className="text-[#000000]">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
+                                    <p className="text-gray-900">
                                         {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
                                             selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[#111827] mb-1">Last Updated</label>
-                                    <p className="text-[#000000]">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">
                                         {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
                                     </p>
                                 </div>
@@ -2239,8 +2239,8 @@ const SuperAdmin = () => {
 
 
                         {/* Resolution Message */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Resolution Message</h3>
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Resolution Message</h3>
                             <textarea
                                 value={supportResolutionMessage}
                                 onChange={(e) => setSupportResolutionMessage(e.target.value)}
@@ -2490,10 +2490,10 @@ const SuperAdmin = () => {
                 </div>
             )}
 
-            <div className="flex h-[calc(100vh-64px)]">
+            <div className="hidden lg:flex h-[calc(100vh-64px)]">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
-                    className={`lg:block lg:w-16 lg:hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out lg:fixed lg:left-0 lg:top-16 lg:h-[calc(100vh-64px)] lg:z-20 overflow-hidden group`}
+                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-20 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
                 >
                     <div className="p-4">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
