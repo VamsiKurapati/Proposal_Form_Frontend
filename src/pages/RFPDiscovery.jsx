@@ -16,6 +16,7 @@ import {
   MdOutlineCheck,
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
+import { useUser } from "../context/UserContext";
 
 // Constants
 const API_BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
@@ -217,19 +218,8 @@ const DiscoverRFPs = () => {
   const navigate = useNavigate();
   // Add this state for upload loading
   const [isUploading, setIsUploading] = useState(false);
-
-  const triggerRFPDiscovery = async () => {
-    const res = await axios.post(`${API_BASE_URL}/triggerRFPDiscovery`, {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
-    //console.log(res.data);
-  };
-
-  useEffect(() => {
-    triggerRFPDiscovery();
-  }, []);
+  const [fetchedRFPs, setFetchedRFPs] = useState(false);
+  const { role } = useUser();
 
   // Set available industries statically
   useEffect(() => {
@@ -315,8 +305,11 @@ const DiscoverRFPs = () => {
   };
 
   useEffect(() => {
-    fetchRFPs();
-  }, []);
+    if (!fetchedRFPs) {
+      fetchRFPs();
+      setFetchedRFPs(true);
+    }
+  }, [fetchedRFPs]);
 
   const applyFilters = (rfps) => {
     return rfps.filter((rfp) => {
@@ -376,8 +369,6 @@ const DiscoverRFPs = () => {
       setLoadingSave(prev => ({ ...prev, [rfp._id]: false }));
     }
   };
-
-  // Removed problematic useEffect that was permanently modifying state
 
   const handleUnsave = async (rfpId) => {
     setLoadingSave(prev => ({ ...prev, [rfpId]: true }));
@@ -446,7 +437,11 @@ const DiscoverRFPs = () => {
             {loadingSave[rfp._id] ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
             ) : isSaved ? (
-              <MdOutlineBookmark onClick={() => handleUnsave(rfp._id)} className="cursor-pointer text-[#111827]" title="Unsave" />
+              <MdOutlineBookmark
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} text-[#111827]`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
+              />
             ) : (
               <FaRegBookmark onClick={() => handleSave(rfp)} className="cursor-pointer" title="Save" />
             )}
@@ -485,9 +480,9 @@ const DiscoverRFPs = () => {
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
-                onClick={() => handleUnsave(rfp._id)}
-                className="cursor-pointer"
-                title="Unsave"
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
@@ -579,9 +574,9 @@ const DiscoverRFPs = () => {
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563]"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
-                onClick={() => handleUnsave(rfp._id)}
-                className="cursor-pointer hover:text-[#2563EB] transition-colors"
-                title="Unsave"
+                onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"}`}
+                title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
@@ -774,146 +769,208 @@ const DiscoverRFPs = () => {
       />
       <main className="pt-20 px-8 md:px-12 py-6 ml-0">
         {/* Search Bar Section */}
-
-
-
         <div className="flex  justify-center mx-auto text-lg space-x-6 border-b border-gray-200 p-4">
+          <button
+            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "rfp"
+              ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
+              : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
+              }`}
+            onClick={() => setActiveTab("rfp")}
+          >
+            RFP's
+          </button>
 
-  <button
-    className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${
-      activeTab === "rfp"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600"
-        : "font-bold text-gray-600"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
-        : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
-    }`}
-    onClick={() => setActiveTab("rfp")}
-  >
-    RFP's
-  </button>
+          <button
+            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "grants"
+              ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
+              : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
+              }`}
+            onClick={() => setActiveTab("grants")}
+          >
+            Grant's
+          </button>
+        </div>
 
-  <button
-    className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${
-      activeTab === "grants"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600"
-        : "font-bold text-gray-600"
-        ? "text-blue-600 font-bold border-b-2 border-blue-600 bg-blue-50 shadow"
-        : "font-bold text-gray-600 hover:text-blue-600 hover:bg-gray-100"
-    }`}
-    onClick={() => setActiveTab("grants")}
-  >
-    Grant's
-  </button>
-</div>
+        {activeTab === "rfp" && (
+          <div className="mt-4">
+            <div className="mb-8">
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                {/* Search Input with Advanced Search Button */}
+                <div className="relative flex-1 w-full md:max-w-[90%]">
+                  <div className="relative">
+                    <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
+                    <input
+                      type="text"
+                      placeholder="Search RFPs by title, organization or category"
+                      className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button
+                      className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
+                      onClick={() => setIsSearchFocused(true)}
+                    >
+                      Advanced Search
+                    </button>
+                  </div>
+                </div>
 
-
-      {activeTab === "rfp" && (
-        <div>
-          <div>
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            {/* Search Input with Advanced Search Button */}
-            <div className="relative flex-1 w-full md:max-w-[90%]">
-              <div className="relative">
-                <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
-                <input
-                  type="text"
-                  placeholder="Search RFPs by title, organization or category"
-                  className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
-                  onClick={() => setIsSearchFocused(true)}
+                {/* Upload RFP Button */}
+                <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+                  onClick={() => setUploadModalOpen(true)}
                 >
-                  Advanced Search
+                  <MdOutlineUpload className="w-5 h-5" />
+                  Upload RFP
                 </button>
               </div>
             </div>
 
-            {/* Upload RFP Button */}
-            <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
-              onClick={() => setUploadModalOpen(true)}
-            >
-              <MdOutlineUpload className="w-5 h-5" />
-              Upload RFP
-            </button>
-          </div>
-        </div>
+            <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                <p className="text-red-700">{error}</p>
+                <button
+                  onClick={handleRetry}
+                  className="mt-2 text-red-600 hover:text-red-800 underline"
+                >
+                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                </button>
+              </div>
+            )}
+            {loadingRecommended ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                <span className="ml-3 text-[16px] text-[#4B5563]">Loading recommended RFPs...</span>
+              </div>
+            ) : filteredRecommended.length ? (
+              <div className="flex overflow-x-auto pb-2 custom-scroll">
+                {applyFilters(filteredRecommended).map((rfp) => (
+                  <RFPCard
+                    key={rfp._id}
+                    rfp={rfp}
+                    isSaved={!!saved.find((s) => s._id === rfp._id)}
+                    handleGenerateProposal={handleGenerateProposal}
+                  />
+                ))}
+              </div>
+            ) : (
+              (!error && (
+                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+              ))
+            )}
 
-        <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-            <p className="text-red-700">{error}</p>
-            <button
-              onClick={handleRetry}
-              className="mt-2 text-red-600 hover:text-red-800 underline"
-            >
-              {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-            </button>
-          </div>
-        )}
-        {loadingRecommended ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
-            <span className="ml-3 text-[16px] text-[#4B5563]">Loading recommended RFPs...</span>
-          </div>
-        ) : filteredRecommended.length ? (
-          <div className="flex overflow-x-auto pb-2 custom-scroll">
-            {applyFilters(filteredRecommended).map((rfp) => (
-              <RFPCard
-                key={rfp._id}
-                rfp={rfp}
-                isSaved={!!saved.find((s) => s._id === rfp._id)}
-                handleGenerateProposal={handleGenerateProposal}
-              />
-            ))}
-          </div>
-        ) : (
-          (!error && (
-            <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
-          ))
-        )}
+            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other RFPs</h2>
+            <div className="mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                {/* Industry Selection */}
+                <div>
+                  <label className="block text-[16px] font-medium text-[#111827] mb-2">
+                    Select Industries to Filter RFPs
+                  </label>
+                  <IndustryMultiSelect
+                    selectedIndustries={selectedIndustries}
+                    onIndustryChange={setSelectedIndustries}
+                    industries={availableIndustries}
+                  />
+                </div>
 
-        <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other RFPs</h2>
-        <div className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-            {/* Industry Selection */}
-            <div>
-              <label className="block text-[16px] font-medium text-[#111827] mb-2">
-                Select Industries to Filter RFPs
-              </label>
-              <IndustryMultiSelect
-                selectedIndustries={selectedIndustries}
-                onIndustryChange={setSelectedIndustries}
-                industries={availableIndustries}
-              />
+                {/* Search Button */}
+                <div className="flex justify-start md:justify-end">
+                  <button
+                    onClick={fetchOtherRFPs}
+                    disabled={selectedIndustries.length === 0 || loadingOtherRFPs}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherRFPs
+                      ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+                      : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
+                      }`}
+                  >
+                    {loadingOtherRFPs ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Searching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <MdOutlineSearch className="w-5 h-5" />
+                        <span>Search RFPs</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
 
-            {/* Search Button */}
-            <div className="flex justify-start md:justify-end">
-              <button
-                onClick={fetchOtherRFPs}
-                disabled={selectedIndustries.length === 0 || loadingOtherRFPs}
-                className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherRFPs
-                  ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
-                  : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
-                  }`}
-              >
-                {loadingOtherRFPs ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Searching...</span>
-                  </>
-                ) : (
-                  <>
-                    <MdOutlineSearch className="w-5 h-5" />
-                    <span>Search RFPs</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {loadingOtherRFPs ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                <span className="ml-3 text-[16px] text-[#4B5563]">Loading RFPs...</span>
+              </div>
+            ) : filteredOtherRFPs.length > 0 ? (
+              <div className="flex overflow-x-auto pb-2 custom-scroll">
+                {applyFilters(filteredOtherRFPs).map((rfp) => (
+                  <RecentRFPCard
+                    key={rfp._id}
+                    rfp={rfp}
+                    isSaved={!!saved.find((s) => s._id === rfp._id)}
+                  />
+                ))}
+              </div>
+            ) : filteredOtherRFPs.length === 0 && selectedIndustries.length > 0 ? (
+              <div className="text-center py-8">
+                <p className="text-[16px] text-[#4B5563] mb-2">No RFPs found for the selected industries.</p>
+                <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search RFPs" to discover relevant opportunities.</p>
+                <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find RFPs that match your expertise.</p>
+              </div>
+            )}
+
+            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                <p className="text-red-700">{error}</p>
+                <button
+                  onClick={handleRetry}
+                  className="mt-2 text-red-600 hover:text-red-800 underline"
+                >
+                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                </button>
+              </div>
+            )}
+
+            {!error && (
+              filteredSaved.length > 0 ? (
+                <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#F8FAFC]">
+                        <tr className="text-[#374151] text-[14px] font-medium">
+                          <th className="px-4 py-3 text-left">RFP Title</th>
+                          <th className="px-4 py-3 text-left">Organisation</th>
+                          <th className="px-4 py-3 text-left">Amount</th>
+                          <th className="px-4 py-3 text-left">Deadline</th>
+                          <th className="px-4 py-3 text-center">Status</th>
+                          <th className="px-4 py-3 text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSaved.map((rfp) => (
+                          <SavedRFPCard
+                            key={rfp._id}
+                            rfp={rfp}
+                            isSaved={true}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
+              )
+            )}
           </div>
         </div>
 
@@ -944,18 +1001,44 @@ const DiscoverRFPs = () => {
           </div>
         )}
 
-        <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-            <p className="text-red-700">{error}</p>
-            <button
-              onClick={handleRetry}
-              className="mt-2 text-red-600 hover:text-red-800 underline"
-            >
-              {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-            </button>
-          </div>
-        )}
+
+        {activeTab === "grants" && (
+          <div className="mt-4">
+            <div className="mb-8">
+              <h2 className="text-[24px] text-[#000000] font-semibold mb-4">Recently Added Grant's</h2>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                  <p className="text-red-700">{error}</p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-red-600 hover:text-red-800 underline"
+                  >
+                    {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                  </button>
+                </div>
+              )}
+              {loadingRecommended ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                  <span className="ml-3 text-[16px] text-[#4B5563]">Loading Recently Added Grant's...</span>
+                </div>
+              ) : filteredRecommended.length ? (
+                <div className="flex overflow-x-auto pb-2 custom-scroll">
+                  {applyFilters(filteredRecommended).map((rfp) => (
+                    <RFPCard
+                      key={rfp._id}
+                      rfp={rfp}
+                      isSaved={!!saved.find((s) => s._id === rfp._id)}
+                      handleGenerateProposal={handleGenerateProposal}
+                    />
+                  ))}
+                </div>
+              ) : (
+                (!error && (
+                  <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+                ))
+              )}
+
 
         {!error && (
           filteredSaved.length > 0 ? (
