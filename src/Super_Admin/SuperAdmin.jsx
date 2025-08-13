@@ -25,7 +25,6 @@ import {
     MdOutlineMenu,
     MdOutlineVisibility,
     MdOutlineClose,
-    MdOutlineSend,
     MdOutlineCheckCircle,
     MdOutlineCancel
 } from 'react-icons/md';
@@ -67,8 +66,6 @@ const SuperAdmin = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [selectedSupport, setSelectedSupport] = useState(null);
-    const [supportMessage, setSupportMessage] = useState('');
-    const [supportChat, setSupportChat] = useState([]);
 
     // Invoice modal states for inline display
     const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
@@ -116,16 +113,15 @@ const SuperAdmin = () => {
         try {
             const newBlockedStatus = !currentBlockedStatus;
             const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
-                blocked: newBlockedStatus,
-                status: newBlockedStatus ? 'Blocked' : 'Active'
+                blocked: newBlockedStatus
             }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             if (res.status === 200) {
-                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
-                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus } : u));
                 toast.success(`User ${newBlockedStatus ? 'blocked' : 'unblocked'} successfully`);
             }
         } catch (e) {
@@ -147,35 +143,10 @@ const SuperAdmin = () => {
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
                 setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
                 toast.success(`Ticket status updated to ${newStatus}`);
-                if (newStatus === 'In Progress') {
-                    setSupportChat(prev => [...prev, {
-                        id: Date.now(),
-                        message: `Status changed to ${newStatus}`,
-                        sender: 'admin',
-                        timestamp: new Date().toLocaleString()
-                    }]);
-                }
             }
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    };
-
-    const sendSupportMessage = async () => {
-        if (!supportMessage.trim()) return;
-
-        const newMessage = {
-            id: Date.now(),
-            message: supportMessage,
-            sender: 'admin',
-            timestamp: new Date().toLocaleString()
-        };
-
-        setSupportChat(prev => [...prev, newMessage]);
-        setSupportMessage('');
-
-        // Here you would typically send the message to the backend
-        // For now, we'll just add it to the local state
     };
 
     // View modal functions
@@ -192,15 +163,6 @@ const SuperAdmin = () => {
     const openSupportModal = (support) => {
         setSelectedSupport(support);
         setViewSupportModal(true);
-        // Initialize chat with existing messages
-        setSupportChat([
-            {
-                id: 1,
-                message: support.description || 'No description provided',
-                sender: 'user',
-                timestamp: support.created_at || new Date().toLocaleString()
-            }
-        ]);
     };
 
     // Invoice row toggle functions
@@ -219,6 +181,9 @@ const SuperAdmin = () => {
     const closeAllInvoiceRows = () => {
         setOpenInvoiceRows(new Set());
     };
+
+    // Sidebar state for large screens
+    const [showSidebar, setShowSidebar] = useState(false);
 
     // Close modals when clicking outside
     const handleModalBackdropClick = (e) => {
@@ -287,6 +252,7 @@ const SuperAdmin = () => {
         setTransactionStatusFilter(value);
         closeAllInvoiceRows();
     };
+
     const handleTransactionDateChangeFilter = (value) => {
         setTransactionDateFilter(value);
         closeAllInvoiceRows();
@@ -297,12 +263,14 @@ const SuperAdmin = () => {
         setSupportStatusFilter(value);
         closeAllInvoiceRows();
     };
+
     const handleSupportPriorityChangeFilter = (value) => {
-        setSupportPriorityChangeFilter(value);
+        setSupportPriorityFilter(value);
         closeAllInvoiceRows();
     };
-    const handleSupportTypeChangeFilter = (value) => {
-        setSupportTypeChangeFilter(value);
+
+    const handleSupportTypeFilter = (value) => {
+        setSupportTypeFilter(value);
         closeAllInvoiceRows();
     };
 
@@ -913,8 +881,8 @@ const SuperAdmin = () => {
                                             {user.email}
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : (user.status || 'Active'))}`}>
-                                                {user.blocked ? 'Blocked' : (user.status || 'Active')}
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : user.status)}`}>
+                                                {user.blocked ? 'Blocked' : user.status}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
@@ -1882,7 +1850,7 @@ const SuperAdmin = () => {
     // Modal Components
     const UserViewModal = () => (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
                     <button
@@ -1893,35 +1861,102 @@ const SuperAdmin = () => {
                     </button>
                 </div>
                 {selectedUser && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                                <p className="text-gray-900">{selectedUser.companyName}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <p className="text-gray-900">{selectedUser.email}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
-                                <p className="text-gray-900">{selectedUser._id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
-                                <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                                <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
-                                    {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
-                                </span>
+                    <div className="space-y-6">
+                        {/* Basic Information */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.companyName}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.email}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
+                                        {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
+                                    </span>
+                                </div>
                             </div>
                         </div>
+
+                        {/* Company Details */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Company Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+                                    <p className="text-gray-900">{selectedUser.companySize || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Account Information */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Account Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                                    <p className="text-gray-900">{selectedUser.created_at || selectedUser.createdAt || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Login</label>
+                                    <p className="text-gray-900">{selectedUser.lastLogin || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Subscription Plan</label>
+                                    <p className="text-gray-900">{selectedUser.subscriptionPlan || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Proposals Created</label>
+                                    <p className="text-gray-900">{selectedUser.proposalsCount || '0'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Contact Information */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                    <p className="text-gray-900">{selectedUser.phone || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                                    <p className="text-gray-900">{selectedUser.website || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                    <p className="text-gray-900">{selectedUser.address || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                                    <p className="text-gray-900">{selectedUser.contactPerson || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
                         <div className="flex justify-end space-x-3 pt-4 border-t">
                             <button
                                 onClick={() => handleUserBlockToggle(selectedUser._id, selectedUser.blocked || false)}
@@ -2049,40 +2084,7 @@ const SuperAdmin = () => {
                             <p className="text-gray-700 mb-4">{selectedSupport.description || 'No description provided'}</p>
                         </div>
 
-                        {/* Chat Interface */}
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Conversation</h3>
-                            <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
-                                {supportChat.map((message) => (
-                                    <div key={message.id} className={`mb-3 ${message.sender === 'admin' ? 'text-right' : 'left'}`}>
-                                        <div className={`inline-block p-3 rounded-lg max-w-xs ${message.sender === 'admin'
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-white text-gray-900 border'
-                                            }`}>
-                                            <p className="text-sm">{message.message}</p>
-                                            <p className="text-xs opacity-75 mt-1">{message.timestamp}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
 
-                            <div className="flex space-x-2 mb-4">
-                                <input
-                                    type="text"
-                                    value={supportMessage}
-                                    onChange={(e) => setSupportMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    onKeyPress={(e) => e.key === 'Enter' && sendSupportMessage()}
-                                />
-                                <button
-                                    onClick={sendSupportMessage}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <MdOutlineSend className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
 
                         {/* Action Buttons */}
                         <div className="flex justify-between items-center pt-4 border-t">
@@ -2243,6 +2245,13 @@ const SuperAdmin = () => {
                         >
                             <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
                         </button>
+                        {/* Large Screen Menu Button */}
+                        <button
+                            className="hidden lg:block p-2 transition-colors hover:bg-gray-100 rounded-lg"
+                            onClick={() => setShowSidebar(!showSidebar)}
+                        >
+                            <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
+                        </button>
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
                                 <span className="text-[#2563eb] font-bold text-sm">LOGO</span>
@@ -2352,9 +2361,28 @@ const SuperAdmin = () => {
             )}
 
             <div className="flex h-[calc(100vh-64px)]">
-                {/* Left Sidebar - Hidden on small screens, visible on large screens */}
-                <div className="hidden lg:block w-64 bg-white border-r border-[#0000001A] flex-shrink-0">
+                {/* Hover trigger area for large screens */}
+                <div
+                    className="hidden lg:block fixed left-0 top-16 w-2 h-full z-10"
+                    onMouseEnter={() => setShowSidebar(true)}
+                />
+
+                {/* Left Sidebar - Responsive for large screens */}
+                <div
+                    className={`${showSidebar ? 'lg:block' : 'lg:hidden'} lg:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out lg:fixed lg:left-0 lg:top-16 lg:h-[calc(100vh-64px)] lg:z-20`}
+                    onMouseEnter={() => window.innerWidth >= 1024 && setShowSidebar(true)}
+                    onMouseLeave={() => window.innerWidth >= 1024 && setShowSidebar(false)}
+                >
                     <div className="p-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-medium text-gray-900">Menu</h2>
+                            <button
+                                className="lg:hidden p-2 transition-colors"
+                                onClick={() => setShowSidebar(false)}
+                            >
+                                <MdOutlineClose className="w-5 h-5 text-[#4B5563]" />
+                            </button>
+                        </div>
                         <nav className="space-y-2">
                             <button
                                 className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'user-management'
@@ -2400,7 +2428,7 @@ const SuperAdmin = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${showSidebar ? 'lg:ml-64' : 'lg:ml-0'}`}>
                     {/* Scrollable Content Area */}
                     <div className="flex-1 overflow-y-auto">
                         <div className="p-6 min-h-full">
