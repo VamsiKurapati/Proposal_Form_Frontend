@@ -128,16 +128,37 @@ const SuperAdmin = () => {
     // New functions for support ticket management
     const handleSupportStatusUpdate = async (ticketId, newStatus) => {
         try {
-            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
+            // Prepare update data - include resolution message if resolving
+            const updateData = {
                 status: newStatus
-            }, {
+            };
+
+            // If resolving, include the resolution message
+            if (newStatus === 'Resolved') {
+                updateData.resolutionMessage = supportResolutionMessage;
+            }
+
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             if (res.status === 200) {
-                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
-                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
+                // Update local state with new status and resolution message
+                const updatedTicket = {
+                    ...(supportTicketsData.find(t => t._id === ticketId) || {}),
+                    status: newStatus,
+                    resolutionMessage: newStatus === 'Resolved' ? supportResolutionMessage : undefined
+                };
+
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+
+                // Update selectedSupport if it's the current ticket
+                if (selectedSupport && selectedSupport._id === ticketId) {
+                    setSelectedSupport(updatedTicket);
+                }
+
                 toast.success(`Ticket status updated to ${newStatus}`);
             }
         } catch (e) {
@@ -145,16 +166,41 @@ const SuperAdmin = () => {
         }
     };
 
+
+
     // View modal functions
     const openUserModal = (user) => {
         setSelectedUser(user);
         setViewUserModal(true);
     };
 
-    const openSupportModal = (support) => {
-        setSelectedSupport(support);
-        setSupportResolutionMessage('');
-        setViewSupportModal(true);
+    const openSupportModal = async (support) => {
+        if (support.status === 'Pending') {
+            try {
+                const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
+                    status: 'In Progress',
+                    resolutionMessage: ""
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (res.status === 200) {
+                    setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
+                    setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
+                    setSelectedSupport(support);
+                    setSupportResolutionMessage(support.resolutionMessage || '');
+                    setViewSupportModal(true);
+                }
+            } catch (e) {
+                toast.error('Failed to update support ticket');
+                return;
+            }
+        } else {
+            setSelectedSupport(support);
+            setSupportResolutionMessage(support.resolutionMessage || '');
+            setViewSupportModal(true);
+        }
     };
 
     // Invoice row toggle functions
@@ -181,7 +227,10 @@ const SuperAdmin = () => {
         if (e.target === e.currentTarget) {
             setViewUserModal(false);
             setViewSupportModal(false);
-            setSupportResolutionMessage('');
+            // Only clear resolution message if it's different from saved value
+            if (selectedSupport && supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
+                setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+            }
         }
     };
 
@@ -191,13 +240,16 @@ const SuperAdmin = () => {
             if (e.key === 'Escape') {
                 setViewUserModal(false);
                 setViewSupportModal(false);
-                setSupportResolutionMessage('');
+                // Only clear resolution message if it's different from saved value
+                if (selectedSupport && supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
+                    setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+                }
             }
         };
 
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
-    }, []);
+    }, [selectedSupport, supportResolutionMessage]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -1407,9 +1459,16 @@ const SuperAdmin = () => {
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                    {ticket.status}
+                                                </span>
+                                                {ticket.resolutionMessage && (
+                                                    <span className="inline-flex items-center px-2 py-1 text-[10px] bg-green-100 text-green-800 rounded-full">
+                                                        📝 Has Notes
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
                                             <button
@@ -2128,7 +2187,7 @@ const SuperAdmin = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.ticked_id || selectedSupport.ticketId || selectedSupport._id}</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
@@ -2236,49 +2295,52 @@ const SuperAdmin = () => {
                             </div>
                         </div>
 
-
-
                         {/* Resolution Message */}
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Resolution Message</h3>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-medium text-gray-800">Resolution Message</h3>
+                                {selectedSupport.resolutionMessage && (
+                                    <button
+                                        onClick={() => setSupportResolutionMessage('')}
+                                        className="px-3 py-1 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+                                        title="Clear current input (will be saved when resolving)"
+                                    >
+                                        Clear Input
+                                    </button>
+                                )}
+                            </div>
                             <textarea
                                 value={supportResolutionMessage}
                                 onChange={(e) => setSupportResolutionMessage(e.target.value)}
-                                placeholder="Enter resolution message or notes..."
+                                placeholder="Enter resolution message or notes for this ticket..."
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                                 rows="4"
                             />
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-between items-center pt-4 border-t">
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => {
-                                        if (supportResolutionMessage.trim()) {
-                                            handleSupportStatusUpdate(selectedSupport._id, 'Resolved');
-                                            setSupportResolutionMessage('');
-                                        } else {
-                                            toast.warning('Please enter a resolution message before resolving the ticket');
-                                        }
-                                    }}
-                                    disabled={selectedSupport.status === 'Resolved'}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Resolve Ticket
-                                </button>
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Cancelled')}
-                                    disabled={selectedSupport.status === 'Cancelled'}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Cancel Ticket
-                                </button>
-                            </div>
+                        <div className="flex justify-between items-center pt-4 gap-4">
+                            <button
+                                onClick={() => {
+                                    if (supportResolutionMessage.trim()) {
+                                        handleSupportStatusUpdate(selectedSupport._id, 'Resolved');
+                                        setSupportResolutionMessage('');
+                                    } else {
+                                        toast.warning('Please enter a resolution message before resolving the ticket');
+                                    }
+                                }}
+                                disabled={selectedSupport.status === 'Resolved'}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Resolve Ticket
+                            </button>
                             <button
                                 onClick={() => {
                                     setViewSupportModal(false);
-                                    setSupportResolutionMessage('');
+                                    // Only clear resolution message if it's different from saved value
+                                    if (supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
+                                        setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+                                    }
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
@@ -2495,7 +2557,7 @@ const SuperAdmin = () => {
                 <div
                     className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
                 >
-                    <div className="p-4 ml-4">
+                    <div className="px-6 py-4">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
                             <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
                         </div>
@@ -2544,7 +2606,7 @@ const SuperAdmin = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:ml-16`}>
+                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:ml-20`}>
                     {/* Scrollable Content Area */}
                     <div className="flex-1 overflow-y-auto">
                         <div className="p-6 min-h-full">
