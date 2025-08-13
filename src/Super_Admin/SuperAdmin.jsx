@@ -70,6 +70,9 @@ const SuperAdmin = () => {
     const [supportMessage, setSupportMessage] = useState('');
     const [supportChat, setSupportChat] = useState([]);
 
+    // Invoice modal states for inline display
+    const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
+
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
     const [transactionStatusFilter, setTransactionStatusFilter] = useState('all');
@@ -200,6 +203,23 @@ const SuperAdmin = () => {
         ]);
     };
 
+    // Invoice row toggle functions
+    const toggleInvoiceRow = (rowId) => {
+        setOpenInvoiceRows(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(rowId)) {
+                newSet.delete(rowId);
+            } else {
+                newSet.add(rowId);
+            }
+            return newSet;
+        });
+    };
+
+    const closeAllInvoiceRows = () => {
+        setOpenInvoiceRows(new Set());
+    };
+
     // Close modals when clicking outside
     const handleModalBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -257,16 +277,34 @@ const SuperAdmin = () => {
     };
 
     // User filter: single select with toggle back to 'all'
-    const handleUserStatusChangeFilter = (value) => setUserStatusFilter(value);
+    const handleUserStatusChangeFilter = (value) => {
+        setUserStatusFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Transaction filters are split by group
-    const handleTransactionStatusChangeFilter = (value) => setTransactionStatusFilter(value);
-    const handleTransactionDateChangeFilter = (value) => setTransactionDateFilter(value);
+    const handleTransactionStatusChangeFilter = (value) => {
+        setTransactionStatusFilter(value);
+        closeAllInvoiceRows();
+    };
+    const handleTransactionDateChangeFilter = (value) => {
+        setTransactionDateFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Support filters split by group
-    const handleSupportStatusChangeFilter = (value) => setSupportStatusFilter(value);
-    const handleSupportPriorityChangeFilter = (value) => setSupportPriorityFilter(value);
-    const handleSupportTypeChangeFilter = (value) => setSupportTypeFilter(value);
+    const handleSupportStatusChangeFilter = (value) => {
+        setSupportStatusFilter(value);
+        closeAllInvoiceRows();
+    };
+    const handleSupportPriorityChangeFilter = (value) => {
+        setSupportPriorityChangeFilter(value);
+        closeAllInvoiceRows();
+    };
+    const handleSupportTypeChangeFilter = (value) => {
+        setSupportTypeChangeFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Export helpers
     const exportArrayToCSV = (filename, headers, rows) => {
@@ -314,7 +352,10 @@ const SuperAdmin = () => {
         exportArrayToCSV('transactions.csv', headers, rows);
     };
 
-    const handleNotificationCategoryFilter = (value) => setNotificationCategoryFilter(value);
+    const handleNotificationCategoryFilter = (value) => {
+        setNotificationCategoryFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Pagination utility functions
     const paginateData = (data, currentPage, rowsPerPage) => {
@@ -694,41 +735,49 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when search terms change
         setCurrentPage(1);
+        closeAllInvoiceRows();
     }, [searchTerm]);
 
     useEffect(() => {
         // Reset pagination when transaction search terms change
         setCurrentPageTransactions(1);
+        closeAllInvoiceRows();
     }, [transactionSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when support search terms change
         setCurrentPageSupport(1);
+        closeAllInvoiceRows();
     }, [supportSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when notification search terms change
         setCurrentPageNotifications(1);
+        closeAllInvoiceRows();
     }, [notificationSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when user filters change
         setCurrentPage(1);
+        closeAllInvoiceRows();
     }, [userStatusFilter]);
 
     useEffect(() => {
         // Reset pagination when transaction filters change
         setCurrentPageTransactions(1);
+        closeAllInvoiceRows();
     }, [transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
         // Reset pagination when support filters change
         setCurrentPageSupport(1);
+        closeAllInvoiceRows();
     }, [supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
     useEffect(() => {
         // Reset pagination when notification filters change
         setCurrentPageNotifications(1);
+        closeAllInvoiceRows();
     }, [notificationTimeFilter, notificationCategoryFilter]);
 
     const renderUserManagement = () => (
@@ -758,7 +807,10 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF]"
                             />
                         </div>
@@ -852,41 +904,49 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedUsers = paginateData(filteredUsers, currentPage, rowsPerPage);
                             return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
-                                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {user.email}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : (user.status || 'Active'))}`}>
-                                            {user.blocked ? 'Blocked' : (user.status || 'Active')}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <div className="flex items-center space-x-2">
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => openUserModal(user)}
-                                                title="View Details"
-                                            >
-                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                            </button>
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-50"
-                                                onClick={() => handleUserBlockToggle(user._id, user.blocked || false)}
-                                                title={user.blocked ? 'Unblock User' : 'Block User'}
-                                            >
-                                                {user.blocked ? (
-                                                    <MdOutlineCheckCircle className="w-5 h-5 text-[#22C55E]" />
-                                                ) : (
-                                                    <MdOutlineCancel className="w-5 h-5 text-[#EF4444]" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {user.email}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : (user.status || 'Active'))}`}>
+                                                {user.blocked ? 'Blocked' : (user.status || 'Active')}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => toggleInvoiceRow(`user-${user._id}`)}
+                                                    title="View Invoice"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                                </button>
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-50"
+                                                    onClick={() => handleUserBlockToggle(user._id, user.blocked || false)}
+                                                    title={user.blocked ? 'Unblock User' : 'Block User'}
+                                                >
+                                                    {user.blocked ? (
+                                                        <MdOutlineCheckCircle className="w-5 h-5 text-[#22C55E]" />
+                                                    ) : (
+                                                        <MdOutlineCancel className="w-5 h-5 text-[#EF4444]" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <InlineInvoiceModal
+                                        data={user}
+                                        type="user"
+                                        isOpen={openInvoiceRows.has(`user-${user._id}`)}
+                                        onClose={() => toggleInvoiceRow(`user-${user._id}`)}
+                                    />
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -901,12 +961,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPage}
                         totalPages={getTotalPages(filteredUsers, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPage(page)}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredUsers.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPage(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -986,7 +1050,10 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={transactionSearchTerm}
-                                onChange={(e) => setTransactionSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setTransactionSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
@@ -1127,31 +1194,39 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
                             return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
-                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {transaction.transaction_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {transaction.user_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        ${transaction.price}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                                            {transaction.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openPaymentModal(transaction)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr className="hover:bg-[#F8FAFC] transition-colors">
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.transaction_id}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.user_id}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            ${transaction.price}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                                                {transaction.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                                title="View Invoice"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <InlineInvoiceModal
+                                        data={transaction}
+                                        type="payment"
+                                        isOpen={openInvoiceRows.has(`payment-${transaction.transaction_id}`)}
+                                        onClose={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                    />
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -1166,12 +1241,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPageTransactions}
                         totalPages={getTotalPages(filteredTransactions, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPageTransactions(page)}
+                        onPageChange={(page) => {
+                            setCurrentPageTransactions(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredTransactions.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPageTransactions(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -1230,7 +1309,10 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={supportSearchTerm}
-                                onChange={(e) => setSupportSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSupportSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
@@ -1404,36 +1486,44 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
                             return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
-                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {ticket.ticket_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {ticket.type}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {ticket.subject}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                            {ticket.priority}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                            {ticket.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openSupportModal(ticket)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr className="hover:bg-[#F8FAFC] transition-colors">
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {ticket.ticket_id}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {ticket.type}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {ticket.subject}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                {ticket.priority}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => toggleInvoiceRow(`support-${ticket.ticket_id}`)}
+                                                title="View Invoice"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <InlineInvoiceModal
+                                        data={ticket}
+                                        type="support"
+                                        isOpen={openInvoiceRows.has(`support-${ticket.ticket_id}`)}
+                                        onClose={() => toggleInvoiceRow(`support-${ticket.ticket_id}`)}
+                                    />
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -1448,12 +1538,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPageSupport}
                         totalPages={getTotalPages(filteredSupport, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPageSupport(page)}
+                        onPageChange={(page) => {
+                            setCurrentPageSupport(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredSupport.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -1497,7 +1591,10 @@ const SuperAdmin = () => {
                                             <span className="text-[14px] font-medium text-[#111827]">Time</span>
                                             <button
                                                 className="text-[12px] text-[#2563EB] hover:underline"
-                                                onClick={() => setNotificationTimeFilter('all')}
+                                                onClick={() => {
+                                                    setNotificationTimeFilter('all');
+                                                    closeAllInvoiceRows();
+                                                }}
                                             >
                                                 Clear
                                             </button>
@@ -1505,47 +1602,90 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
                                                 checked={notificationTimeFilter === 'All Time'}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="allTime">All Time</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
                                                 checked={notificationTimeFilter === 'today'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="today">Today</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
                                                 checked={notificationTimeFilter === 'yesterday'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="yesterday">Yesterday</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
                                                 checked={notificationTimeFilter === 'last7Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
                                                 checked={notificationTimeFilter === 'last14Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last14Days">Last 14 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
                                                 checked={notificationTimeFilter === 'last30Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
                                         </div>
@@ -1581,7 +1721,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
                                                 checked={notificationCategoryFilter === 'account access'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="accountAccess">Account & Access</label>
@@ -1589,7 +1733,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
                                                 checked={notificationCategoryFilter === 'billing & payments'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="billingPayments">Billing & Payments</label>
@@ -1597,7 +1745,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
                                                 checked={notificationCategoryFilter === 'technical errors'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="technicalErrors">Technical Errors</label>
@@ -1605,7 +1757,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
                                                 checked={notificationCategoryFilter === 'feature requests'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="featureRequests">Feature Requests</label>
@@ -1613,7 +1769,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
                                                 checked={notificationCategoryFilter === 'proposal issues'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="proposalIssues">Proposal Issues</label>
@@ -1621,7 +1781,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
                                                 checked={notificationCategoryFilter === 'others'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="others">Others</label>
@@ -1638,7 +1802,10 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={notificationSearchTerm}
-                                onChange={(e) => setNotificationSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setNotificationSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
                                 className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
@@ -1686,12 +1853,16 @@ const SuperAdmin = () => {
                         <PaginationComponent
                             currentPage={currentPageNotifications}
                             totalPages={getTotalPages(filteredNotifications, rowsPerPage)}
-                            onPageChange={(page) => setCurrentPageNotifications(page)}
+                            onPageChange={(page) => {
+                                setCurrentPageNotifications(page);
+                                closeAllInvoiceRows();
+                            }}
                             totalItems={filteredNotifications.length}
                             rowsPerPage={rowsPerPage}
                             onRowsPerPageChange={(newRowsPerPage) => {
                                 setRowsPerPage(newRowsPerPage);
                                 setCurrentPageNotifications(1); // Reset to first page when changing rows per page
+                                closeAllInvoiceRows();
                             }}
                         />
                     </div>
@@ -1710,7 +1881,7 @@ const SuperAdmin = () => {
 
     // Modal Components
     const UserViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
@@ -1755,8 +1926,8 @@ const SuperAdmin = () => {
                             <button
                                 onClick={() => handleUserBlockToggle(selectedUser._id, selectedUser.blocked || false)}
                                 className={`px-4 py-2 rounded-lg transition-colors ${selectedUser.blocked
-                                        ? 'bg-green-600 text-white hover:bg-green-700'
-                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                    ? 'bg-green-600 text-white hover:bg-green-700'
+                                    : 'bg-red-600 text-white hover:bg-red-700'
                                     }`}
                             >
                                 {selectedUser.blocked ? 'Unblock User' : 'Block User'}
@@ -1775,7 +1946,7 @@ const SuperAdmin = () => {
     );
 
     const PaymentViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Transaction Details</h2>
@@ -1834,7 +2005,7 @@ const SuperAdmin = () => {
     );
 
     const SupportViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
@@ -1883,10 +2054,10 @@ const SuperAdmin = () => {
                             <h3 className="text-lg font-medium text-gray-900 mb-3">Conversation</h3>
                             <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
                                 {supportChat.map((message) => (
-                                    <div key={message.id} className={`mb-3 ${message.sender === 'admin' ? 'text-right' : 'text-left'}`}>
+                                    <div key={message.id} className={`mb-3 ${message.sender === 'admin' ? 'text-right' : 'left'}`}>
                                         <div className={`inline-block p-3 rounded-lg max-w-xs ${message.sender === 'admin'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-900 border'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-white text-gray-900 border'
                                             }`}>
                                             <p className="text-sm">{message.message}</p>
                                             <p className="text-xs opacity-75 mt-1">{message.timestamp}</p>
@@ -1951,6 +2122,101 @@ const SuperAdmin = () => {
         </div>
     );
 
+    // Inline Invoice Modal Component
+    const InlineInvoiceModal = ({ data, type, isOpen, onClose }) => {
+        if (!isOpen || !data) return null;
+
+        const getInvoiceTitle = () => {
+            switch (type) {
+                case 'user':
+                    return `User Invoice - ${data.email || data.user_id}`;
+                case 'payment':
+                    return `Payment Invoice - ${data.transaction_id}`;
+                case 'support':
+                    return `Support Invoice - ${data.ticket_id}`;
+                default:
+                    return 'Invoice';
+            }
+        };
+
+        const getInvoiceData = () => {
+            switch (type) {
+                case 'user':
+                    return [
+                        { label: 'User ID', value: data._id || data.user_id },
+                        { label: 'Email', value: data.email },
+                        { label: 'Status', value: data.blocked ? 'Blocked' : (data.status || 'Active') },
+                        { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
+                    ];
+                case 'payment':
+                    return [
+                        { label: 'Transaction ID', value: data.transaction_id },
+                        { label: 'Amount', value: `$${data.price}` },
+                        { label: 'Payment Method', value: data.payment_method || 'N/A' },
+                        { label: 'Status', value: data.status },
+                        { label: 'User ID', value: data.user_id },
+                        { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
+                    ];
+                case 'support':
+                    return [
+                        { label: 'Ticket ID', value: data.ticket_id },
+                        { label: 'Type', value: data.type },
+                        { label: 'Priority', value: data.priority },
+                        { label: 'Status', value: data.status },
+                        { label: 'Subject', value: data.subject },
+                        { label: 'Created Date', value: data.created_at || 'N/A' }
+                    ];
+                default:
+                    return [];
+            }
+        };
+
+        return (
+            <tr className="bg-gray-50">
+                <td colSpan="100%" className="px-4 py-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">{getInvoiceTitle()}</h3>
+                            <button
+                                onClick={onClose}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                <MdOutlineClose className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {getInvoiceData().map((item, index) => (
+                                <div key={index}>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {item.label}
+                                    </label>
+                                    <p className="text-gray-900">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="border-t pt-4">
+                            <div className="flex justify-between items-center">
+                                <div className="text-sm text-gray-600">
+                                    Invoice generated on {new Date().toLocaleDateString()}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        Download PDF
+                                    </button>
+                                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                        Print
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        );
+    };
+
     if (loading) {
         return <div className="flex justify-center items-center h-screen">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -1985,7 +2251,10 @@ const SuperAdmin = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                         <button className="p-2 transition-colors relative"
-                            onClick={() => setActiveTab('notifications')}
+                            onClick={() => {
+                                setActiveTab('notifications');
+                                closeAllInvoiceRows();
+                            }}
                         >
                             <MdOutlineNotifications className="relative w-6 h-6 text-[#4B5563]" />
                             {notificationsData.length > 0 && (
@@ -2041,6 +2310,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('user-management');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2054,6 +2324,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('payments');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2067,6 +2338,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('support');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2089,7 +2361,10 @@ const SuperAdmin = () => {
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('user-management')}
+                                onClick={() => {
+                                    setActiveTab('user-management');
+                                    closeAllInvoiceRows();
+                                }}
                             >
                                 <MdOutlineManageAccounts className="w-4 h-4" />
                                 <span className="text-[16px] font-medium">User Management</span>
@@ -2099,7 +2374,10 @@ const SuperAdmin = () => {
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('payments')}
+                                onClick={() => {
+                                    setActiveTab('payments');
+                                    closeAllInvoiceRows();
+                                }}
                             >
                                 <MdOutlinePayments className="w-4 h-4" />
                                 <span className="text-[16px] font-medium">Payments & Subscriptions</span>
@@ -2109,7 +2387,10 @@ const SuperAdmin = () => {
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('support')}
+                                onClick={() => {
+                                    setActiveTab('support');
+                                    closeAllInvoiceRows();
+                                }}
                             >
                                 <MdOutlineHeadsetMic className="w-4 h-4" />
                                 <span className="text-[16px] font-medium">Support</span>
