@@ -859,16 +859,16 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Company Name
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Email
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Actions
                             </th>
                         </tr>
@@ -879,18 +879,18 @@ const SuperAdmin = () => {
                             return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
                                 <React.Fragment key={index}>
                                     <tr>
-                                        <td className="px-4 py-4 whitespace-nowrap">
+                                        <td className="p-4 whitespace-nowrap">
                                             <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                             {user.email}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
+                                        <td className="p-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : user.status)}`}>
                                                 {user.blocked ? 'Blocked' : user.status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
                                             <div className="flex items-center space-x-2">
                                                 <button
                                                     className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
@@ -1130,19 +1130,19 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
                                 Transaction ID
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Company/User
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Amount
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
                                 Action
                             </th>
                         </tr>
@@ -1153,21 +1153,21 @@ const SuperAdmin = () => {
                             return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
                                 <React.Fragment key={index}>
                                     <tr className="hover:bg-[#F8FAFC] transition-colors">
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                             {transaction.transaction_id}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                             {transaction.user_id}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                             ${transaction.price}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
+                                        <td className="p-4 whitespace-nowrap">
                                             <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
                                                 {transaction.status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
                                             <button
                                                 className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
                                                 onClick={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
@@ -1444,21 +1444,23 @@ const SuperAdmin = () => {
                             return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
                                 <React.Fragment key={index}>
                                     <tr>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
                                             {ticket.category}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
                                             {ticket.subCategory}
                                         </td>
-                                        <td className="px-4 py-4 text-[16px] text-[#4B5563]">
-                                            <span className="line-clamp-2 truncate text-ellipsis">{ticket.description}</span>
+                                        <td className="p-4 text-[16px] text-[#4B5563]">
+                                            <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                            </div>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
+                                        <td className="p-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
                                                 {ticket.priority}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
+                                        <td className="p-4 whitespace-nowrap">
                                             <div className="flex flex-col gap-1">
                                                 <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
                                                     {ticket.status}
@@ -1470,7 +1472,7 @@ const SuperAdmin = () => {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
                                             <button
                                                 className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
                                                 onClick={() => openSupportModal(ticket)}
@@ -2557,7 +2559,7 @@ const SuperAdmin = () => {
                 <div
                     className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
                 >
-                    <div className="px-6 py-4">
+                    <div className="p-4">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
                             <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
                         </div>
