@@ -43,7 +43,7 @@ const SuperAdmin = () => {
     const [supportSearchTerm, setSupportSearchTerm] = useState('');
     const [notificationSearchTerm, setNotificationSearchTerm] = useState('');
 
-    // Tabs
+    // Inner Tabs
     const [supportTab, setSupportTab] = useState('active');
     const [paymentsTab, setPaymentsTab] = useState('payments');
 
@@ -54,21 +54,17 @@ const SuperAdmin = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-    // Edit (kept for backward compatibility but not used in new design)
-    const [editUser, setEditUser] = useState(false);
-    const [editTransaction, setEditTransaction] = useState(false);
-    const [editSupport, setEditSupport] = useState(false);
-
     // View Modals
     const [viewUserModal, setViewUserModal] = useState(false);
-    const [viewPaymentModal, setViewPaymentModal] = useState(false);
     const [viewSupportModal, setViewSupportModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedPayment, setSelectedPayment] = useState(null);
     const [selectedSupport, setSelectedSupport] = useState(null);
 
     // Invoice modal states for inline display
     const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
+
+    // Support resolution message
+    const [supportResolutionMessage, setSupportResolutionMessage] = useState('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -155,13 +151,9 @@ const SuperAdmin = () => {
         setViewUserModal(true);
     };
 
-    const openPaymentModal = (payment) => {
-        setSelectedPayment(payment);
-        setViewPaymentModal(true);
-    };
-
     const openSupportModal = (support) => {
         setSelectedSupport(support);
+        setSupportResolutionMessage('');
         setViewSupportModal(true);
     };
 
@@ -182,15 +174,14 @@ const SuperAdmin = () => {
         setOpenInvoiceRows(new Set());
     };
 
-    // Sidebar state for large screens
-    const [showSidebar, setShowSidebar] = useState(false);
+
 
     // Close modals when clicking outside
     const handleModalBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             setViewUserModal(false);
-            setViewPaymentModal(false);
             setViewSupportModal(false);
+            setSupportResolutionMessage('');
         }
     };
 
@@ -199,47 +190,14 @@ const SuperAdmin = () => {
         const handleEscapeKey = (e) => {
             if (e.key === 'Escape') {
                 setViewUserModal(false);
-                setViewPaymentModal(false);
                 setViewSupportModal(false);
+                setSupportResolutionMessage('');
             }
         };
 
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, []);
-
-    // Legacy status change handlers (kept for backward compatibility but not used in new design)
-    const handleUserStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleTransactionStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleSupportStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleSupportPriorityChange = (id, priority) => {
-        // This function is no longer used in the new design
-    };
-
-    // Legacy save handlers (kept for backward compatibility but not used in new design)
-    const saveUserStatus = async (userId) => {
-        // This function is no longer used in the new design
-        // User status is now managed through the block/unblock functionality
-    };
-
-    const saveTransactionStatus = async (transactionId) => {
-        // This function is no longer used in the new design
-        // Transaction status is now read-only
-    };
-
-    const saveSupportStatus = async (ticketId) => {
-        // This function is no longer used in the new design
-        // Support status is now managed through the view modal
-    };
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -266,11 +224,6 @@ const SuperAdmin = () => {
 
     const handleSupportPriorityChangeFilter = (value) => {
         setSupportPriorityFilter(value);
-        closeAllInvoiceRows();
-    };
-
-    const handleSupportTypeFilter = (value) => {
-        setSupportTypeFilter(value);
         closeAllInvoiceRows();
     };
 
@@ -749,7 +702,7 @@ const SuperAdmin = () => {
     }, [notificationTimeFilter, notificationCategoryFilter]);
 
     const renderUserManagement = () => (
-        <div className='h-full'>
+        <div className='h-full '>
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                 {Object.keys(usersStats).map((key, index) => (
@@ -770,7 +723,7 @@ const SuperAdmin = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="relative">
-                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Search"
@@ -779,11 +732,11 @@ const SuperAdmin = () => {
                                     setSearchTerm(e.target.value);
                                     closeAllInvoiceRows();
                                 }}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF]"
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF] bg-white"
                             />
                         </div>
                         <div className="relative">
-                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
+                            <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
                                 onClick={() => setUserFilterModal(!userFilterModal)}
                             >
                                 <MdOutlineFilterList className="w-5 h-5" />
@@ -873,7 +826,7 @@ const SuperAdmin = () => {
                             const paginatedUsers = paginateData(filteredUsers, currentPage, rowsPerPage);
                             return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
                                 <React.Fragment key={index}>
-                                    <tr className="hover:bg-gray-50 transition-colors">
+                                    <tr>
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
                                         </td>
@@ -894,21 +847,10 @@ const SuperAdmin = () => {
                                                 >
                                                     <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
                                                 </button>
-                                                <button
-                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-50"
-                                                    onClick={() => handleUserBlockToggle(user._id, user.blocked || false)}
-                                                    title={user.blocked ? 'Unblock User' : 'Block User'}
-                                                >
-                                                    {user.blocked ? (
-                                                        <MdOutlineCheckCircle className="w-5 h-5 text-[#22C55E]" />
-                                                    ) : (
-                                                        <MdOutlineCancel className="w-5 h-5 text-[#EF4444]" />
-                                                    )}
-                                                </button>
+
                                             </div>
                                         </td>
                                     </tr>
-
                                 </React.Fragment>
                             )) : (
                                 <tr>
@@ -944,7 +886,7 @@ const SuperAdmin = () => {
     const renderPayments = () => (
         <div className='h-full'>
             {/* Payments Inner Tabs */}
-            <div className="bg-white mb-6 py-4">
+            <div className="bg-white mb-6">
                 <nav className="flex space-x-8">
                     <button
                         onClick={() => setPaymentsTab('payments')}
@@ -1223,7 +1165,7 @@ const SuperAdmin = () => {
     const renderSupport = () => (
         <div className='h-full'>
             {/* Support Inner Tabs */}
-            <div className="mb-6 py-4">
+            <div className="mb-6">
                 <nav className="flex space-x-8">
                     <button
                         onClick={() => { setSupportTab('active'); setCompletedTickets(false) }}
@@ -1275,11 +1217,11 @@ const SuperAdmin = () => {
                                     setSupportSearchTerm(e.target.value);
                                     closeAllInvoiceRows();
                                 }}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 bg-white"
                             />
                         </div>
                         <div className="relative">
-                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                            <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
                                 onClick={() => setSupportFilterModal(!supportFilterModal)}
                             >
                                 <MdOutlineFilterList className="w-5 h-5" />
@@ -1424,22 +1366,22 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Ticket ID
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Type
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
                                 Subject
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Priority
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
                                 Action
                             </th>
                         </tr>
@@ -1449,15 +1391,15 @@ const SuperAdmin = () => {
                             const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
                             return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
                                 <React.Fragment key={index}>
-                                    <tr className="hover:bg-[#F8FAFC] transition-colors">
+                                    <tr>
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                            {ticket.ticket_id}
+                                            {ticket.category}
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                            {ticket.type}
+                                            {ticket.subCategory}
                                         </td>
-                                        <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                            {ticket.subject}
+                                        <td className="px-4 py-4 truncate whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {ticket.description}
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
@@ -1535,7 +1477,7 @@ const SuperAdmin = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
                                     onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
@@ -1650,7 +1592,7 @@ const SuperAdmin = () => {
                                 )}
                             </div>
                             <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
                                     <span>{notificationCategoryFilter || 'All Categories'}</span>
@@ -1753,7 +1695,7 @@ const SuperAdmin = () => {
                         </div>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MdOutlineSearch className="h-4 w-4 text-gray-400" />
+                                <MdOutlineSearch className="h-4 w-4 text-[#4B5563]" />
                             </div>
                             <input
                                 type="text"
@@ -1763,7 +1705,7 @@ const SuperAdmin = () => {
                                     setNotificationSearchTerm(e.target.value);
                                     closeAllInvoiceRows();
                                 }}
-                                className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-[#4B5563] rounded-lg leading-5 bg-white placeholder-[#4B5563] focus:outline-none focus:placeholder-[#4B5563] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
@@ -1786,12 +1728,12 @@ const SuperAdmin = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <p className="text-sm text-gray-500 mb-1">{item.category}</p>
-                                            <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
-                                            <p className="text-sm text-gray-600">{item.description}</p>
+                                            <p className="text-sm text-[#4B5563] mb-1">{item.category}</p>
+                                            <h3 className="text-sm font-medium text-[#000000] mb-1">{item.title}</h3>
+                                            <p className="text-sm text-[#4B5563]">{item.description}</p>
                                         </div>
                                         <div className="flex-shrink-0 ml-4">
-                                            <p className="text-sm text-gray-500">{item.timestamp}</p>
+                                            <p className="text-sm text-[#4B5563]">{item.timestamp}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1839,12 +1781,12 @@ const SuperAdmin = () => {
     // Modal Components
     const UserViewModal = () => (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
+                    <h2 className="text-xl font-semibold text-[#000000]">Company Information</h2>
                     <button
                         onClick={() => setViewUserModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-[#4B5563] hover:text-[#4B5563]"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
@@ -1852,76 +1794,76 @@ const SuperAdmin = () => {
                 {selectedUser && (
                     <div className="space-y-6">
                         {/* Basic Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Basic Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                                    <p className="text-gray-900 font-medium">{selectedUser.companyName}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Company Name</label>
+                                    <p className="text-[#000000] font-medium">{selectedUser.companyName}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <p className="text-gray-900 font-medium">{selectedUser.email}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Email</label>
+                                    <p className="text-[#000000] font-medium">{selectedUser.email}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
-                                    <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Company ID</label>
+                                    <p className="text-[#000000] font-mono text-sm">{selectedUser._id}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Status</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
                                         {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900 font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">User ID</label>
+                                    <p className="text-[#000000] font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin Name</label>
-                                    <p className="text-gray-900">{selectedUser.adminName || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Admin Name</label>
+                                    <p className="text-[#000000]">{selectedUser.adminName || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Company Details */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Company Details</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Company Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Industry</label>
+                                    <p className="text-[#000000]">{selectedUser.industry || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                                    <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Location</label>
+                                    <p className="text-[#000000]">{selectedUser.location || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
-                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Established Year</label>
+                                    <p className="text-[#000000]">{selectedUser.establishedYear || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
-                                    <p className="text-gray-900">{selectedUser.numberOfEmployees || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Number of Employees</label>
+                                    <p className="text-[#000000]">{selectedUser.numberOfEmployees || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
-                                    <p className="text-gray-900">{selectedUser.teamSize || '0'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Team Size</label>
+                                    <p className="text-[#000000]">{selectedUser.teamSize || '0'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Departments</label>
-                                    <p className="text-gray-900">{selectedUser.departments || '0'}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Departments</label>
+                                    <p className="text-[#000000]">{selectedUser.departments || '0'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Contact & Links */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Contact & Links</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Contact & Links</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                                    <p className="text-gray-900">
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Website</label>
+                                    <p className="text-[#000000]">
                                         {selectedUser.website ? (
                                             <a href={selectedUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                                 {selectedUser.website}
@@ -1930,8 +1872,8 @@ const SuperAdmin = () => {
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-                                    <p className="text-gray-900">
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">LinkedIn</label>
+                                    <p className="text-[#000000]">
                                         {selectedUser.linkedIn ? (
                                             <a href={selectedUser.linkedIn} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                                 {selectedUser.linkedIn}
@@ -1943,11 +1885,11 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Services & Industries */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Services & Industries</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Services & Industries</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Services</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Services</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.services && selectedUser.services.length > 0 ? (
                                             selectedUser.services.map((service, index) => (
@@ -1956,12 +1898,12 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-gray-500">No services listed</p>
+                                            <p className="text-[#4B5563]">No services listed</p>
                                         )}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Industries</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Preferred Industries</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.preferredIndustries && selectedUser.preferredIndustries.length > 0 ? (
                                             selectedUser.preferredIndustries.map((industry, index) => (
@@ -1970,7 +1912,7 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-gray-500">No preferred industries</p>
+                                            <p className="text-[#4B5563]">No preferred industries</p>
                                         )}
                                     </div>
                                 </div>
@@ -1978,11 +1920,11 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Awards & Clients */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Awards & Clients</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Awards & Clients</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Awards</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Awards</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.awards && selectedUser.awards.length > 0 ? (
                                             selectedUser.awards.map((award, index) => (
@@ -1991,12 +1933,12 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-gray-500">No awards listed</p>
+                                            <p className="text-[#4B5563]">No awards listed</p>
                                         )}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Clients</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Clients</label>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedUser.clients && selectedUser.clients.length > 0 ? (
                                             selectedUser.clients.map((client, index) => (
@@ -2005,7 +1947,7 @@ const SuperAdmin = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <p className="text-gray-500">No clients listed</p>
+                                            <p className="text-[#4B5563]">No clients listed</p>
                                         )}
                                     </div>
                                 </div>
@@ -2014,23 +1956,23 @@ const SuperAdmin = () => {
 
                         {/* Licenses & Certifications */}
                         {selectedUser.licensesAndCertifications && selectedUser.licensesAndCertifications.length > 0 && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Licenses & Certifications</h3>
+                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-[#000000] mb-3">Licenses & Certifications</h3>
                                 <div className="space-y-3">
                                     {selectedUser.licensesAndCertifications.map((license, index) => (
                                         <div key={index} className="border-l-4 border-blue-500 pl-4">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                                                    <p className="text-gray-900">{license.name}</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Name</label>
+                                                    <p className="text-[#000000]">{license.name}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
-                                                    <p className="text-gray-900">{license.issuer}</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Issuer</label>
+                                                    <p className="text-[#000000]">{license.issuer}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till</label>
-                                                    <p className="text-gray-900">{license.validTill}</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Valid Till</label>
+                                                    <p className="text-[#000000]">{license.validTill}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -2041,26 +1983,26 @@ const SuperAdmin = () => {
 
                         {/* Documents */}
                         {selectedUser.documents && selectedUser.documents.length > 0 && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Documents</h3>
+                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-[#000000] mb-3">Documents</h3>
                                 <div className="space-y-3">
                                     {selectedUser.documents.map((doc, index) => (
                                         <div key={index} className="border-l-4 border-green-500 pl-4">
                                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                                                    <p className="text-gray-900">{doc.name}</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Name</label>
+                                                    <p className="text-[#000000]">{doc.name}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                                                    <p className="text-gray-900">{doc.type}</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Type</label>
+                                                    <p className="text-[#000000]">{doc.type}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
-                                                    <p className="text-gray-900">{(doc.size / 1024).toFixed(2)} KB</p>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Size</label>
+                                                    <p className="text-[#000000]">{(doc.size / 1024).toFixed(2)} KB</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Download</label>
+                                                    <label className="block text-sm font-medium text-[#111827] mb-1">Download</label>
                                                     <a
                                                         href={doc.url}
                                                         target="_blank"
@@ -2079,34 +2021,34 @@ const SuperAdmin = () => {
 
                         {/* Employees */}
                         {selectedUser.employees && selectedUser.employees.length > 0 && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Employees ({selectedUser.employees.length})</h3>
+                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-[#000000] mb-3">Employees ({selectedUser.employees.length})</h3>
                                 <div className="max-h-64 overflow-y-auto">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {selectedUser.employees.map((employee, index) => (
-                                            <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                            <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
                                                 <div className="space-y-2">
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Name</label>
-                                                        <p className="text-sm text-gray-900 font-medium">{employee.name}</p>
+                                                        <label className="block text-xs font-medium text-[#111827]">Name</label>
+                                                        <p className="text-sm text-[#000000] font-medium">{employee.name}</p>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Job Title</label>
-                                                        <p className="text-sm text-gray-900">{employee.jobTitle}</p>
+                                                        <label className="block text-xs font-medium text-[#111827]">Job Title</label>
+                                                        <p className="text-sm text-[#000000]">{employee.jobTitle}</p>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Email</label>
-                                                        <p className="text-sm text-gray-900">{employee.email}</p>
+                                                        <label className="block text-xs font-medium text-[#111827]">Email</label>
+                                                        <p className="text-sm text-[#000000]">{employee.email}</p>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Phone</label>
-                                                        <p className="text-sm text-gray-900">{employee.phone}</p>
+                                                        <label className="block text-xs font-medium text-[#111827]">Phone</label>
+                                                        <p className="text-sm text-[#000000]">{employee.phone}</p>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Access Level</label>
+                                                        <label className="block text-xs font-medium text-[#111827]">Access Level</label>
                                                         <span className={`inline-flex px-2 py-1 text-xs rounded-full ${employee.accessLevel === 'Admin' ? 'bg-red-100 text-red-800' :
                                                             employee.accessLevel === 'Editor' ? 'bg-blue-100 text-blue-800' :
-                                                                'bg-gray-100 text-gray-800'
+                                                                'bg-[#4B5563] text-[#000000]'
                                                             }`}>
                                                             {employee.accessLevel}
                                                         </span>
@@ -2121,23 +2063,23 @@ const SuperAdmin = () => {
 
                         {/* Company Bio */}
                         {selectedUser.bio && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Company Bio</h3>
-                                <p className="text-gray-700 whitespace-pre-line">{selectedUser.bio}</p>
+                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-[#000000] mb-3">Company Bio</h3>
+                                <p className="text-[#111827] whitespace-pre-line">{selectedUser.bio}</p>
                             </div>
                         )}
 
                         {/* Account Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Account Information</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Account Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
-                                    <p className="text-gray-900">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Account Created</label>
+                                    <p className="text-[#000000]">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
-                                    <p className="text-gray-900">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Last Updated</label>
+                                    <p className="text-[#000000]">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -2155,66 +2097,7 @@ const SuperAdmin = () => {
                             </button>
                             <button
                                 onClick={() => setViewUserModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    const PaymentViewModal = () => (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Transaction Details</h2>
-                    <button
-                        onClick={() => setViewPaymentModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedPayment && (
-                    <div className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Invoice</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Transaction ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedPayment.transaction_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                                    <p className="text-gray-900 text-lg font-semibold">${selectedPayment.price}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                                    <p className="text-gray-900">{selectedPayment.payment_method || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedPayment.status)}`}>
-                                        {selectedPayment.status}
-                                    </span>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900">{selectedPayment.user_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                                    <p className="text-gray-900">{selectedPayment.created_at || selectedPayment.createdAt || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-end pt-4 border-t">
-                            <button
-                                onClick={() => setViewPaymentModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
                                 Close
                             </button>
@@ -2227,12 +2110,12 @@ const SuperAdmin = () => {
 
     const SupportViewModal = () => (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
+                    <h2 className="text-xl font-semibold text-[#000000]">Support Ticket Details</h2>
                     <button
                         onClick={() => setViewSupportModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-[#4B5563] hover:text-[#4B5563]"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
@@ -2240,19 +2123,19 @@ const SuperAdmin = () => {
                 {selectedSupport && (
                     <div className="space-y-6">
                         {/* Basic Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Basic Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Ticket ID</label>
+                                    <p className="text-[#000000] font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">User ID</label>
+                                    <p className="text-[#000000] font-mono">{selectedSupport.userId}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Status</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
                                         {selectedSupport.status}
                                     </span>
@@ -2261,23 +2144,23 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Ticket Details */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Ticket Details</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Ticket Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Type</label>
                                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                                         {selectedSupport.type}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Sub Category</label>
                                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                                         {selectedSupport.subCategory || 'N/A'}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Priority</label>
                                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
                                         {selectedSupport.priority}
                                     </span>
@@ -2286,36 +2169,36 @@ const SuperAdmin = () => {
                         </div>
 
                         {/* Description */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Description</h3>
-                            <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Description</h3>
+                            <p className="text-[#111827] whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
                         </div>
 
                         {/* Attachments */}
                         {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
+                            <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-[#000000] mb-3">Attachments ({selectedSupport.attachments.length})</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {selectedSupport.attachments.map((attachment, index) => (
-                                        <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                        <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
                                             <div className="space-y-2">
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700">File Name</label>
-                                                    <p className="text-sm text-gray-900 font-medium">{attachment.name || `Attachment ${index + 1}`}</p>
+                                                    <label className="block text-xs font-medium text-[#111827]">File Name</label>
+                                                    <p className="text-sm text-[#000000] font-medium">{attachment.name || `Attachment ${index + 1}`}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700">Type</label>
-                                                    <p className="text-sm text-gray-900">{attachment.type || 'Unknown'}</p>
+                                                    <label className="block text-xs font-medium text-[#111827]">Type</label>
+                                                    <p className="text-sm text-[#000000]">{attachment.type || 'Unknown'}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700">Size</label>
-                                                    <p className="text-sm text-gray-900">
+                                                    <label className="block text-xs font-medium text-[#111827]">Size</label>
+                                                    <p className="text-sm text-[#000000]">
                                                         {attachment.size ? `${(attachment.size / 1024).toFixed(2)} KB` : 'Unknown'}
                                                     </p>
                                                 </div>
                                                 {attachment.url && (
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-700">Download</label>
+                                                        <label className="block text-xs font-medium text-[#111827]">Download</label>
                                                         <a
                                                             href={attachment.url}
                                                             target="_blank"
@@ -2334,19 +2217,19 @@ const SuperAdmin = () => {
                         )}
 
                         {/* Timestamps */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Timestamps</h3>
+                        <div className="bg-[#F8FAFC] p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-[#000000] mb-3">Timestamps</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
-                                    <p className="text-gray-900">
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Created At</label>
+                                    <p className="text-[#000000]">
                                         {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
                                             selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
-                                    <p className="text-gray-900">
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">Last Updated</label>
+                                    <p className="text-[#000000]">
                                         {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
                                     </p>
                                 </div>
@@ -2355,34 +2238,49 @@ const SuperAdmin = () => {
 
 
 
+                        {/* Resolution Message */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Resolution Message</h3>
+                            <textarea
+                                value={supportResolutionMessage}
+                                onChange={(e) => setSupportResolutionMessage(e.target.value)}
+                                placeholder="Enter resolution message or notes..."
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                rows="4"
+                            />
+                        </div>
+
                         {/* Action Buttons */}
                         <div className="flex justify-between items-center pt-4 border-t">
                             <div className="flex space-x-2">
                                 <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'In Progress')}
-                                    disabled={selectedSupport.status === 'In Progress'}
-                                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Set In Progress
-                                </button>
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Resolved')}
+                                    onClick={() => {
+                                        if (supportResolutionMessage.trim()) {
+                                            handleSupportStatusUpdate(selectedSupport._id, 'Resolved');
+                                            setSupportResolutionMessage('');
+                                        } else {
+                                            toast.warning('Please enter a resolution message before resolving the ticket');
+                                        }
+                                    }}
                                     disabled={selectedSupport.status === 'Resolved'}
                                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Resolve
+                                    Resolve Ticket
                                 </button>
                                 <button
                                     onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Cancelled')}
                                     disabled={selectedSupport.status === 'Cancelled'}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Cancel
+                                    Cancel Ticket
                                 </button>
                             </div>
                             <button
-                                onClick={() => setViewSupportModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                onClick={() => {
+                                    setViewSupportModal(false);
+                                    setSupportResolutionMessage('');
+                                }}
+                                className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
                                 Close
                             </button>
@@ -2413,14 +2311,14 @@ const SuperAdmin = () => {
         };
 
         return (
-            <tr className="bg-gray-50">
+            <tr className="bg-[#F8FAFC]">
                 <td colSpan="100%" className="px-4 py-6">
-                    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="bg-white rounded-lg border border-[#4B5563] p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">{getInvoiceTitle()}</h3>
+                            <h3 className="text-lg font-semibold text-[#000000]">{getInvoiceTitle()}</h3>
                             <button
                                 onClick={onClose}
-                                className="text-gray-400 hover:text-gray-600 p-1"
+                                className="text-[#4B5563] hover:text-[#4B5563] p-1"
                             >
                                 <MdOutlineClose className="w-5 h-5" />
                             </button>
@@ -2429,24 +2327,24 @@ const SuperAdmin = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             {getInvoiceData().map((item, index) => (
                                 <div key={index}>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">
                                         {item.label}
                                     </label>
-                                    <p className="text-gray-900">{item.value}</p>
+                                    <p className="text-[#000000]">{item.value}</p>
                                 </div>
                             ))}
                         </div>
 
                         <div className="border-t pt-4">
                             <div className="flex justify-between items-center">
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-[#4B5563]">
                                     Invoice generated on {new Date().toLocaleDateString()}
                                 </div>
                                 <div className="flex space-x-2">
                                     <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                         Download PDF
                                     </button>
-                                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <button className="px-4 py-2 border border-[#4B5563] text-[#111827] rounded-lg hover:bg-[#F8FAFC] transition-colors">
                                         Print
                                     </button>
                                 </div>
@@ -2470,7 +2368,6 @@ const SuperAdmin = () => {
 
             {/* Modals */}
             {viewUserModal && <UserViewModal />}
-            {viewPaymentModal && <PaymentViewModal />}
             {viewSupportModal && <SupportViewModal />}
 
             {/* Top Header Bar */}
@@ -2484,13 +2381,7 @@ const SuperAdmin = () => {
                         >
                             <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
                         </button>
-                        {/* Large Screen Menu Button */}
-                        <button
-                            className="hidden lg:block p-2 transition-colors hover:bg-gray-100 rounded-lg"
-                            onClick={() => setShowSidebar(!showSidebar)}
-                        >
-                            <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
-                        </button>
+
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
                                 <span className="text-[#2563eb] font-bold text-sm">LOGO</span>
@@ -2538,9 +2429,9 @@ const SuperAdmin = () => {
             {showMobileMenu && (
                 <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
                     <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
-                        <div className="p-4 border-b border-gray-200">
+                        <div className="p-4 border-b border-[#4B5563]">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium text-gray-900">Menu</h2>
+                                <h2 className="text-lg font-medium text-[#000000]">Menu</h2>
                                 <button
                                     className="p-2 transition-colors"
                                     onClick={() => setShowMobileMenu(false)}
@@ -2600,31 +2491,17 @@ const SuperAdmin = () => {
             )}
 
             <div className="flex h-[calc(100vh-64px)]">
-                {/* Hover trigger area for large screens */}
+                {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
-                    className="hidden lg:block fixed left-0 top-16 w-2 h-full z-10"
-                    onMouseEnter={() => setShowSidebar(true)}
-                />
-
-                {/* Left Sidebar - Responsive for large screens */}
-                <div
-                    className={`${showSidebar ? 'lg:block' : 'lg:hidden'} lg:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out lg:fixed lg:left-0 lg:top-16 lg:h-[calc(100vh-64px)] lg:z-20`}
-                    onMouseEnter={() => window.innerWidth >= 1024 && setShowSidebar(true)}
-                    onMouseLeave={() => window.innerWidth >= 1024 && setShowSidebar(false)}
+                    className={`lg:block lg:w-16 lg:hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out lg:fixed lg:left-0 lg:top-16 lg:h-[calc(100vh-64px)] lg:z-20 overflow-hidden group`}
                 >
                     <div className="p-4">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-medium text-gray-900">Menu</h2>
-                            <button
-                                className="lg:hidden p-2 transition-colors"
-                                onClick={() => setShowSidebar(false)}
-                            >
-                                <MdOutlineClose className="w-5 h-5 text-[#4B5563]" />
-                            </button>
+                        <div className="flex items-center justify-center lg:justify-start mb-4">
+                            <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
                         </div>
                         <nav className="space-y-2">
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'user-management'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'user-management'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
@@ -2633,11 +2510,11 @@ const SuperAdmin = () => {
                                     closeAllInvoiceRows();
                                 }}
                             >
-                                <MdOutlineManageAccounts className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">User Management</span>
+                                <MdOutlineManageAccounts className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">User Management</span>
                             </button>
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'payments'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'payments'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
@@ -2646,11 +2523,11 @@ const SuperAdmin = () => {
                                     closeAllInvoiceRows();
                                 }}
                             >
-                                <MdOutlinePayments className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">Payments & Subscriptions</span>
+                                <MdOutlinePayments className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Payments & Subscriptions</span>
                             </button>
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'support'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'support'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
@@ -2659,15 +2536,15 @@ const SuperAdmin = () => {
                                     closeAllInvoiceRows();
                                 }}
                             >
-                                <MdOutlineHeadsetMic className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">Support</span>
+                                <MdOutlineHeadsetMic className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Support</span>
                             </button>
                         </nav>
                     </div>
                 </div>
 
                 {/* Main Content */}
-                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${showSidebar ? 'lg:ml-64' : 'lg:ml-0'}`}>
+                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:ml-16`}>
                     {/* Scrollable Content Area */}
                     <div className="flex-1 overflow-y-auto">
                         <div className="p-6 min-h-full">
