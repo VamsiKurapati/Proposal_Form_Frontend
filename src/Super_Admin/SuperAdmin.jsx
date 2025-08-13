@@ -249,7 +249,7 @@ const SuperAdmin = () => {
 
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
-    }, [selectedSupport, supportResolutionMessage]);
+    }, [selectedSupport]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -1461,16 +1461,9 @@ const SuperAdmin = () => {
                                             </span>
                                         </td>
                                         <td className="p-4 whitespace-nowrap">
-                                            <div className="flex flex-col gap-1">
-                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                                    {ticket.status}
-                                                </span>
-                                                {ticket.resolutionMessage && (
-                                                    <span className="inline-flex items-center px-2 py-1 text-[10px] bg-green-100 text-green-800 rounded-full">
-                                                        📝 Has Notes
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
                                         </td>
                                         <td className="p-4 whitespace-nowrap text-[16px] font-medium">
                                             <button
