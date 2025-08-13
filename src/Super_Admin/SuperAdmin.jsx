@@ -889,8 +889,8 @@ const SuperAdmin = () => {
                                             <div className="flex items-center space-x-2">
                                                 <button
                                                     className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                    onClick={() => toggleInvoiceRow(`user-${user._id}`)}
-                                                    title="View Invoice"
+                                                    onClick={() => openUserModal(user)}
+                                                    title="View Details"
                                                 >
                                                     <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
                                                 </button>
@@ -908,12 +908,7 @@ const SuperAdmin = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                    <InlineInvoiceModal
-                                        data={user}
-                                        type="user"
-                                        isOpen={openInvoiceRows.has(`user-${user._id}`)}
-                                        onClose={() => toggleInvoiceRow(`user-${user._id}`)}
-                                    />
+
                                 </React.Fragment>
                             )) : (
                                 <tr>
@@ -1190,7 +1185,6 @@ const SuperAdmin = () => {
                                     </tr>
                                     <InlineInvoiceModal
                                         data={transaction}
-                                        type="payment"
                                         isOpen={openInvoiceRows.has(`payment-${transaction.transaction_id}`)}
                                         onClose={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
                                     />
@@ -1478,19 +1472,14 @@ const SuperAdmin = () => {
                                         <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
                                             <button
                                                 className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => toggleInvoiceRow(`support-${ticket.ticket_id}`)}
-                                                title="View Invoice"
+                                                onClick={() => openSupportModal(ticket)}
+                                                title="View Details"
                                             >
                                                 <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
                                             </button>
                                         </td>
                                     </tr>
-                                    <InlineInvoiceModal
-                                        data={ticket}
-                                        type="support"
-                                        isOpen={openInvoiceRows.has(`support-${ticket.ticket_id}`)}
-                                        onClose={() => toggleInvoiceRow(`support-${ticket.ticket_id}`)}
-                                    />
+
                                 </React.Fragment>
                             )) : (
                                 <tr>
@@ -1850,7 +1839,7 @@ const SuperAdmin = () => {
     // Modal Components
     const UserViewModal = () => (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
                     <button
@@ -1865,7 +1854,7 @@ const SuperAdmin = () => {
                         {/* Basic Information */}
                         <div className="bg-gray-50 p-4 rounded-lg">
                             <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
                                     <p className="text-gray-900 font-medium">{selectedUser.companyName}</p>
@@ -1884,31 +1873,259 @@ const SuperAdmin = () => {
                                         {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
                                     </span>
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin Name</label>
+                                    <p className="text-gray-900">{selectedUser.adminName || 'N/A'}</p>
+                                </div>
                             </div>
                         </div>
 
                         {/* Company Details */}
                         <div className="bg-gray-50 p-4 rounded-lg">
                             <h3 className="text-lg font-medium text-gray-900 mb-3">Company Details</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
-                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                                     <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
-                                    <p className="text-gray-900">{selectedUser.companySize || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                                    <p className="text-gray-900">{selectedUser.numberOfEmployees || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
+                                    <p className="text-gray-900">{selectedUser.teamSize || '0'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Departments</label>
+                                    <p className="text-gray-900">{selectedUser.departments || '0'}</p>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Contact & Links */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Contact & Links</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                                    <p className="text-gray-900">
+                                        {selectedUser.website ? (
+                                            <a href={selectedUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                                {selectedUser.website}
+                                            </a>
+                                        ) : 'N/A'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                                    <p className="text-gray-900">
+                                        {selectedUser.linkedIn ? (
+                                            <a href={selectedUser.linkedIn} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                                {selectedUser.linkedIn}
+                                            </a>
+                                        ) : 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Services & Industries */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Services & Industries</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Services</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.services && selectedUser.services.length > 0 ? (
+                                            selectedUser.services.map((service, index) => (
+                                                <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                                    {service}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No services listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Industries</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.preferredIndustries && selectedUser.preferredIndustries.length > 0 ? (
+                                            selectedUser.preferredIndustries.map((industry, index) => (
+                                                <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                                    {industry}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No preferred industries</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Awards & Clients */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Awards & Clients</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Awards</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.awards && selectedUser.awards.length > 0 ? (
+                                            selectedUser.awards.map((award, index) => (
+                                                <span key={index} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                                                    {award}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No awards listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Clients</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.clients && selectedUser.clients.length > 0 ? (
+                                            selectedUser.clients.map((client, index) => (
+                                                <span key={index} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                                    {client}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No clients listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Licenses & Certifications */}
+                        {selectedUser.licensesAndCertifications && selectedUser.licensesAndCertifications.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Licenses & Certifications</h3>
+                                <div className="space-y-3">
+                                    {selectedUser.licensesAndCertifications.map((license, index) => (
+                                        <div key={index} className="border-l-4 border-blue-500 pl-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{license.name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
+                                                    <p className="text-gray-900">{license.issuer}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till</label>
+                                                    <p className="text-gray-900">{license.validTill}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Documents */}
+                        {selectedUser.documents && selectedUser.documents.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Documents</h3>
+                                <div className="space-y-3">
+                                    {selectedUser.documents.map((doc, index) => (
+                                        <div key={index} className="border-l-4 border-green-500 pl-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{doc.name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                                    <p className="text-gray-900">{doc.type}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                                                    <p className="text-gray-900">{(doc.size / 1024).toFixed(2)} KB</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Download</label>
+                                                    <a
+                                                        href={doc.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline text-sm"
+                                                    >
+                                                        View Document
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Employees */}
+                        {selectedUser.employees && selectedUser.employees.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Employees ({selectedUser.employees.length})</h3>
+                                <div className="max-h-64 overflow-y-auto">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {selectedUser.employees.map((employee, index) => (
+                                            <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Name</label>
+                                                        <p className="text-sm text-gray-900 font-medium">{employee.name}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Job Title</label>
+                                                        <p className="text-sm text-gray-900">{employee.jobTitle}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Email</label>
+                                                        <p className="text-sm text-gray-900">{employee.email}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Phone</label>
+                                                        <p className="text-sm text-gray-900">{employee.phone}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Access Level</label>
+                                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${employee.accessLevel === 'Admin' ? 'bg-red-100 text-red-800' :
+                                                            employee.accessLevel === 'Editor' ? 'bg-blue-100 text-blue-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                            }`}>
+                                                            {employee.accessLevel}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Company Bio */}
+                        {selectedUser.bio && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Company Bio</h3>
+                                <p className="text-gray-700 whitespace-pre-line">{selectedUser.bio}</p>
+                            </div>
+                        )}
 
                         {/* Account Information */}
                         <div className="bg-gray-50 p-4 rounded-lg">
@@ -1916,42 +2133,11 @@ const SuperAdmin = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
-                                    <p className="text-gray-900">{selectedUser.created_at || selectedUser.createdAt || 'N/A'}</p>
+                                    <p className="text-gray-900">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Login</label>
-                                    <p className="text-gray-900">{selectedUser.lastLogin || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Subscription Plan</label>
-                                    <p className="text-gray-900">{selectedUser.subscriptionPlan || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Proposals Created</label>
-                                    <p className="text-gray-900">{selectedUser.proposalsCount || '0'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Contact Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                    <p className="text-gray-900">{selectedUser.phone || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                                    <p className="text-gray-900">{selectedUser.website || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                    <p className="text-gray-900">{selectedUser.address || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
-                                    <p className="text-gray-900">{selectedUser.contactPerson || 'N/A'}</p>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -2041,7 +2227,7 @@ const SuperAdmin = () => {
 
     const SupportViewModal = () => (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
                     <button
@@ -2052,36 +2238,119 @@ const SuperAdmin = () => {
                     </button>
                 </div>
                 {selectedSupport && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                <p className="text-gray-900">{selectedSupport.ticket_id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                                <p className="text-gray-900">{selectedSupport.type}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
-                                    {selectedSupport.priority}
-                                </span>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
-                                    {selectedSupport.status}
-                                </span>
+                    <div className="space-y-6">
+                        {/* Basic Information */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.ticketId || selectedSupport.ticket_id}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
+                                        {selectedSupport.status}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Subject</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.subject}</p>
+                        {/* Ticket Details */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Ticket Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                        {selectedSupport.type}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                        {selectedSupport.subCategory || 'N/A'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
+                                        {selectedSupport.priority}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
+                        {/* Description */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
                             <h3 className="text-lg font-medium text-gray-900 mb-3">Description</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.description || 'No description provided'}</p>
+                            <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
+                        </div>
+
+                        {/* Attachments */}
+                        {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {selectedSupport.attachments.map((attachment, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                            <div className="space-y-2">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-700">File Name</label>
+                                                    <p className="text-sm text-gray-900 font-medium">{attachment.name || `Attachment ${index + 1}`}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-700">Type</label>
+                                                    <p className="text-sm text-gray-900">{attachment.type || 'Unknown'}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-700">Size</label>
+                                                    <p className="text-sm text-gray-900">
+                                                        {attachment.size ? `${(attachment.size / 1024).toFixed(2)} KB` : 'Unknown'}
+                                                    </p>
+                                                </div>
+                                                {attachment.url && (
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-700">Download</label>
+                                                        <a
+                                                            href={attachment.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-600 hover:underline text-sm"
+                                                        >
+                                                            View File
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Timestamps */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">Timestamps</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
+                                    <p className="text-gray-900">
+                                        {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
+                                            selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">
+                                        {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
 
@@ -2125,52 +2394,22 @@ const SuperAdmin = () => {
     );
 
     // Inline Invoice Modal Component
-    const InlineInvoiceModal = ({ data, type, isOpen, onClose }) => {
+    const InlineInvoiceModal = ({ data, isOpen, onClose }) => {
         if (!isOpen || !data) return null;
 
         const getInvoiceTitle = () => {
-            switch (type) {
-                case 'user':
-                    return `User Invoice - ${data.email || data.user_id}`;
-                case 'payment':
-                    return `Payment Invoice - ${data.transaction_id}`;
-                case 'support':
-                    return `Support Invoice - ${data.ticket_id}`;
-                default:
-                    return 'Invoice';
-            }
+            return `Payment Invoice - ${data.transaction_id}`;
         };
 
         const getInvoiceData = () => {
-            switch (type) {
-                case 'user':
-                    return [
-                        { label: 'User ID', value: data._id || data.user_id },
-                        { label: 'Email', value: data.email },
-                        { label: 'Status', value: data.blocked ? 'Blocked' : (data.status || 'Active') },
-                        { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
-                    ];
-                case 'payment':
-                    return [
-                        { label: 'Transaction ID', value: data.transaction_id },
-                        { label: 'Amount', value: `$${data.price}` },
-                        { label: 'Payment Method', value: data.payment_method || 'N/A' },
-                        { label: 'Status', value: data.status },
-                        { label: 'User ID', value: data.user_id },
-                        { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
-                    ];
-                case 'support':
-                    return [
-                        { label: 'Ticket ID', value: data.ticket_id },
-                        { label: 'Type', value: data.type },
-                        { label: 'Priority', value: data.priority },
-                        { label: 'Status', value: data.status },
-                        { label: 'Subject', value: data.subject },
-                        { label: 'Created Date', value: data.created_at || 'N/A' }
-                    ];
-                default:
-                    return [];
-            }
+            return [
+                { label: 'Transaction ID', value: data.transaction_id },
+                { label: 'Amount', value: `$${data.price}` },
+                { label: 'Payment Method', value: data.payment_method || 'N/A' },
+                { label: 'Status', value: data.status },
+                { label: 'User ID', value: data.user_id },
+                { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
+            ];
         };
 
         return (
