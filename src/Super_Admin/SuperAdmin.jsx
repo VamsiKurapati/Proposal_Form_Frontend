@@ -63,9 +63,11 @@ const SuperAdmin = () => {
     // Invoice modal states for inline display
     const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
 
-    // Support resolution message
-    const [supportResolutionMessage, setSupportResolutionMessage] = useState('');
-    const supportResolutionMessageRef = useRef('');
+    // Support conversation messages
+    const [supportAdminMessage, setSupportAdminMessage] = useState('');
+    const [supportUserMessage, setSupportUserMessage] = useState('');
+    const supportAdminMessageRef = useRef('');
+    const supportUserMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -129,14 +131,40 @@ const SuperAdmin = () => {
     // New functions for support ticket management
     const handleSupportStatusUpdate = useCallback(async (ticketId, newStatus) => {
         try {
-            // Prepare update data - include resolution message if resolving
+            // Prepare update data
             const updateData = {
                 status: newStatus
             };
 
-            // If resolving or updating with a message, include the resolution message
-            if (newStatus === 'Completed' || (newStatus === 'In Progress' && supportResolutionMessageRef.current.trim())) {
-                updateData.Resolved_Description = supportResolutionMessageRef.current;
+            // Get current ticket data
+            const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
+            const currentAdminMessages = currentTicket.adminMessages || [];
+            const currentUserMessages = currentTicket.userMessages || [];
+
+            // Prepare new messages to add
+            const newAdminMessage = supportAdminMessageRef.current.trim();
+            const newUserMessage = supportUserMessageRef.current.trim();
+
+            // Add admin message if provided
+            if (newAdminMessage) {
+                updateData.adminMessages = [
+                    ...currentAdminMessages,
+                    {
+                        message: newAdminMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
+
+            // Add user message if provided
+            if (newUserMessage) {
+                updateData.userMessages = [
+                    ...currentUserMessages,
+                    {
+                        message: newUserMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
             }
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
@@ -145,13 +173,12 @@ const SuperAdmin = () => {
                 }
             });
             if (res.status === 200) {
-                // Update local state with new status and resolution message
+                // Update local state
                 const updatedTicket = {
-                    ...(supportTicketsData.find(t => t._id === ticketId) || {}),
+                    ...currentTicket,
                     status: newStatus,
-                    Resolved_Description: (newStatus === 'Completed' || (newStatus === 'In Progress' && supportResolutionMessageRef.current.trim()))
-                        ? supportResolutionMessageRef.current
-                        : undefined
+                    adminMessages: updateData.adminMessages || currentAdminMessages,
+                    userMessages: updateData.userMessages || currentUserMessages
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -162,10 +189,87 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
+                // Clear input fields
+                setSupportAdminMessage('');
+                setSupportUserMessage('');
+
                 toast.success(`Ticket status updated to ${newStatus}`);
             }
         } catch (e) {
             toast.error('Failed to update ticket status');
+        }
+    }, [supportTicketsData, selectedSupport]);
+
+    // Function to add messages without changing status
+    const handleAddMessage = useCallback(async (ticketId) => {
+        try {
+            const newAdminMessage = supportAdminMessageRef.current.trim();
+            const newUserMessage = supportUserMessageRef.current.trim();
+
+            if (!newAdminMessage && !newUserMessage) {
+                toast.warning('Please enter at least one message');
+                return;
+            }
+
+            // Get current ticket data
+            const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
+            const currentAdminMessages = currentTicket.adminMessages || [];
+            const currentUserMessages = currentTicket.userMessages || [];
+
+            // Prepare update data
+            const updateData = {};
+
+            // Add admin message if provided
+            if (newAdminMessage) {
+                updateData.adminMessages = [
+                    ...currentAdminMessages,
+                    {
+                        message: newAdminMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
+
+            // Add user message if provided
+            if (newUserMessage) {
+                updateData.userMessages = [
+                    ...currentUserMessages,
+                    {
+                        message: newUserMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
+
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.status === 200) {
+                // Update local state
+                const updatedTicket = {
+                    ...currentTicket,
+                    adminMessages: updateData.adminMessages || currentAdminMessages,
+                    userMessages: updateData.userMessages || currentUserMessages
+                };
+
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+
+                // Update selectedSupport if it's the current ticket
+                if (selectedSupport && selectedSupport._id === ticketId) {
+                    setSelectedSupport(updatedTicket);
+                }
+
+                // Clear input fields
+                setSupportAdminMessage('');
+                setSupportUserMessage('');
+
+                toast.success('Message added successfully');
+            }
+        } catch (e) {
+            toast.error('Failed to add message');
         }
     }, [supportTicketsData, selectedSupport]);
 
@@ -181,8 +285,7 @@ const SuperAdmin = () => {
         if (support.status === 'Pending') {
             try {
                 const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
-                    status: 'In Progress',
-                    Resolved_Description: ""
+                    status: 'In Progress'
                 }, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -193,7 +296,8 @@ const SuperAdmin = () => {
                     setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setSelectedSupport(updatedSupport);
-                    setSupportResolutionMessage(updatedSupport.Resolved_Description || '');
+                    setSupportAdminMessage('');
+                    setSupportUserMessage('');
                     setViewSupportModal(true);
                 }
             } catch (e) {
@@ -202,7 +306,8 @@ const SuperAdmin = () => {
             }
         } else {
             setSelectedSupport(support);
-            setSupportResolutionMessage(support.Resolved_Description || '');
+            setSupportAdminMessage('');
+            setSupportUserMessage('');
             setViewSupportModal(true);
         }
     };
@@ -231,12 +336,11 @@ const SuperAdmin = () => {
         if (e.target === e.currentTarget) {
             setViewUserModal(false);
             setViewSupportModal(false);
-            // Only clear resolution message if it's different from saved value
-            if (selectedSupport && supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
-                setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
-            }
+            // Clear conversation messages when closing
+            setSupportAdminMessage('');
+            setSupportUserMessage('');
         }
-    }, [selectedSupport]);
+    }, []);
 
     // Close modals with Escape key
     useEffect(() => {
@@ -244,28 +348,24 @@ const SuperAdmin = () => {
             if (e.key === 'Escape') {
                 setViewUserModal(false);
                 setViewSupportModal(false);
-                // Only clear resolution message if it's different from saved value
-                if (selectedSupport && supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
-                    setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
-                }
+                // Clear conversation messages when closing
+                setSupportAdminMessage('');
+                setSupportUserMessage('');
             }
         };
 
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
-    }, [selectedSupport]);
+    }, []);
 
-    // Keep ref updated with current state value
+    // Keep refs updated with current state values
     useEffect(() => {
-        supportResolutionMessageRef.current = supportResolutionMessage;
-    }, [supportResolutionMessage]);
+        supportAdminMessageRef.current = supportAdminMessage;
+    }, [supportAdminMessage]);
 
-    // Synchronize supportResolutionMessage with selectedSupport when it changes
     useEffect(() => {
-        if (selectedSupport) {
-            setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
-        }
-    }, [selectedSupport]);
+        supportUserMessageRef.current = supportUserMessage;
+    }, [supportUserMessage]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -2321,41 +2421,78 @@ const SuperAdmin = () => {
                             </div>
                         </div>
 
-                        {/* Resolution Message */}
+                        {/* Conversation Interface */}
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-lg font-medium text-gray-800">Resolution Message</h3>
-                                <div className="flex space-x-2">
-                                    {selectedSupport.Resolved_Description && (
-                                        <button
-                                            onClick={() => setSupportResolutionMessage(selectedSupport.Resolved_Description || '')}
-                                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
-                                            title="Restore original resolution message"
-                                        >
-                                            Restore Original
-                                        </button>
+                            <h3 className="text-lg font-medium text-gray-800 mb-4">Conversation</h3>
+
+                            {/* Display existing conversation */}
+                            <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
+                                {/* User Messages */}
+                                {selectedSupport.userMessages && selectedSupport.userMessages.length > 0 && (
+                                    <div className="space-y-2">
+                                        {selectedSupport.userMessages.map((msg, index) => (
+                                            <div key={index} className="flex justify-start">
+                                                <div className="bg-blue-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                                                    <div className="text-sm text-blue-800 font-medium mb-1">User</div>
+                                                    <div className="text-sm text-blue-900">{msg.message}</div>
+                                                    <div className="text-xs text-blue-600 mt-1">
+                                                        {new Date(msg.createdAt).toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Admin Messages */}
+                                {selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0 && (
+                                    <div className="space-y-2">
+                                        {selectedSupport.adminMessages.map((msg, index) => (
+                                            <div key={index} className="flex justify-end">
+                                                <div className="bg-green-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                                                    <div className="text-sm text-green-800 font-medium mb-1">Admin</div>
+                                                    <div className="text-sm text-green-900">{msg.message}</div>
+                                                    <div className="text-xs text-green-600 mt-1">
+                                                        {new Date(msg.createdAt).toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
+                                    (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
+                                        <div className="text-center text-gray-500 text-sm py-4">
+                                            No messages yet. Start the conversation below.
+                                        </div>
                                     )}
-                                    <button
-                                        onClick={() => setSupportResolutionMessage('')}
-                                        className="px-3 py-1 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
-                                        title="Clear current input"
-                                    >
-                                        Clear Input
-                                    </button>
+                            </div>
+
+                            {/* New Message Input */}
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Admin Message</label>
+                                    <textarea
+                                        value={supportAdminMessage}
+                                        onChange={(e) => setSupportAdminMessage(e.target.value)}
+                                        placeholder="Type your response or update here..."
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                        rows="3"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">User Message (Optional)</label>
+                                    <textarea
+                                        value={supportUserMessage}
+                                        onChange={(e) => setSupportUserMessage(e.target.value)}
+                                        placeholder="Add a user message if needed..."
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                        rows="2"
+                                    />
                                 </div>
                             </div>
-                            <textarea
-                                value={supportResolutionMessage}
-                                onChange={(e) => setSupportResolutionMessage(e.target.value)}
-                                placeholder="Enter resolution message or notes for this ticket..."
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                rows="4"
-                            />
-                            {selectedSupport.Resolved_Description && (
-                                <div className="mt-2 text-sm text-gray-600">
-                                    <strong>Original Resolution:</strong> {selectedSupport.Resolved_Description}
-                                </div>
-                            )}
                         </div>
 
                         {/* Action Buttons */}
@@ -2363,10 +2500,10 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        if (supportResolutionMessage.trim()) {
+                                        if (supportAdminMessage.trim() || supportUserMessage.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
-                                            toast.warning('Please enter a resolution message before resolving the ticket');
+                                            toast.warning('Please enter at least one message before resolving the ticket');
                                         }
                                     }}
                                     disabled={selectedSupport.status === 'Completed'}
@@ -2377,10 +2514,10 @@ const SuperAdmin = () => {
                                 {selectedSupport.status !== 'Completed' && (
                                     <button
                                         onClick={() => {
-                                            if (supportResolutionMessage.trim()) {
+                                            if (supportAdminMessage.trim() || supportUserMessage.trim()) {
                                                 handleSupportStatusUpdate(selectedSupport._id, 'In Progress');
                                             } else {
-                                                toast.warning('Please enter a message before updating status');
+                                                toast.warning('Please enter at least one message before updating status');
                                             }
                                         }}
                                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -2388,12 +2525,34 @@ const SuperAdmin = () => {
                                         Update Status
                                     </button>
                                 )}
+                                <button
+                                    onClick={() => {
+                                        if (supportAdminMessage.trim() || supportUserMessage.trim()) {
+                                            handleAddMessage(selectedSupport._id);
+                                        } else {
+                                            toast.warning('Please enter at least one message');
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                >
+                                    Add Message
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSupportAdminMessage('');
+                                        setSupportUserMessage('');
+                                    }}
+                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                >
+                                    Clear Inputs
+                                </button>
                             </div>
                             <button
                                 onClick={() => {
                                     setViewSupportModal(false);
-                                    // Reset resolution message to original value when closing
-                                    setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
+                                    // Clear conversation messages when closing
+                                    setSupportAdminMessage('');
+                                    setSupportUserMessage('');
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
