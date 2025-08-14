@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -126,7 +126,7 @@ const SuperAdmin = () => {
     };
 
     // New functions for support ticket management
-    const handleSupportStatusUpdate = async (ticketId, newStatus) => {
+    const handleSupportStatusUpdate = useCallback(async (ticketId, newStatus) => {
         try {
             // Prepare update data - include resolution message if resolving
             const updateData = {
@@ -164,7 +164,7 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    };
+    }, [supportResolutionMessage, supportTicketsData, selectedSupport]);
 
 
 
@@ -223,7 +223,7 @@ const SuperAdmin = () => {
 
 
     // Close modals when clicking outside
-    const handleModalBackdropClick = (e) => {
+    const handleModalBackdropClick = useCallback((e) => {
         if (e.target === e.currentTarget) {
             setViewUserModal(false);
             setViewSupportModal(false);
@@ -232,7 +232,7 @@ const SuperAdmin = () => {
                 setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
             }
         }
-    };
+    }, [selectedSupport, supportResolutionMessage]);
 
     // Close modals with Escape key
     useEffect(() => {
@@ -936,7 +936,7 @@ const SuperAdmin = () => {
     );
 
     const renderPayments = () => (
-        <div className='h-full bg-white'>
+        <div className='h-full'>
             {/* Payments Inner Tabs */}
             <div className="mb-6">
                 <nav className="flex space-x-8">
@@ -961,263 +961,261 @@ const SuperAdmin = () => {
                 </nav>
             </div>
 
-            <div className="bg-[#F8F9FA]">
-                {paymentsTab === 'payments' ? (
-                    <>
-                        {/* Payments Summary Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-                            {Object.keys(paymentsStats).map((key, index) => (
-                                <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
-                                    <div className={`p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 ${key === "Total Revenue" ? "bg-[#EBF4FF]" : key === "Successful Payments" ? "bg-[#F0FDF4]" : key === "Failed Payments" ? "bg-[#FEF2F2]" : key === "Revenue this month" ? "bg-[#EBF4FF]" : key === "Total Refunds" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
-                                        {key === "Total Revenue" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Successful Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#22C55E]" /> : key === "Failed Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#EF4444]" /> : key === "Revenue this month" ? <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" /> : key === "Total Refunds" ? <MdOutlinePaid className="w-6 h-6 text-[#22C55E]" /> : <MdOutlinePaid className="w-6 h-6 text-[#EF4444]" />}
-                                    </div>
-                                    <div className="flex flex-col items-left">
-                                        <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
-                                        <p className="text-[24px] font-semibold text-[#2563EB]">{paymentsStats[key]}</p>
-                                    </div>
+            {paymentsTab === 'payments' ? (
+                <>
+                    {/* Payments Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+                        {Object.keys(paymentsStats).map((key, index) => (
+                            <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
+                                <div className={`p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 ${key === "Total Revenue" ? "bg-[#EBF4FF]" : key === "Successful Payments" ? "bg-[#F0FDF4]" : key === "Failed Payments" ? "bg-[#FEF2F2]" : key === "Revenue this month" ? "bg-[#EBF4FF]" : key === "Total Refunds" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
+                                    {key === "Total Revenue" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Successful Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#22C55E]" /> : key === "Failed Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#EF4444]" /> : key === "Revenue this month" ? <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" /> : key === "Total Refunds" ? <MdOutlinePaid className="w-6 h-6 text-[#22C55E]" /> : <MdOutlinePaid className="w-6 h-6 text-[#EF4444]" />}
                                 </div>
-                            ))}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Plan Management Summary Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                            {Object.keys(planManagementStats).map((key, index) => (
-                                <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
-                                    <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
-                                        {key === "Active Subscriptions" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" />}
-                                    </div>
-                                    <div className="flex flex-col items-left">
-                                        <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
-                                        <p className="text-[24px] font-semibold text-[#2563EB]">{planManagementStats[key]}</p>
-                                    </div>
+                                <div className="flex flex-col items-left">
+                                    <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
+                                    <p className="text-[24px] font-semibold text-[#2563EB]">{paymentsStats[key]}</p>
                                 </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {/* Search and Filter Bar */}
-                <div className="mb-6 py-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div className="relative">
-                                <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    value={transactionSearchTerm}
-                                    onChange={(e) => {
-                                        setTransactionSearchTerm(e.target.value);
-                                        closeAllInvoiceRows();
-                                    }}
-                                    className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
-                                />
                             </div>
-                            <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
-                                    onClick={() => setTransactionFilterModal(!transactionFilterModal)}
-                                >
-                                    <MdOutlineFilterList className="w-5 h-5" />
-                                    <span>Filter</span>
-                                </button>
-                                {transactionFilterModal && (
-                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-[14px] font-medium text-[#111827]">Filters</span>
-                                            <button
-                                                className="text-[12px] text-[#2563EB] hover:underline"
-                                                onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
-                                            >
-                                                Clear
-                                            </button>
-                                        </div>
-                                        {/* All */}
-                                        <div className="flex items-center space-x-2">
-                                            <input type="radio" name="transactionAll" id="txn_all" value="all"
-                                                checked={transactionStatusFilter === 'all' && transactionDateFilter === 'all'}
-                                                onChange={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
-                                            />
-                                            <label htmlFor="txn_all">All</label>
-                                        </div>
-                                        {/* Status */}
-                                        <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
-                                        <div className="ml-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionStatusFilter" id="succeeded" value="succeeded"
-                                                    checked={transactionStatusFilter === 'succeeded'}
-                                                    onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="succeeded">Succeeded</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionStatusFilter" id="pending" value="pending"
-                                                    checked={transactionStatusFilter === 'pending'}
-                                                    onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="pending">Pending</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionStatusFilter" id="failed" value="failed"
-                                                    checked={transactionStatusFilter === 'failed'}
-                                                    onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="failed">Failed</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionStatusFilter" id="refunded" value="refunded"
-                                                    checked={transactionStatusFilter === 'refunded'}
-                                                    onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="refunded">Refunded</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionStatusFilter" id="pending_refund" value="pending refund"
-                                                    checked={transactionStatusFilter === 'pending refund'}
-                                                    onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="pending_refund">Pending Refund</label>
-                                            </div>
-                                        </div>
-                                        {/* Date */}
-                                        <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
-                                        <div className="ml-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionDateFilter" id="last7Days" value="last7Days"
-                                                    checked={transactionDateFilter === 'last7Days'}
-                                                    onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="last7Days">Last 7 Days</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionDateFilter" id="last15Days" value="last15Days"
-                                                    checked={transactionDateFilter === 'last15Days'}
-                                                    onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="last15Days">Last 15 Days</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="transactionDateFilter" id="last30Days" value="last30Days"
-                                                    checked={transactionDateFilter === 'last30Days'}
-                                                    onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
-                                                    onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="last30Days">Last 30 Days</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                        ))}
+                    </div>
+                </>
+            ) : (
+                <>
+                    {/* Plan Management Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        {Object.keys(planManagementStats).map((key, index) => (
+                            <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
+                                <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
+                                    {key === "Active Subscriptions" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : <MdOutlinePaid className="w-6 h-6 text-[#2563EB]" />}
+                                </div>
+                                <div className="flex flex-col items-left">
+                                    <p className="text-[16px] font-medium text-[#4B5563]">{key}</p>
+                                    <p className="text-[24px] font-semibold text-[#2563EB]">{planManagementStats[key]}</p>
+                                </div>
                             </div>
-                        </div>
+                        ))}
+                    </div>
+                </>
+            )}
 
-                        <div className="flex items-center justify-center sm:justify-end">
-                            <button onClick={handleExportTransactions} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
-                                <MdOutlineFileUpload className="w-5 h-5" />
-                                <span>Export</span>
+            {/* Search and Filter Bar */}
+            <div className="mb-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="relative">
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={transactionSearchTerm}
+                                onChange={(e) => {
+                                    setTransactionSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
+                            />
+                        </div>
+                        <div className="relative">
+                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                                onClick={() => setTransactionFilterModal(!transactionFilterModal)}
+                            >
+                                <MdOutlineFilterList className="w-5 h-5" />
+                                <span>Filter</span>
                             </button>
+                            {transactionFilterModal && (
+                                <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB] z-1000">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionAll" id="txn_all" value="all"
+                                            checked={transactionStatusFilter === 'all' && transactionDateFilter === 'all'}
+                                            onChange={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        />
+                                        <label htmlFor="txn_all">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="succeeded" value="succeeded"
+                                                checked={transactionStatusFilter === 'succeeded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="succeeded">Succeeded</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pending" value="pending"
+                                                checked={transactionStatusFilter === 'pending'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending">Pending</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="failed" value="failed"
+                                                checked={transactionStatusFilter === 'failed'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="failed">Failed</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="refunded" value="refunded"
+                                                checked={transactionStatusFilter === 'refunded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="refunded">Refunded</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pending_refund" value="pending refund"
+                                                checked={transactionStatusFilter === 'pending refund'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="pending_refund">Pending Refund</label>
+                                        </div>
+                                    </div>
+                                    {/* Date */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionDateFilter" id="last7Days" value="last7Days"
+                                                checked={transactionDateFilter === 'last7Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last7Days">Last 7 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionDateFilter" id="last15Days" value="last15Days"
+                                                checked={transactionDateFilter === 'last15Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last15Days">Last 15 Days</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="transactionDateFilter" id="last30Days" value="last30Days"
+                                                checked={transactionDateFilter === 'last30Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="last30Days">Last 30 Days</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div>
 
-                <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
-                    <table className="w-full rounded-2xl">
-                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
-                            <tr>
-                                <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
-                                    Transaction ID
-                                </th>
-                                <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
-                                    Company/User
-                                </th>
-                                <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
-                                    Amount
-                                </th>
-                                <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
-                                    Status
-                                </th>
-                                <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white">
-                            {(() => {
-                                const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
-                                return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
-                                    <React.Fragment key={index}>
-                                        <tr className="hover:bg-[#F8FAFC] transition-colors">
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                                {transaction.transaction_id}
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                                {transaction.user_id}
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                                ${transaction.price}
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                                                    {transaction.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
-                                                <button
-                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                    onClick={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
-                                                    title="View Invoice"
-                                                >
-                                                    <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <InlineInvoiceModal
-                                            data={transaction}
-                                            isOpen={openInvoiceRows.has(`payment-${transaction.transaction_id}`)}
-                                            onClose={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
-                                        />
-                                    </React.Fragment>
-                                )) : (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
-                                            No transactions found
+                    <div className="flex items-center justify-center sm:justify-end">
+                        <button onClick={handleExportTransactions} className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#2563EB] transition-colors w-full sm:w-auto">
+                            <MdOutlineFileUpload className="w-5 h-5" />
+                            <span>Export</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
+                <table className="w-full rounded-2xl">
+                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                        <tr>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
+                                Transaction ID
+                            </th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                                Company/User
+                            </th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                                Amount
+                            </th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                                Status
+                            </th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                        {(() => {
+                            const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
+                            return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
+                                <React.Fragment key={index}>
+                                    <tr className="hover:bg-[#F8FAFC] transition-colors">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.transaction_id}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.user_id}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            ${transaction.price}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                                                {transaction.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                                title="View Invoice"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
                                         </td>
                                     </tr>
-                                );
-                            })()}
-                        </tbody>
-                    </table>
-                    {filteredTransactions.length > 0 && (
-                        <PaginationComponent
-                            currentPage={currentPageTransactions}
-                            totalPages={getTotalPages(filteredTransactions, rowsPerPage)}
-                            onPageChange={(page) => {
-                                setCurrentPageTransactions(page);
-                                closeAllInvoiceRows();
-                            }}
-                            totalItems={filteredTransactions.length}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={(newRowsPerPage) => {
-                                setRowsPerPage(newRowsPerPage);
-                                setCurrentPageTransactions(1); // Reset to first page when changing rows per page
-                                closeAllInvoiceRows();
-                            }}
-                        />
-                    )}
-                </div>
+                                    <InlineInvoiceModal
+                                        data={transaction}
+                                        isOpen={openInvoiceRows.has(`payment-${transaction.transaction_id}`)}
+                                        onClose={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                    />
+                                </React.Fragment>
+                            )) : (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                        No transactions found
+                                    </td>
+                                </tr>
+                            );
+                        })()}
+                    </tbody>
+                </table>
+                {filteredTransactions.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageTransactions}
+                        totalPages={getTotalPages(filteredTransactions, rowsPerPage)}
+                        onPageChange={(page) => {
+                            setCurrentPageTransactions(page);
+                            closeAllInvoiceRows();
+                        }}
+                        totalItems={filteredTransactions.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => {
+                            setRowsPerPage(newRowsPerPage);
+                            setCurrentPageTransactions(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
 
     const renderSupport = () => (
-        <div className='h-full bg-white'>
+        <div className='h-full'>
             {/* Support Inner Tabs */}
             <div className="mb-6">
                 <nav className="flex space-x-8">
@@ -1242,272 +1240,270 @@ const SuperAdmin = () => {
                 </nav>
             </div>
 
-            <div className="bg-[#F8F9FA]">
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    {Object.keys(supportTicketsStats).map((key, index) => (
-                        <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
-                            <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
-                                {key === "Billing & Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Proposal Issues" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" /> : key === "Account & Access" ? <MdOutlinePerson className="w-6 h-6 text-[#2563EB]" /> : key === "Technical Errors" ? <MdOutlinePriorityHigh className="w-6 h-6 text-[#2563EB]" /> : key === "Feature Requests" ? <MdOutlinePayment className="w-6 h-6 text-[#2563EB]" /> : <MdOutlineMoreVert className="w-6 h-6 text-[#2563EB]" />}
-                            </div>
-                            <div className="flex flex-col items-left">
-                                <span className="text-[16px] font-medium text-[#4B5563]">{key}</span>
-                                <span className="text-[12px] font-medium text-[#4B5563]">{supportTicketsStats[key]}</span>
-                            </div>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {Object.keys(supportTicketsStats).map((key, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 hover:shadow-md transition-shadow">
+                        <div className="p-2 rounded-lg w-10 h-10 flex items-center justify-center mb-2 bg-[#EBF4FF]">
+                            {key === "Billing & Payments" ? <MdOutlineMoney className="w-6 h-6 text-[#2563EB]" /> : key === "Proposal Issues" ? <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" /> : key === "Account & Access" ? <MdOutlinePerson className="w-6 h-6 text-[#2563EB]" /> : key === "Technical Errors" ? <MdOutlinePriorityHigh className="w-6 h-6 text-[#2563EB]" /> : key === "Feature Requests" ? <MdOutlinePayment className="w-6 h-6 text-[#2563EB]" /> : <MdOutlineMoreVert className="w-6 h-6 text-[#2563EB]" />}
                         </div>
-                    ))}
-                </div>
+                        <div className="flex flex-col items-left">
+                            <span className="text-[16px] font-medium text-[#4B5563]">{key}</span>
+                            <span className="text-[12px] font-medium text-[#4B5563]">{supportTicketsStats[key]}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
-                {/* Search and Filter Bar */}
-                <div className="mb-6 py-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div className="relative">
-                                <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    value={supportSearchTerm}
-                                    onChange={(e) => {
-                                        setSupportSearchTerm(e.target.value);
-                                        closeAllInvoiceRows();
-                                    }}
-                                    className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 bg-white"
-                                />
-                            </div>
-                            <div className="relative">
-                                <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
-                                    onClick={() => setSupportFilterModal(!supportFilterModal)}
-                                >
-                                    <MdOutlineFilterList className="w-5 h-5" />
-                                    <span>Filter</span>
-                                </button>
+            {/* Search and Filter Bar */}
+            <div className="mb-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="relative">
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={supportSearchTerm}
+                                onChange={(e) => {
+                                    setSupportSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 bg-white"
+                            />
+                        </div>
+                        <div className="relative">
+                            <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                                onClick={() => setSupportFilterModal(!supportFilterModal)}
+                            >
+                                <MdOutlineFilterList className="w-5 h-5" />
+                                <span>Filter</span>
+                            </button>
 
-                                {supportFilterModal && (
-                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-[14px] font-medium text-[#111827]">Filters</span>
-                                            <button
-                                                className="text-[12px] text-[#2563EB] hover:underline"
-                                                onClick={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
-                                            >
-                                                Clear
-                                            </button>
-                                        </div>
-                                        {/* All */}
+                            {supportFilterModal && (
+                                <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="supportAll" id="support_all" value="all"
+                                            checked={supportStatusFilter === 'all' && supportPriorityFilter === 'all' && supportTypeFilter === 'all'}
+                                            onChange={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
+                                        />
+                                        <label htmlFor="support_all">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportAll" id="support_all" value="all"
-                                                checked={supportStatusFilter === 'all' && supportPriorityFilter === 'all' && supportTypeFilter === 'all'}
-                                                onChange={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
+                                            <input type="radio" name="supportStatusFilter" id="new" value="new"
+                                                checked={supportStatusFilter === 'new'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="support_all">All</label>
+                                            <label htmlFor="new">New</label>
                                         </div>
-                                        {/* Status */}
-                                        <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
-                                        <div className="ml-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportStatusFilter" id="new" value="new"
-                                                    checked={supportStatusFilter === 'new'}
-                                                    onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="new">New</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
-                                                    checked={supportStatusFilter === 'in progress'}
-                                                    onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="inProgress">In Progress</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
-                                                    checked={supportStatusFilter === 'resolved'}
-                                                    onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="resolved">Resolved</label>
-                                            </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
+                                                checked={supportStatusFilter === 'in progress'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="inProgress">In Progress</label>
                                         </div>
-                                        {/* Priority */}
-                                        <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
-                                        <div className="ml-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportPriorityFilter" id="low" value="low"
-                                                    checked={supportPriorityFilter === 'low'}
-                                                    onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="low">Low</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportPriorityFilter" id="medium" value="medium"
-                                                    checked={supportPriorityFilter === 'medium'}
-                                                    onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="medium">Medium</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportPriorityFilter" id="high" value="high"
-                                                    checked={supportPriorityFilter === 'high'}
-                                                    onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="high">High</label>
-                                            </div>
-                                        </div>
-                                        {/* Type */}
-                                        <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
-                                        <div className="ml-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="billingPayments" value="billing & payments"
-                                                    checked={supportTypeFilter === 'billing & payments'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="billingPayments">Billing & Payments</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="technicalErrors" value="technical errors"
-                                                    checked={supportTypeFilter === 'technical errors'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="technicalErrors">Technical Errors</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="featureRequests" value="feature requests"
-                                                    checked={supportTypeFilter === 'feature requests'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="featureRequests">Feature Requests</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="accountAccess" value="account & access"
-                                                    checked={supportTypeFilter === 'account & access'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="accountAccess">Account & Access</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="proposalIssues" value="proposal issues"
-                                                    checked={supportTypeFilter === 'proposal issues'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="proposalIssues">Proposal Issues</label>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <input type="radio" name="supportTypeFilter" id="others" value="others"
-                                                    checked={supportTypeFilter === 'others'}
-                                                    onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
-                                                    onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                />
-                                                <label htmlFor="others">Others</label>
-                                            </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
+                                                checked={supportStatusFilter === 'resolved'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="resolved">Resolved</label>
                                         </div>
                                     </div>
-                                )}
-                            </div>
+                                    {/* Priority */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportPriorityFilter" id="low" value="low"
+                                                checked={supportPriorityFilter === 'low'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="low">Low</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportPriorityFilter" id="medium" value="medium"
+                                                checked={supportPriorityFilter === 'medium'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="medium">Medium</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportPriorityFilter" id="high" value="high"
+                                                checked={supportPriorityFilter === 'high'}
+                                                onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="high">High</label>
+                                        </div>
+                                    </div>
+                                    {/* Type */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Type :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="billingPayments" value="billing & payments"
+                                                checked={supportTypeFilter === 'billing & payments'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="billingPayments">Billing & Payments</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="technicalErrors" value="technical errors"
+                                                checked={supportTypeFilter === 'technical errors'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="technicalErrors">Technical Errors</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="featureRequests" value="feature requests"
+                                                checked={supportTypeFilter === 'feature requests'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="featureRequests">Feature Requests</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="accountAccess" value="account & access"
+                                                checked={supportTypeFilter === 'account & access'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="accountAccess">Account & Access</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="proposalIssues" value="proposal issues"
+                                                checked={supportTypeFilter === 'proposal issues'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="proposalIssues">Proposal Issues</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportTypeFilter" id="others" value="others"
+                                                checked={supportTypeFilter === 'others'}
+                                                onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="others">Others</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
-                    <table className="w-full rounded-2xl">
-                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
-                            <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                    Ticket ID
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                    Type
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
-                                    Subject
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                    Priority
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                    Status
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white">
-                            {(() => {
-                                const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
-                                return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
-                                    <React.Fragment key={index}>
-                                        <tr>
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                                {ticket.category}
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                                {ticket.subCategory}
-                                            </td>
-                                            <td className="p-4 text-[16px] text-[#4B5563]">
-                                                <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
-                                                    <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
-                                                </div>
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                                    {ticket.priority}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                                    {ticket.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
-                                                <button
-                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                    onClick={() => openSupportModal(ticket)}
-                                                    title="View Details"
-                                                >
-                                                    <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                                </button>
-                                            </td>
-                                        </tr>
-
-                                    </React.Fragment>
-                                )) : (
+            <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
+                <table className="w-full rounded-2xl">
+                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                        <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Ticket ID
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Type
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                Subject
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Priority
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Status
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                        {(() => {
+                            const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
+                            return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
+                                <React.Fragment key={index}>
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
-                                            No tickets found
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {ticket.category}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {ticket.subCategory}
+                                        </td>
+                                        <td className="p-4 text-[16px] text-[#4B5563]">
+                                            <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                            </div>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                {ticket.priority}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => openSupportModal(ticket)}
+                                                title="View Details"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
                                         </td>
                                     </tr>
-                                );
-                            })()}
-                        </tbody>
-                    </table>
-                    {filteredSupport.length > 0 && (
-                        <PaginationComponent
-                            currentPage={currentPageSupport}
-                            totalPages={getTotalPages(filteredSupport, rowsPerPage)}
-                            onPageChange={(page) => {
-                                setCurrentPageSupport(page);
-                                closeAllInvoiceRows();
-                            }}
-                            totalItems={filteredSupport.length}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={(newRowsPerPage) => {
-                                setRowsPerPage(newRowsPerPage);
-                                setCurrentPageSupport(1); // Reset to first page when changing rows per page
-                                closeAllInvoiceRows();
-                            }}
-                        />
-                    )}
-                </div>
+
+                                </React.Fragment>
+                            )) : (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                        No tickets found
+                                    </td>
+                                </tr>
+                            );
+                        })()}
+                    </tbody>
+                </table>
+                {filteredSupport.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageSupport}
+                        totalPages={getTotalPages(filteredSupport, rowsPerPage)}
+                        onPageChange={(page) => {
+                            setCurrentPageSupport(page);
+                            closeAllInvoiceRows();
+                        }}
+                        totalItems={filteredSupport.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => {
+                            setRowsPerPage(newRowsPerPage);
+                            setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
@@ -2166,7 +2162,7 @@ const SuperAdmin = () => {
         </div>
     );
 
-    const SupportViewModal = () => (
+    const SupportViewModal = useCallback(() => (
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
             <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
@@ -2350,7 +2346,204 @@ const SuperAdmin = () => {
                 )}
             </div>
         </div>
-    );
+    ), [selectedSupport, supportResolutionMessage, handleModalBackdropClick, handleSupportStatusUpdate]);
+
+    // Invoice utility functions
+    const downloadInvoiceAsPDF = async (data) => {
+        try {
+            // Create a temporary div for the invoice content
+            const invoiceDiv = document.createElement('div');
+            invoiceDiv.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
+                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px;">
+                        <img src="/vite.svg" alt="Company Logo" style="width: 60px; height: 60px; margin-right: 20px;">
+                        <div>
+                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP App</h1>
+                            <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 16px;">Professional Proposal Management</p>
+                        </div>
+                    </div>
+                    
+                    <h2 style="color: #111827; margin: 30px 0 20px 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px;">
+                        Payment Invoice - ${data.transaction_id}
+                    </h2>
+                    
+                    <div style="margin: 30px 0;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <div>
+                                <h3 style="color: #374151; margin: 0 0 15px 0; font-size: 18px;">Invoice Details</h3>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Transaction ID:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.transaction_id}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Payment Method:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.payment_method || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 style="color: #374151; margin: 0 0 15px 0; font-size: 18px;">Additional Information</h3>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Status:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.status}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">User ID:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.user_id}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Created Date:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.created_at || data.createdAt || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="color: #6b7280; font-size: 14px;">
+                                Invoice generated on ${new Date().toLocaleDateString()}
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 5px;">
+                                    Total Amount: $${data.price}
+                                </div>
+                                <div style="color: #6b7280; font-size: 14px;">Thank you for your business!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Use html2pdf to generate PDF
+            const { default: html2pdf } = await import('html2pdf.js');
+
+            const opt = {
+                margin: 10,
+                filename: `invoice-${data.transaction_id}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().set(opt).from(invoiceDiv).save();
+
+            toast.success('Invoice downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading invoice:', error);
+            toast.error('Failed to download invoice. Please try again.');
+        }
+    };
+
+    const printInvoice = (data) => {
+        try {
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice - ${data.transaction_id}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        .invoice-header { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+                        .logo { width: 60px; height: 60px; margin-right: 20px; }
+                        .company-name { color: #2563eb; margin: 0; font-size: 28px; font-weight: bold; }
+                        .company-tagline { color: #6b7280; margin: 5px 0 0 0; font-size: 16px; }
+                        .invoice-title { color: #111827; margin: 30px 0 20px 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+                        .invoice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0; }
+                        .section-title { color: #374151; margin: 0 0 15px 0; font-size: 18px; }
+                        .detail-row { margin-bottom: 15px; }
+                        .label { font-weight: bold; color: #111827; }
+                        .value { margin-left: 10px; color: #6b7280; }
+                        .footer { border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; }
+                        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+                        .total-amount { font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 5px; }
+                        .thank-you { color: #6b7280; font-size: 14px; }
+                        @media print {
+                            body { padding: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="invoice-header">
+                        <img src="/vite.svg" alt="Company Logo" class="logo">
+                        <div>
+                            <h1 class="company-name">RFP App</h1>
+                            <p class="company-tagline">Professional Proposal Management</p>
+                        </div>
+                    </div>
+                    
+                    <h2 class="invoice-title">Payment Invoice - ${data.transaction_id}</h2>
+                    
+                    <div class="invoice-grid">
+                        <div>
+                            <h3 class="section-title">Invoice Details</h3>
+                            <div class="detail-row">
+                                <span class="label">Transaction ID:</span>
+                                <span class="value">${data.transaction_id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Amount:</span>
+                                <span class="value">$${data.price}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Payment Method:</span>
+                                <span class="value">${data.payment_method || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="section-title">Additional Information</h3>
+                            <div class="detail-row">
+                                <span class="label">Status:</span>
+                                <span class="value">${data.status}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">User ID:</span>
+                                <span class="value">${data.user_id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Created Date:</span>
+                                <span class="value">${data.created_at || data.createdAt || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="footer-content">
+                            <div style="color: #6b7280; font-size: 14px;">
+                                Invoice generated on ${new Date().toLocaleDateString()}
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="total-amount">Total Amount: $${data.price}</div>
+                                <div class="thank-you">Thank you for your business!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="no-print" style="text-align: center; margin-top: 30px; padding: 20px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                            Print Invoice
+                        </button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                            Close
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+
+            toast.success('Invoice opened for printing!');
+        } catch (error) {
+            console.error('Error printing invoice:', error);
+            toast.error('Failed to open invoice for printing. Please try again.');
+        }
+    };
 
     // Inline Invoice Modal Component
     const InlineInvoiceModal = ({ data, isOpen, onClose }) => {
@@ -2385,6 +2578,15 @@ const SuperAdmin = () => {
                             </button>
                         </div>
 
+                        {/* Logo and Company Header */}
+                        <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
+                            <img src="/vite.svg" alt="Company Logo" className="w-12 h-12 mr-4" />
+                            <div>
+                                <h4 className="text-xl font-bold text-[#2563eb]">RFP App</h4>
+                                <p className="text-sm text-[#6b7280]">Professional Proposal Management</p>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             {getInvoiceData().map((item, index) => (
                                 <div key={index}>
@@ -2402,11 +2604,19 @@ const SuperAdmin = () => {
                                     Invoice generated on {new Date().toLocaleDateString()}
                                 </div>
                                 <div className="flex space-x-2">
-                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                        Download PDF
+                                    <button
+                                        onClick={() => downloadInvoiceAsPDF(data)}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                                    >
+                                        <MdOutlineFileUpload className="w-4 h-4" />
+                                        <span>Download PDF</span>
                                     </button>
-                                    <button className="px-4 py-2 border border-[#4B5563] text-[#111827] rounded-lg hover:bg-[#F8FAFC] transition-colors">
-                                        Print
+                                    <button
+                                        onClick={() => printInvoice(data)}
+                                        className="px-4 py-2 border border-[#4B5563] text-[#111827] rounded-lg hover:bg-[#F8FAFC] transition-colors flex items-center space-x-2"
+                                    >
+                                        <MdOutlineDocumentScanner className="w-4 h-4" />
+                                        <span>Print</span>
                                     </button>
                                 </div>
                             </div>
@@ -2554,7 +2764,7 @@ const SuperAdmin = () => {
             <div className="hidden lg:flex h-[calc(100vh-64px)]">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
-                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 z-20 overflow-hidden group`}
+                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
                 >
                     <div className="p-4">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
