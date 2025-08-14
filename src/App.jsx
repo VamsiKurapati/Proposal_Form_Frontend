@@ -10,6 +10,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
+const SupportTicket = lazy(() => import("./pages/SupportTicket"));
 
 const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
 
@@ -106,6 +107,9 @@ const App = () => {
               <SuperAdmin />
             </ProtectedRoutes>
           } />
+
+
+          <Route path="/support-ticket" element={<SupportTicket />} />
 
           <Route path="*" element={<Home />} />
         </Routes>
