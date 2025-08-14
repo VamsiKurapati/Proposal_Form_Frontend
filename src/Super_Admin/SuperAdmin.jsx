@@ -134,8 +134,8 @@ const SuperAdmin = () => {
                 status: newStatus
             };
 
-            // If resolving, include the resolution message
-            if (newStatus === 'Completed') {
+            // If resolving or updating with a message, include the resolution message
+            if (newStatus === 'Completed' || (newStatus === 'In Progress' && supportResolutionMessageRef.current.trim())) {
                 updateData.Resolved_Description = supportResolutionMessageRef.current;
             }
 
@@ -149,7 +149,9 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...(supportTicketsData.find(t => t._id === ticketId) || {}),
                     status: newStatus,
-                    Resolved_Description: newStatus === 'Completed' ? supportResolutionMessageRef.current : undefined
+                    Resolved_Description: (newStatus === 'Completed' || (newStatus === 'In Progress' && supportResolutionMessageRef.current.trim()))
+                        ? supportResolutionMessageRef.current
+                        : undefined
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -187,10 +189,11 @@ const SuperAdmin = () => {
                     }
                 });
                 if (res.status === 200) {
-                    setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
-                    setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
-                    setSelectedSupport(support);
-                    setSupportResolutionMessage(support.Resolved_Description || '');
+                    const updatedSupport = { ...support, status: 'In Progress' };
+                    setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                    setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                    setSelectedSupport(updatedSupport);
+                    setSupportResolutionMessage(updatedSupport.Resolved_Description || '');
                     setViewSupportModal(true);
                 }
             } catch (e) {
@@ -256,6 +259,13 @@ const SuperAdmin = () => {
     useEffect(() => {
         supportResolutionMessageRef.current = supportResolutionMessage;
     }, [supportResolutionMessage]);
+
+    // Synchronize supportResolutionMessage with selectedSupport when it changes
+    useEffect(() => {
+        if (selectedSupport) {
+            setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
+        }
+    }, [selectedSupport]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -2315,15 +2325,24 @@ const SuperAdmin = () => {
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-medium text-gray-800">Resolution Message</h3>
-                                {selectedSupport.Resolved_Description && (
+                                <div className="flex space-x-2">
+                                    {selectedSupport.Resolved_Description && (
+                                        <button
+                                            onClick={() => setSupportResolutionMessage(selectedSupport.Resolved_Description || '')}
+                                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                                            title="Restore original resolution message"
+                                        >
+                                            Restore Original
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => setSupportResolutionMessage('')}
                                         className="px-3 py-1 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
-                                        title="Clear current input (will be saved when resolving)"
+                                        title="Clear current input"
                                     >
                                         Clear Input
                                     </button>
-                                )}
+                                </div>
                             </div>
                             <textarea
                                 value={supportResolutionMessage}
@@ -2332,31 +2351,49 @@ const SuperAdmin = () => {
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                                 rows="4"
                             />
+                            {selectedSupport.Resolved_Description && (
+                                <div className="mt-2 text-sm text-gray-600">
+                                    <strong>Original Resolution:</strong> {selectedSupport.Resolved_Description}
+                                </div>
+                            )}
                         </div>
 
                         {/* Action Buttons */}
                         <div className="flex justify-between items-center pt-4 gap-4">
-                            <button
-                                onClick={() => {
-                                    if (supportResolutionMessage.trim()) {
-                                        handleSupportStatusUpdate(selectedSupport._id, 'Completed');
-                                        setSupportResolutionMessage('');
-                                    } else {
-                                        toast.warning('Please enter a resolution message before resolving the ticket');
-                                    }
-                                }}
-                                disabled={selectedSupport.status === 'Completed'}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Resolve Ticket
-                            </button>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => {
+                                        if (supportResolutionMessage.trim()) {
+                                            handleSupportStatusUpdate(selectedSupport._id, 'Completed');
+                                        } else {
+                                            toast.warning('Please enter a resolution message before resolving the ticket');
+                                        }
+                                    }}
+                                    disabled={selectedSupport.status === 'Completed'}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
+                                </button>
+                                {selectedSupport.status !== 'Completed' && (
+                                    <button
+                                        onClick={() => {
+                                            if (supportResolutionMessage.trim()) {
+                                                handleSupportStatusUpdate(selectedSupport._id, 'In Progress');
+                                            } else {
+                                                toast.warning('Please enter a message before updating status');
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        Update Status
+                                    </button>
+                                )}
+                            </div>
                             <button
                                 onClick={() => {
                                     setViewSupportModal(false);
-                                    // Only clear resolution message if it's different from saved value
-                                    if (supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
-                                        setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
-                                    }
+                                    // Reset resolution message to original value when closing
+                                    setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
@@ -2782,12 +2819,12 @@ const SuperAdmin = () => {
                 </div>
             )}
 
-            <div className="hidden lg:flex h-[calc(100vh-64px)]">
+            <div className="hidden lg:flex h-[calc(100vh-64px)] relative">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
-                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out fixed left-0 top-18 h-[calc(100vh-64px)] z-20 overflow-hidden group`}
+                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out absolute left-0 top-0 h-full z-20 overflow-hidden group`}
                 >
-                    <div className="p-4">
+                    <div className="p-4 pt-20">
                         <div className="flex items-center justify-center lg:justify-start mb-4">
                             <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
                         </div>
