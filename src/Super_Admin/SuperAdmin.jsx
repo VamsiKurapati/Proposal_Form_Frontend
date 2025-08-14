@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -65,6 +65,7 @@ const SuperAdmin = () => {
 
     // Support resolution message
     const [supportResolutionMessage, setSupportResolutionMessage] = useState('');
+    const supportResolutionMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -135,7 +136,7 @@ const SuperAdmin = () => {
 
             // If resolving, include the resolution message
             if (newStatus === 'Resolved') {
-                updateData.resolutionMessage = supportResolutionMessage;
+                updateData.Resolved_Description = supportResolutionMessageRef.current;
             }
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
@@ -148,7 +149,7 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...(supportTicketsData.find(t => t._id === ticketId) || {}),
                     status: newStatus,
-                    resolutionMessage: newStatus === 'Resolved' ? supportResolutionMessage : undefined
+                    Resolved_Description: newStatus === 'Resolved' ? supportResolutionMessageRef.current : undefined
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -164,7 +165,7 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    }, [supportResolutionMessage, supportTicketsData, selectedSupport]);
+    }, [supportTicketsData, selectedSupport]);
 
 
 
@@ -179,7 +180,7 @@ const SuperAdmin = () => {
             try {
                 const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
                     status: 'In Progress',
-                    resolutionMessage: ""
+                    Resolved_Description: ""
                 }, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -189,7 +190,7 @@ const SuperAdmin = () => {
                     setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
                     setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? { ...t, status: 'In Progress' } : t));
                     setSelectedSupport(support);
-                    setSupportResolutionMessage(support.resolutionMessage || '');
+                    setSupportResolutionMessage(support.Resolved_Description || '');
                     setViewSupportModal(true);
                 }
             } catch (e) {
@@ -198,7 +199,7 @@ const SuperAdmin = () => {
             }
         } else {
             setSelectedSupport(support);
-            setSupportResolutionMessage(support.resolutionMessage || '');
+            setSupportResolutionMessage(support.Resolved_Description || '');
             setViewSupportModal(true);
         }
     };
@@ -228,11 +229,11 @@ const SuperAdmin = () => {
             setViewUserModal(false);
             setViewSupportModal(false);
             // Only clear resolution message if it's different from saved value
-            if (selectedSupport && supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
-                setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+            if (selectedSupport && supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
+                setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
             }
         }
-    }, [selectedSupport, supportResolutionMessage]);
+    }, [selectedSupport]);
 
     // Close modals with Escape key
     useEffect(() => {
@@ -241,8 +242,8 @@ const SuperAdmin = () => {
                 setViewUserModal(false);
                 setViewSupportModal(false);
                 // Only clear resolution message if it's different from saved value
-                if (selectedSupport && supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
-                    setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+                if (selectedSupport && supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
+                    setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
                 }
             }
         };
@@ -250,6 +251,11 @@ const SuperAdmin = () => {
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, [selectedSupport]);
+
+    // Keep ref updated with current state value
+    useEffect(() => {
+        supportResolutionMessageRef.current = supportResolutionMessage;
+    }, [supportResolutionMessage]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -2294,7 +2300,7 @@ const SuperAdmin = () => {
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-medium text-gray-800">Resolution Message</h3>
-                                {selectedSupport.resolutionMessage && (
+                                {selectedSupport.Resolved_Description && (
                                     <button
                                         onClick={() => setSupportResolutionMessage('')}
                                         className="px-3 py-1 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
@@ -2333,8 +2339,8 @@ const SuperAdmin = () => {
                                 onClick={() => {
                                     setViewSupportModal(false);
                                     // Only clear resolution message if it's different from saved value
-                                    if (supportResolutionMessage !== (selectedSupport.resolutionMessage || '')) {
-                                        setSupportResolutionMessage(selectedSupport.resolutionMessage || '');
+                                    if (supportResolutionMessage !== (selectedSupport.Resolved_Description || '')) {
+                                        setSupportResolutionMessage(selectedSupport.Resolved_Description || '');
                                     }
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
@@ -2346,7 +2352,7 @@ const SuperAdmin = () => {
                 )}
             </div>
         </div>
-    ), [selectedSupport, supportResolutionMessage, handleModalBackdropClick, handleSupportStatusUpdate]);
+    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate]);
 
     // Invoice utility functions
     const downloadInvoiceAsPDF = async (data) => {
