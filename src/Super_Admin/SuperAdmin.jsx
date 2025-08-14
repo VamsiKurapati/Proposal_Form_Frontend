@@ -135,7 +135,7 @@ const SuperAdmin = () => {
             };
 
             // If resolving, include the resolution message
-            if (newStatus === 'Resolved') {
+            if (newStatus === 'Completed') {
                 updateData.Resolved_Description = supportResolutionMessageRef.current;
             }
 
@@ -149,7 +149,7 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...(supportTicketsData.find(t => t._id === ticketId) || {}),
                     status: newStatus,
-                    Resolved_Description: newStatus === 'Resolved' ? supportResolutionMessageRef.current : undefined
+                    Resolved_Description: newStatus === 'Completed' ? supportResolutionMessageRef.current : undefined
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -282,6 +282,11 @@ const SuperAdmin = () => {
 
     const handleSupportPriorityChangeFilter = (value) => {
         setSupportPriorityFilter(value);
+        closeAllInvoiceRows();
+    };
+
+    const handleSupportTypeChangeFilter = (value) => {
+        setSupportTypeFilter(value);
         closeAllInvoiceRows();
     };
 
@@ -458,14 +463,16 @@ const SuperAdmin = () => {
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Refunded':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Resolved':
+            case 'Completed':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'In Progress':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'New':
+            case 'Re-Opened':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'Withdrawn':
+                return 'bg-[#4B5563] text-[#111827]';
             case 'Cancelled':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
+                return 'bg-[#F3F4F6] text-[#6B7280]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -693,9 +700,9 @@ const SuperAdmin = () => {
 
     useEffect(() => {
         const base = supportTicketsData || [];
-        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status || '').toLowerCase() === supportStatusFilter.toLowerCase());
-        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
-        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type || '').toLowerCase() === supportTypeFilter.toLowerCase());
+        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
+        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority === supportPriorityFilter));
+        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type === supportTypeFilter));
         setFilteredSupport(byType);
     }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
@@ -703,10 +710,10 @@ const SuperAdmin = () => {
 
     useEffect(() => {
         if (completedTickets) {
-            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Completed'));
             //console.log("resolved", filteredSupport);
         } else {
-            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Completed'));
             //console.log("not resolved", filteredSupport);
         }
     }, [completedTickets, supportTicketsData]);
@@ -1309,28 +1316,36 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="new" value="new"
-                                                checked={supportStatusFilter === 'new'}
+                                            <input type="radio" name="supportStatusFilter" id="pending" value="Pending"
+                                                checked={supportStatusFilter === 'Pending'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="new">New</label>
+                                            <label htmlFor="pending">Pending</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
-                                                checked={supportStatusFilter === 'in progress'}
+                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="In Progress"
+                                                checked={supportStatusFilter === 'In Progress'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="inProgress">In Progress</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
-                                                checked={supportStatusFilter === 'resolved'}
+                                            <input type="radio" name="supportStatusFilter" id="reopened" value="Re-Opened"
+                                                checked={supportStatusFilter === 'Re-Opened'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="resolved">Resolved</label>
+                                            <label htmlFor="reopened">Re-Opened</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="completed" value="Completed"
+                                                checked={supportStatusFilter === 'Completed'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="completed">Completed</label>
                                         </div>
                                     </div>
                                     {/* Priority */}
@@ -2188,7 +2203,7 @@ const SuperAdmin = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport.ticked_id || selectedSupport.ticketId || selectedSupport._id}</p>
+                                    <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
@@ -2208,9 +2223,9 @@ const SuperAdmin = () => {
                             <h3 className="text-lg font-medium text-gray-800 mb-3">Ticket Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                        {selectedSupport.type}
+                                        {selectedSupport.category}
                                     </span>
                                 </div>
                                 <div>
@@ -2324,13 +2339,13 @@ const SuperAdmin = () => {
                             <button
                                 onClick={() => {
                                     if (supportResolutionMessage.trim()) {
-                                        handleSupportStatusUpdate(selectedSupport._id, 'Resolved');
+                                        handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         setSupportResolutionMessage('');
                                     } else {
                                         toast.warning('Please enter a resolution message before resolving the ticket');
                                     }
                                 }}
-                                disabled={selectedSupport.status === 'Resolved'}
+                                disabled={selectedSupport.status === 'Completed'}
                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Resolve Ticket
