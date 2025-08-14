@@ -2819,6 +2819,17 @@ const SuperAdmin = () => {
                 </div>
             )}
 
+            {/* Mobile Content - Visible on small screens */}
+            <div className="lg:hidden">
+                <div className="p-4">
+                    {/* Content based on active tab */}
+                    {activeTab === 'user-management' && renderUserManagement()}
+                    {activeTab === 'payments' && renderPayments()}
+                    {activeTab === 'support' && renderSupport()}
+                    {activeTab === 'notifications' && renderNotifications()}
+                </div>
+            </div>
+
             <div className="hidden lg:flex h-[calc(100vh-64px)] relative">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 <div
