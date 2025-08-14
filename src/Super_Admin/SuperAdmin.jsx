@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -25,7 +25,6 @@ import {
     MdOutlineMenu,
     MdOutlineVisibility,
     MdOutlineClose,
-    MdOutlineSend,
     MdOutlineCheckCircle,
     MdOutlineCancel
 } from 'react-icons/md';
@@ -44,7 +43,7 @@ const SuperAdmin = () => {
     const [supportSearchTerm, setSupportSearchTerm] = useState('');
     const [notificationSearchTerm, setNotificationSearchTerm] = useState('');
 
-    // Tabs
+    // Inner Tabs
     const [supportTab, setSupportTab] = useState('active');
     const [paymentsTab, setPaymentsTab] = useState('payments');
 
@@ -55,20 +54,18 @@ const SuperAdmin = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-    // Edit (kept for backward compatibility but not used in new design)
-    const [editUser, setEditUser] = useState(false);
-    const [editTransaction, setEditTransaction] = useState(false);
-    const [editSupport, setEditSupport] = useState(false);
-
     // View Modals
     const [viewUserModal, setViewUserModal] = useState(false);
-    const [viewPaymentModal, setViewPaymentModal] = useState(false);
     const [viewSupportModal, setViewSupportModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedPayment, setSelectedPayment] = useState(null);
     const [selectedSupport, setSelectedSupport] = useState(null);
-    const [supportMessage, setSupportMessage] = useState('');
-    const [supportChat, setSupportChat] = useState([]);
+
+    // Invoice modal states for inline display
+    const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
+
+    // Support conversation messages
+    const [supportAdminMessage, setSupportAdminMessage] = useState('');
+    const supportAdminMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -113,16 +110,15 @@ const SuperAdmin = () => {
         try {
             const newBlockedStatus = !currentBlockedStatus;
             const res = await axios.put(`${baseUrl}/updateCompanyStatus/${userId}`, {
-                blocked: newBlockedStatus,
-                status: newBlockedStatus ? 'Blocked' : 'Active'
+                blocked: newBlockedStatus
             }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             if (res.status === 200) {
-                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
-                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus, status: newBlockedStatus ? 'Blocked' : 'Active' } : u));
+                setCompaniesData(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus } : u));
+                setFilteredUsers(prev => (prev || []).map(u => u._id === userId ? { ...u, blocked: newBlockedStatus } : u));
                 toast.success(`User ${newBlockedStatus ? 'blocked' : 'unblocked'} successfully`);
             }
         } catch (e) {
@@ -131,49 +127,116 @@ const SuperAdmin = () => {
     };
 
     // New functions for support ticket management
-    const handleSupportStatusUpdate = async (ticketId, newStatus) => {
+    const handleSupportStatusUpdate = useCallback(async (ticketId, newStatus) => {
         try {
-            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, {
+            // Prepare update data
+            const updateData = {
                 status: newStatus
-            }, {
+            };
+
+            // Get current ticket data
+            const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
+            const currentAdminMessages = currentTicket.adminMessages || [];
+
+            // Add admin message if provided
+            const newAdminMessage = supportAdminMessageRef.current.trim();
+            if (newAdminMessage) {
+                updateData.adminMessages = [
+                    ...currentAdminMessages,
+                    {
+                        message: newAdminMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
+
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             if (res.status === 200) {
-                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
-                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
-                toast.success(`Ticket status updated to ${newStatus}`);
-                if (newStatus === 'In Progress') {
-                    setSupportChat(prev => [...prev, {
-                        id: Date.now(),
-                        message: `Status changed to ${newStatus}`,
-                        sender: 'admin',
-                        timestamp: new Date().toLocaleString()
-                    }]);
+                // Update local state
+                const updatedTicket = {
+                    ...currentTicket,
+                    status: newStatus,
+                    adminMessages: updateData.adminMessages || currentAdminMessages
+                };
+
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+
+                // Update selectedSupport if it's the current ticket
+                if (selectedSupport && selectedSupport._id === ticketId) {
+                    setSelectedSupport(updatedTicket);
                 }
+
+                // Clear input field
+                setSupportAdminMessage('');
+
+                toast.success(`Ticket status updated to ${newStatus}`);
             }
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    };
+    }, [supportTicketsData, selectedSupport]);
 
-    const sendSupportMessage = async () => {
-        if (!supportMessage.trim()) return;
+    // Function to add messages without changing status
+    const handleAddMessage = useCallback(async (ticketId) => {
+        try {
+            const newAdminMessage = supportAdminMessageRef.current.trim();
 
-        const newMessage = {
-            id: Date.now(),
-            message: supportMessage,
-            sender: 'admin',
-            timestamp: new Date().toLocaleString()
-        };
+            if (!newAdminMessage) {
+                toast.warning('Please enter an admin message');
+                return;
+            }
 
-        setSupportChat(prev => [...prev, newMessage]);
-        setSupportMessage('');
+            // Get current ticket data
+            const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
+            const currentAdminMessages = currentTicket.adminMessages || [];
 
-        // Here you would typically send the message to the backend
-        // For now, we'll just add it to the local state
-    };
+            // Prepare update data
+            const updateData = {
+                adminMessages: [
+                    ...currentAdminMessages,
+                    {
+                        message: newAdminMessage,
+                        createdAt: new Date().toISOString()
+                    }
+                ]
+            };
+
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.status === 200) {
+                // Update local state
+                const updatedTicket = {
+                    ...currentTicket,
+                    adminMessages: updateData.adminMessages
+                };
+
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
+
+                // Update selectedSupport if it's the current ticket
+                if (selectedSupport && selectedSupport._id === ticketId) {
+                    setSelectedSupport(updatedTicket);
+                }
+
+                // Clear input field
+                setSupportAdminMessage('');
+
+                toast.success('Admin message added successfully');
+            }
+        } catch (e) {
+            toast.error('Failed to add message');
+        }
+    }, [supportTicketsData, selectedSupport]);
+
+
 
     // View modal functions
     const openUserModal = (user) => {
@@ -181,41 +244,67 @@ const SuperAdmin = () => {
         setViewUserModal(true);
     };
 
-    const openPaymentModal = (payment) => {
-        setSelectedPayment(payment);
-        setViewPaymentModal(true);
-    };
-
-    const openSupportModal = (support) => {
-        setSelectedSupport(support);
-        setViewSupportModal(true);
-        // Initialize chat with existing messages
-        setSupportChat([
-            {
-                id: 1,
-                message: support.description || 'No description provided',
-                sender: 'user',
-                timestamp: support.created_at || new Date().toLocaleString()
+    const openSupportModal = async (support) => {
+        try {
+            // Always set status to "In Progress" when opening modal
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
+                status: 'In Progress'
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.status === 200) {
+                const updatedSupport = { ...support, status: 'In Progress' };
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                setSelectedSupport(updatedSupport);
+                setSupportAdminMessage('');
+                setViewSupportModal(true);
             }
-        ]);
-    };
-
-    // Close modals when clicking outside
-    const handleModalBackdropClick = (e) => {
-        if (e.target === e.currentTarget) {
-            setViewUserModal(false);
-            setViewPaymentModal(false);
-            setViewSupportModal(false);
+        } catch (e) {
+            toast.error('Failed to update support ticket');
+            return;
         }
     };
+
+    // Invoice row toggle functions
+    const toggleInvoiceRow = (rowId) => {
+        setOpenInvoiceRows(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(rowId)) {
+                newSet.delete(rowId);
+            } else {
+                newSet.add(rowId);
+            }
+            return newSet;
+        });
+    };
+
+    const closeAllInvoiceRows = () => {
+        setOpenInvoiceRows(new Set());
+    };
+
+
+
+    // Close modals when clicking outside
+    const handleModalBackdropClick = useCallback((e) => {
+        if (e.target === e.currentTarget) {
+            setViewUserModal(false);
+            setViewSupportModal(false);
+            // Clear admin message when closing
+            setSupportAdminMessage('');
+        }
+    }, []);
 
     // Close modals with Escape key
     useEffect(() => {
         const handleEscapeKey = (e) => {
             if (e.key === 'Escape') {
                 setViewUserModal(false);
-                setViewPaymentModal(false);
                 setViewSupportModal(false);
+                // Clear admin message when closing
+                setSupportAdminMessage('');
             }
         };
 
@@ -223,50 +312,43 @@ const SuperAdmin = () => {
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, []);
 
-    // Legacy status change handlers (kept for backward compatibility but not used in new design)
-    const handleUserStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleTransactionStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleSupportStatusChange = (id, status) => {
-        // This function is no longer used in the new design
-    };
-
-    const handleSupportPriorityChange = (id, priority) => {
-        // This function is no longer used in the new design
-    };
-
-    // Legacy save handlers (kept for backward compatibility but not used in new design)
-    const saveUserStatus = async (userId) => {
-        // This function is no longer used in the new design
-        // User status is now managed through the block/unblock functionality
-    };
-
-    const saveTransactionStatus = async (transactionId) => {
-        // This function is no longer used in the new design
-        // Transaction status is now read-only
-    };
-
-    const saveSupportStatus = async (ticketId) => {
-        // This function is no longer used in the new design
-        // Support status is now managed through the view modal
-    };
+    // Keep ref updated with current state value
+    useEffect(() => {
+        supportAdminMessageRef.current = supportAdminMessage;
+    }, [supportAdminMessage]);
 
     // User filter: single select with toggle back to 'all'
-    const handleUserStatusChangeFilter = (value) => setUserStatusFilter(value);
+    const handleUserStatusChangeFilter = (value) => {
+        setUserStatusFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Transaction filters are split by group
-    const handleTransactionStatusChangeFilter = (value) => setTransactionStatusFilter(value);
-    const handleTransactionDateChangeFilter = (value) => setTransactionDateFilter(value);
+    const handleTransactionStatusChangeFilter = (value) => {
+        setTransactionStatusFilter(value);
+        closeAllInvoiceRows();
+    };
+
+    const handleTransactionDateChangeFilter = (value) => {
+        setTransactionDateFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Support filters split by group
-    const handleSupportStatusChangeFilter = (value) => setSupportStatusFilter(value);
-    const handleSupportPriorityChangeFilter = (value) => setSupportPriorityFilter(value);
-    const handleSupportTypeChangeFilter = (value) => setSupportTypeFilter(value);
+    const handleSupportStatusChangeFilter = (value) => {
+        setSupportStatusFilter(value);
+        closeAllInvoiceRows();
+    };
+
+    const handleSupportPriorityChangeFilter = (value) => {
+        setSupportPriorityFilter(value);
+        closeAllInvoiceRows();
+    };
+
+    const handleSupportTypeChangeFilter = (value) => {
+        setSupportTypeFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Export helpers
     const exportArrayToCSV = (filename, headers, rows) => {
@@ -314,7 +396,10 @@ const SuperAdmin = () => {
         exportArrayToCSV('transactions.csv', headers, rows);
     };
 
-    const handleNotificationCategoryFilter = (value) => setNotificationCategoryFilter(value);
+    const handleNotificationCategoryFilter = (value) => {
+        setNotificationCategoryFilter(value);
+        closeAllInvoiceRows();
+    };
 
     // Pagination utility functions
     const paginateData = (data, currentPage, rowsPerPage) => {
@@ -438,14 +523,16 @@ const SuperAdmin = () => {
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Refunded':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'Resolved':
+            case 'Completed':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'In Progress':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
-            case 'New':
+            case 'Re-Opened':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
+            case 'Withdrawn':
+                return 'bg-[#4B5563] text-[#111827]';
             case 'Cancelled':
-                return 'bg-[#FEE2E2] text-[#DC2626]';
+                return 'bg-[#F3F4F6] text-[#6B7280]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -673,9 +760,9 @@ const SuperAdmin = () => {
 
     useEffect(() => {
         const base = supportTicketsData || [];
-        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status || '').toLowerCase() === supportStatusFilter.toLowerCase());
-        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
-        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type || '').toLowerCase() === supportTypeFilter.toLowerCase());
+        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
+        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority === supportPriorityFilter));
+        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type === supportTypeFilter));
         setFilteredSupport(byType);
     }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
@@ -683,10 +770,10 @@ const SuperAdmin = () => {
 
     useEffect(() => {
         if (completedTickets) {
-            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Completed'));
             //console.log("resolved", filteredSupport);
         } else {
-            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Resolved'));
+            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Completed'));
             //console.log("not resolved", filteredSupport);
         }
     }, [completedTickets, supportTicketsData]);
@@ -694,45 +781,53 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when search terms change
         setCurrentPage(1);
+        closeAllInvoiceRows();
     }, [searchTerm]);
 
     useEffect(() => {
         // Reset pagination when transaction search terms change
         setCurrentPageTransactions(1);
+        closeAllInvoiceRows();
     }, [transactionSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when support search terms change
         setCurrentPageSupport(1);
+        closeAllInvoiceRows();
     }, [supportSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when notification search terms change
         setCurrentPageNotifications(1);
+        closeAllInvoiceRows();
     }, [notificationSearchTerm]);
 
     useEffect(() => {
         // Reset pagination when user filters change
         setCurrentPage(1);
+        closeAllInvoiceRows();
     }, [userStatusFilter]);
 
     useEffect(() => {
         // Reset pagination when transaction filters change
         setCurrentPageTransactions(1);
+        closeAllInvoiceRows();
     }, [transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
         // Reset pagination when support filters change
         setCurrentPageSupport(1);
+        closeAllInvoiceRows();
     }, [supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
     useEffect(() => {
         // Reset pagination when notification filters change
         setCurrentPageNotifications(1);
+        closeAllInvoiceRows();
     }, [notificationTimeFilter, notificationCategoryFilter]);
 
     const renderUserManagement = () => (
-        <div className='h-full'>
+        <div className='h-full '>
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                 {Object.keys(usersStats).map((key, index) => (
@@ -753,17 +848,20 @@ const SuperAdmin = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="relative">
-                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Search"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF]"
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 text-[#9CA3AF] bg-white"
                             />
                         </div>
                         <div className="relative">
-                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
+                            <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg transition-colors w-full sm:w-auto"
                                 onClick={() => setUserFilterModal(!userFilterModal)}
                             >
                                 <MdOutlineFilterList className="w-5 h-5" />
@@ -834,16 +932,16 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Company Name
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Email
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Actions
                             </th>
                         </tr>
@@ -852,41 +950,33 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedUsers = paginateData(filteredUsers, currentPage, rowsPerPage);
                             return paginatedUsers.length > 0 ? paginatedUsers.map((user, index) => (
-                                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {user.email}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : (user.status || 'Active'))}`}>
-                                            {user.blocked ? 'Blocked' : (user.status || 'Active')}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <div className="flex items-center space-x-2">
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => openUserModal(user)}
-                                                title="View Details"
-                                            >
-                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                            </button>
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-50"
-                                                onClick={() => handleUserBlockToggle(user._id, user.blocked || false)}
-                                                title={user.blocked ? 'Unblock User' : 'Block User'}
-                                            >
-                                                {user.blocked ? (
-                                                    <MdOutlineCheckCircle className="w-5 h-5 text-[#22C55E]" />
-                                                ) : (
-                                                    <MdOutlineCancel className="w-5 h-5 text-[#EF4444]" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className="text-[16px] font-medium text-[#4B5563]">{user.companyName}</span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {user.email}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] rounded-full ${getStatusColor(user.blocked ? 'Blocked' : user.status)}`}>
+                                                {user.blocked ? 'Blocked' : user.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => openUserModal(user)}
+                                                    title="View Details"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                                </button>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -901,12 +991,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPage}
                         totalPages={getTotalPages(filteredUsers, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPage(page)}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredUsers.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPage(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -917,7 +1011,7 @@ const SuperAdmin = () => {
     const renderPayments = () => (
         <div className='h-full'>
             {/* Payments Inner Tabs */}
-            <div className="bg-white mb-6 py-4">
+            <div className="mb-6">
                 <nav className="flex space-x-8">
                     <button
                         onClick={() => setPaymentsTab('payments')}
@@ -986,7 +1080,10 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={transactionSearchTerm}
-                                onChange={(e) => setTransactionSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setTransactionSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
                                 className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
                             />
                         </div>
@@ -1106,19 +1203,19 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/4">
                                 Transaction ID
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/3">
                                 Company/User
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Amount
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563] w-1/12">
                                 Action
                             </th>
                         </tr>
@@ -1127,31 +1224,38 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedTransactions = paginateData(filteredTransactions, currentPageTransactions, rowsPerPage);
                             return paginatedTransactions.length > 0 ? paginatedTransactions.map((transaction, index) => (
-                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {transaction.transaction_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {transaction.user_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        ${transaction.price}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                                            {transaction.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openPaymentModal(transaction)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr className="hover:bg-[#F8FAFC] transition-colors">
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.transaction_id}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {transaction.user_id}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            ${transaction.price}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-3 py-2 text-[12px] font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                                                {transaction.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                                title="View Invoice"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <InlineInvoiceModal
+                                        data={transaction}
+                                        isOpen={openInvoiceRows.has(`payment-${transaction.transaction_id}`)}
+                                        onClose={() => toggleInvoiceRow(`payment-${transaction.transaction_id}`)}
+                                    />
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -1166,12 +1270,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPageTransactions}
                         totalPages={getTotalPages(filteredTransactions, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPageTransactions(page)}
+                        onPageChange={(page) => {
+                            setCurrentPageTransactions(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredTransactions.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPageTransactions(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -1182,7 +1290,7 @@ const SuperAdmin = () => {
     const renderSupport = () => (
         <div className='h-full'>
             {/* Support Inner Tabs */}
-            <div className="mb-6 py-4">
+            <div className="mb-6">
                 <nav className="flex space-x-8">
                     <button
                         onClick={() => { setSupportTab('active'); setCompletedTickets(false) }}
@@ -1230,12 +1338,15 @@ const SuperAdmin = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={supportSearchTerm}
-                                onChange={(e) => setSupportSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64"
+                                onChange={(e) => {
+                                    setSupportSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-full sm:w-64 bg-white"
                             />
                         </div>
                         <div className="relative">
-                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
+                            <button className="bg-white flex items-center justify-center space-x-2 px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#E5E7EB] transition-colors w-full sm:w-auto"
                                 onClick={() => setSupportFilterModal(!supportFilterModal)}
                             >
                                 <MdOutlineFilterList className="w-5 h-5" />
@@ -1265,28 +1376,36 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="new" value="new"
-                                                checked={supportStatusFilter === 'new'}
+                                            <input type="radio" name="supportStatusFilter" id="pending" value="Pending"
+                                                checked={supportStatusFilter === 'Pending'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="new">New</label>
+                                            <label htmlFor="pending">Pending</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="in progress"
-                                                checked={supportStatusFilter === 'in progress'}
+                                            <input type="radio" name="supportStatusFilter" id="inProgress" value="In Progress"
+                                                checked={supportStatusFilter === 'In Progress'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
                                             <label htmlFor="inProgress">In Progress</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <input type="radio" name="supportStatusFilter" id="resolved" value="resolved"
-                                                checked={supportStatusFilter === 'resolved'}
+                                            <input type="radio" name="supportStatusFilter" id="reopened" value="Re-Opened"
+                                                checked={supportStatusFilter === 'Re-Opened'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
                                             />
-                                            <label htmlFor="resolved">Resolved</label>
+                                            <label htmlFor="reopened">Re-Opened</label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input type="radio" name="supportStatusFilter" id="completed" value="Completed"
+                                                checked={supportStatusFilter === 'Completed'}
+                                                onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
+                                            />
+                                            <label htmlFor="completed">Completed</label>
                                         </div>
                                     </div>
                                     {/* Priority */}
@@ -1380,22 +1499,22 @@ const SuperAdmin = () => {
                 <table className="w-full rounded-2xl">
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                Ticket ID
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Category
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                Type
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Sub Category
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
-                                Subject
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                Description
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Priority
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
                                 Action
                             </th>
                         </tr>
@@ -1404,36 +1523,41 @@ const SuperAdmin = () => {
                         {(() => {
                             const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
                             return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
-                                <tr key={index} className="hover:bg-[#F8FAFC] transition-colors">
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                        {ticket.ticket_id}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {ticket.type}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                        {ticket.subject}
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                            {ticket.priority}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                            {ticket.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 whitespace-nowrap text-[16px] font-medium">
-                                        <button
-                                            className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                            onClick={() => openSupportModal(ticket)}
-                                            title="View Details"
-                                        >
-                                            <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
-                                        </button>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={index}>
+                                    <tr>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                            {ticket.category}
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                            {ticket.subCategory}
+                                        </td>
+                                        <td className="p-4 text-[16px] text-[#4B5563]">
+                                            <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                            </div>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                {ticket.priority}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                {ticket.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                            <button
+                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                onClick={() => openSupportModal(ticket)}
+                                                title="View Details"
+                                            >
+                                                <MdOutlineVisibility className="w-5 h-5 text-[#2563EB]" />
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                </React.Fragment>
                             )) : (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
@@ -1448,12 +1572,16 @@ const SuperAdmin = () => {
                     <PaginationComponent
                         currentPage={currentPageSupport}
                         totalPages={getTotalPages(filteredSupport, rowsPerPage)}
-                        onPageChange={(page) => setCurrentPageSupport(page)}
+                        onPageChange={(page) => {
+                            setCurrentPageSupport(page);
+                            closeAllInvoiceRows();
+                        }}
                         totalItems={filteredSupport.length}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={(newRowsPerPage) => {
                             setRowsPerPage(newRowsPerPage);
                             setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                            closeAllInvoiceRows();
                         }}
                     />
                 )}
@@ -1484,7 +1612,7 @@ const SuperAdmin = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
                                     onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
                                     <MdOutlineKeyboardArrowDown className="w-4 h-4" />
@@ -1497,7 +1625,10 @@ const SuperAdmin = () => {
                                             <span className="text-[14px] font-medium text-[#111827]">Time</span>
                                             <button
                                                 className="text-[12px] text-[#2563EB] hover:underline"
-                                                onClick={() => setNotificationTimeFilter('all')}
+                                                onClick={() => {
+                                                    setNotificationTimeFilter('all');
+                                                    closeAllInvoiceRows();
+                                                }}
                                             >
                                                 Clear
                                             </button>
@@ -1505,47 +1636,90 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
                                                 checked={notificationTimeFilter === 'All Time'}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="allTime">All Time</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
                                                 checked={notificationTimeFilter === 'today'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="today">Today</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
                                                 checked={notificationTimeFilter === 'yesterday'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="yesterday">Yesterday</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
                                                 checked={notificationTimeFilter === 'last7Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last7Days">Last 7 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
                                                 checked={notificationTimeFilter === 'last14Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last14Days">Last 14 Days</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
                                                 checked={notificationTimeFilter === 'last30Days'}
-                                                onClick={(e) => { if (notificationTimeFilter === e.target.value) setNotificationTimeFilter('All Time'); }}
-                                                onChange={(e) => setNotificationTimeFilter(e.target.value)}
+                                                onClick={(e) => {
+                                                    if (notificationTimeFilter === e.target.value) {
+                                                        setNotificationTimeFilter('All Time');
+                                                        closeAllInvoiceRows();
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    setNotificationTimeFilter(e.target.value);
+                                                    closeAllInvoiceRows();
+                                                }}
                                             />
                                             <label htmlFor="last30Days">Last 30 Days</label>
                                         </div>
@@ -1553,7 +1727,7 @@ const SuperAdmin = () => {
                                 )}
                             </div>
                             <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 w-full sm:w-auto"
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
                                     <span>{notificationCategoryFilter || 'All Categories'}</span>
@@ -1581,7 +1755,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
                                                 checked={notificationCategoryFilter === 'account access'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="accountAccess">Account & Access</label>
@@ -1589,7 +1767,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
                                                 checked={notificationCategoryFilter === 'billing & payments'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="billingPayments">Billing & Payments</label>
@@ -1597,7 +1779,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
                                                 checked={notificationCategoryFilter === 'technical errors'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="technicalErrors">Technical Errors</label>
@@ -1605,7 +1791,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
                                                 checked={notificationCategoryFilter === 'feature requests'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="featureRequests">Feature Requests</label>
@@ -1613,7 +1803,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
                                                 checked={notificationCategoryFilter === 'proposal issues'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="proposalIssues">Proposal Issues</label>
@@ -1621,7 +1815,11 @@ const SuperAdmin = () => {
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
                                                 checked={notificationCategoryFilter === 'others'}
-                                                onClick={(e) => { if (notificationCategoryFilter === e.target.value) handleNotificationCategoryFilter('All Categories'); }}
+                                                onClick={(e) => {
+                                                    if (notificationCategoryFilter === e.target.value) {
+                                                        handleNotificationCategoryFilter('All Categories');
+                                                    }
+                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="others">Others</label>
@@ -1632,14 +1830,17 @@ const SuperAdmin = () => {
                         </div>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MdOutlineSearch className="h-4 w-4 text-gray-400" />
+                                <MdOutlineSearch className="h-4 w-4 text-[#4B5563]" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Search"
                                 value={notificationSearchTerm}
-                                onChange={(e) => setNotificationSearchTerm(e.target.value)}
-                                className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                onChange={(e) => {
+                                    setNotificationSearchTerm(e.target.value);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-[#4B5563] rounded-lg leading-5 bg-white placeholder-[#4B5563] focus:outline-none focus:placeholder-[#4B5563] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
@@ -1662,12 +1863,12 @@ const SuperAdmin = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <p className="text-sm text-gray-500 mb-1">{item.category}</p>
-                                            <h3 className="text-sm font-medium text-gray-900 mb-1">{item.title}</h3>
-                                            <p className="text-sm text-gray-600">{item.description}</p>
+                                            <p className="text-sm text-[#4B5563] mb-1">{item.category}</p>
+                                            <h3 className="text-sm font-medium text-[#000000] mb-1">{item.title}</h3>
+                                            <p className="text-sm text-[#4B5563]">{item.description}</p>
                                         </div>
                                         <div className="flex-shrink-0 ml-4">
-                                            <p className="text-sm text-gray-500">{item.timestamp}</p>
+                                            <p className="text-sm text-[#4B5563]">{item.timestamp}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1686,12 +1887,16 @@ const SuperAdmin = () => {
                         <PaginationComponent
                             currentPage={currentPageNotifications}
                             totalPages={getTotalPages(filteredNotifications, rowsPerPage)}
-                            onPageChange={(page) => setCurrentPageNotifications(page)}
+                            onPageChange={(page) => {
+                                setCurrentPageNotifications(page);
+                                closeAllInvoiceRows();
+                            }}
                             totalItems={filteredNotifications.length}
                             rowsPerPage={rowsPerPage}
                             onRowsPerPageChange={(newRowsPerPage) => {
                                 setRowsPerPage(newRowsPerPage);
                                 setCurrentPageNotifications(1); // Reset to first page when changing rows per page
+                                closeAllInvoiceRows();
                             }}
                         />
                     </div>
@@ -1710,60 +1915,324 @@ const SuperAdmin = () => {
 
     // Modal Components
     const UserViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Company Information</h2>
                     <button
                         onClick={() => setViewUserModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
                 </div>
                 {selectedUser && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                                <p className="text-gray-900">{selectedUser.companyName}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <p className="text-gray-900">{selectedUser.email}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
-                                <p className="text-gray-900">{selectedUser._id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
-                                <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                                <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
-                                    {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
-                                </span>
+                    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
+                        {/* Basic Information */}
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.companyName}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <p className="text-gray-900 font-medium">{selectedUser.email}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
+                                        {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono text-sm">{selectedUser.userId || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin Name</label>
+                                    <p className="text-gray-900">{selectedUser.adminName || 'N/A'}</p>
+                                </div>
                             </div>
                         </div>
+
+                        {/* Company Details */}
+                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Company Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                    <p className="text-gray-900">{selectedUser.industry || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <p className="text-gray-900">{selectedUser.location || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+                                    <p className="text-gray-900">{selectedUser.establishedYear || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                                    <p className="text-gray-900">{selectedUser.numberOfEmployees || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
+                                    <p className="text-gray-900">{selectedUser.teamSize || '0'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Departments</label>
+                                    <p className="text-gray-900">{selectedUser.departments || '0'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Contact & Links */}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Contact & Links</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                                    <p className="text-gray-900">
+                                        {selectedUser.website ? (
+                                            <a href={selectedUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                                {selectedUser.website}
+                                            </a>
+                                        ) : 'N/A'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                                    <p className="text-gray-900">
+                                        {selectedUser.linkedIn ? (
+                                            <a href={selectedUser.linkedIn} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                                {selectedUser.linkedIn}
+                                            </a>
+                                        ) : 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Services & Industries */}
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Services & Industries</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Services</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.services && selectedUser.services.length > 0 ? (
+                                            selectedUser.services.map((service, index) => (
+                                                <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                                    {service}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No services listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Industries</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.preferredIndustries && selectedUser.preferredIndustries.length > 0 ? (
+                                            selectedUser.preferredIndustries.map((industry, index) => (
+                                                <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                                    {industry}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No preferred industries</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Awards & Clients */}
+                        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Awards & Clients</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Awards</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.awards && selectedUser.awards.length > 0 ? (
+                                            selectedUser.awards.map((award, index) => (
+                                                <span key={index} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                                                    {award}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No awards listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Clients</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedUser.clients && selectedUser.clients.length > 0 ? (
+                                            selectedUser.clients.map((client, index) => (
+                                                <span key={index} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                                    {client}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No clients listed</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Licenses & Certifications */}
+                        {selectedUser.licensesAndCertifications && selectedUser.licensesAndCertifications.length > 0 && (
+                            <div className="bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Licenses & Certifications</h3>
+                                <div className="space-y-3">
+                                    {selectedUser.licensesAndCertifications.map((license, index) => (
+                                        <div key={index} className="border-l-4 border-blue-500 pl-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{license.name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
+                                                    <p className="text-gray-900">{license.issuer}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till</label>
+                                                    <p className="text-gray-900">{license.validTill}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Documents */}
+                        {selectedUser.documents && selectedUser.documents.length > 0 && (
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Documents</h3>
+                                <div className="space-y-3">
+                                    {selectedUser.documents.map((doc, index) => (
+                                        <div key={index} className="border-l-4 border-green-500 pl-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                    <p className="text-gray-900">{doc.name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                                    <p className="text-gray-900">{doc.type}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                                                    <p className="text-gray-900">{(doc.size / 1024).toFixed(2)} KB</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Download</label>
+                                                    <a
+                                                        href={doc.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline text-sm"
+                                                    >
+                                                        View Document
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Employees */}
+                        {selectedUser.employees && selectedUser.employees.length > 0 && (
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Employees ({selectedUser.employees.length})</h3>
+                                <div className="max-h-64 overflow-y-auto">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {selectedUser.employees.map((employee, index) => (
+                                            <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Name</label>
+                                                        <p className="text-sm text-[#000000] font-medium">{employee.name}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Job Title</label>
+                                                        <p className="text-sm text-[#000000]">{employee.jobTitle}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Email</label>
+                                                        <p className="text-sm text-[#000000]">{employee.email}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Phone</label>
+                                                        <p className="text-sm text-[#000000]">{employee.phone}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Access Level</label>
+                                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${employee.accessLevel === 'Admin' ? 'bg-red-100 text-red-800' :
+                                                            employee.accessLevel === 'Editor' ? 'bg-blue-100 text-blue-800' :
+                                                                'bg-[#4B5563] text-[#000000]'
+                                                            }`}>
+                                                            {employee.accessLevel}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Company Bio */}
+                        {selectedUser.bio && (
+                            <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Company Bio</h3>
+                                <p className="text-gray-700 whitespace-pre-line">{selectedUser.bio}</p>
+                            </div>
+                        )}
+
+                        {/* Account Information */}
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Account Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                                    <p className="text-gray-900">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">{new Date(selectedUser.updatedAt).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
                         <div className="flex justify-end space-x-3 pt-4 border-t">
                             <button
                                 onClick={() => handleUserBlockToggle(selectedUser._id, selectedUser.blocked || false)}
                                 className={`px-4 py-2 rounded-lg transition-colors ${selectedUser.blocked
-                                        ? 'bg-green-600 text-white hover:bg-green-700'
-                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                    ? 'bg-green-600 text-white hover:bg-green-700'
+                                    : 'bg-red-600 text-white hover:bg-red-700'
                                     }`}
                             >
                                 {selectedUser.blocked ? 'Unblock User' : 'Block User'}
                             </button>
                             <button
                                 onClick={() => setViewUserModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
                                 Close
                             </button>
@@ -1774,173 +2243,239 @@ const SuperAdmin = () => {
         </div>
     );
 
-    const PaymentViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Transaction Details</h2>
-                    <button
-                        onClick={() => setViewPaymentModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedPayment && (
-                    <div className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Invoice</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Transaction ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedPayment.transaction_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                                    <p className="text-gray-900 text-lg font-semibold">${selectedPayment.price}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                                    <p className="text-gray-900">{selectedPayment.payment_method || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedPayment.status)}`}>
-                                        {selectedPayment.status}
-                                    </span>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900">{selectedPayment.user_id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                                    <p className="text-gray-900">{selectedPayment.created_at || selectedPayment.createdAt || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-end pt-4 border-t">
-                            <button
-                                onClick={() => setViewPaymentModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    const SupportViewModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    const SupportViewModal = useCallback(() => (
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
                     <button
                         onClick={() => setViewSupportModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                         <MdOutlineClose className="w-6 h-6" />
                     </button>
                 </div>
                 {selectedSupport && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                <p className="text-gray-900">{selectedSupport.ticket_id}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                                <p className="text-gray-900">{selectedSupport.type}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
-                                    {selectedSupport.priority}
-                                </span>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
-                                    {selectedSupport.status}
-                                </span>
+                    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
+                        {/* Basic Information */}
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                    <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
+                                        {selectedSupport.status}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Subject</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.subject}</p>
-
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Description</h3>
-                            <p className="text-gray-700 mb-4">{selectedSupport.description || 'No description provided'}</p>
+                        {/* Ticket Details */}
+                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Ticket Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                        {selectedSupport.category}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                        {selectedSupport.subCategory || 'N/A'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
+                                        {selectedSupport.priority}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Chat Interface */}
-                        <div className="border-t pt-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-3">Conversation</h3>
-                            <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
-                                {supportChat.map((message) => (
-                                    <div key={message.id} className={`mb-3 ${message.sender === 'admin' ? 'text-right' : 'text-left'}`}>
-                                        <div className={`inline-block p-3 rounded-lg max-w-xs ${message.sender === 'admin'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-900 border'
-                                            }`}>
-                                            <p className="text-sm">{message.message}</p>
-                                            <p className="text-xs opacity-75 mt-1">{message.timestamp}</p>
+                        {/* Description */}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Description</h3>
+                            <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
+                        </div>
+
+                        {/* Attachments */}
+                        {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {selectedSupport.attachments.map((attachment, index) => (
+                                        <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
+                                            <div className="space-y-2">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-[#111827]">File Name</label>
+                                                    <p className="text-sm text-[#000000] font-medium">{attachment.name || `Attachment ${index + 1}`}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-[#111827]">Type</label>
+                                                    <p className="text-sm text-[#000000]">{attachment.type || 'Unknown'}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-[#111827]">Size</label>
+                                                    <p className="text-sm text-[#000000]">
+                                                        {attachment.size ? `${(attachment.size / 1024).toFixed(2)} KB` : 'Unknown'}
+                                                    </p>
+                                                </div>
+                                                {attachment.url && (
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Download</label>
+                                                        <a
+                                                            href={attachment.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-600 hover:underline text-sm"
+                                                        >
+                                                            View File
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Timestamps */}
+                        <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Timestamps</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
+                                    <p className="text-gray-900">
+                                        {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
+                                            selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                    <p className="text-gray-900">
+                                        {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Conversation Interface */}
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-4">Conversation</h3>
+
+                            {/* Display existing conversation */}
+                            <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
+                                {/* User Messages */}
+                                {selectedSupport.userMessages && selectedSupport.userMessages.length > 0 && (
+                                    <div className="space-y-2">
+                                        {selectedSupport.userMessages.map((msg, index) => (
+                                            <div key={index} className="flex justify-start">
+                                                <div className="bg-blue-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                                                    <div className="text-sm text-blue-800 font-medium mb-1">User</div>
+                                                    <div className="text-sm text-blue-900">{msg.message}</div>
+                                                    <div className="text-xs text-blue-600 mt-1">
+                                                        {new Date(msg.createdAt).toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                )}
+
+                                {/* Admin Messages */}
+                                {selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0 && (
+                                    <div className="space-y-2">
+                                        {selectedSupport.adminMessages.map((msg, index) => (
+                                            <div key={index} className="flex justify-end">
+                                                <div className="bg-green-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                                                    <div className="text-sm text-green-800 font-medium mb-1">Admin</div>
+                                                    <div className="text-sm text-green-900">{msg.message}</div>
+                                                    <div className="text-xs text-green-600 mt-1">
+                                                        {new Date(msg.createdAt).toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
+                                    (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
+                                        <div className="text-center text-gray-500 text-sm py-4">
+                                            No messages yet. Start the conversation below.
+                                        </div>
+                                    )}
                             </div>
 
-                            <div className="flex space-x-2 mb-4">
-                                <input
-                                    type="text"
-                                    value={supportMessage}
-                                    onChange={(e) => setSupportMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    onKeyPress={(e) => e.key === 'Enter' && sendSupportMessage()}
+                            {/* New Message Input */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Admin Message</label>
+                                <textarea
+                                    value={supportAdminMessage}
+                                    onChange={(e) => setSupportAdminMessage(e.target.value)}
+                                    placeholder="Type your response or update here..."
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                    rows="3"
                                 />
-                                <button
-                                    onClick={sendSupportMessage}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <MdOutlineSend className="w-5 h-5" />
-                                </button>
                             </div>
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-between items-center pt-4 border-t">
+                        <div className="flex justify-between items-center pt-4 gap-4">
                             <div className="flex space-x-2">
                                 <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'In Progress')}
-                                    disabled={selectedSupport.status === 'In Progress'}
-                                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Set In Progress
-                                </button>
-                                <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Resolved')}
-                                    disabled={selectedSupport.status === 'Resolved'}
+                                    onClick={() => {
+                                        if (supportAdminMessage.trim()) {
+                                            handleSupportStatusUpdate(selectedSupport._id, 'Completed');
+                                        } else {
+                                            toast.warning('Please enter an admin message before resolving the ticket');
+                                        }
+                                    }}
+                                    disabled={selectedSupport.status === 'Completed'}
                                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Resolve
+                                    {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
                                 </button>
                                 <button
-                                    onClick={() => handleSupportStatusUpdate(selectedSupport._id, 'Cancelled')}
-                                    disabled={selectedSupport.status === 'Cancelled'}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => {
+                                        if (supportAdminMessage.trim()) {
+                                            handleAddMessage(selectedSupport._id);
+                                        } else {
+                                            toast.warning('Please enter an admin message');
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                                 >
-                                    Cancel
+                                    Add Message
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSupportAdminMessage('');
+                                    }}
+                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                >
+                                    Clear Input
                                 </button>
                             </div>
                             <button
-                                onClick={() => setViewSupportModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                onClick={() => {
+                                    setViewSupportModal(false);
+                                    // Clear admin message when closing
+                                    setSupportAdminMessage('');
+                                }}
+                                className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
                                 Close
                             </button>
@@ -1949,7 +2484,286 @@ const SuperAdmin = () => {
                 )}
             </div>
         </div>
-    );
+    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate]);
+
+    // Invoice utility functions
+    const downloadInvoiceAsPDF = async (data) => {
+        try {
+            // Create a temporary div for the invoice content
+            const invoiceDiv = document.createElement('div');
+            invoiceDiv.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
+                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px;">
+                        <img src="/vite.svg" alt="Company Logo" style="width: 60px; height: 60px; margin-right: 20px;">
+                        <div>
+                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP App</h1>
+                            <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 16px;">Professional Proposal Management</p>
+                        </div>
+                    </div>
+                    
+                    <h2 style="color: #111827; margin: 30px 0 20px 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px;">
+                        Payment Invoice - ${data.transaction_id}
+                    </h2>
+                    
+                    <div style="margin: 30px 0;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <div>
+                                <h3 style="color: #374151; margin: 0 0 15px 0; font-size: 18px;">Invoice Details</h3>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Transaction ID:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.transaction_id}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Payment Method:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.payment_method || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 style="color: #374151; margin: 0 0 15px 0; font-size: 18px;">Additional Information</h3>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Status:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.status}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">User ID:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.user_id}</span>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <span style="font-weight: bold; color: #111827;">Created Date:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.created_at || data.createdAt || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="color: #6b7280; font-size: 14px;">
+                                Invoice generated on ${new Date().toLocaleDateString()}
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 5px;">
+                                    Total Amount: $${data.price}
+                                </div>
+                                <div style="color: #6b7280; font-size: 14px;">Thank you for your business!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Use html2pdf to generate PDF
+            const { default: html2pdf } = await import('html2pdf.js');
+
+            const opt = {
+                margin: 10,
+                filename: `invoice-${data.transaction_id}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().set(opt).from(invoiceDiv).save();
+
+            toast.success('Invoice downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading invoice:', error);
+            toast.error('Failed to download invoice. Please try again.');
+        }
+    };
+
+    const printInvoice = (data) => {
+        try {
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice - ${data.transaction_id}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        .invoice-header { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+                        .logo { width: 60px; height: 60px; margin-right: 20px; }
+                        .company-name { color: #2563eb; margin: 0; font-size: 28px; font-weight: bold; }
+                        .company-tagline { color: #6b7280; margin: 5px 0 0 0; font-size: 16px; }
+                        .invoice-title { color: #111827; margin: 30px 0 20px 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+                        .invoice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0; }
+                        .section-title { color: #374151; margin: 0 0 15px 0; font-size: 18px; }
+                        .detail-row { margin-bottom: 15px; }
+                        .label { font-weight: bold; color: #111827; }
+                        .value { margin-left: 10px; color: #6b7280; }
+                        .footer { border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; }
+                        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+                        .total-amount { font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 5px; }
+                        .thank-you { color: #6b7280; font-size: 14px; }
+                        @media print {
+                            body { padding: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="invoice-header">
+                        <img src="/vite.svg" alt="Company Logo" class="logo">
+                        <div>
+                            <h1 class="company-name">RFP App</h1>
+                            <p class="company-tagline">Professional Proposal Management</p>
+                        </div>
+                    </div>
+                    
+                    <h2 class="invoice-title">Payment Invoice - ${data.transaction_id}</h2>
+                    
+                    <div class="invoice-grid">
+                        <div>
+                            <h3 class="section-title">Invoice Details</h3>
+                            <div class="detail-row">
+                                <span class="label">Transaction ID:</span>
+                                <span class="value">${data.transaction_id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Amount:</span>
+                                <span class="value">$${data.price}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Payment Method:</span>
+                                <span class="value">${data.payment_method || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="section-title">Additional Information</h3>
+                            <div class="detail-row">
+                                <span class="label">Status:</span>
+                                <span class="value">${data.status}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">User ID:</span>
+                                <span class="value">${data.user_id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Created Date:</span>
+                                <span class="value">${data.created_at || data.createdAt || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="footer-content">
+                            <div style="color: #6b7280; font-size: 14px;">
+                                Invoice generated on ${new Date().toLocaleDateString()}
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="total-amount">Total Amount: $${data.price}</div>
+                                <div class="thank-you">Thank you for your business!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="no-print" style="text-align: center; margin-top: 30px; padding: 20px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                            Print Invoice
+                        </button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                            Close
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+
+            toast.success('Invoice opened for printing!');
+        } catch (error) {
+            console.error('Error printing invoice:', error);
+            toast.error('Failed to open invoice for printing. Please try again.');
+        }
+    };
+
+    // Inline Invoice Modal Component
+    const InlineInvoiceModal = ({ data, isOpen, onClose }) => {
+        if (!isOpen || !data) return null;
+
+        const getInvoiceTitle = () => {
+            return `Payment Invoice - ${data.transaction_id}`;
+        };
+
+        const getInvoiceData = () => {
+            return [
+                { label: 'Transaction ID', value: data.transaction_id },
+                { label: 'Amount', value: `$${data.price}` },
+                { label: 'Payment Method', value: data.payment_method || 'N/A' },
+                { label: 'Status', value: data.status },
+                { label: 'User ID', value: data.user_id },
+                { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
+            ];
+        };
+
+        return (
+            <tr className="bg-[#F8FAFC]">
+                <td colSpan="100%" className="px-4 py-6">
+                    <div className="bg-white rounded-lg border border-[#4B5563] p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-[#000000]">{getInvoiceTitle()}</h3>
+                            <button
+                                onClick={onClose}
+                                className="text-[#4B5563] hover:text-[#4B5563] p-1"
+                            >
+                                <MdOutlineClose className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Logo and Company Header */}
+                        <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
+                            <img src="/vite.svg" alt="Company Logo" className="w-12 h-12 mr-4" />
+                            <div>
+                                <h4 className="text-xl font-bold text-[#2563eb]">RFP App</h4>
+                                <p className="text-sm text-[#6b7280]">Professional Proposal Management</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {getInvoiceData().map((item, index) => (
+                                <div key={index}>
+                                    <label className="block text-sm font-medium text-[#111827] mb-1">
+                                        {item.label}
+                                    </label>
+                                    <p className="text-[#000000]">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="border-t pt-4">
+                            <div className="flex justify-between items-center">
+                                <div className="text-sm text-[#4B5563]">
+                                    Invoice generated on {new Date().toLocaleDateString()}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => downloadInvoiceAsPDF(data)}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                                    >
+                                        <MdOutlineFileUpload className="w-4 h-4" />
+                                        <span>Download PDF</span>
+                                    </button>
+                                    <button
+                                        onClick={() => printInvoice(data)}
+                                        className="px-4 py-2 border border-[#4B5563] text-[#111827] rounded-lg hover:bg-[#F8FAFC] transition-colors flex items-center space-x-2"
+                                    >
+                                        <MdOutlineDocumentScanner className="w-4 h-4" />
+                                        <span>Print</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        );
+    };
 
     if (loading) {
         return <div className="flex justify-center items-center h-screen">
@@ -1963,7 +2777,6 @@ const SuperAdmin = () => {
 
             {/* Modals */}
             {viewUserModal && <UserViewModal />}
-            {viewPaymentModal && <PaymentViewModal />}
             {viewSupportModal && <SupportViewModal />}
 
             {/* Top Header Bar */}
@@ -1977,6 +2790,7 @@ const SuperAdmin = () => {
                         >
                             <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
                         </button>
+
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
                                 <span className="text-[#2563eb] font-bold text-sm">LOGO</span>
@@ -1985,7 +2799,10 @@ const SuperAdmin = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                         <button className="p-2 transition-colors relative"
-                            onClick={() => setActiveTab('notifications')}
+                            onClick={() => {
+                                setActiveTab('notifications');
+                                closeAllInvoiceRows();
+                            }}
                         >
                             <MdOutlineNotifications className="relative w-6 h-6 text-[#4B5563]" />
                             {notificationsData.length > 0 && (
@@ -2021,9 +2838,9 @@ const SuperAdmin = () => {
             {showMobileMenu && (
                 <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
                     <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
-                        <div className="p-4 border-b border-gray-200">
+                        <div className="p-4 border-b border-[#4B5563]">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium text-gray-900">Menu</h2>
+                                <h2 className="text-lg font-medium text-[#000000]">Menu</h2>
                                 <button
                                     className="p-2 transition-colors"
                                     onClick={() => setShowMobileMenu(false)}
@@ -2041,6 +2858,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('user-management');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2054,6 +2872,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('payments');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2067,6 +2886,7 @@ const SuperAdmin = () => {
                                         }`}
                                     onClick={() => {
                                         setActiveTab('support');
+                                        closeAllInvoiceRows();
                                         setShowMobileMenu(false);
                                     }}
                                 >
@@ -2079,47 +2899,72 @@ const SuperAdmin = () => {
                 </div>
             )}
 
-            <div className="flex h-[calc(100vh-64px)]">
-                {/* Left Sidebar - Hidden on small screens, visible on large screens */}
-                <div className="hidden lg:block w-64 bg-white border-r border-[#0000001A] flex-shrink-0">
-                    <div className="p-4">
+            {/* Mobile Content - Visible on small screens */}
+            <div className="lg:hidden">
+                <div className="p-4">
+                    {/* Content based on active tab */}
+                    {activeTab === 'user-management' && renderUserManagement()}
+                    {activeTab === 'payments' && renderPayments()}
+                    {activeTab === 'support' && renderSupport()}
+                    {activeTab === 'notifications' && renderNotifications()}
+                </div>
+            </div>
+
+            <div className="hidden lg:flex h-[calc(100vh-64px)] relative">
+                {/* Left Sidebar - Half visible by default, expands on hover */}
+                <div
+                    className={`block w-20 hover:w-64 bg-white border-r border-[#0000001A] flex-shrink-0 transition-all duration-300 ease-in-out absolute left-0 top-0 h-full z-20 overflow-hidden group`}
+                >
+                    <div className="p-4 pt-20">
+                        <div className="flex items-center justify-center lg:justify-start mb-4">
+                            <h2 className="text-lg font-medium text-[#000000] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Menu</h2>
+                        </div>
                         <nav className="space-y-2">
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'user-management'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'user-management'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('user-management')}
+                                onClick={() => {
+                                    setActiveTab('user-management');
+                                    closeAllInvoiceRows();
+                                }}
                             >
-                                <MdOutlineManageAccounts className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">User Management</span>
+                                <MdOutlineManageAccounts className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">User Management</span>
                             </button>
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'payments'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'payments'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('payments')}
+                                onClick={() => {
+                                    setActiveTab('payments');
+                                    closeAllInvoiceRows();
+                                }}
                             >
-                                <MdOutlinePayments className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">Payments & Subscriptions</span>
+                                <MdOutlinePayments className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Payments & Subscriptions</span>
                             </button>
                             <button
-                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === 'support'
+                                className={`w-full text-left text-[#4B5563] rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'support'
                                     ? 'bg-[#2563eb] text-white'
                                     : 'text-[#4B5563]'
                                     }`}
-                                onClick={() => setActiveTab('support')}
+                                onClick={() => {
+                                    setActiveTab('support');
+                                    closeAllInvoiceRows();
+                                }}
                             >
-                                <MdOutlineHeadsetMic className="w-4 h-4" />
-                                <span className="text-[16px] font-medium">Support</span>
+                                <MdOutlineHeadsetMic className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">Support</span>
                             </button>
                         </nav>
                     </div>
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:ml-20`}>
                     {/* Scrollable Content Area */}
                     <div className="flex-1 overflow-y-auto">
                         <div className="p-6 min-h-full">
