@@ -65,9 +65,7 @@ const SuperAdmin = () => {
 
     // Support conversation messages
     const [supportAdminMessage, setSupportAdminMessage] = useState('');
-    const [supportUserMessage, setSupportUserMessage] = useState('');
     const supportAdminMessageRef = useRef('');
-    const supportUserMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -139,29 +137,14 @@ const SuperAdmin = () => {
             // Get current ticket data
             const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
             const currentAdminMessages = currentTicket.adminMessages || [];
-            const currentUserMessages = currentTicket.userMessages || [];
-
-            // Prepare new messages to add
-            const newAdminMessage = supportAdminMessageRef.current.trim();
-            const newUserMessage = supportUserMessageRef.current.trim();
 
             // Add admin message if provided
+            const newAdminMessage = supportAdminMessageRef.current.trim();
             if (newAdminMessage) {
                 updateData.adminMessages = [
                     ...currentAdminMessages,
                     {
                         message: newAdminMessage,
-                        createdAt: new Date().toISOString()
-                    }
-                ];
-            }
-
-            // Add user message if provided
-            if (newUserMessage) {
-                updateData.userMessages = [
-                    ...currentUserMessages,
-                    {
-                        message: newUserMessage,
                         createdAt: new Date().toISOString()
                     }
                 ];
@@ -177,8 +160,7 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...currentTicket,
                     status: newStatus,
-                    adminMessages: updateData.adminMessages || currentAdminMessages,
-                    userMessages: updateData.userMessages || currentUserMessages
+                    adminMessages: updateData.adminMessages || currentAdminMessages
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -189,9 +171,8 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear input fields
+                // Clear input field
                 setSupportAdminMessage('');
-                setSupportUserMessage('');
 
                 toast.success(`Ticket status updated to ${newStatus}`);
             }
@@ -204,42 +185,26 @@ const SuperAdmin = () => {
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
             const newAdminMessage = supportAdminMessageRef.current.trim();
-            const newUserMessage = supportUserMessageRef.current.trim();
 
-            if (!newAdminMessage && !newUserMessage) {
-                toast.warning('Please enter at least one message');
+            if (!newAdminMessage) {
+                toast.warning('Please enter an admin message');
                 return;
             }
 
             // Get current ticket data
             const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
             const currentAdminMessages = currentTicket.adminMessages || [];
-            const currentUserMessages = currentTicket.userMessages || [];
 
             // Prepare update data
-            const updateData = {};
-
-            // Add admin message if provided
-            if (newAdminMessage) {
-                updateData.adminMessages = [
+            const updateData = {
+                adminMessages: [
                     ...currentAdminMessages,
                     {
                         message: newAdminMessage,
                         createdAt: new Date().toISOString()
                     }
-                ];
-            }
-
-            // Add user message if provided
-            if (newUserMessage) {
-                updateData.userMessages = [
-                    ...currentUserMessages,
-                    {
-                        message: newUserMessage,
-                        createdAt: new Date().toISOString()
-                    }
-                ];
-            }
+                ]
+            };
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
                 headers: {
@@ -250,8 +215,7 @@ const SuperAdmin = () => {
                 // Update local state
                 const updatedTicket = {
                     ...currentTicket,
-                    adminMessages: updateData.adminMessages || currentAdminMessages,
-                    userMessages: updateData.userMessages || currentUserMessages
+                    adminMessages: updateData.adminMessages
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -262,11 +226,10 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear input fields
+                // Clear input field
                 setSupportAdminMessage('');
-                setSupportUserMessage('');
 
-                toast.success('Message added successfully');
+                toast.success('Admin message added successfully');
             }
         } catch (e) {
             toast.error('Failed to add message');
@@ -282,33 +245,26 @@ const SuperAdmin = () => {
     };
 
     const openSupportModal = async (support) => {
-        if (support.status === 'Pending') {
-            try {
-                const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
-                    status: 'In Progress'
-                }, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                if (res.status === 200) {
-                    const updatedSupport = { ...support, status: 'In Progress' };
-                    setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
-                    setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
-                    setSelectedSupport(updatedSupport);
-                    setSupportAdminMessage('');
-                    setSupportUserMessage('');
-                    setViewSupportModal(true);
+        try {
+            // Always set status to "In Progress" when opening modal
+            const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
+                status: 'In Progress'
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
-            } catch (e) {
-                toast.error('Failed to update support ticket');
-                return;
+            });
+            if (res.status === 200) {
+                const updatedSupport = { ...support, status: 'In Progress' };
+                setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                setSelectedSupport(updatedSupport);
+                setSupportAdminMessage('');
+                setViewSupportModal(true);
             }
-        } else {
-            setSelectedSupport(support);
-            setSupportAdminMessage('');
-            setSupportUserMessage('');
-            setViewSupportModal(true);
+        } catch (e) {
+            toast.error('Failed to update support ticket');
+            return;
         }
     };
 
@@ -336,9 +292,8 @@ const SuperAdmin = () => {
         if (e.target === e.currentTarget) {
             setViewUserModal(false);
             setViewSupportModal(false);
-            // Clear conversation messages when closing
+            // Clear admin message when closing
             setSupportAdminMessage('');
-            setSupportUserMessage('');
         }
     }, []);
 
@@ -348,9 +303,8 @@ const SuperAdmin = () => {
             if (e.key === 'Escape') {
                 setViewUserModal(false);
                 setViewSupportModal(false);
-                // Clear conversation messages when closing
+                // Clear admin message when closing
                 setSupportAdminMessage('');
-                setSupportUserMessage('');
             }
         };
 
@@ -358,14 +312,10 @@ const SuperAdmin = () => {
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, []);
 
-    // Keep refs updated with current state values
+    // Keep ref updated with current state value
     useEffect(() => {
         supportAdminMessageRef.current = supportAdminMessage;
     }, [supportAdminMessage]);
-
-    useEffect(() => {
-        supportUserMessageRef.current = supportUserMessage;
-    }, [supportUserMessage]);
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
@@ -2470,28 +2420,15 @@ const SuperAdmin = () => {
                             </div>
 
                             {/* New Message Input */}
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Admin Message</label>
-                                    <textarea
-                                        value={supportAdminMessage}
-                                        onChange={(e) => setSupportAdminMessage(e.target.value)}
-                                        placeholder="Type your response or update here..."
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                        rows="3"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">User Message (Optional)</label>
-                                    <textarea
-                                        value={supportUserMessage}
-                                        onChange={(e) => setSupportUserMessage(e.target.value)}
-                                        placeholder="Add a user message if needed..."
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                        rows="2"
-                                    />
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Admin Message</label>
+                                <textarea
+                                    value={supportAdminMessage}
+                                    onChange={(e) => setSupportAdminMessage(e.target.value)}
+                                    placeholder="Type your response or update here..."
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                    rows="3"
+                                />
                             </div>
                         </div>
 
@@ -2500,10 +2437,10 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        if (supportAdminMessage.trim() || supportUserMessage.trim()) {
+                                        if (supportAdminMessage.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
-                                            toast.warning('Please enter at least one message before resolving the ticket');
+                                            toast.warning('Please enter an admin message before resolving the ticket');
                                         }
                                     }}
                                     disabled={selectedSupport.status === 'Completed'}
@@ -2511,26 +2448,12 @@ const SuperAdmin = () => {
                                 >
                                     {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
                                 </button>
-                                {selectedSupport.status !== 'Completed' && (
-                                    <button
-                                        onClick={() => {
-                                            if (supportAdminMessage.trim() || supportUserMessage.trim()) {
-                                                handleSupportStatusUpdate(selectedSupport._id, 'In Progress');
-                                            } else {
-                                                toast.warning('Please enter at least one message before updating status');
-                                            }
-                                        }}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        Update Status
-                                    </button>
-                                )}
                                 <button
                                     onClick={() => {
-                                        if (supportAdminMessage.trim() || supportUserMessage.trim()) {
+                                        if (supportAdminMessage.trim()) {
                                             handleAddMessage(selectedSupport._id);
                                         } else {
-                                            toast.warning('Please enter at least one message');
+                                            toast.warning('Please enter an admin message');
                                         }
                                     }}
                                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -2540,19 +2463,17 @@ const SuperAdmin = () => {
                                 <button
                                     onClick={() => {
                                         setSupportAdminMessage('');
-                                        setSupportUserMessage('');
                                     }}
                                     className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
-                                    Clear Inputs
+                                    Clear Input
                                 </button>
                             </div>
                             <button
                                 onClick={() => {
                                     setViewSupportModal(false);
-                                    // Clear conversation messages when closing
+                                    // Clear admin message when closing
                                     setSupportAdminMessage('');
-                                    setSupportUserMessage('');
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
