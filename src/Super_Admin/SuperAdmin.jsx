@@ -1500,13 +1500,13 @@ const SuperAdmin = () => {
                     <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
                         <tr>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Ticket ID
+                                Category
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Type
+                                Sub Category
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
-                                Subject
+                                Description
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Priority
