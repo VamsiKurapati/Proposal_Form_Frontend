@@ -13,7 +13,6 @@ import {
     MdOutlineLock,
     MdOutlineDocumentScanner,
     MdOutlineFileUpload,
-    MdOutlineEdit,
     MdOutlineMoney,
     MdOutlinePaid,
     MdOutlinePriorityHigh,
@@ -25,8 +24,6 @@ import {
     MdOutlineMenu,
     MdOutlineVisibility,
     MdOutlineClose,
-    MdOutlineCheckCircle,
-    MdOutlineCancel
 } from 'react-icons/md';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -190,23 +187,9 @@ const SuperAdmin = () => {
                 toast.warning('Please enter an admin message');
                 return;
             }
-
-            // Get current ticket data
-            const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
-            const currentAdminMessages = currentTicket.adminMessages || [];
-
-            // Prepare update data
-            const updateData = {
-                adminMessages: [
-                    ...currentAdminMessages,
-                    {
-                        message: newAdminMessage,
-                        createdAt: new Date().toISOString()
-                    }
-                ]
-            };
-
-            const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
+            const res = await axios.put(`${baseUrl}/addAdminMessage/${ticketId}`, {
+                newAdminMessage
+            }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -214,8 +197,8 @@ const SuperAdmin = () => {
             if (res.status === 200) {
                 // Update local state
                 const updatedTicket = {
-                    ...currentTicket,
-                    adminMessages: updateData.adminMessages
+                    ...selectedSupport,
+                    adminMessages: [...(selectedSupport.adminMessages || []), { message: newAdminMessage, createdAt: new Date().toISOString() }]
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -2377,39 +2360,67 @@ const SuperAdmin = () => {
 
                             {/* Display existing conversation */}
                             <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
-                                {/* User Messages */}
-                                {selectedSupport.userMessages && selectedSupport.userMessages.length > 0 && (
-                                    <div className="space-y-2">
-                                        {selectedSupport.userMessages.map((msg, index) => (
-                                            <div key={index} className="flex justify-start">
-                                                <div className="bg-blue-100 rounded-lg p-3 max-w-xs lg:max-w-md">
-                                                    <div className="text-sm text-blue-800 font-medium mb-1">User</div>
-                                                    <div className="text-sm text-blue-900">{msg.message}</div>
-                                                    <div className="text-xs text-blue-600 mt-1">
-                                                        {new Date(msg.createdAt).toLocaleString()}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                {/* Combined Messages Sorted by Timestamp */}
+                                {(() => {
+                                    const allMessages = [];
 
-                                {/* Admin Messages */}
-                                {selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0 && (
-                                    <div className="space-y-2">
-                                        {selectedSupport.adminMessages.map((msg, index) => (
-                                            <div key={index} className="flex justify-end">
-                                                <div className="bg-green-100 rounded-lg p-3 max-w-xs lg:max-w-md">
-                                                    <div className="text-sm text-green-800 font-medium mb-1">Admin</div>
-                                                    <div className="text-sm text-green-900">{msg.message}</div>
-                                                    <div className="text-xs text-green-600 mt-1">
-                                                        {new Date(msg.createdAt).toLocaleString()}
+                                    // Add user messages with type indicator
+                                    if (selectedSupport.userMessages && selectedSupport.userMessages.length > 0) {
+                                        selectedSupport.userMessages.forEach(msg => {
+                                            allMessages.push({
+                                                ...msg,
+                                                type: 'user',
+                                                timestamp: new Date(msg.createdAt).getTime()
+                                            });
+                                        });
+                                    }
+
+                                    // Add admin messages with type indicator
+                                    if (selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0) {
+                                        selectedSupport.adminMessages.forEach(msg => {
+                                            allMessages.push({
+                                                ...msg,
+                                                type: 'admin',
+                                                timestamp: new Date(msg.createdAt).getTime()
+                                            });
+                                        });
+                                    }
+
+                                    // Sort all messages by timestamp
+                                    allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+                                    return allMessages.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {allMessages.map((msg, index) => (
+                                                <div key={index} className={`flex ${msg.type === 'user' ? 'justify-start' : 'justify-end'}`}>
+                                                    <div className={`rounded-lg p-3 max-w-xs lg:max-w-md ${msg.type === 'user'
+                                                        ? 'bg-blue-100'
+                                                        : 'bg-green-100'
+                                                        }`}>
+                                                        <div className={`text-sm font-medium mb-1 ${msg.type === 'user'
+                                                            ? 'text-blue-800'
+                                                            : 'text-green-800'
+                                                            }`}>
+                                                            {msg.type === 'user' ? 'User' : 'Admin'}
+                                                        </div>
+                                                        <div className={`text-sm ${msg.type === 'user'
+                                                            ? 'text-blue-900'
+                                                            : 'text-green-900'
+                                                            }`}>
+                                                            {msg.message}
+                                                        </div>
+                                                        <div className={`text-xs mt-1 ${msg.type === 'user'
+                                                            ? 'text-blue-600'
+                                                            : 'text-green-600'
+                                                            }`}>
+                                                            {new Date(msg.createdAt).toLocaleString()}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                            ))}
+                                        </div>
+                                    ) : null;
+                                })()}
 
                                 {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
                                     (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
