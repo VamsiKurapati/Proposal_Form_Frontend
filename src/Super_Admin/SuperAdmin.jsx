@@ -141,7 +141,7 @@ const SuperAdmin = () => {
             const currentAdminMessages = currentTicket.adminMessages || [];
 
             // Always include resolved description if it exists (regardless of status)
-            const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
+            const resolvedDescription = supportResolvedDescriptionRef.current && supportResolvedDescriptionRef.current.value ? supportResolvedDescriptionRef.current.value.trim() : '';
             if (resolvedDescription) {
                 updateData.resolvedDescription = resolvedDescription;
             }
@@ -196,7 +196,7 @@ const SuperAdmin = () => {
             };
 
             // Always include resolved description if it exists
-            const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
+            const resolvedDescription = supportResolvedDescriptionRef.current && supportResolvedDescriptionRef.current.value ? supportResolvedDescriptionRef.current.value.trim() : '';
             if (resolvedDescription) {
                 updateData.resolvedDescription = resolvedDescription;
             }
@@ -333,6 +333,13 @@ const SuperAdmin = () => {
         document.addEventListener('keydown', handleEscapeKey);
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, []);
+
+    // Initialize refs when selectedSupport changes
+    useEffect(() => {
+        if (selectedSupport && supportResolvedDescriptionRef.current) {
+            supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
+        }
+    }, [selectedSupport]);
 
 
 
@@ -2447,6 +2454,10 @@ const SuperAdmin = () => {
                             {/* Collapsible Conversation Section */}
                             {showConversation && (
                                 <>
+                                    {/* Debug info - remove this later */}
+                                    <div className="mb-2 p-2 bg-gray-100 rounded text-xs">
+                                        <strong>Debug:</strong> User Messages: {selectedSupport.userMessages?.length || 0}, Admin Messages: {selectedSupport.adminMessages?.length || 0}
+                                    </div>
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
@@ -2459,7 +2470,7 @@ const SuperAdmin = () => {
                                                     allMessages.push({
                                                         ...msg,
                                                         type: 'user',
-                                                        timestamp: new Date(msg.createdAt).getTime()
+                                                        timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
                                                     });
                                                 });
                                             }
@@ -2470,7 +2481,7 @@ const SuperAdmin = () => {
                                                     allMessages.push({
                                                         ...msg,
                                                         type: 'admin',
-                                                        timestamp: new Date(msg.createdAt).getTime()
+                                                        timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
                                                     });
                                                 });
                                             }
@@ -2496,7 +2507,7 @@ const SuperAdmin = () => {
                                                                     ? 'text-blue-600'
                                                                     : 'text-green-600'
                                                                     }`}>
-                                                                    {new Date(msg.createdAt).toLocaleString()}
+                                                                    {new Date(msg.createdAt || msg.created_at || Date.now()).toLocaleString()}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2533,7 +2544,7 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        if (supportAdminMessageRef.current.value.trim()) {
+                                        if (supportAdminMessageRef.current && supportAdminMessageRef.current.value.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
                                             toast.warning('Please enter an admin message before resolving the ticket');
@@ -2546,7 +2557,7 @@ const SuperAdmin = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        if (supportAdminMessageRef.current.value.trim()) {
+                                        if (supportAdminMessageRef.current && supportAdminMessageRef.current.value.trim()) {
                                             handleAddMessage(selectedSupport._id);
                                         } else {
                                             toast.warning('Please enter an admin message');
