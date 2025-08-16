@@ -140,12 +140,10 @@ const SuperAdmin = () => {
             const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
             const currentAdminMessages = currentTicket.adminMessages || [];
 
-            // Add resolved description if status is "Completed"
-            if (newStatus === "Completed") {
-                const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
-                if (resolvedDescription) {
-                    updateData.resolvedDescription = resolvedDescription;
-                }
+            // Always include resolved description if it exists (regardless of status)
+            const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
+            if (resolvedDescription) {
+                updateData.resolvedDescription = resolvedDescription;
             }
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
@@ -170,10 +168,11 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear input fields
+                // Clear admin message field only
                 if (supportAdminMessageRef.current) {
                     supportAdminMessageRef.current.value = '';
                 }
+                // Don't clear resolved description - preserve it for display
 
                 toast.success(`Ticket status updated to ${newStatus}`);
             }
@@ -191,9 +190,18 @@ const SuperAdmin = () => {
                 toast.warning('Please enter a message');
                 return;
             }
-            const res = await axios.post(`${baseUrl}/addAdminMessage/${ticketId}`, {
+            // Prepare update data
+            const updateData = {
                 newAdminMessage
-            }, {
+            };
+
+            // Always include resolved description if it exists
+            const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
+            if (resolvedDescription) {
+                updateData.resolvedDescription = resolvedDescription;
+            }
+
+            const res = await axios.post(`${baseUrl}/addAdminMessage/${ticketId}`, updateData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -202,7 +210,8 @@ const SuperAdmin = () => {
                 // Update local state
                 const updatedTicket = {
                     ...selectedSupport,
-                    adminMessages: [...(selectedSupport.adminMessages || []), { message: newAdminMessage, createdAt: new Date().toISOString() }]
+                    adminMessages: [...(selectedSupport.adminMessages || []), { message: newAdminMessage, createdAt: new Date().toISOString() }],
+                    resolvedDescription: updateData.resolvedDescription || selectedSupport.resolvedDescription
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -213,8 +222,9 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear input field
+                // Clear admin message field only
                 supportAdminMessageRef.current.value = '';
+                // Don't clear resolved description - preserve it for display
 
                 toast.success('Message added successfully');
             }
