@@ -62,8 +62,7 @@ const SuperAdmin = () => {
 
     // Support conversation messages
 
-    // Ref for the textarea to prevent modal re-renders
-    const supportAdminMessageRef = useRef(null);
+    // Ref for the resolved description textarea
     const supportResolvedDescriptionRef = useRef(null);
 
     // State for admin message input
@@ -258,18 +257,24 @@ const SuperAdmin = () => {
                     setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setSelectedSupport(updatedSupport);
-                    setAdminMessage('');
+                    // Don't clear adminMessage here - let user keep their message
                     if (supportResolvedDescriptionRef.current) {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
+                    console.log('Resetting conversation view to false (status change)');
                     setShowConversation(false); // Reset conversation view
                     setViewSupportModal(true);
                 }
             } else {
+                // Check if we're switching to a different ticket
+                if (selectedSupport && selectedSupport._id !== support._id) {
+                    setAdminMessage(''); // Clear message when switching tickets
+                }
                 setSelectedSupport(support);
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
+                console.log('Resetting conversation view to false (same ticket)');
                 setShowConversation(false); // Reset conversation view
                 setViewSupportModal(true);
             }
@@ -2426,15 +2431,46 @@ const SuperAdmin = () => {
                             </div>
                         </div>
 
+                        {/* Admin Message Input */}
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Admin Message</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Type your message here</label>
+                                <textarea
+                                    value={adminMessage}
+                                    onChange={(e) => {
+                                        console.log('Textarea onChange:', e.target.value);
+                                        setAdminMessage(e.target.value);
+                                    }}
+                                    placeholder="Type your response or update here..."
+                                    className="w-full p-3 border border-gray-300 rounded-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                    rows="3"
+                                    disabled={selectedSupport.status === 'Completed'}
+                                />
+                                {/* Debug: Show current adminMessage value */}
+                                <div className="text-xs text-gray-500 mt-1">
+                                    Debug - Current value: "{adminMessage}" (Length: {adminMessage.length})
+                                </div>
+                                {selectedSupport.status === 'Completed' && (
+                                    <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Conversation Interface */}
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
-                                    onClick={() => setShowConversation(!showConversation)}
+                                    onClick={() => {
+                                        console.log('Conversation button clicked. Current state:', showConversation);
+                                        setShowConversation(!showConversation);
+                                    }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
                                     {showConversation ? 'Hide Conversation' : 'View Conversation'}
+                                    {/* Debug: Show current conversation state */}
+                                    <span className="text-xs text-gray-500 ml-2">({showConversation ? 'Open' : 'Closed'})</span>
                                     <svg
                                         className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
                                         fill="none"
@@ -2449,7 +2485,6 @@ const SuperAdmin = () => {
                             {/* Collapsible Conversation Section */}
                             {showConversation && (
                                 <>
-
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
@@ -2515,20 +2550,6 @@ const SuperAdmin = () => {
                                                 </div>
                                             )}
                                     </div>
-
-                                    {/* New Message Input */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Add Message</label>
-                                        <textarea
-                                            ref={supportAdminMessageRef}
-                                            value={adminMessage}
-                                            onChange={(e) => setAdminMessage(e.target.value)}
-                                            placeholder="Type your response or update here..."
-                                            className="w-full p-3 border border-gray-300 rounded-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                            rows="3"
-                                            disabled={selectedSupport.status === 'Completed'}
-                                        />
-                                    </div>
                                 </>
                             )}
                         </div>
@@ -2538,6 +2559,7 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
+                                        console.log('Resolve Ticket clicked. adminMessage:', adminMessage, 'trimmed:', adminMessage.trim());
                                         if (adminMessage.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
@@ -2551,6 +2573,7 @@ const SuperAdmin = () => {
                                 </button>
                                 <button
                                     onClick={() => {
+                                        console.log('Add Message clicked. adminMessage:', adminMessage, 'trimmed:', adminMessage.trim());
                                         if (adminMessage.trim()) {
                                             handleAddMessage(selectedSupport._id);
                                         } else {
