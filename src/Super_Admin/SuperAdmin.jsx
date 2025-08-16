@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -64,6 +64,7 @@ const SuperAdmin = () => {
 
     // Ref for the textarea to prevent modal re-renders
     const supportAdminMessageRef = useRef(null);
+    const supportResolvedDescriptionRef = useRef(null);
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -81,6 +82,7 @@ const SuperAdmin = () => {
     const [supportFilterModal, setSupportFilterModal] = useState(false);
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
+    const [showConversation, setShowConversation] = useState(false);
 
     // Data
     const [usersStats, setUsersStats] = useState({});
@@ -138,16 +140,12 @@ const SuperAdmin = () => {
             const currentTicket = supportTicketsData.find(t => t._id === ticketId) || {};
             const currentAdminMessages = currentTicket.adminMessages || [];
 
-            // Add admin message if provided
-            const adminMessageForStatus = supportAdminMessageRef.current ? supportAdminMessageRef.current.value.trim() : '';
-            if (adminMessageForStatus) {
-                updateData.adminMessages = [
-                    ...currentAdminMessages,
-                    {
-                        message: adminMessageForStatus,
-                        createdAt: new Date().toISOString()
-                    }
-                ];
+            // Add resolved description if status is "Completed"
+            if (newStatus === "Completed") {
+                const resolvedDescription = supportResolvedDescriptionRef.current ? supportResolvedDescriptionRef.current.value.trim() : '';
+                if (resolvedDescription) {
+                    updateData.resolvedDescription = resolvedDescription;
+                }
             }
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
@@ -160,7 +158,8 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...currentTicket,
                     status: newStatus,
-                    adminMessages: updateData.adminMessages || currentAdminMessages
+                    adminMessages: currentAdminMessages,
+                    resolvedDescription: updateData.resolvedDescription || currentTicket.resolvedDescription
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -171,7 +170,7 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear input field
+                // Clear input fields
                 if (supportAdminMessageRef.current) {
                     supportAdminMessageRef.current.value = '';
                 }
@@ -234,22 +233,35 @@ const SuperAdmin = () => {
 
     const openSupportModal = async (support) => {
         try {
-            // Always set status to "In Progress" when opening modal
-            const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
-                status: 'In Progress'
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+            if (support.status !== "In Progress") {
+                // Always set status to "In Progress" when opening modal
+                const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
+                    status: 'In Progress'
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (res.status === 200) {
+                    const updatedSupport = { ...support, status: 'In Progress' };
+                    setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                    setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
+                    setSelectedSupport(updatedSupport);
+                    if (supportAdminMessageRef.current) {
+                        supportAdminMessageRef.current.value = '';
+                    }
+                    if (supportResolvedDescriptionRef.current) {
+                        supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
+                    }
+                    setShowConversation(false); // Reset conversation view
+                    setViewSupportModal(true);
                 }
-            });
-            if (res.status === 200) {
-                const updatedSupport = { ...support, status: 'In Progress' };
-                setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
-                setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
-                setSelectedSupport(updatedSupport);
-                if (supportAdminMessageRef.current) {
-                    supportAdminMessageRef.current.value = '';
+            } else {
+                setSelectedSupport(support);
+                if (supportResolvedDescriptionRef.current) {
+                    supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
+                setShowConversation(false); // Reset conversation view
                 setViewSupportModal(true);
             }
         } catch (e) {
@@ -286,6 +298,9 @@ const SuperAdmin = () => {
             if (supportAdminMessageRef.current) {
                 supportAdminMessageRef.current.value = '';
             }
+            if (supportResolvedDescriptionRef.current) {
+                supportResolvedDescriptionRef.current.value = '';
+            }
         }
     }, []);
 
@@ -298,6 +313,9 @@ const SuperAdmin = () => {
                 // Clear admin message when closing
                 if (supportAdminMessageRef.current) {
                     supportAdminMessageRef.current.value = '';
+                }
+                if (supportResolvedDescriptionRef.current) {
+                    supportResolvedDescriptionRef.current.value = '';
                 }
             }
         };
@@ -2375,86 +2393,129 @@ const SuperAdmin = () => {
                             </div>
                         </div>
 
-                        {/* Conversation Interface */}
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-4">Conversation</h3>
 
-                            {/* Display existing conversation */}
-                            <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
-                                {/* Combined Messages Sorted by Timestamp */}
-                                {(() => {
-                                    const allMessages = [];
 
-                                    // Add user messages with type indicator
-                                    if (selectedSupport.userMessages && selectedSupport.userMessages.length > 0) {
-                                        selectedSupport.userMessages.forEach(msg => {
-                                            allMessages.push({
-                                                ...msg,
-                                                type: 'user',
-                                                timestamp: new Date(msg.createdAt).getTime()
-                                            });
-                                        });
-                                    }
-
-                                    // Add admin messages with type indicator
-                                    if (selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0) {
-                                        selectedSupport.adminMessages.forEach(msg => {
-                                            allMessages.push({
-                                                ...msg,
-                                                type: 'admin',
-                                                timestamp: new Date(msg.createdAt).getTime()
-                                            });
-                                        });
-                                    }
-
-                                    // Sort all messages by timestamp
-                                    allMessages.sort((a, b) => a.timestamp - b.timestamp);
-
-                                    return allMessages.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {allMessages.map((msg, index) => (
-                                                <div key={index} className={`flex ${msg.type === 'user' ? 'justify-start' : 'justify-end'}`}>
-                                                    <div className={`rounded-lg p-3 max-w-xs lg:max-w-md ${msg.type === 'user'
-                                                        ? 'bg-blue-100'
-                                                        : 'bg-green-100'
-                                                        }`}>
-                                                        <div className={`text-sm ${msg.type === 'user'
-                                                            ? 'text-blue-900'
-                                                            : 'text-green-900'
-                                                            }`}>
-                                                            {msg.message}
-                                                        </div>
-                                                        <div className={`text-xs mt-1 ${msg.type === 'user'
-                                                            ? 'text-blue-600'
-                                                            : 'text-green-600'
-                                                            }`}>
-                                                            {new Date(msg.createdAt).toLocaleString()}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : null;
-                                })()}
-
-                                {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
-                                    (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
-                                        <div className="text-center text-gray-500 text-sm py-4">
-                                            No messages yet. Start the conversation below.
-                                        </div>
-                                    )}
-                            </div>
-
-                            {/* New Message Input */}
+                        {/* Resolved Description */}
+                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-medium text-gray-800 mb-3">Resolved Description</h3>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Add Message</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Resolution Details</label>
                                 <textarea
-                                    ref={supportAdminMessageRef}
-                                    placeholder="Type your response or update here..."
+                                    ref={supportResolvedDescriptionRef}
+                                    placeholder="Describe how the issue was resolved..."
                                     className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                                     rows="3"
+                                    disabled={selectedSupport.status === "Completed"}
+                                    value={selectedSupport.resolvedDescription || ''}
+                                    onChange={(e) => setSelectedSupport(prev => ({ ...prev, resolvedDescription: e.target.value }))}
                                 />
+                                {selectedSupport.status === "Completed" && (
+                                    <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
+                                )}
                             </div>
+                        </div>
+
+                        {/* Conversation Interface */}
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
+                                <button
+                                    onClick={() => setShowConversation(!showConversation)}
+                                    className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
+                                >
+                                    {showConversation ? 'Hide Conversation' : 'View Conversation'}
+                                    <svg
+                                        className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Collapsible Conversation Section */}
+                            {showConversation && (
+                                <>
+                                    {/* Display existing conversation */}
+                                    <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
+                                        {/* Combined Messages Sorted by Timestamp */}
+                                        {(() => {
+                                            const allMessages = [];
+
+                                            // Add user messages with type indicator
+                                            if (selectedSupport.userMessages && selectedSupport.userMessages.length > 0) {
+                                                selectedSupport.userMessages.forEach(msg => {
+                                                    allMessages.push({
+                                                        ...msg,
+                                                        type: 'user',
+                                                        timestamp: new Date(msg.createdAt).getTime()
+                                                    });
+                                                });
+                                            }
+
+                                            // Add admin messages with type indicator
+                                            if (selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0) {
+                                                selectedSupport.adminMessages.forEach(msg => {
+                                                    allMessages.push({
+                                                        ...msg,
+                                                        type: 'admin',
+                                                        timestamp: new Date(msg.createdAt).getTime()
+                                                    });
+                                                });
+                                            }
+
+                                            // Sort all messages by timestamp
+                                            allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+                                            return allMessages.length > 0 ? (
+                                                <div className="space-y-2">
+                                                    {allMessages.map((msg, index) => (
+                                                        <div key={index} className={`flex ${msg.type === 'user' ? 'justify-start' : 'justify-end'}`}>
+                                                            <div className={`rounded-lg p-3 max-w-xs lg:max-w-md ${msg.type === 'user'
+                                                                ? 'bg-blue-100'
+                                                                : 'bg-green-100'
+                                                                }`}>
+                                                                <div className={`text-sm ${msg.type === 'user'
+                                                                    ? 'text-blue-900'
+                                                                    : 'text-green-900'
+                                                                    }`}>
+                                                                    {msg.message}
+                                                                </div>
+                                                                <div className={`text-xs mt-1 ${msg.type === 'user'
+                                                                    ? 'text-blue-600'
+                                                                    : 'text-green-600'
+                                                                    }`}>
+                                                                    {new Date(msg.createdAt).toLocaleString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : null;
+                                        })()}
+
+                                        {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
+                                            (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
+                                                <div className="text-center text-gray-500 text-sm py-4">
+                                                    No messages yet. Start the conversation below.
+                                                </div>
+                                            )}
+                                    </div>
+
+                                    {/* New Message Input */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Add Message</label>
+                                        <textarea
+                                            ref={supportAdminMessageRef}
+                                            placeholder="Type your response or update here..."
+                                            className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                                            rows="3"
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         {/* Action Buttons */}
