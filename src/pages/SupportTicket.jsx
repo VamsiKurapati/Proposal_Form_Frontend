@@ -62,6 +62,53 @@ const SupportTicket = () => {
 
   const [tickets, setTickets] = useState([]);
   const [openTickets, setOpenTickets] = useState({});
+  const [showConversationPopup, setShowConversationPopup] = useState(null);
+ 
+                    const [conversationMessages, setConversationMessages] = useState([]);
+                    const [loadingMessages, setLoadingMessages] = useState(false);
+                    const [newMessage, setNewMessage] = useState("");
+                    const [sendingMessage, setSendingMessage] = useState(false);
+
+                    const fetchConversationMessages = async (ticketId) => {
+                      setLoadingMessages(true);
+                      try {
+                        const [userRes, adminRes] = await Promise.all([
+                          axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/userMessages`),
+                          axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/adminMessages`)
+                        ]);
+                    
+                        const userMsgs = (userRes.data.userMessages || []).map(msg => ({
+                          text: msg.message,
+                          createdAt: msg.createdAt,
+                          sender: "user"
+                        }));
+                    
+                        const adminMsgs = (adminRes.data.adminMessages || []).map(msg => ({
+                          text: msg.message,
+                          createdAt: msg.createdAt,
+                          sender: "admin"
+                        }));
+                    
+                        // ✅ Merge & sort by createdAt
+                        const allMsgs = [...userMsgs, ...adminMsgs].sort(
+                          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+                        );
+                    
+                        setConversationMessages(allMsgs);
+                      } catch (err) {
+                        console.error("Fetch conversation error:", err);
+                        setConversationMessages([]);
+                      }
+                      setLoadingMessages(false);
+                    };
+                    
+                    
+
+                    useEffect(() => {
+                      if (showConversationPopup) {
+                        fetchConversationMessages(showConversationPopup);
+                      }
+                    }, [showConversationPopup]);
 
   // Fetch tickets from backend
   useEffect(() => {
@@ -489,11 +536,138 @@ const SupportTicket = () => {
                       })()}
                     </div>
 
+                    {/* Admin Reply */}
+                    {/* Conversation Popup Trigger */}
+                    <div className="flex justify-center mt-4">
+                      <button
+                        className="bg-gray-200 hover:bg-blue-500 hover:text-white text-blue-600 font-semibold py-1 px-4 rounded shadow"
+                        onClick={() => setShowConversationPopup(ticket._id || ticket.id)}
+                      >
+                        View Conversation
+                      </button>
+                    </div>
+
+                    {/* Conversation Popup */}
+                    {showConversationPopup === (ticket._id || ticket.id) && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40  backdrop-blur-sm">
+                        <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] flex flex-col relative">
+                          <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-red-600"
+                            onClick={() => setShowConversationPopup(null)}
+                          >
+                            <span className="text-2xl">&times;</span>
+                          </button>
+                          <div className="p-4 border-b flex items-center">
+                            <h2 className="text-lg font-semibold text-blue-700 flex-1">Conversation</h2>
+                          </div>
+                          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                            {loadingMessages ? (
+                              <div className="text-center text-gray-500">Loading messages...</div>
+                            ) : (
+                              <>
+
+                                {/* Admin Messages */}
+                                {[...conversationMessages]
+  .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // oldest → newest
+  .map((msg, idx) => (
+    <div
+      key={idx}
+      className={`flex flex-col ${
+        msg.sender === "user" ? "items-end" : "items-start"
+      }`}
+    >
+      <div
+        className={`px-3 py-2 rounded-lg max-w-[80%] ${
+          msg.sender === "user"
+            ? "bg-blue-100 text-blue-800"
+            : "bg-green-100 text-green-800"
+        }`}
+      >
+        <span className="font-semibold">
+          {msg.sender === "user" ? "User:" : "Admin:"}
+        </span>{" "}
+        {msg.text}
+      </div>
+      <span
+        className={`text-xs text-gray-400 mt-1 ${
+          msg.sender === "user" ? "mr-1" : "ml-1"
+        }`}
+      >
+        {msg.createdAt
+          ? new Date(msg.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : ""}
+      </span>
+    </div>
+  ))}
+
+                                {/* No messages */}
+                                {conversationMessages.length === 0 && (
+                                  <div className="text-center text-gray-400">No conversation yet.</div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                          <form
+                            className="p-4 border-t flex gap-2"
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              if (!newMessage.trim()) return;
+                              setSendingMessage(true);
+                              try {
+                                await axios.post(
+                                  `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id}/userMessages`,
+                                  { message: newMessage }   // ✅ changed text → message
+                                );
+                                // Refetch messages
+                                await fetchConversationMessages(ticket._id || ticket.id);
+                                setNewMessage("");
+                              } catch (err) {
+                                alert(
+                                  err.response?.data?.message ||
+                                    "Failed to send message."
+                                );
+                              }
+                              setSendingMessage(false);
+                            }}
+                          >
+                            <input
+                              type="text"
+                              className="flex-1 border rounded px-3 py-2 focus:outline-none"
+                              placeholder="Type your message..."
+                              value={newMessage}
+                              onChange={e => setNewMessage(e.target.value)}
+                              disabled={sendingMessage}
+                            />
+                            <button
+                              type="submit"
+                              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                              disabled={sendingMessage || !newMessage.trim()}
+                            >
+                              {sendingMessage ? "Sending..." : "Send"}
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* State and logic for conversation popup */}
+                    {/* Place these hooks at the top level of your component (not inside render/return): */}
+                    {/* 
+                    
+                    */}
+
+
+
+                    
+                    
                     {/* Description */}
                     <div className="mt-6 text-center p-4 bg-gray-100 border-2 border-blue-600 rounded-lg flex items-center">
                       <span className="text-gray-500 mr-2">Resolved Description:</span>
                       <span className="text-blue-600 font-medium">
-                        {ticket.Resolved_Description || "N/A"}
+                        {ticket.Resolved_Description.length>0?ticket.Resolved_Description:"Admin will contact you soon"}
                       </span>
                     </div>
 
