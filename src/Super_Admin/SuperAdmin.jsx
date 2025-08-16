@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -61,7 +61,9 @@ const SuperAdmin = () => {
     const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
 
     // Support conversation messages
-    const [supportAdminMessage, setSupportAdminMessage] = useState('');
+
+    // Ref for the textarea to prevent modal re-renders
+    const supportAdminMessageRef = useRef(null);
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -101,9 +103,7 @@ const SuperAdmin = () => {
 
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
-    useEffect(() => {
-        console.log("supportAdminMessage", supportAdminMessage);
-    }, [supportAdminMessage]);
+
 
     // New functions for user blocking/unblocking
     const handleUserBlockToggle = async (userId, currentBlockedStatus) => {
@@ -139,12 +139,12 @@ const SuperAdmin = () => {
             const currentAdminMessages = currentTicket.adminMessages || [];
 
             // Add admin message if provided
-            const newAdminMessage = supportAdminMessage.trim();
-            if (newAdminMessage) {
+            const adminMessageForStatus = supportAdminMessageRef.current ? supportAdminMessageRef.current.value.trim() : '';
+            if (adminMessageForStatus) {
                 updateData.adminMessages = [
                     ...currentAdminMessages,
                     {
-                        message: newAdminMessage,
+                        message: adminMessageForStatus,
                         createdAt: new Date().toISOString()
                     }
                 ];
@@ -172,7 +172,9 @@ const SuperAdmin = () => {
                 }
 
                 // Clear input field
-                setSupportAdminMessage('');
+                if (supportAdminMessageRef.current) {
+                    supportAdminMessageRef.current.value = '';
+                }
 
                 toast.success(`Ticket status updated to ${newStatus}`);
             }
@@ -184,8 +186,7 @@ const SuperAdmin = () => {
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
-            console.log("supportAdminMessage : ", supportAdminMessage);
-            const newAdminMessage = supportAdminMessage.trim();
+            const newAdminMessage = supportAdminMessageRef.current.value.trim();
 
             if (!newAdminMessage) {
                 toast.warning('Please enter a message');
@@ -214,7 +215,7 @@ const SuperAdmin = () => {
                 }
 
                 // Clear input field
-                setSupportAdminMessage('');
+                supportAdminMessageRef.current.value = '';
 
                 toast.success('Message added successfully');
             }
@@ -246,7 +247,9 @@ const SuperAdmin = () => {
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                 setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                 setSelectedSupport(updatedSupport);
-                setSupportAdminMessage('');
+                if (supportAdminMessageRef.current) {
+                    supportAdminMessageRef.current.value = '';
+                }
                 setViewSupportModal(true);
             }
         } catch (e) {
@@ -280,7 +283,9 @@ const SuperAdmin = () => {
             setViewUserModal(false);
             setViewSupportModal(false);
             // Clear admin message when closing
-            setSupportAdminMessage('');
+            if (supportAdminMessageRef.current) {
+                supportAdminMessageRef.current.value = '';
+            }
         }
     }, []);
 
@@ -291,7 +296,9 @@ const SuperAdmin = () => {
                 setViewUserModal(false);
                 setViewSupportModal(false);
                 // Clear admin message when closing
-                setSupportAdminMessage('');
+                if (supportAdminMessageRef.current) {
+                    supportAdminMessageRef.current.value = '';
+                }
             }
         };
 
@@ -2429,8 +2436,7 @@ const SuperAdmin = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Add Message</label>
                                 <textarea
-                                    value={supportAdminMessage}
-                                    onChange={(e) => setSupportAdminMessage(e.target.value)}
+                                    ref={supportAdminMessageRef}
                                     placeholder="Type your response or update here..."
                                     className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                                     rows="3"
@@ -2443,7 +2449,7 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        if (supportAdminMessage.trim()) {
+                                        if (supportAdminMessageRef.current.value.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
                                             toast.warning('Please enter an admin message before resolving the ticket');
@@ -2456,8 +2462,7 @@ const SuperAdmin = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        console.log("On button Click supportAdminMessage : ", supportAdminMessage);
-                                        if (supportAdminMessage.trim()) {
+                                        if (supportAdminMessageRef.current.value.trim()) {
                                             handleAddMessage(selectedSupport._id);
                                         } else {
                                             toast.warning('Please enter an admin message');
@@ -2469,7 +2474,7 @@ const SuperAdmin = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        setSupportAdminMessage('');
+                                        supportAdminMessageRef.current.value = '';
                                     }}
                                     className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
@@ -2480,7 +2485,7 @@ const SuperAdmin = () => {
                                 onClick={() => {
                                     setViewSupportModal(false);
                                     // Clear admin message when closing
-                                    setSupportAdminMessage('');
+                                    supportAdminMessageRef.current.value = '';
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
