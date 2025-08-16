@@ -2456,6 +2456,7 @@ const SuperAdmin = () => {
                                 </button>
                                 <button
                                     onClick={() => {
+                                        console.log("On button Click supportAdminMessage : ", supportAdminMessage);
                                         if (supportAdminMessage.trim()) {
                                             handleAddMessage(selectedSupport._id);
                                         } else {
