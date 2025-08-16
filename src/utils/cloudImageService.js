@@ -2,11 +2,10 @@
 class CloudImageService {
   constructor() {
     // Use environment variables from .env file
-    this.baseUrl = process.env.REACT_APP_API_URL || 'https://127.0.0.1:5000';
-    this.maxFileSize = parseInt(process.env.REACT_APP_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
-    this.maxImages = parseInt(process.env.REACT_APP_MAX_IMAGES) || 15;
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://127.0.0.1:5000';
+    this.maxFileSize = parseInt(import.meta.env.VITE_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
+    this.maxImages = parseInt(import.meta.env.VITE_MAX_IMAGES) || 15;
     this.uploadedImages = this.loadUploadedImages();
-
   }
 
   // Load uploaded images from localStorage

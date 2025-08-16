@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
         // Also check for changes on focus (in case localStorage was changed in another tab)
         window.addEventListener('focus', handleStorageChange);
 
-        console.log("Role in Context: ", role);
+        // console.log("Role in Context: ", role);
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);

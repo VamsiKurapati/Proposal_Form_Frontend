@@ -248,22 +248,34 @@ export function encodeSVGToBase64(svgString) {
 }
 
 // Get all SVGs in subfolders of design/
-export function getTemplateSets() {
-  const req = require.context(
-    '../components/design',
-    true,
-    /\.svg$/
-  );
-  const sets = {};
-  req.keys().forEach((key) => {
-    const match = key.match(/^\.\/([^/]+)\//);
-    if (!match) return;
-    const folder = match[1];
-    if (!sets[folder]) sets[folder] = [];
-    sets[folder].push(req(key).default);
-  });
-  Object.values(sets).forEach(arr => arr.sort());
-  return sets;
+export async function getTemplateSets() {
+  try {
+    // Use Vite's import.meta.glob for dynamic imports
+    const modules = import.meta.glob('../components/design/**/*.svg', { eager: true });
+
+    const sets = {};
+
+    Object.keys(modules).forEach((key) => {
+      const match = key.match(/\.\.\/components\/design\/([^/]+)\//);
+      if (!match) return;
+
+      const folder = match[1];
+      if (!sets[folder]) sets[folder] = [];
+
+      // Extract the default export or the module itself
+      const module = modules[key];
+      const svgPath = module.default || module;
+      sets[folder].push(svgPath);
+    });
+
+    // Sort each set
+    Object.values(sets).forEach(arr => arr.sort());
+
+    return sets;
+  } catch (error) {
+    console.error('Error loading template sets:', error);
+    return {};
+  }
 }
 
 // Function to scale SVG template to fit page dimensions

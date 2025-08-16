@@ -25,6 +25,8 @@ import ProjectsPanel from '../components/ProjectsPanel.jsx';
 const CanvaApp = () => {
   const [zoom, setZoom] = React.useState(100);
   const [isGridView, setIsGridView] = React.useState(false);
+  const [sets, setSets] = React.useState({});
+  const [svgPreviews, setSvgPreviews] = React.useState({});
 
   const panelState = usePanelState();
 
@@ -318,7 +320,20 @@ const CanvaApp = () => {
   const jsonInputRef = useRef(null);
   const svgInputRef = useRef(null);
 
-  const { sets, svgPreviews } = getTemplateSets();
+  // Load template sets asynchronously
+  useEffect(() => {
+    const loadTemplateSets = async () => {
+      try {
+        const templateData = await getTemplateSets();
+        setSets(templateData.sets);
+        setSvgPreviews(templateData.svgPreviews);
+      } catch (error) {
+        console.error('Error loading template sets:', error);
+      }
+    };
+
+    loadTemplateSets();
+  }, []);
 
   // Get selected element
   const getSelectedElement = () => {

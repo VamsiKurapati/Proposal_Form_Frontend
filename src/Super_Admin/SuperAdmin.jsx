@@ -2520,8 +2520,9 @@ const SuperAdmin = () => {
                                         <textarea
                                             ref={supportAdminMessageRef}
                                             placeholder="Type your response or update here..."
-                                            className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                                            className="w-full p-3 border border-gray-300 rounded-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                                             rows="3"
+                                            disabled={selectedSupport.status === 'Completed'}
                                         />
                                     </div>
                                 </>
@@ -2552,17 +2553,10 @@ const SuperAdmin = () => {
                                             toast.warning('Please enter an admin message');
                                         }
                                     }}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                    disabled={selectedSupport.status === 'Completed'}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Add Message
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        supportAdminMessageRef.current.value = '';
-                                    }}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                                >
-                                    Clear Input
                                 </button>
                             </div>
                             <button

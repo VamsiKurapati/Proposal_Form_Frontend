@@ -14,9 +14,9 @@ export const ProfileProvider = ({ children }) => {
 
     const { role } = useUser();
 
-    useEffect(() => {
-        console.log("Role in ProfileContext: ", role);
-    }, [role]);
+    // useEffect(() => {
+    //     console.log("Role in ProfileContext: ", role);
+    // }, [role]);
 
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockCompanyData = useCallback(() => ({
