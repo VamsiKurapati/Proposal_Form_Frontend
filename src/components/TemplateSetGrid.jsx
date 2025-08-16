@@ -10,32 +10,10 @@ const TemplateSetGrid = ({ sets, svgPreviews, setShowTemplatePreview }) => (
       >
         <div className="w-16 h-20 flex items-center justify-center overflow-hidden bg-white border mb-1">
           {svgPreviews[folder] && svgPreviews[folder][0] ? (
-            (() => {
-              const svgContent = svgPreviews[folder][0];
-              const isDataUrl = svgContent.startsWith('data:image/svg+xml');
-
-              if (isDataUrl) {
-                return (
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundImage: `url('${svgContent}')`,
-                      backgroundSize: 'contain',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  />
-                );
-              } else {
-                return (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: svgContent }}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-                  />
-                );
-              }
-            })()
+            <div
+              dangerouslySetInnerHTML={{ __html: svgPreviews[folder][0] }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            />
           ) : (
             <span className="text-xs text-gray-400">Loading...</span>
           )}

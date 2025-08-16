@@ -4,7 +4,7 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
   const updateElement = useCallback((pageIndex, elementId, updates) => {
     const page = project.pages[pageIndex];
     if (!page) return;
-    
+
     // Check if element is being moved or resized
     if (updates.x !== undefined || updates.y !== undefined || updates.width !== undefined || updates.height !== undefined) {
       const element = page.elements.find(el => el.id === elementId);
@@ -12,45 +12,45 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       const newY = updates.y !== undefined ? updates.y : element.y;
       const newWidth = updates.width !== undefined ? updates.width : element.width;
       const newHeight = updates.height !== undefined ? updates.height : element.height;
-      
+
       // Check if element is fully outside the canvas bounds
-      const isFullyOutside = 
-        newX + newWidth < 0 || 
-        newY + newHeight < 0 || 
-        newX > page.pageSettings.width || 
+      const isFullyOutside =
+        newX + newWidth < 0 ||
+        newY + newHeight < 0 ||
+        newX > page.pageSettings.width ||
         newY > page.pageSettings.height;
-      
+
       // If element is fully outside, don't update it (let useInteraction handle deletion)
       if (isFullyOutside) {
         return;
       }
-      
+
       // Apply updates without boundary constraints
       updates.x = newX;
       updates.y = newY;
-      updates.width = Math.max(20, newWidth);
-      updates.height = Math.max(20, newHeight);
+      updates.width = Math.max(5, Math.min(page.pageSettings.width, newWidth));
+      updates.height = Math.max(5, Math.min(page.pageSettings.height, newHeight));
     }
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
         pages: prev.pages.map((p, idx) =>
           idx === pageIndex
             ? {
-                ...p,
-                elements: p.elements.map(el => 
-                  el.id === elementId 
-                    ? { ...el, ...updates }
-                    : el
-                )
-              }
+              ...p,
+              elements: p.elements.map(el =>
+                el.id === elementId
+                  ? { ...el, ...updates }
+                  : el
+              )
+            }
             : p
         )
       };
-      
 
-      
+
+
       return newProject;
     });
   }, [project, setProject]);
@@ -59,18 +59,18 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
     setProject(prev => {
       const newProject = {
         ...prev,
-        pages: prev.pages.map((p, idx) => 
-          idx === pageIndex 
+        pages: prev.pages.map((p, idx) =>
+          idx === pageIndex
             ? { ...p, elements: p.elements.filter(el => el.id !== elementId) }
             : p
         )
       };
-      
+
       // Call onComplete with the updated project if provided
       if (onComplete) {
         setTimeout(() => onComplete(newProject), 0);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex: 0, elementId: null });
@@ -84,8 +84,8 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       type: 'text',
       x: 100,
       y: 100,
-      width: 200,
-      height: 50,
+      width: Math.min(200, page.pageSettings.width),
+      height: Math.min(50, page.pageSettings.height),
       rotation: 0,
       zIndex: page.elements.length + 1,
       properties: {
@@ -102,22 +102,22 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
         letterSpacing: 0
       }
     };
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
-        pages: prev.pages.map((p, idx) => 
-          idx === pageIndex 
+        pages: prev.pages.map((p, idx) =>
+          idx === pageIndex
             ? { ...p, elements: [...p.elements, newElement] }
             : p
         )
       };
-      
+
       // Call the callback with the updated state immediately
       if (onComplete) {
         onComplete(newProject);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex, elementId: newElement.id });
@@ -131,26 +131,26 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       id: generateId(),
       zIndex: page.elements.length + 1,
     };
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
-        pages: prev.pages.map((p, idx) => 
-          idx === pageIndex 
+        pages: prev.pages.map((p, idx) =>
+          idx === pageIndex
             ? { ...p, elements: [...p.elements, newElement] }
             : p
         )
       };
-      
+
       // Call the callback with the updated state immediately
       if (onComplete) {
         onComplete(newProject);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex, elementId: newElement.id });
-    
+
     return newElement.id; // Return the element ID
   }, [currentEditingPage, project, generateId, setProject, setSelectedElement]);
 
@@ -162,8 +162,8 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       type: 'image',
       x: 150,
       y: 150,
-      width: 200,
-      height: 200,
+      width: Math.min(200, page.pageSettings.width),
+      height: Math.min(200, page.pageSettings.height),
       rotation: 0,
       zIndex: page.elements.length + 1,
       properties: {
@@ -171,22 +171,22 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
         fit: 'contain'
       }
     };
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
-        pages: prev.pages.map((p, idx) => 
-          idx === pageIndex 
+        pages: prev.pages.map((p, idx) =>
+          idx === pageIndex
             ? { ...p, elements: [...p.elements, newElement] }
             : p
         )
       };
-      
+
       // Call the callback with the updated state immediately
       if (onComplete) {
         onComplete(newProject);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex, elementId: newElement.id });
@@ -202,8 +202,8 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       shapeType,
       x: 120,
       y: 120,
-      width: 120,
-      height: 80,
+      width: Math.min(120, page.pageSettings.width),
+      height: Math.min(80, page.pageSettings.height),
       rotation: 0,
       zIndex: page.elements.length + 1,
       properties: {
@@ -213,43 +213,43 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       }
     };
 
-    // Shape-specific dimensions
+    // Shape-specific dimensions with page boundary constraints
     const shapeConfig = {
-      rectangle: { width: 120, height: 80 },
-      ellipse: { width: 100, height: 100 },
-      line: { width: 120, height: 20 },
-      triangle: { width: 100, height: 90 },
-      pentagon: { width: 100, height: 100 },
-      diamond: { width: 100, height: 100 },
-      hexagon: { width: 100, height: 100 },
-      octagon: { width: 100, height: 100 },
-      star: { width: 100, height: 100 },
-      heart: { width: 100, height: 100 },
-      cloud: { width: 120, height: 80 },
-      arrow: { width: 120, height: 40 },
-      rightArrow: { width: 120, height: 40 },
-      leftArrow: { width: 120, height: 40 },
-      upArrow: { width: 40, height: 120 },
-      downArrow: { width: 40, height: 120 },
-      parallelogram: { width: 120, height: 80 },
-      trapezoid: { width: 120, height: 80 },
-      chevron: { width: 120, height: 40 },
-      bookmark: { width: 80, height: 120 },
-      lightning: { width: 80, height: 120 },
-      sun: { width: 100, height: 100 },
-      crescent: { width: 100, height: 100 },
-      speechBubble: { width: 120, height: 80 },
-      cross: { width: 80, height: 80 },
-      checkmark: { width: 80, height: 80 },
-      plus: { width: 80, height: 80 },
-      minus: { width: 80, height: 40 },
-      exclamation: { width: 40, height: 80 },
+      rectangle: { width: Math.min(120, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      ellipse: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      line: { width: Math.min(120, page.pageSettings.width), height: Math.min(20, page.pageSettings.height) },
+      triangle: { width: Math.min(100, page.pageSettings.width), height: Math.min(90, page.pageSettings.height) },
+      pentagon: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      diamond: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      hexagon: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      octagon: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      star: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      heart: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      cloud: { width: Math.min(120, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      arrow: { width: Math.min(120, page.pageSettings.width), height: Math.min(40, page.pageSettings.height) },
+      rightArrow: { width: Math.min(120, page.pageSettings.width), height: Math.min(40, page.pageSettings.height) },
+      leftArrow: { width: Math.min(120, page.pageSettings.width), height: Math.min(40, page.pageSettings.height) },
+      upArrow: { width: Math.min(40, page.pageSettings.width), height: Math.min(120, page.pageSettings.height) },
+      downArrow: { width: Math.min(40, page.pageSettings.width), height: Math.min(120, page.pageSettings.height) },
+      parallelogram: { width: Math.min(120, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      trapezoid: { width: Math.min(120, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      chevron: { width: Math.min(120, page.pageSettings.width), height: Math.min(40, page.pageSettings.height) },
+      bookmark: { width: Math.min(80, page.pageSettings.width), height: Math.min(120, page.pageSettings.height) },
+      lightning: { width: Math.min(80, page.pageSettings.width), height: Math.min(120, page.pageSettings.height) },
+      sun: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      crescent: { width: Math.min(100, page.pageSettings.width), height: Math.min(100, page.pageSettings.height) },
+      speechBubble: { width: Math.min(120, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      cross: { width: Math.min(80, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      checkmark: { width: Math.min(80, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      plus: { width: Math.min(80, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
+      minus: { width: Math.min(80, page.pageSettings.width), height: Math.min(40, page.pageSettings.height) },
+      exclamation: { width: Math.min(40, page.pageSettings.width), height: Math.min(80, page.pageSettings.height) },
       // ... add more shapes as needed
     };
 
     const config = shapeConfig[shapeType] || base;
     newElement = { ...base, ...config };
-    
+
     // Special handling for line shape to ensure proper stroke width
     if (shapeType === 'line') {
       newElement.properties = {
@@ -267,12 +267,12 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
             : p
         )
       };
-      
+
       // Call the callback with the updated state immediately
       if (onComplete) {
         onComplete(newProject);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex, elementId: newElement.id });
@@ -284,7 +284,7 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
     const page = project.pages[pageIndex];
     const orig = selectedEl;
     const offset = 20;
-    
+
     const newElement = {
       ...orig,
       id: generateId(),
@@ -292,7 +292,7 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
       y: orig.y + offset,
       zIndex: page.elements.length + 1,
     };
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
@@ -302,12 +302,12 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
             : p
         )
       };
-      
+
       // Call the callback with the updated state immediately
       if (onComplete) {
         onComplete(newProject);
       }
-      
+
       return newProject;
     });
     setSelectedElement({ pageIndex, elementId: newElement.id });

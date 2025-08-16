@@ -249,14 +249,18 @@ export function encodeSVGToBase64(svgString) {
 
 // Get all SVGs in subfolders of design/
 export function getTemplateSets() {
-  const svgModules = import.meta.glob('../components/design/**/*.svg', { eager: true });
+  const req = require.context(
+    '../components/design',
+    true,
+    /\.svg$/
+  );
   const sets = {};
-  Object.entries(svgModules).forEach(([key, module]) => {
-    const match = key.match(/design\/([^/]+)\//);
+  req.keys().forEach((key) => {
+    const match = key.match(/^\.\/([^/]+)\//);
     if (!match) return;
     const folder = match[1];
     if (!sets[folder]) sets[folder] = [];
-    sets[folder].push(module.default || module);
+    sets[folder].push(req(key).default);
   });
   Object.values(sets).forEach(arr => arr.sort());
   return sets;

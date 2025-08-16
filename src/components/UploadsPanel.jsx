@@ -12,7 +12,6 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
     const loadUploads = async () => {
       try {
         const cloudUploads = cloudImageService.getUploadedImages();
-        console.log('Loading uploads on mount:', cloudUploads);
         setUploads(cloudUploads);
       } catch (error) {
         console.error('Error loading uploads:', error);
@@ -30,9 +29,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
     };
 
     const handleCloudImagesUpdate = (event) => {
-      console.log('Cloud images updated:', event.detail);
       const cloudUploads = cloudImageService.getUploadedImages();
-      console.log('Updated uploads list:', cloudUploads);
       setUploads(cloudUploads);
     };
 
@@ -165,14 +162,6 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
         </div>
 
-        {/* Debug Info */}
-        {import.meta.env.DEV && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mb-4 text-xs">
-            <p>Debug: Uploads count: {uploads.length}</p>
-            <p>Debug: Uploads: {JSON.stringify(uploads.map(u => ({ name: u.name, isTemplate: u.isTemplate })))}</p>
-          </div>
-        )}
-
         {/* Upload Area */}
         <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
           <div
@@ -197,7 +186,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
               browse files
             </button>
             <p className="text-xs text-gray-500 mt-2">
-              PNG, JPG, JPEG, SVG • Max {import.meta.env.VITE_MAX_IMAGES || 15} images
+              PNG, JPG, JPEG, SVG • Max {process.env.REACT_APP_MAX_IMAGES || 15} images
             </p>
           </div>
           <input

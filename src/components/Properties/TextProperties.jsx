@@ -59,7 +59,6 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             type="color"
             value={element.properties.color}
             onChange={(e) => {
-              console.log('Color change in TextProperties:', e.target.value);
               updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                 properties: { ...element.properties, color: e.target.value }
               });
@@ -85,11 +84,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, bold: !element.properties.bold }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium ${
-              element.properties.bold 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium ${element.properties.bold
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             <strong>B</strong>
           </button>
@@ -97,11 +95,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, italic: !element.properties.italic }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.italic 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.italic
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             <em>I</em>
           </button>
@@ -109,11 +106,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, underline: !element.properties.underline }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.underline 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.underline
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             <u>U</u>
           </button>
@@ -121,11 +117,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, listStyle: element.properties.listStyle === 'bullet' ? 'none' : 'bullet' }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.listStyle === 'bullet'
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.listStyle === 'bullet'
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             • Bullets
           </button>
@@ -139,11 +134,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, textAlign: 'left' }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.textAlign === 'left' 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.textAlign === 'left'
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             ←
           </button>
@@ -151,11 +145,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, textAlign: 'center' }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.textAlign === 'center' 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.textAlign === 'center'
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             ↔
           </button>
@@ -163,11 +156,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, textAlign: 'right' }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.textAlign === 'right' 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.textAlign === 'right'
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             →
           </button>
@@ -175,11 +167,10 @@ const TextProperties = ({ element, selectedElement, updateElement }) => {
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
               properties: { ...element.properties, textAlign: 'justify' }
             })}
-            className={`flex-1 py-2 px-3 rounded-md border text-sm ${
-              element.properties.textAlign === 'justify'
+            className={`flex-1 py-2 px-3 rounded-md border text-sm ${element.properties.textAlign === 'justify'
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             ⬌
           </button>

@@ -4,7 +4,7 @@ const SelectionHandles = ({ element, handleResizeMouseDown }) => {
   return (
     <>
       <div className="selection-outline absolute inset-0 border-2 border-blue-500 pointer-events-none" />
-      
+
       {/* Corner handles */}
       <div
         className="resize-handle absolute w-2 h-2 bg-blue-500 cursor-nw-resize"
@@ -26,7 +26,7 @@ const SelectionHandles = ({ element, handleResizeMouseDown }) => {
         style={{ bottom: '-4px', right: '-4px' }}
         onMouseDown={(e) => handleResizeMouseDown(e, element.id, 'se')}
       />
-      
+
       {/* Edge handles */}
       <div
         className="resize-handle absolute w-2 h-2 bg-blue-500 cursor-n-resize"

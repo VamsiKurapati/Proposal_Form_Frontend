@@ -1,7 +1,7 @@
 import React from 'react';
-import HelpIcon from './icons/help.svg';
-import FullscreenIcon from './icons/fullscreen.svg';
-import GridIcon from './icons/grid.svg';
+import { ReactComponent as HelpIcon } from './icons/help.svg';
+import { ReactComponent as FullscreenIcon } from './icons/fullscreen.svg';
+import { ReactComponent as GridIcon } from './icons/grid.svg';
 import './Footer.css';
 
 const Footer = ({
@@ -39,7 +39,7 @@ const Footer = ({
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-600">Pages</span>
         <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
-        <span className="text-xs text-gray-400">(max 20)</span>
+        <span className="text-xs text-gray-400">(max 50)</span>
       </div>
 
       {/* Grid, Fullscreen, Help */}
@@ -47,12 +47,12 @@ const Footer = ({
         <button
           onClick={onGridClick}
           className={`p-2 rounded-md transition-colors ${isGridView
-            ? 'bg-blue-100 text-blue-600'
-            : 'hover:bg-gray-100 text-gray-600'
+              ? 'bg-blue-100 text-blue-600'
+              : 'hover:bg-gray-100 text-gray-600'
             }`}
           title={isGridView ? "Exit Grid View" : "Grid View"}
         >
-          <img src={GridIcon} alt="Grid" className="w-5 h-5" />
+          <GridIcon className="w-5 h-5" />
         </button>
 
         <button
@@ -60,7 +60,7 @@ const Footer = ({
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
           title="Fullscreen"
         >
-          <img src={FullscreenIcon} alt="Fullscreen" className="w-5 h-5" />
+          <FullscreenIcon className="w-5 h-5 text-gray-600" />
         </button>
 
         <button
@@ -68,7 +68,7 @@ const Footer = ({
           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
           title="Help"
         >
-          <img src={HelpIcon} alt="Help" className="w-5 h-5" />
+          <HelpIcon className="w-5 h-5 text-gray-600" />
         </button>
       </div>
     </div>

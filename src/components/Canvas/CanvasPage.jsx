@@ -22,7 +22,7 @@ const CanvasPage = ({
 }) => {
   const [hoveredElement, setHoveredElement] = useState(null);
 
-  console.log('CanvasPage render:', { pageIndex, draggedElement, currentEditingPage });
+
 
   return (
     <div
@@ -48,27 +48,22 @@ const CanvasPage = ({
         if (e.target === e.currentTarget) {
           setSelectedElement({ pageIndex: 0, elementId: null });
         }
-        setCurrentEditingPage(pageIndex);
+        // Don't automatically switch pages on click - let grid view control this
+        // setCurrentEditingPage(pageIndex);
       }}
       onMouseEnter={() => {
-        if (currentEditingPage !== pageIndex) {
-          setCurrentEditingPage(pageIndex);
-        }
+        // Don't automatically switch pages on mouse enter - let grid view control this
+        // if (currentEditingPage !== pageIndex) {
+        //   setCurrentEditingPage(pageIndex);
+        // }
       }}
     >
       {/* SVG Background Layer */}
       {page.pageSettings.background.type === 'svg' && (
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{
-            width: '100%',
-            height: '100%',
-            zIndex: 0,
-            backgroundImage: `url('data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.pageSettings.background.value)}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
+          style={{ width: '100%', height: '100%', zIndex: 0 }}
+          dangerouslySetInnerHTML={{ __html: page.pageSettings.background.value }}
         />
       )}
 

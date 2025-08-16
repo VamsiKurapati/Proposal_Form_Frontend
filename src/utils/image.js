@@ -19,8 +19,8 @@ export function addImageElement(project, setProject, currentEditingPage, src) {
     type: 'image',
     x: 150,
     y: 150,
-    width: 200,
-    height: 200,
+    width: Math.min(200, page.pageSettings.width),
+    height: Math.min(200, page.pageSettings.height),
     rotation: 0,
     zIndex: page.elements.length + 1,
     properties: {

@@ -3,6 +3,7 @@ import TextProperties from './Properties/TextProperties';
 import ImageProperties from './Properties/ImageProperties';
 import ShapeProperties from './Properties/ShapeProperties';
 import CommonProperties from './Properties/CommonProperties';
+import { truncateText } from '../utils/text';
 
 const PropertiesPanel = ({
   show,
@@ -12,7 +13,7 @@ const PropertiesPanel = ({
   deleteElement,
   duplicateElement,
   onClose,
-  project
+  project,
 }) => {
   if (!show) return null;
 
@@ -61,7 +62,7 @@ const PropertiesPanel = ({
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {selectedEl.type === 'text' && (selectedEl.properties?.text || 'Text element')}
+                {selectedEl.type === 'text' && (selectedEl.properties?.text ? truncateText(selectedEl.properties.text, 30) : 'Text element')}
                 {selectedEl.type === 'image' && 'Image element'}
                 {selectedEl.type === 'shape' && `${selectedEl.shapeType || 'Shape'} element`}
                 {selectedEl.type === 'svg' && 'SVG element'}

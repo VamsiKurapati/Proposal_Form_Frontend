@@ -1,6 +1,6 @@
 import React from 'react';
 import GridTextElement from './elements/GridTextElement';
-import ImageElement from './elements/ImageElement';
+import LazyImageElement from './elements/LazyImageElement';
 import ShapeElement from './elements/ShapeElement';
 import SVGElement from './elements/SVGElement';
 
@@ -13,7 +13,7 @@ const GridElementRenderer = ({ element, pageIndex, project }) => {
         />
       );
     case 'image':
-      return <ImageElement element={element} />;
+      return <LazyImageElement element={element} />;
     case 'shape':
       return <ShapeElement element={element} />;
     case 'svg':

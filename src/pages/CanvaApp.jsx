@@ -38,6 +38,8 @@ const CanvaApp = () => {
     generateId,
     addPage,
     deletePage,
+    duplicatePage,
+    reorderPages,
     clearCurrentPage,
     clearAllPages,
     setBackground
@@ -53,8 +55,7 @@ const CanvaApp = () => {
     canRedo,
     getHistoryList,
     restoreToHistoryEntry,
-    clearHistory,
-    setIsUndoRedoAction
+    clearHistory
   } = useHistory(project, setProject, setCurrentEditingPage, setSelectedElement);
 
   const {
@@ -70,8 +71,53 @@ const CanvaApp = () => {
   // Create a flag to track if we're in the middle of an interaction
   const [isInInteraction, setIsInInteraction] = useState(false);
 
-  // State for copy feedback
+  // State for copy/cut feedback
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const [lastOperation, setLastOperation] = useState('copy'); // 'copy', 'cut', or 'external-copy'
+
+  // Function to paste internal elements
+  const pasteInternalElement = useCallback(() => {
+    const copiedElementData = localStorage.getItem('canva-copied-element');
+    if (copiedElementData) {
+      try {
+        const elementData = JSON.parse(copiedElementData);
+        const newElement = {
+          ...elementData,
+          id: generateId(),
+          x: elementData.x + 20,
+          y: elementData.y + 20
+        };
+
+        // Add the element to the current editing page
+        setProject(prev => {
+          const newProject = {
+            ...prev,
+            pages: prev.pages.map((page, idx) =>
+              idx === currentEditingPage
+                ? {
+                  ...page,
+                  elements: [...page.elements, newElement]
+                }
+                : page
+            )
+          };
+
+          // Mark this project as a paste operation for history tracking
+          newProject._isPasteOperation = true;
+
+          return newProject;
+        });
+
+        // Select the new element
+        setSelectedElement({
+          pageIndex: currentEditingPage,
+          elementId: newElement.id
+        });
+      } catch (error) {
+        console.error('Error pasting element:', error);
+      }
+    }
+  }, [generateId, setProject, currentEditingPage, setSelectedElement]);
 
   // Create updateElementWithHistory function before useInteraction hook
   const updateElementWithHistory = useCallback((pageIndex, elementId, updates) => {
@@ -86,7 +132,12 @@ const CanvaApp = () => {
 
     const isAnyPropertyUpdate = updates && !!updates.properties;
     const isTextContentChange = updates.properties && updates.properties.text !== undefined;
-    const isOtherPropertyChange = updates.properties && !isTextContentChange;
+    const isColorChange = updates.properties && (
+      updates.properties.fill !== undefined ||
+      updates.properties.stroke !== undefined ||
+      updates.properties.color !== undefined
+    );
+    const isOtherPropertyChange = updates.properties && !isTextContentChange && !isColorChange;
     const isRotationChange = updates.rotation !== undefined;
     const isZIndexChange = updates.zIndex !== undefined;
 
@@ -108,6 +159,25 @@ const CanvaApp = () => {
           pendingTextChangesRef.current[elementId] = null;
         }
       }, 1000); // Wait 1 second after last text change
+    }
+    // For color changes, use longer debouncing to handle drag operations
+    else if (isColorChange) {
+      // Clear existing timer
+      if (propertyChangeTimerRef.current) {
+        clearTimeout(propertyChangeTimerRef.current);
+      }
+
+      // Store the pending color change
+      pendingPropertyChangesRef.current[elementId] = updates;
+
+      // Set a timer to save history after user stops changing colors
+      propertyChangeTimerRef.current = setTimeout(() => {
+        if (saveToHistory && pendingPropertyChangesRef.current[elementId]) {
+          saveToHistory('Color Updated', 'Updated element colors', { [elementId]: pendingPropertyChangesRef.current[elementId] });
+          // Clear the pending changes
+          pendingPropertyChangesRef.current[elementId] = null;
+        }
+      }, 1500); // Wait 1.5 seconds after last color change to handle drag operations
     }
     // Use debounced history for image properties (contrast, brightness, blur, etc.)
     else if (saveToHistoryDebounced && (isOtherPropertyChange || isRotationChange || isZIndexChange)) {
@@ -164,6 +234,13 @@ const CanvaApp = () => {
       // Store the pending change
       pendingPropertyChangesRef.current[elementId] = updates;
 
+      // Check if these are color changes that should be debounced
+      const isColorChange = updates.properties && (
+        updates.properties.fill !== undefined ||
+        updates.properties.stroke !== undefined ||
+        updates.properties.color !== undefined
+      );
+
       // Check if these are image-specific properties that should be debounced
       const isImageProperty = updates.properties && (
         updates.properties.contrast !== undefined ||
@@ -179,7 +256,9 @@ const CanvaApp = () => {
       // Set a timer to save history after user stops making changes
       propertyChangeTimerRef.current = setTimeout(() => {
         if (pendingPropertyChangesRef.current[elementId]) {
-          if (isImageProperty && saveToHistoryDebounced) {
+          if (isColorChange && saveToHistory) {
+            saveToHistory('Color Updated', 'Updated element colors', { [elementId]: pendingPropertyChangesRef.current[elementId] });
+          } else if (isImageProperty && saveToHistoryDebounced) {
             saveToHistoryDebounced('Image Properties Updated', 'Updated image properties', { [elementId]: pendingPropertyChangesRef.current[elementId] });
           } else if (saveToHistory) {
             saveToHistory('Properties Updated', 'Updated element properties', { [elementId]: pendingPropertyChangesRef.current[elementId] });
@@ -187,7 +266,7 @@ const CanvaApp = () => {
           // Clear the pending changes
           pendingPropertyChangesRef.current[elementId] = null;
         }
-      }, 1000); // Wait 1 second after last property change
+      }, isColorChange ? 1500 : 1000); // Wait 1.5 seconds for color changes, 1 second for other properties
 
     } catch (error) {
       console.error('updateElementPropertiesOnly: Error calling updateElement', error);
@@ -211,7 +290,7 @@ const CanvaApp = () => {
     handleMouseUp,
     handleResizeMouseDown,
     draggedElement
-  } = useInteraction(zoom / 100, updateElementWithHistory, project, setSelectedElement, setCurrentEditingPage, saveToHistory, setIsInInteraction, deleteElementWithHistory, currentEditingPage);
+  } = useInteraction(zoom / 100, updateElement, project, setSelectedElement, setCurrentEditingPage, saveToHistory, setIsInInteraction, deleteElementWithHistory, currentEditingPage);
 
   // Wrapper for text editing that saves history after editing ends
   const setIsEditing = useCallback((elementId) => {
@@ -238,7 +317,6 @@ const CanvaApp = () => {
   const imageInputRef = useRef(null);
   const jsonInputRef = useRef(null);
   const svgInputRef = useRef(null);
-  const svgIconInputRef = useRef(null);
 
   const { sets, svgPreviews } = getTemplateSets();
 
@@ -255,10 +333,11 @@ const CanvaApp = () => {
   const addPageWithHistory = useCallback(() => {
     addPage((updatedProject) => {
       if (saveToHistory) {
-        saveToHistory('Page Added', `Added new page ${updatedProject.pages.length}`, null, updatedProject);
+        const insertedAt = updatedProject.currentPage + 1;
+        saveToHistory('Page Added', `Added new page at position ${insertedAt}`, null, updatedProject);
       }
-    });
-  }, [addPage, saveToHistory]);
+    }, currentEditingPage);
+  }, [addPage, saveToHistory, currentEditingPage]);
 
   const deletePageWithHistory = useCallback((pageIndex) => {
     deletePage(pageIndex, (updatedProject) => {
@@ -267,6 +346,22 @@ const CanvaApp = () => {
       }
     });
   }, [deletePage, saveToHistory]);
+
+  const duplicatePageWithHistory = useCallback((pageIndex) => {
+    duplicatePage(pageIndex, (updatedProject) => {
+      if (saveToHistory) {
+        saveToHistory('Page Duplicated', `Duplicated page ${pageIndex + 1}`, null, updatedProject);
+      }
+    });
+  }, [duplicatePage, saveToHistory]);
+
+  const reorderPagesWithHistory = useCallback((fromIndex, toIndex) => {
+    reorderPages(fromIndex, toIndex, (updatedProject) => {
+      if (saveToHistory) {
+        saveToHistory('Pages Reordered', `Moved page ${fromIndex + 1} to position ${toIndex + 1}`, null, updatedProject);
+      }
+    });
+  }, [reorderPages, saveToHistory]);
 
   const clearCurrentPageWithHistory = useCallback(() => {
     clearCurrentPage((updatedProject) => {
@@ -285,13 +380,14 @@ const CanvaApp = () => {
   }, [clearAllPages, saveToHistory]);
 
   const setBackgroundWithHistory = useCallback((type, value) => {
-    setBackground(type, value);
-    setTimeout(() => {
+    setBackground(type, value, (updatedProject) => {
       if (saveToHistory) {
-        saveToHistory('Background Changed', `Changed background on page ${currentEditingPage + 1}`);
+        // Use the currentPage from the updated project to ensure we're referencing the correct page
+        const targetPageIndex = updatedProject.currentPage;
+        saveToHistory('Background Changed', `Changed background on page ${targetPageIndex + 1}`, null, updatedProject);
       }
-    }, 10);
-  }, [setBackground, currentEditingPage, saveToHistory]);
+    });
+  }, [setBackground, saveToHistory]);
 
   const addTextElementWithHistory = () => {
     addTextElement((updatedProject) => {
@@ -394,6 +490,28 @@ const CanvaApp = () => {
           e.preventDefault();
           deleteElementWithHistory(selectedElement.pageIndex, selectedElement.elementId);
         }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+        // Cut selected element (copy then delete)
+        if (selectedEl && selectedElement) {
+          e.preventDefault();
+          // Store element data in localStorage for internal copy/paste
+          const elementData = {
+            ...selectedEl,
+            id: undefined, // Remove id so a new one will be generated
+            x: selectedEl.x + 20, // Offset for visual feedback
+            y: selectedEl.y + 20
+          };
+          localStorage.setItem('canva-copied-element', JSON.stringify(elementData));
+          localStorage.removeItem('canva-copied-text'); // Clear any copied text
+
+          // Delete the original element
+          deleteElementWithHistory(selectedElement.pageIndex, selectedElement.elementId);
+
+          // Show cut feedback
+          setLastOperation('cut');
+          setCopyFeedback(true);
+          setTimeout(() => setCopyFeedback(false), 2000);
+        }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         // Copy selected element
         if (selectedEl && selectedElement) {
@@ -406,28 +524,89 @@ const CanvaApp = () => {
             y: selectedEl.y + 20
           };
           localStorage.setItem('canva-copied-element', JSON.stringify(elementData));
+          localStorage.removeItem('canva-copied-text'); // Clear any copied text
 
           // Show copy feedback
+          setLastOperation('copy');
           setCopyFeedback(true);
           setTimeout(() => setCopyFeedback(false), 2000);
+        } else {
+          // No element selected, check if we can copy external text
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(externalText => {
+              if (externalText && externalText.trim()) {
+                // Store external text as the last copied item
+                localStorage.setItem('canva-copied-text', externalText);
+                localStorage.removeItem('canva-copied-element'); // Clear element clipboard
+
+                // Show external copy feedback
+                setLastOperation('external-copy');
+                setCopyFeedback(true);
+                setTimeout(() => setCopyFeedback(false), 2000);
+              }
+            }).catch(() => {
+              // If clipboard API fails, do nothing
+            });
+          }
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-        // Handle internal paste
+        // Handle paste - paste whatever was last copied
         e.preventDefault();
 
-        // Check for internal clipboard data
+        // Check if we have internal clipboard data
         const copiedElementData = localStorage.getItem('canva-copied-element');
+        const copiedTextData = localStorage.getItem('canva-copied-text');
+
         if (copiedElementData) {
-          try {
-            const elementData = JSON.parse(copiedElementData);
-            const newElement = {
-              ...elementData,
+          // Paste internal element
+          pasteInternalElement();
+        } else if (copiedTextData) {
+          // Paste copied text
+          const externalText = copiedTextData;
+
+          // If we have text and a text element is selected, paste into it
+          if (selectedEl && selectedElement && selectedEl.type === 'text') {
+            // Paste text into the selected text element (replace existing text)
+            updateElement(currentEditingPage, selectedEl.id, {
+              properties: {
+                ...selectedEl.properties,
+                text: externalText
+              }
+            });
+
+            // Show text paste feedback
+            setLastOperation('text-paste');
+            setCopyFeedback(true);
+            setTimeout(() => setCopyFeedback(false), 2000);
+
+            // Save to history
+            if (saveToHistory) {
+              saveToHistory('Text Pasted', 'Pasted copied text', null, project);
+            }
+          } else {
+            // Create a new text element with the copied text
+            const newTextElement = {
               id: generateId(),
-              x: elementData.x + 20,
-              y: elementData.y + 20
+              type: 'text',
+              x: 100,
+              y: 100,
+              width: Math.min(200, project.pages[currentEditingPage].pageSettings.width),
+              height: Math.min(100, project.pages[currentEditingPage].pageSettings.height),
+              properties: {
+                text: externalText,
+                fontSize: 16,
+                fontFamily: 'Arial, sans-serif',
+                color: '#000000',
+                bold: false,
+                italic: false,
+                textAlign: 'left',
+                underline: false,
+                lineHeight: 1.2,
+                letterSpacing: 0,
+                listStyle: 'none'
+              }
             };
 
-            // Add the element to the current editing page
             setProject(prev => {
               const newProject = {
                 ...prev,
@@ -435,26 +614,111 @@ const CanvaApp = () => {
                   idx === currentEditingPage
                     ? {
                       ...page,
-                      elements: [...page.elements, newElement]
+                      elements: [...page.elements, newTextElement]
                     }
                     : page
                 )
               };
+
+              newProject._isPasteOperation = true;
               return newProject;
             });
 
-            // Select the new element
+            // Select the new text element
             setSelectedElement({
               pageIndex: currentEditingPage,
-              elementId: newElement.id
+              elementId: newTextElement.id
             });
 
-            // Save to history
-            if (saveToHistory) {
-              saveToHistory('Element Pasted', 'Pasted element', null, project);
-            }
-          } catch (error) {
-            console.error('Error pasting element:', error);
+            // Show text paste feedback
+            setLastOperation('text-paste');
+            setCopyFeedback(true);
+            setTimeout(() => setCopyFeedback(false), 2000);
+          }
+        } else {
+          // Try to paste external text from system clipboard
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(externalText => {
+              if (externalText && externalText.trim()) {
+                // If we have external text and a text element is selected, paste into it
+                if (selectedEl && selectedElement && selectedEl.type === 'text') {
+                  // Paste external text into the selected text element (replace existing text)
+                  updateElement(currentEditingPage, selectedEl.id, {
+                    properties: {
+                      ...selectedEl.properties,
+                      text: externalText
+                    }
+                  });
+
+                  // Show external paste feedback
+                  setLastOperation('external-paste');
+                  setCopyFeedback(true);
+                  setTimeout(() => setCopyFeedback(false), 2000);
+
+                  // Save to history
+                  if (saveToHistory) {
+                    saveToHistory('External Text Pasted', 'Pasted external text', null, project);
+                  }
+                } else {
+                  // Create a new text element with the external text
+                  const page = project.pages[currentEditingPage];
+                  const newTextElement = {
+                    id: generateId(),
+                    type: 'text',
+                    x: 100,
+                    y: 100,
+                    width: Math.min(200, page.pageSettings.width),
+                    height: Math.min(100, page.pageSettings.height),
+                    rotation: 0,
+                    zIndex: page.elements.length + 1,
+                    properties: {
+                      text: externalText,
+                      fontSize: 16,
+                      fontFamily: 'Arial, sans-serif',
+                      color: '#000000',
+                      bold: false,
+                      italic: false,
+                      textAlign: 'left',
+                      underline: false,
+                      lineHeight: 1.2,
+                      letterSpacing: 0,
+                      listStyle: 'none'
+                    }
+                  };
+
+                  setProject(prev => {
+                    const newProject = {
+                      ...prev,
+                      pages: prev.pages.map((p, idx) =>
+                        idx === currentEditingPage
+                          ? {
+                            ...p,
+                            elements: [...p.elements, newTextElement]
+                          }
+                          : p
+                      )
+                    };
+
+                    newProject._isPasteOperation = true;
+                    return newProject;
+                  });
+
+                  // Select the new text element
+                  setSelectedElement({
+                    pageIndex: currentEditingPage,
+                    elementId: newTextElement.id
+                  });
+
+                  // Show external paste feedback
+                  setLastOperation('external-paste');
+                  setCopyFeedback(true);
+                  setTimeout(() => setCopyFeedback(false), 2000);
+                }
+              }
+            }).catch((error) => {
+              console.error('Clipboard API failed:', error);
+              // If clipboard API fails, try alternative method
+            });
           }
         }
       }
@@ -464,7 +728,102 @@ const CanvaApp = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [undo, redo, canUndo, canRedo, selectedEl, selectedElement, deleteElementWithHistory, generateId, setProject, saveToHistory, project, isEditing]);
+  }, [undo, redo, canUndo, canRedo, selectedEl, selectedElement, deleteElementWithHistory, generateId, setProject, saveToHistory, project, isEditing, currentEditingPage, setSelectedElement, pasteInternalElement, updateElement]);
+
+  // Effect to handle paste operation history
+  useEffect(() => {
+    if (project && project._isPasteOperation) {
+      // Remove the flag and save to history
+      const cleanProject = { ...project };
+      delete cleanProject._isPasteOperation;
+
+      if (saveToHistory) {
+        saveToHistory('Element Pasted', 'Pasted element', null, cleanProject);
+      }
+
+      // Clean up the flag from the project state
+      setProject(prev => {
+        const { _isPasteOperation, ...cleanState } = prev;
+        return cleanState;
+      });
+    }
+  }, [project, saveToHistory, setProject]);
+
+  // Global paste event listener as fallback
+  useEffect(() => {
+    const handleGlobalPaste = (event) => {
+      // Only handle if we're not in a text input/textarea
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      const clipboardData = event.clipboardData;
+      if (clipboardData && clipboardData.getData('text')) {
+        const externalText = clipboardData.getData('text');
+
+        if (externalText && externalText.trim()) {
+          // Create a new text element with the external text
+          const page = project.pages[currentEditingPage];
+          const newTextElement = {
+            id: generateId(),
+            type: 'text',
+            x: 100,
+            y: 100,
+            width: Math.min(200, page.pageSettings.width),
+            height: Math.min(100, page.pageSettings.height),
+            rotation: 0,
+            zIndex: page.elements.length + 1,
+            properties: {
+              text: externalText,
+              fontSize: 16,
+              fontFamily: 'Arial, sans-serif',
+              color: '#000000',
+              bold: false,
+              italic: false,
+              textAlign: 'left',
+              underline: false,
+              lineHeight: 1.2,
+              letterSpacing: 0,
+              listStyle: 'none'
+            }
+          };
+
+          setProject(prev => {
+            const newProject = {
+              ...prev,
+              pages: prev.pages.map((p, idx) =>
+                idx === currentEditingPage
+                  ? {
+                    ...p,
+                    elements: [...p.elements, newTextElement]
+                  }
+                  : p
+              )
+            };
+
+            newProject._isPasteOperation = true;
+            return newProject;
+          });
+
+          // Select the new text element
+          setSelectedElement({
+            pageIndex: currentEditingPage,
+            elementId: newTextElement.id
+          });
+
+          // Show external paste feedback
+          setLastOperation('external-paste');
+          setCopyFeedback(true);
+          setTimeout(() => setCopyFeedback(false), 2000);
+        }
+      }
+    };
+
+    document.addEventListener('paste', handleGlobalPaste);
+    return () => {
+      document.removeEventListener('paste', handleGlobalPaste);
+    };
+  }, [project, currentEditingPage, generateId, setProject, setSelectedElement]);
 
 
 
@@ -481,65 +840,9 @@ const CanvaApp = () => {
     }
   };
 
-  // Handle SVG icon upload
-  const handleSVGIconUpload = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === 'image/svg+xml') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const svgContent = e.target.result;
-        // Create a new SVG element
-        const newElement = {
-          id: generateId(),
-          type: 'svg',
-          x: 100,
-          y: 100,
-          width: 100,
-          height: 100,
-          rotation: 0,
-          zIndex: 1,
-          properties: {
-            svgContent: svgContent
-          }
-        };
-
-        // Add to current page
-        setProject(prev => {
-          const newProject = {
-            ...prev,
-            pages: prev.pages.map((page, idx) =>
-              idx === currentEditingPage
-                ? {
-                  ...page,
-                  elements: [...page.elements, newElement]
-                }
-                : page
-            )
-          };
-          return newProject;
-        });
-
-        // Select the new element
-        setSelectedElement({
-          pageIndex: currentEditingPage,
-          elementId: newElement.id
-        });
-
-        // Save to history
-        if (saveToHistory) {
-          saveToHistory('SVG Icon Added', 'Added SVG icon', null, project);
-        }
-
-        // Clear the input
-        event.target.value = '';
-      };
-      reader.readAsText(file);
-    }
-  };
-
   // Import from JSON
   const handleImportFromJSON = (event) => {
-    importFromJSON(event, setProject, setSelectedElement);
+    importFromJSON(event, setProject, setSelectedElement, clearHistory);
   };
 
 
@@ -629,10 +932,15 @@ const CanvaApp = () => {
           </div>
         )}
 
-        {/* Copy Feedback */}
+        {/* Copy/Cut/Paste Feedback */}
         {copyFeedback && (
           <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-300">
-            Element copied! Press Ctrl+V to paste
+            {lastOperation === 'cut' ? 'Element cut! Press Ctrl+V to paste' :
+              lastOperation === 'copy' ? 'Element copied! Press Ctrl+V to paste' :
+                lastOperation === 'external-copy' ? 'Text copied! Press Ctrl+V to paste' :
+                  lastOperation === 'external-paste' ? 'External text pasted!' :
+                    lastOperation === 'text-paste' ? 'Text pasted!' :
+                      'Element copied! Press Ctrl+V to paste'}
           </div>
         )}
         {/* Panels */}
@@ -658,8 +966,6 @@ const CanvaApp = () => {
           addTextElement={addTextElementWithHistory}
           imageInputRef={imageInputRef}
           addShapeElement={addShapeElementWithHistory}
-          svgIconInputRef={svgIconInputRef}
-          handleSVGIconUpload={handleSVGIconUpload}
         />
 
         <TextPanel
@@ -698,9 +1004,10 @@ const CanvaApp = () => {
           onClearAll={clearAllPagesWithHistory}
           onDeletePage={() => deletePageWithHistory(currentEditingPage)}
           onInsertPage={addPageWithHistory}
+          onDuplicatePage={() => duplicatePageWithHistory(currentEditingPage)}
           onLoadJSON={(file) => {
             const event = { target: { files: [file] } };
-            importFromJSON(event, setProject, setSelectedElement);
+            importFromJSON(event, setProject, setSelectedElement, clearHistory);
           }}
           onExportJSON={() => exportToJSON(project)}
           onExportPDF={async () => await exportToPDF(project)}
@@ -771,6 +1078,7 @@ const CanvaApp = () => {
             duplicateElement={() => duplicateElementWithHistory(selectedEl, selectedElement)}
             onClose={() => panelState.setShowPropertiesPanel(false)}
             project={project}
+
           />
         )}
 
@@ -787,8 +1095,14 @@ const CanvaApp = () => {
               currentEditingPage={currentEditingPage}
               onPageClick={(pageIndex) => {
                 setCurrentEditingPage(pageIndex);
+                // Also update the project's currentPage to ensure consistency
+                setProject(prev => ({
+                  ...prev,
+                  currentPage: pageIndex
+                }));
                 setIsGridView(false);
               }}
+              onReorderPages={reorderPagesWithHistory}
             />
           ) : (
             <Canvas
@@ -819,7 +1133,7 @@ const CanvaApp = () => {
         }}
       >
         <Footer
-          onHelpClick={() => alert('Help documentation coming soon!')}
+          onHelpClick={() => alert('Keyboard Shortcuts:\n\nCtrl/Cmd + C: Copy element\nCtrl/Cmd + X: Cut element\nCtrl/Cmd + V: Paste last copied item\nCtrl/Cmd + Z: Undo\nCtrl/Cmd + Shift + Z: Redo\nDelete/Backspace: Delete element\n\nPaste Behavior:\n- Ctrl+V pastes whatever was last copied (element or external text)\n- If you copy/cut an element, that gets pasted\n- If you copy text from outside, that gets pasted\n- Last copied item always takes precedence\n\nHelp documentation coming soon!')}
           onFullscreenClick={() => {
             if (!document.fullscreenElement) {
               document.documentElement.requestFullscreen();

@@ -45,16 +45,16 @@ const DesignPanel = ({
             </div>
             <button onClick={e => { e.stopPropagation(); onClose(); }} className="text-gray-500 hover:text-gray-700">✕</button>
           </div>
-          <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
             {previews.map((svgUrl, idx) => (
               <button
                 key={idx}
                 className="border rounded p-2 bg-gray-50 hover:bg-blue-50 transition-colors flex flex-col items-center min-w-0"
                 onClick={() => handleTemplateApply(svgUrl)}
               >
-                              <div className="w-20 h-28 flex items-center justify-center overflow-hidden bg-white border mb-1 rounded">
-                <img src={svgUrl} alt="SVG preview" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-              </div>
+                <div className="w-20 h-28 flex items-center justify-center overflow-hidden bg-white border mb-1 rounded">
+                  <img src={svgUrl} alt="SVG preview" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+                </div>
               </button>
             ))}
           </div>
@@ -108,7 +108,7 @@ const DesignPanel = ({
             {Object.keys(sets).length > 0 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Template Sets</label>
-                <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-2 gap-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 320px)' }}>
                   {Object.entries(sets).map(([folder, svgs]) => {
                     const firstSvgUrl = svgPreviews[folder]?.[0];
                     return (

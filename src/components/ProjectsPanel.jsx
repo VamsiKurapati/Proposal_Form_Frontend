@@ -6,7 +6,7 @@ const ProjectsPanel = ({ show, onClose }) => {
   };
 
   if (!show) return null;
-  
+
   return (
     <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
       <div className="p-4">
@@ -39,7 +39,7 @@ const ProjectsPanel = ({ show, onClose }) => {
         {/* Projects List */}
         <div className="space-y-4">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Projects Currently Assigned</h4>
-          
+
           {/* Empty State */}
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

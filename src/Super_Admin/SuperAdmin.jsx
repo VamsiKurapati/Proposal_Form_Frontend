@@ -1898,9 +1898,12 @@ const SuperAdmin = () => {
 
     const handleLogout = () => {
         localStorage.clear();
+        console.log("Local Storage Cleared");
         sessionStorage.clear();
+        console.log("Session Storage Cleared");
         setTimeout(() => {
             navigate('/');
+            window.location.reload();
         }, 1000);
     };
 

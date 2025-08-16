@@ -67,15 +67,8 @@ const CanvasArea = ({
               {page.pageSettings.background.type === 'svg' && (
                 <div
                   className="absolute inset-0 pointer-events-none"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    zIndex: 0,
-                    backgroundImage: `url('data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.pageSettings.background.value)}')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}
+                  style={{ width: '100%', height: '100%', zIndex: 0 }}
+                  dangerouslySetInnerHTML={{ __html: page.pageSettings.background.value }}
                 />
               )}
               {/* Render elements */}
@@ -195,34 +188,11 @@ const CanvasArea = ({
                       />
                     )}
                     {element.type === 'svg' && element.properties?.svgContent && (
-                      (() => {
-                        const svgContent = element.properties.svgContent;
-                        const isDataUrl = svgContent.startsWith('data:image/svg+xml');
-
-                        if (isDataUrl) {
-                          return (
-                            <div
-                              className="w-full h-full"
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                backgroundImage: `url('${svgContent}')`,
-                                backgroundSize: 'contain',
-                                backgroundPosition: 'center',
-                                backgroundRepeat: 'no-repeat'
-                              }}
-                            />
-                          );
-                        } else {
-                          return (
-                            <div
-                              className="w-full h-full"
-                              dangerouslySetInnerHTML={{ __html: svgContent }}
-                              style={{ width: '100%', height: '100%' }}
-                            />
-                          );
-                        }
-                      })()
+                      <div
+                        className="w-full h-full"
+                        dangerouslySetInnerHTML={{ __html: element.properties.svgContent }}
+                        style={{ width: '100%', height: '100%' }}
+                      />
                     )}
                     {/* Render shape elements (copy the shape rendering logic from App.js) */}
                     {/* ... shape rendering logic ... */}

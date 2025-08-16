@@ -1,23 +1,13 @@
 import React from 'react';
 
-const AlignmentGuides = ({ 
-  draggedElement, 
-  allElements, 
-  pageWidth, 
+const AlignmentGuides = ({
+  draggedElement,
+  allElements,
+  pageWidth,
   pageHeight,
   snapThreshold = 15,
   zoom = 1
 }) => {
-  console.log('AlignmentGuides render:', { 
-    draggedElement, 
-    draggedElementId: draggedElement?.id,
-    draggedElementPage: draggedElement?.pageIndex,
-    allElements: allElements?.length, 
-    pageWidth, 
-    pageHeight,
-    snapThreshold 
-  });
-  
   if (!draggedElement) return null;
 
   const guides = [];
@@ -29,8 +19,6 @@ const AlignmentGuides = ({
     centerX: draggedElement.x + draggedElement.width / 2,
     centerY: draggedElement.y + draggedElement.height / 2
   };
-
-  console.log('Dragged bounds:', draggedBounds);
 
   // Check alignment with other elements
   allElements.forEach(element => {
@@ -108,8 +96,6 @@ const AlignmentGuides = ({
     }
   });
 
-  console.log('Generated guides:', guides);
-
   return (
     <svg
       className="absolute inset-0 pointer-events-none"
@@ -118,7 +104,7 @@ const AlignmentGuides = ({
       height={pageHeight * zoom}
       viewBox={`0 0 ${pageWidth} ${pageHeight}`}
     >
-      
+
       {guides.map((guide, index) => (
         <line
           key={index}

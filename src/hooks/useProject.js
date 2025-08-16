@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { DEFAULT_PAGE_SETTINGS } from '../constants';
-import { safeSetItem, safeGetItem, STORAGE_KEYS } from '../utils/storage';
 
 export const useProject = () => {
   const [project, setProject] = useState({
@@ -19,31 +18,29 @@ export const useProject = () => {
   useEffect(() => {
     // Only auto-save if not in the middle of a history restoration
     if (!project._isHistoryRestoration) {
-      const success = safeSetItem(STORAGE_KEYS.PROJECT, project);
-      if (!success) {
-        console.warn('Failed to save project to localStorage. Data may be too large.');
-      }
+      localStorage.setItem('canva-project', JSON.stringify(project));
     }
   }, [project]);
 
   // Load from localStorage on mount
   useEffect(() => {
-    const saved = safeGetItem(STORAGE_KEYS.PROJECT);
+    const saved = localStorage.getItem('canva-project');
     if (saved) {
       try {
+        const parsed = JSON.parse(saved);
         // Migration for old format
-        if (saved.pageSettings && saved.elements) {
+        if (parsed.pageSettings && parsed.elements) {
           const migratedProject = {
             pages: [{
               id: 1,
-              pageSettings: saved.pageSettings,
-              elements: saved.elements
+              pageSettings: parsed.pageSettings,
+              elements: parsed.elements
             }],
             currentPage: 0
           };
           setProject(migratedProject);
         } else {
-          setProject(saved);
+          setProject(parsed);
         }
       } catch (e) {
         console.error('Error loading saved project:', e);
@@ -55,9 +52,10 @@ export const useProject = () => {
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
-  const addPage = (onComplete) => {
-    if (project.pages.length >= 20) {
-      alert('Maximum page limit reached. You can only have up to 20 pages.');
+  // Optionally accepts an insertion index (insert after this index)
+  const addPage = (onComplete, insertAfterIndexParam) => {
+    if (project.pages.length >= 50) {
+      alert('Maximum page limit reached. You can only have up to 50 pages.');
       return;
     }
 
@@ -66,12 +64,26 @@ export const useProject = () => {
       pageSettings: DEFAULT_PAGE_SETTINGS,
       elements: []
     };
+    // Allow caller to specify the insertion base index; default to currentEditingPage
+    let insertAfterIndex = currentEditingPage;
+    if (typeof onComplete === 'number' && insertAfterIndexParam === undefined) {
+      // Backward-compatible overload: addPage(insertAfterIndex)
+      insertAfterIndex = onComplete;
+      onComplete = undefined;
+    } else if (typeof insertAfterIndexParam === 'number') {
+      insertAfterIndex = insertAfterIndexParam;
+    }
+    const safeAfterIndex = Math.max(-1, Math.min(insertAfterIndex, project.pages.length - 1));
+    const insertionIndex = safeAfterIndex + 1;
     setProject(prev => {
-      const newPageIndex = prev.pages.length;
+      const pagesBefore = prev.pages.slice(0, insertionIndex);
+      const pagesAfter = prev.pages.slice(insertionIndex);
+      const updatedPages = [...pagesBefore, newPage, ...pagesAfter];
+
       const newProject = {
         ...prev,
-        pages: [...prev.pages, newPage],
-        currentPage: newPageIndex
+        pages: updatedPages,
+        currentPage: insertionIndex
       };
 
       // Call onComplete with the updated project if provided
@@ -82,11 +94,10 @@ export const useProject = () => {
       return newProject;
     });
 
-    // Update currentEditingPage to the new page after state update
+    // Update currentEditingPage to the inserted page
     setTimeout(() => {
-      const newPageIndex = project.pages.length;
-      setCurrentEditingPage(newPageIndex);
-      setSelectedElement({ pageIndex: newPageIndex, elementId: null });
+      setCurrentEditingPage(insertionIndex);
+      setSelectedElement({ pageIndex: insertionIndex, elementId: null });
     }, 0);
   };
 
@@ -185,12 +196,12 @@ export const useProject = () => {
     setSelectedElement({ pageIndex: 0, elementId: null });
   };
 
-  const setBackground = (type, value) => {
+  const setBackground = (type, value, onComplete) => {
     setProject(prev => {
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
-          index === currentEditingPage
+          index === prev.currentPage
             ? {
               ...page,
               pageSettings: {
@@ -202,10 +213,111 @@ export const useProject = () => {
         )
       };
 
-
+      // Provide the updated project to a callback for history saving, similar to other actions
+      if (onComplete) {
+        onComplete(newProject);
+      }
 
       return newProject;
     });
+  };
+
+  const duplicatePage = (pageIndex, onComplete) => {
+    if (project.pages.length >= 50) {
+      alert('Maximum page limit reached. You can only have up to 50 pages.');
+      return;
+    }
+
+    const pageToDuplicate = project.pages[pageIndex];
+    if (!pageToDuplicate) {
+      console.error('Page to duplicate not found');
+      return;
+    }
+
+    // Create a deep copy of the page with new IDs for all elements
+    const duplicatedPage = {
+      ...pageToDuplicate,
+      id: Date.now(),
+      elements: pageToDuplicate.elements.map(element => ({
+        ...element,
+        id: generateId()
+      }))
+    };
+
+    // Insert the duplicated page right after the original page
+    const insertionIndex = pageIndex + 1;
+    setProject(prev => {
+      const pagesBefore = prev.pages.slice(0, insertionIndex);
+      const pagesAfter = prev.pages.slice(insertionIndex);
+      const updatedPages = [...pagesBefore, duplicatedPage, ...pagesAfter];
+
+      const newProject = {
+        ...prev,
+        pages: updatedPages,
+        currentPage: insertionIndex
+      };
+
+      // Call onComplete with the updated project if provided
+      if (onComplete) {
+        setTimeout(() => onComplete(newProject), 0);
+      }
+
+      return newProject;
+    });
+
+    // Update currentEditingPage to the duplicated page
+    setTimeout(() => {
+      setCurrentEditingPage(insertionIndex);
+      setSelectedElement({ pageIndex: insertionIndex, elementId: null });
+    }, 0);
+  };
+
+  const reorderPages = (fromIndex, toIndex, onComplete) => {
+    if (fromIndex === toIndex) return;
+
+    // Calculate new currentEditingPage before the setProject call
+    let newCurrentEditingPage = currentEditingPage;
+    if (fromIndex === currentEditingPage) {
+      newCurrentEditingPage = toIndex;
+    } else if (fromIndex < currentEditingPage && toIndex >= currentEditingPage) {
+      newCurrentEditingPage = currentEditingPage - 1;
+    } else if (fromIndex > currentEditingPage && toIndex <= currentEditingPage) {
+      newCurrentEditingPage = currentEditingPage + 1;
+    }
+
+    setProject(prev => {
+      const newPages = [...prev.pages];
+      const [movedPage] = newPages.splice(fromIndex, 1);
+      newPages.splice(toIndex, 0, movedPage);
+
+      // Update currentPage if it was affected
+      let newCurrentPage = prev.currentPage;
+      if (fromIndex === prev.currentPage) {
+        newCurrentPage = toIndex;
+      } else if (fromIndex < prev.currentPage && toIndex >= prev.currentPage) {
+        newCurrentPage = prev.currentPage - 1;
+      } else if (fromIndex > prev.currentPage && toIndex <= prev.currentPage) {
+        newCurrentPage = prev.currentPage + 1;
+      }
+
+      const newProject = {
+        ...prev,
+        pages: newPages,
+        currentPage: newCurrentPage
+      };
+
+      // Call onComplete with the updated project if provided
+      if (onComplete) {
+        setTimeout(() => onComplete(newProject), 0);
+      }
+
+      return newProject;
+    });
+
+    // Update currentEditingPage
+    setTimeout(() => {
+      setCurrentEditingPage(newCurrentEditingPage);
+    }, 0);
   };
 
   return {
@@ -220,6 +332,8 @@ export const useProject = () => {
     addPage,
     goToPage,
     deletePage,
+    duplicatePage,
+    reorderPages,
     clearCurrentPage,
     clearAllPages,
     setBackground

@@ -1,26 +1,19 @@
-import { safeSetItem, safeGetItem, STORAGE_KEYS } from './storage';
-
 // Cloud Image Service for handling image uploads and lazy loading
 class CloudImageService {
   constructor() {
     // Use environment variables from .env file
-    this.baseUrl = import.meta.env.VITE_API_URL || 'https://127.0.0.1:5000';
-    this.maxFileSize = parseInt(import.meta.env.VITE_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
-    this.maxImages = parseInt(import.meta.env.VITE_MAX_IMAGES) || 15;
+    this.baseUrl = process.env.REACT_APP_API_URL || 'https://127.0.0.1:5000';
+    this.maxFileSize = parseInt(process.env.REACT_APP_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
+    this.maxImages = parseInt(process.env.REACT_APP_MAX_IMAGES) || 15;
     this.uploadedImages = this.loadUploadedImages();
-    console.log('CloudImageService initialized with:', {
-      baseUrl: this.baseUrl,
-      maxFileSize: this.maxFileSize,
-      maxImages: this.maxImages,
-      uploadedImagesCount: this.uploadedImages.length
-    });
+
   }
 
   // Load uploaded images from localStorage
   loadUploadedImages() {
     try {
-      const saved = safeGetItem(STORAGE_KEYS.CLOUD_IMAGES);
-      return saved || [];
+      const saved = localStorage.getItem('canva-cloud-images');
+      return saved ? JSON.parse(saved) : [];
     } catch (error) {
       console.error('Error loading cloud images:', error);
       return [];
@@ -30,10 +23,7 @@ class CloudImageService {
   // Save uploaded images to localStorage
   saveUploadedImages() {
     try {
-      const success = safeSetItem(STORAGE_KEYS.CLOUD_IMAGES, this.uploadedImages);
-      if (!success) {
-        console.warn('Failed to save cloud images to localStorage. Data may be too large.');
-      }
+      localStorage.setItem('canva-cloud-images', JSON.stringify(this.uploadedImages));
     } catch (error) {
       console.error('Error saving cloud images:', error);
     }
@@ -124,7 +114,6 @@ class CloudImageService {
       formData.append('file', processedFile);
 
       // Upload to cloud
-      console.log('Uploading to:', `${this.baseUrl}/upload_image`);
       const response = await fetch(`${this.baseUrl}/upload_image`, {
         method: 'POST',
         body: formData,
@@ -132,8 +121,6 @@ class CloudImageService {
         mode: 'cors',
         credentials: 'omit'
       });
-
-      console.log('Upload response status:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -147,11 +134,8 @@ class CloudImageService {
         console.error('Failed to parse response as JSON:', parseError);
         // If response is not JSON, try to get text
         const responseText = await response.text();
-        console.log('Response text:', responseText);
         throw new Error(`Upload succeeded but invalid response format: ${responseText}`);
       }
-
-      console.log('Upload result:', result);
 
       // Check for success based on your API response format
       const isSuccess = result.message === 'File uploaded successfully' || response.status === 201;
@@ -242,8 +226,7 @@ class CloudImageService {
         result = await response.json();
       } catch (parseError) {
         console.error('Failed to parse delete response as JSON:', parseError);
-        const responseText = await response.text();
-        console.log('Delete response text:', responseText);
+        // Response text not needed for this operation
       }
 
       // Always remove from local storage, even if server deletion fails
@@ -261,7 +244,6 @@ class CloudImageService {
       }
 
       // If server deletion failed but we removed from local storage, return true
-      console.log(`Image ${imageName} removed from local storage (server deletion may have failed)`);
       return true;
 
     } catch (error) {
@@ -281,7 +263,6 @@ class CloudImageService {
 
   // Get all uploaded images
   getUploadedImages() {
-    console.log('getUploadedImages called, returning:', this.uploadedImages);
     return [...this.uploadedImages];
   }
 
@@ -289,7 +270,6 @@ class CloudImageService {
   clearUploadedImages() {
     this.uploadedImages = [];
     this.saveUploadedImages();
-    console.log('All uploaded images cleared from local storage');
 
     // Dispatch custom event to notify components
     window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
@@ -381,26 +361,20 @@ class CloudImageService {
   extractImagesFromJSON(project) {
     const extractedImages = [];
     const uniqueImageLinks = new Set(); // Track unique image links during extraction
-    console.log('Starting image extraction from project:', project);
 
     project.pages?.forEach((page, pageIndex) => {
-      console.log(`Processing page ${pageIndex}:`, page);
       page.elements?.forEach((element, elementIndex) => {
-        console.log(`Processing element ${elementIndex}:`, element);
         if (element.type === 'image' && element.properties?.src) {
           const src = element.properties.src;
-          console.log('Found image element with src:', src);
 
           // Skip if this image link is already processed in this extraction
           if (uniqueImageLinks.has(src)) {
-            console.log('Image link already processed in this extraction:', src);
             return;
           }
 
           // Handle uploaded images (cloud://)
           if (this.isCloudImage(src)) {
             const filename = this.getCloudFilename(src);
-            console.log('Cloud image detected, filename:', filename);
             if (filename) {
               // Check if already exists in uploads
               const exists = this.uploadedImages.find(img =>
@@ -408,7 +382,6 @@ class CloudImageService {
               );
 
               if (!exists) {
-                console.log('Adding cloud image to uploads:', filename);
                 uniqueImageLinks.add(src); // Mark as processed
                 extractedImages.push({
                   id: Date.now() + Math.random(),
@@ -421,8 +394,6 @@ class CloudImageService {
                   isFromJSON: true,
                   isDeletable: true
                 });
-              } else {
-                console.log('Cloud image already exists in uploads:', filename);
               }
             }
           }
@@ -430,7 +401,6 @@ class CloudImageService {
           // Handle template images (template://)
           else if (this.isTemplateImage(src)) {
             const templateName = src.replace('template://', '');
-            console.log('Template image detected, templateName:', templateName);
 
             // Check if already exists in uploads
             const exists = this.uploadedImages.find(img =>
@@ -438,7 +408,6 @@ class CloudImageService {
             );
 
             if (!exists) {
-              console.log('Adding template image to uploads:', templateName);
               uniqueImageLinks.add(src); // Mark as processed
               extractedImages.push({
                 id: Date.now() + Math.random(),
@@ -452,11 +421,7 @@ class CloudImageService {
                 isTemplate: true,
                 isDeletable: false // Template images cannot be deleted
               });
-            } else {
-              console.log('Template image already exists in uploads:', templateName);
             }
-          } else {
-            console.log('Image is neither cloud nor template:', src);
           }
         }
       });
@@ -466,14 +431,11 @@ class CloudImageService {
     if (extractedImages.length > 0) {
       this.uploadedImages.unshift(...extractedImages);
       this.saveUploadedImages();
-      console.log(`Extracted ${extractedImages.length} unique images from JSON (${uniqueImageLinks.size} unique links found)`);
 
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
         detail: { action: 'extracted', count: extractedImages.length }
       }));
-    } else {
-      console.log('No new images to extract from JSON');
     }
 
     return extractedImages;

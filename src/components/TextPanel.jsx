@@ -1,15 +1,15 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 
-const TextPanel = ({ 
-  show, 
-  onClose, 
-  addTextElement, 
-  addCustomTextElement, 
-  currentPage, 
-  totalPages, 
-  project, 
-  updateElement, 
-  deleteElement 
+const TextPanel = ({
+  show,
+  onClose,
+  addTextElement,
+  addCustomTextElement,
+  currentPage,
+  totalPages,
+  project,
+  updateElement,
+  deleteElement
 }) => {
   const [selectedFormat, setSelectedFormat] = useState('Page + number');
   const [showFormatDropdown, setShowFormatDropdown] = useState(false);
@@ -38,7 +38,6 @@ const TextPanel = ({
   ];
 
   const addHeading = () => {
-    console.log('Adding heading...');
     // Create a custom text element with heading properties
     const headingElement = {
       type: 'text',
@@ -49,7 +48,7 @@ const TextPanel = ({
       rotation: 0,
       properties: {
         text: 'Add a heading...',
-        fontSize: 55, 
+        fontSize: 55,
         fontFamily: 'Arial',
         color: '#000000',
         bold: true,
@@ -61,8 +60,7 @@ const TextPanel = ({
         letterSpacing: 0
       }
     };
-    
-    console.log('Heading element:', headingElement);
+
     // Call the custom text element function
     addCustomTextElement(headingElement);
   };
@@ -90,7 +88,7 @@ const TextPanel = ({
         letterSpacing: 0
       }
     };
-    
+
     addCustomTextElement(subheadingElement);
   };
 
@@ -117,19 +115,19 @@ const TextPanel = ({
         letterSpacing: 0
       }
     };
-    
+
     addCustomTextElement(bodyElement);
   };
 
   const addPageNumber = () => {
     const pageNumberText = getPageNumberText(currentPage);
-    
+
     const pageNumberElement = {
       type: 'text',
       x: 660,
       y: 40,
-      width: 100,
-      height: 40,
+      width: Math.min(100, project.pages[currentPage].pageSettings.width),
+      height: Math.min(40, project.pages[currentPage].pageSettings.height),
       rotation: 0,
       properties: {
         text: pageNumberText,
@@ -146,7 +144,7 @@ const TextPanel = ({
         // Removed special pageNumber properties to make it a normal text element
       }
     };
-    
+
     addCustomTextElement(pageNumberElement);
   };
 
@@ -221,7 +219,7 @@ const TextPanel = ({
           {/* Page Numbers Section */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Page Numbers</label>
-            
+
             {/* Format Selection */}
             <div className="mb-4">
               <div className="relative">
@@ -234,7 +232,7 @@ const TextPanel = ({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
+
                 {showFormatDropdown && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                     {formatOptions.map((option, index) => (
@@ -244,9 +242,8 @@ const TextPanel = ({
                           setSelectedFormat(option.label);
                           setShowFormatDropdown(false);
                         }}
-                        className={`w-full p-3 text-left hover:bg-gray-50 flex items-center justify-between ${
-                          selectedFormat === option.label ? 'bg-gray-100' : ''
-                        } ${index === 0 ? 'rounded-t-lg' : ''} ${index === formatOptions.length - 1 ? 'rounded-b-lg' : ''}`}
+                        className={`w-full p-3 text-left hover:bg-gray-50 flex items-center justify-between ${selectedFormat === option.label ? 'bg-gray-100' : ''
+                          } ${index === 0 ? 'rounded-t-lg' : ''} ${index === formatOptions.length - 1 ? 'rounded-b-lg' : ''}`}
                       >
                         <div>
                           <div className="font-medium">{option.label}</div>

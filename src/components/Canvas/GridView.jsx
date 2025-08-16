@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import GridElementRenderer from './GridElementRenderer';
 
 const GridView = ({
@@ -6,10 +6,17 @@ const GridView = ({
   zoom,
   scrollContainerRef,
   onPageClick,
-  currentEditingPage
+  currentEditingPage,
+  onReorderPages
 }) => {
   // Calculate grid layout based on screen size
   const [itemsPerRow, setItemsPerRow] = React.useState(3);
+
+  // Drag and drop state
+  const [draggedPageIndex, setDraggedPageIndex] = useState(null);
+  const [dragOverPageIndex, setDragOverPageIndex] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef(null);
 
   // Ensure proper scroll positioning
   useEffect(() => {
@@ -18,7 +25,7 @@ const GridView = ({
 
     // Ensure scroll starts at the top
     scrollContainer.scrollTop = 0;
-  }, []);
+  }, [scrollContainerRef]);
 
   React.useEffect(() => {
     const updateGridLayout = () => {
@@ -39,6 +46,96 @@ const GridView = ({
     return () => window.removeEventListener('resize', updateGridLayout);
   }, []);
 
+  // Handle drag start
+  const handleDragStart = (e, pageIndex) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', pageIndex);
+    setDraggedPageIndex(pageIndex);
+    setIsDragging(true);
+
+    // Create a custom drag image
+    if (dragRef.current) {
+      e.dataTransfer.setDragImage(dragRef.current, 0, 0);
+    }
+  };
+
+  // Handle drag over
+  const handleDragOver = (e, pageIndex) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+
+    // Only update if we're hovering over a different page
+    if (dragOverPageIndex !== pageIndex) {
+      setDragOverPageIndex(pageIndex);
+    }
+  };
+
+  // Handle drag leave
+  const handleDragLeave = (e) => {
+    // Only clear if we're leaving the page element entirely
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverPageIndex(null);
+    }
+  };
+
+  // Handle drop
+  const handleDrop = (e, targetPageIndex) => {
+    e.preventDefault();
+
+    if (draggedPageIndex !== null && draggedPageIndex !== targetPageIndex) {
+      onReorderPages(draggedPageIndex, targetPageIndex);
+    }
+
+    // Reset drag state
+    setDraggedPageIndex(null);
+    setDragOverPageIndex(null);
+    setIsDragging(false);
+  };
+
+  // Handle drag end
+  const handleDragEnd = () => {
+    setDraggedPageIndex(null);
+    setDragOverPageIndex(null);
+    setIsDragging(false);
+  };
+
+  // Handle keyboard navigation for reordering
+  const handleKeyDown = (e, pageIndex) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Start drag mode for keyboard users
+      setDraggedPageIndex(pageIndex);
+      setIsDragging(true);
+    }
+  };
+
+  // Handle keyboard reordering
+  const handleKeyboardReorder = (fromIndex, direction) => {
+    const newIndex = fromIndex + direction;
+    if (newIndex >= 0 && newIndex < project.pages.length) {
+      onReorderPages(fromIndex, newIndex);
+    }
+  };
+
+  // Calculate drop zone position for visual feedback
+  const getDropZoneStyle = (pageIndex) => {
+    if (dragOverPageIndex === pageIndex && draggedPageIndex !== pageIndex) {
+      return {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        border: '2px dashed #3b82f6',
+        borderRadius: '8px',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        pointerEvents: 'none',
+        zIndex: 10
+      };
+    }
+    return null;
+  };
+
   const gridGap = 12;
 
   return (
@@ -52,7 +149,15 @@ const GridView = ({
             </span>
           </div>
           <p className="text-sm text-gray-600 mb-1">View all pages in a grid layout. Click the grid icon to return to edit mode.</p>
-          <p className="text-xs text-gray-500">Showing {project.pages.length} page{project.pages.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-500 mb-2">Showing {project.pages.length} page{project.pages.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-blue-600">
+            💡 Drag pages to rearrange their order
+            {isDragging && draggedPageIndex !== null && (
+              <span className="ml-2 text-orange-600 font-medium">
+                Moving Page {draggedPageIndex + 1}...
+              </span>
+            )}
+          </p>
         </div>
 
         <div
@@ -71,14 +176,27 @@ const GridView = ({
               className={`rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-200 ${currentEditingPage === pageIndex
                   ? 'bg-blue-50 border-2 border-blue-500'
                   : 'bg-white'
+                } ${draggedPageIndex === pageIndex ? 'opacity-50 scale-95 shadow-2xl' : ''
+                } ${dragOverPageIndex === pageIndex && draggedPageIndex !== pageIndex
+                  ? 'ring-2 ring-blue-400 ring-opacity-50'
+                  : ''
                 }`}
               style={{
-                transition: 'transform 0.2s',
+                transition: 'all 0.2s ease',
                 width: 'fit-content',
-                maxWidth: '100%'
+                maxWidth: '100%',
+                transform: draggedPageIndex === pageIndex ? 'scale(0.95) rotate(2deg)' : 'scale(1) rotate(0deg)',
+                zIndex: draggedPageIndex === pageIndex ? 20 : 1
               }}
               onClick={() => onPageClick(pageIndex)}
               title={`Click to edit Page ${pageIndex + 1}`}
+              draggable={true}
+              onDragStart={(e) => handleDragStart(e, pageIndex)}
+              onDragOver={(e) => handleDragOver(e, pageIndex)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, pageIndex)}
+              onDragEnd={handleDragEnd}
+              onKeyDown={(e) => handleKeyDown(e, pageIndex)}
             >
               {/* Page Header */}
               <div className={`px-2 py-1 border-b border-gray-200 ${currentEditingPage === pageIndex ? 'bg-blue-100' : 'bg-gray-50'
@@ -93,9 +211,32 @@ const GridView = ({
                       <span className="text-xs text-blue-600 font-bold">(Current)</span>
                     )}
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {Math.round(page.pageSettings.width * 0.3)} × {Math.round(page.pageSettings.height * 0.3)}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-500">
+                      {Math.round(page.pageSettings.width * 0.3)} × {Math.round(page.pageSettings.height * 0.3)}
+                    </span>
+                    {/* Drag handle */}
+                    <div
+                      className="w-4 h-4 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 flex items-center justify-center"
+                      title="Drag to reorder (or use arrow keys)"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Reorder page ${pageIndex + 1}`}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'ArrowLeft') {
+                          handleKeyboardReorder(pageIndex, -1);
+                        } else if (e.key === 'ArrowRight') {
+                          handleKeyboardReorder(pageIndex, 1);
+                        }
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM8 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM8 18a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 18a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -117,19 +258,16 @@ const GridView = ({
                   boxSizing: 'border-box',
                 }}
               >
+                {/* Drop Zone Indicator */}
+                {getDropZoneStyle(pageIndex) && (
+                  <div style={getDropZoneStyle(pageIndex)} />
+                )}
                 {/* SVG Background Layer */}
                 {page.pageSettings.background.type === 'svg' && (
                   <div
                     className="absolute inset-0 pointer-events-none"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      zIndex: 0,
-                      backgroundImage: `url('data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.pageSettings.background.value)}')`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
+                    style={{ width: '100%', height: '100%', zIndex: 0 }}
+                    dangerouslySetInnerHTML={{ __html: page.pageSettings.background.value }}
                   />
                 )}
 
@@ -168,6 +306,27 @@ const GridView = ({
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Hidden drag reference element */}
+        <div
+          ref={dragRef}
+          className="hidden"
+          style={{
+            width: '100px',
+            height: '100px',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            border: '2px dashed #3b82f6',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#3b82f6',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}
+        >
+          Moving Page
         </div>
       </div>
     </div>

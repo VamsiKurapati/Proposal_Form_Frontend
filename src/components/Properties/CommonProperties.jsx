@@ -1,12 +1,12 @@
 import React from 'react';
 
-const CommonProperties = ({ 
-  element, 
-  selectedElement, 
-  updateElement, 
-  deleteElement, 
+const CommonProperties = ({
+  element,
+  selectedElement,
+  updateElement,
+  deleteElement,
   duplicateElement,
-  project 
+  project
 }) => {
   return (
     <div className="border-t pt-4 mt-6">
