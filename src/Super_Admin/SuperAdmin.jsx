@@ -298,6 +298,8 @@ const SuperAdmin = () => {
     // Keep ref updated with current state value
     useEffect(() => {
         supportAdminMessageRef.current = supportAdminMessage;
+        console.log("supportAdminMessage", supportAdminMessage);
+        console.log("supportAdminMessageRef.current", supportAdminMessageRef.current);
     }, [supportAdminMessage]);
 
     // User filter: single select with toggle back to 'all'
@@ -2432,12 +2434,12 @@ const SuperAdmin = () => {
 
                             {/* New Message Input */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Admin Message</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Add Message</label>
                                 <textarea
                                     value={supportAdminMessage}
                                     onChange={(e) => setSupportAdminMessage(e.target.value)}
                                     placeholder="Type your response or update here..."
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                    className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                                     rows="3"
                                 />
                             </div>
