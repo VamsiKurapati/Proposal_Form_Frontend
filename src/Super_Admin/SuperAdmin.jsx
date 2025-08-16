@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     MdOutlineSearch,
     MdOutlineNotifications,
@@ -184,7 +184,7 @@ const SuperAdmin = () => {
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
-            console.log("supportAdminMessage", supportAdminMessage);
+            console.log("supportAdminMessage : ", supportAdminMessage);
             const newAdminMessage = supportAdminMessage.trim();
 
             if (!newAdminMessage) {
