@@ -175,7 +175,7 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    }, [supportTicketsData, selectedSupport, supportAdminMessage]);
+    }, [supportTicketsData, selectedSupport]);
 
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
@@ -211,12 +211,12 @@ const SuperAdmin = () => {
                 // Clear input field
                 setSupportAdminMessage('');
 
-                toast.success('Admin message added successfully');
+                toast.success('Message added successfully');
             }
         } catch (e) {
             toast.error('Failed to add message');
         }
-    }, [supportTicketsData, selectedSupport, supportAdminMessage]);
+    }, [supportTicketsData, selectedSupport]);
 
 
 
@@ -2393,12 +2393,6 @@ const SuperAdmin = () => {
                                                         ? 'bg-blue-100'
                                                         : 'bg-green-100'
                                                         }`}>
-                                                        <div className={`text-sm font-medium mb-1 ${msg.type === 'user'
-                                                            ? 'text-blue-800'
-                                                            : 'text-green-800'
-                                                            }`}>
-                                                            {msg.type === 'user' ? 'User' : 'Admin'}
-                                                        </div>
                                                         <div className={`text-sm ${msg.type === 'user'
                                                             ? 'text-blue-900'
                                                             : 'text-green-900'
