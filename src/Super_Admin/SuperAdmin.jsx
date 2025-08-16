@@ -192,7 +192,7 @@ const SuperAdmin = () => {
                 toast.warning('Please enter a message');
                 return;
             }
-            const res = await axios.put(`${baseUrl}/addAdminMessage/${ticketId}`, {
+            const res = await axios.post(`${baseUrl}/addAdminMessage/${ticketId}`, {
                 newAdminMessage
             }, {
                 headers: {
