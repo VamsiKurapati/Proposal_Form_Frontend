@@ -184,6 +184,7 @@ const SuperAdmin = () => {
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
+            console.log("supportAdminMessage", supportAdminMessage);
             const newAdminMessage = supportAdminMessage.trim();
 
             if (!newAdminMessage) {
