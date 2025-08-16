@@ -101,6 +101,10 @@ const SuperAdmin = () => {
 
     const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
 
+    useEffect(() => {
+        console.log("supportAdminMessage", supportAdminMessage);
+    }, [supportAdminMessage]);
+
     // New functions for user blocking/unblocking
     const handleUserBlockToggle = async (userId, currentBlockedStatus) => {
         try {
