@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import NavbarComponent from './NavbarComponent';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -84,7 +84,7 @@ const Dashboard = () => {
     const [addEventModalOpen, setAddEventModalOpen] = useState(false);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const [fetchedDashboardData, setFetchedDashboardData] = useState(false);
+
     const [editIdx, setEditIdx] = useState(null);
     const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
 
@@ -130,7 +130,7 @@ const Dashboard = () => {
         }
     };
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -156,16 +156,11 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        if (!fetchedDashboardData) {
-            fetchDashboardData();
-            setFetchedDashboardData(true);
-        } else {
-            setFetchedDashboardData(false);
-        }
-    }, [fetchedDashboardData]);
+        fetchDashboardData();
+    }, []);
 
     const handleSetCurrentEditor = async (idx, editorId) => {
         const token = localStorage.getItem('token');

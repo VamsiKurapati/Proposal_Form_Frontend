@@ -247,7 +247,7 @@ export const ProfileProvider = ({ children }) => {
         loading,
         error,
         refreshProfile: fetchCompanyData
-    }), [companyData, loading, error, fetchCompanyData]);
+    }), [companyData, loading, error, fetchCompanyData, setCompanyData]);
 
     return (
         <ProfileContext.Provider value={contextValue}>

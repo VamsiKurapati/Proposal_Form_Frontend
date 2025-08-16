@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavbarComponent from './NavbarComponent';
 import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment } from 'react-icons/md';
 import { useProfile } from '../context/ProfileContext';
+import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
 import axios from 'axios';
 
@@ -10,11 +11,29 @@ const GenerateProposalPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const proposal = location.state?.proposal;
-  const { companyData, loading, error } = useProfile();
+  const { companyData, loading, error, setCompanyData } = useProfile();
+  const { role } = useUser();
 
   const [showAddTeam, setShowAddTeam] = useState(false);
   const [showViewAllTeam, setShowViewAllTeam] = useState(false);
   const [showAddCaseStudy, setShowAddCaseStudy] = useState(false);
+
+  useEffect(async () => {
+    if (role === "Editor" && proposal) {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`https://proposal-form-backend.vercel.app/api/profile/getCompanyProfile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        // console.log(res.data);
+        setCompanyData(res.data);
+      } catch (error) {
+        console.error("Error getting proposal:", error);
+      }
+    }
+  }, [proposal]);
 
   const handleSaveAndNext = async () => {
     try {
