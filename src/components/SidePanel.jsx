@@ -1,4 +1,11 @@
 import React from 'react';
+import designIcon from './icons/design.svg';
+import elementsIcon from './icons/elements.svg';
+import textIcon from './icons/text.svg';
+import uploadsIcon from './icons/uploads.svg';
+import toolsIcon from './icons/tools.svg';
+import projectsIcon from './icons/projects.svg';
+import propertiesIcon from './icons/properties.svg';
 
 const SidePanel = ({
   onDesignClick,
@@ -33,7 +40,7 @@ const SidePanel = ({
           style={{ height: 74 }}
           onClick={() => onDesignClick()}
         >
-          <img src={require('./icons/design.svg').default} alt="Design" className="w-7 h-7 mb-1" />
+          <img src={designIcon} alt="Design" className="w-7 h-7 mb-1" />
           <span className={`text-xs font-medium ${showDesignPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
             }`}>Design</span>
         </button>
@@ -45,7 +52,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onElementsClick}
       >
-        <img src={require('./icons/elements.svg').default} alt="Elements" className="w-7 h-7 mb-1" />
+        <img src={elementsIcon} alt="Elements" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showElementsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Elements</span>
       </button>
@@ -55,7 +62,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onTextClick}
       >
-        <img src={require('./icons/text.svg').default} alt="Text" className="w-7 h-7 mb-1" />
+        <img src={textIcon} alt="Text" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showTextPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Text</span>
       </button>
@@ -77,7 +84,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onUploadsClick}
       >
-        <img src={require('./icons/uploads.svg').default} alt="Uploads" className="w-7 h-7 mb-1" />
+        <img src={uploadsIcon} alt="Uploads" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showUploadsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Uploads</span>
       </button>
@@ -87,7 +94,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onToolsClick}
       >
-        <img src={require('./icons/tools.svg').default} alt="Tools" className="w-7 h-7 mb-1" />
+        <img src={toolsIcon} alt="Tools" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showToolsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Tools</span>
       </button>
@@ -97,7 +104,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onProjectsClick}
       >
-        <img src={require('./icons/projects.svg').default} alt="Projects" className="w-7 h-7 mb-1" />
+        <img src={projectsIcon} alt="Projects" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showProjectsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Projects</span>
       </button>
@@ -107,7 +114,7 @@ const SidePanel = ({
         style={{ height: 74 }}
         onClick={onPropertiesClick}
       >
-        <img src={require('./icons/properties.svg').default} alt="Properties" className="w-7 h-7 mb-1" />
+        <img src={propertiesIcon} alt="Properties" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showPropertiesPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Properties</span>
       </button>
