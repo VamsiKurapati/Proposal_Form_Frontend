@@ -1,7 +1,7 @@
 import React from 'react';
-import { ReactComponent as HelpIcon } from './icons/help.svg';
-import { ReactComponent as FullscreenIcon } from './icons/fullscreen.svg';
-import { ReactComponent as GridIcon } from './icons/grid.svg';
+import HelpIcon from './icons/help.svg';
+import FullscreenIcon from './icons/fullscreen.svg';
+import GridIcon from './icons/grid.svg';
 import './Footer.css';
 
 const Footer = ({
@@ -47,8 +47,8 @@ const Footer = ({
         <button
           onClick={onGridClick}
           className={`p-2 rounded-md transition-colors ${isGridView
-              ? 'bg-blue-100 text-blue-600'
-              : 'hover:bg-gray-100 text-gray-600'
+            ? 'bg-blue-100 text-blue-600'
+            : 'hover:bg-gray-100 text-gray-600'
             }`}
           title={isGridView ? "Exit Grid View" : "Grid View"}
         >
