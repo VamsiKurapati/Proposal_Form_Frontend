@@ -1896,15 +1896,25 @@ const SuperAdmin = () => {
         );
     };
 
-    const handleLogout = () => {
-        localStorage.clear();
-        console.log("Local Storage Cleared");
-        sessionStorage.clear();
-        console.log("Session Storage Cleared");
-        setTimeout(() => {
-            navigate('/');
-            window.location.reload();
-        }, 1000);
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post(`${baseUrl}/logout`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log("Logout response: ", res);
+            if (res.status === 200) {
+                localStorage.clear();
+                sessionStorage.clear();
+                setTimeout(() => {
+                    navigate('/');
+                    window.location.reload();
+                }, 1000);
+            }
+        } catch (error) {
+            console.log("Error in logout: ", error);
+        }
     };
 
     // Modal Components
