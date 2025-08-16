@@ -2416,8 +2416,7 @@ const SuperAdmin = () => {
                                     className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                                     rows="3"
                                     disabled={selectedSupport.status === "Completed"}
-                                    value={selectedSupport.resolvedDescription || ''}
-                                    onChange={(e) => setSelectedSupport(prev => ({ ...prev, resolvedDescription: e.target.value }))}
+                                    defaultValue={selectedSupport.resolvedDescription || ''}
                                 />
                                 {selectedSupport.status === "Completed" && (
                                     <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
