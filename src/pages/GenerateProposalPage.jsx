@@ -27,8 +27,42 @@ const GenerateProposalPage = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        // console.log(res.data);
-        setCompanyData(res.data);
+        if (res.status === 200) {
+          const data = {
+            companyName: response.data.companyName,
+            adminName: response.data.adminName,
+            industry: response.data.industry,
+            location: response.data.location,
+            email: response.data.email,
+            phone: response.data.phone,
+            website: response.data.website,
+            linkedIn: response.data.linkedIn,
+            profile: {
+              bio: response.data.bio,
+              services: response.data.services,
+              awards: response.data.awards,
+              clients: response.data.clients,
+              preferredIndustries: response.data.preferredIndustries
+            },
+            employees: response.data.employees,
+            companyDetails: {
+              "No.of employees": { value: response.data.numberOfEmployees },
+              "Founded": { value: response.data.establishedYear }
+            },
+            caseStudiesList: response.data.caseStudies,
+            certificationsList: response.data.licensesAndCertifications,
+            documentList: response.data.documents,
+            stats: {
+              totalProposals: response.data.totalProposals,
+              wonProposals: response.data.wonProposals,
+              successRate: response.data.successRate,
+              activeProposals: response.data.activeProposals
+            },
+            proposalList: response.data.proposals,
+            logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
+          };
+          setCompanyData(data);
+        }
       } catch (error) {
         console.error("Error getting proposal:", error);
       }
