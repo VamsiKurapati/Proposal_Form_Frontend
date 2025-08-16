@@ -62,7 +62,6 @@ const SuperAdmin = () => {
 
     // Support conversation messages
     const [supportAdminMessage, setSupportAdminMessage] = useState('');
-    const supportAdminMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -136,7 +135,7 @@ const SuperAdmin = () => {
             const currentAdminMessages = currentTicket.adminMessages || [];
 
             // Add admin message if provided
-            const newAdminMessage = supportAdminMessageRef.current.trim();
+            const newAdminMessage = supportAdminMessage.trim();
             if (newAdminMessage) {
                 updateData.adminMessages = [
                     ...currentAdminMessages,
@@ -176,12 +175,12 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    }, [supportTicketsData, selectedSupport]);
+    }, [supportTicketsData, selectedSupport, supportAdminMessage]);
 
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
-            const newAdminMessage = supportAdminMessageRef.current.trim();
+            const newAdminMessage = supportAdminMessage.trim();
 
             if (!newAdminMessage) {
                 toast.warning('Please enter an admin message');
@@ -217,7 +216,7 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to add message');
         }
-    }, [supportTicketsData, selectedSupport]);
+    }, [supportTicketsData, selectedSupport, supportAdminMessage]);
 
 
 
@@ -295,12 +294,7 @@ const SuperAdmin = () => {
         return () => document.removeEventListener('keydown', handleEscapeKey);
     }, []);
 
-    // Keep ref updated with current state value
-    useEffect(() => {
-        supportAdminMessageRef.current = supportAdminMessage;
-        console.log("supportAdminMessage", supportAdminMessage);
-        console.log("supportAdminMessageRef.current", supportAdminMessageRef.current);
-    }, [supportAdminMessage]);
+
 
     // User filter: single select with toggle back to 'all'
     const handleUserStatusChangeFilter = (value) => {
