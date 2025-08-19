@@ -2530,6 +2530,7 @@ const SuperAdmin = () => {
                             </div>
 
                             {/* Collapsible Conversation Section */}
+                            {console.log('Rendering conversation section, showConversation:', showConversation)}
 
                             {showConversation && (
                                 <>
