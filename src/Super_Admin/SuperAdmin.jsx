@@ -263,9 +263,13 @@ const SuperAdmin = () => {
                     if (supportResolvedDescriptionRef.current) {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
+                    console.log('=== MODAL OPEN DEBUG (status change) ===');
                     console.log('Resetting conversation view to false (status change)');
+                    console.log('showConversation before reset:', showConversation);
                     setShowConversation(false); // Reset conversation view
+                    console.log('showConversation after reset: false');
                     setViewSupportModal(true);
+                    console.log('=== END MODAL OPEN DEBUG ===');
                 }
             } else {
                 // Check if we're switching to a different ticket
@@ -278,9 +282,13 @@ const SuperAdmin = () => {
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
+                console.log('=== MODAL OPEN DEBUG (same ticket) ===');
                 console.log('Resetting conversation view to false (same ticket)');
+                console.log('showConversation before reset:', showConversation);
                 setShowConversation(false); // Reset conversation view
+                console.log('showConversation after reset: false');
                 setViewSupportModal(true);
+                console.log('=== END MODAL OPEN DEBUG ===');
             }
         } catch (e) {
             toast.error('Failed to update support ticket');
@@ -353,6 +361,14 @@ const SuperAdmin = () => {
             }
         }
     }, [selectedSupport]);
+
+    // Debug useEffect for showConversation state changes
+    useEffect(() => {
+        console.log('=== showConversation STATE CHANGED ===');
+        console.log('New showConversation value:', showConversation);
+        console.log('Type:', typeof showConversation);
+        console.log('=== END STATE CHANGE DEBUG ===');
+    }, [showConversation]);
 
 
 
@@ -2450,8 +2466,19 @@ const SuperAdmin = () => {
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
                                     onClick={() => {
-                                        console.log('Conversation button clicked. Current state:', showConversation);
-                                        setShowConversation(!showConversation);
+                                        console.log('=== CONVERSATION TOGGLE DEBUG ===');
+                                        console.log('Button clicked!');
+                                        console.log('Current showConversation state BEFORE toggle:', showConversation);
+                                        console.log('Current selectedSupport:', selectedSupport);
+                                        console.log('Type of showConversation:', typeof showConversation);
+
+                                        const newState = !showConversation;
+                                        console.log('New state will be:', newState);
+
+                                        setShowConversation(newState);
+
+                                        console.log('State update triggered. New state should be:', newState);
+                                        console.log('=== END DEBUG ===');
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
@@ -2467,12 +2494,32 @@ const SuperAdmin = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
+
+                                {/* Debug button to test state directly */}
+                                <button
+                                    onClick={() => {
+                                        console.log('=== DEBUG BUTTON ===');
+                                        console.log('Current showConversation:', showConversation);
+                                        console.log('Forcing showConversation to true');
+                                        setShowConversation(true);
+                                        console.log('=== END DEBUG BUTTON ===');
+                                    }}
+                                    className="text-xs text-red-600 hover:text-red-800 font-medium ml-2 px-2 py-1 border border-red-300 rounded"
+                                >
+                                    Debug: Force Open
+                                </button>
                             </div>
 
                             {/* Collapsible Conversation Section */}
+                            {console.log('=== RENDER DEBUG ===')}
+                            {console.log('showConversation in render:', showConversation)}
+                            {console.log('Type of showConversation in render:', typeof showConversation)}
+                            {console.log('selectedSupport in render:', selectedSupport)}
+                            {console.log('=== END RENDER DEBUG ===')}
+
                             {showConversation && (
                                 <>
-                                    {console.log("Open Conversation")}
+                                    {console.log("Conversation is OPEN - rendering content")}
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
