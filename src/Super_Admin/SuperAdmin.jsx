@@ -85,7 +85,11 @@ const SuperAdmin = () => {
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
     const [showConversation, setShowConversation] = useState(false);
-    const showConversationRef = useRef(false);
+
+    // Debug logging for conversation state changes
+    useEffect(() => {
+        console.log('🔍 [DEBUG] showConversation state changed to:', showConversation);
+    }, [showConversation]);
 
 
 
@@ -245,6 +249,8 @@ const SuperAdmin = () => {
     };
 
     const openSupportModal = async (support) => {
+        console.log('🔍 [DEBUG] openSupportModal called with support:', support?._id);
+        console.log('🔍 [DEBUG] Current showConversation state before opening:', showConversation);
         try {
             if (support.status !== "In Progress" && support.status !== "Completed") {
                 // Always set status to "In Progress" when opening modal
@@ -266,10 +272,11 @@ const SuperAdmin = () => {
                     }
 
                     // Reset conversation state for new ticket
-                    showConversationRef.current = false;
+                    console.log('🔍 [DEBUG] Resetting conversation state in openSupportModal (first branch)');
                     setShowConversation(false);
 
                     setViewSupportModal(true);
+                    console.log('🔍 [DEBUG] Modal opened - showConversation should be false now');
                 }
             } else {
                 // Check if we're switching to a different ticket
@@ -284,10 +291,11 @@ const SuperAdmin = () => {
                 }
 
                 // Reset conversation state for new ticket
-                showConversationRef.current = false;
+                console.log('🔍 [DEBUG] Resetting conversation state in openSupportModal (second branch)');
                 setShowConversation(false);
 
                 setViewSupportModal(true);
+                console.log('🔍 [DEBUG] Modal opened (second branch) - showConversation should be false now');
             }
         } catch (e) {
             toast.error('Failed to update support ticket');
@@ -327,8 +335,16 @@ const SuperAdmin = () => {
                 supportResolvedDescriptionRef.current.value = '';
             }
             // Reset conversation state when closing
+            console.log('🔍 [DEBUG] Resetting conversation state when closing modal (backdrop click)');
             setShowConversation(false);
-            showConversationRef.current = false;
+        }
+    }, []);
+
+    // Close filter modals when clicking outside
+    const handleFilterModalClickOutside = useCallback((e) => {
+        if (e.target === e.currentTarget) {
+            setNotificationTimeFilterModal(false);
+            setNotificationCategoryFilterModal(false);
         }
     }, []);
 
@@ -346,17 +362,36 @@ const SuperAdmin = () => {
                     supportResolvedDescriptionRef.current.value = '';
                 }
                 // Reset conversation state when closing
+                console.log('🔍 [DEBUG] Resetting conversation state when closing modal (escape key)');
                 setShowConversation(false);
-                showConversationRef.current = false;
+                // Close filter modals
+                setNotificationTimeFilterModal(false);
+                setNotificationCategoryFilterModal(false);
             }
         };
 
         document.addEventListener('keydown', handleEscapeKey);
-        return () => document.removeEventListener('keydown', handleEscapeKey);
+
+        // Close filter modals when clicking outside
+        const handleClickOutside = (e) => {
+            if (!e.target.closest('.notification-filter-modal')) {
+                setNotificationTimeFilterModal(false);
+                setNotificationCategoryFilterModal(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, []);
 
     // Initialize refs when selectedSupport changes
     useEffect(() => {
+        console.log('🔍 [DEBUG] useEffect triggered - selectedSupport changed to:', selectedSupport?._id);
+        console.log('🔍 [DEBUG] Current showConversation state in useEffect:', showConversation);
         if (selectedSupport) {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
@@ -366,7 +401,7 @@ const SuperAdmin = () => {
             }
 
             // Reset conversation state for new ticket
-            showConversationRef.current = false;
+            console.log('🔍 [DEBUG] Resetting conversation state in useEffect (selectedSupport)');
             setShowConversation(false);
         }
     }, [selectedSupport]);
@@ -457,7 +492,6 @@ const SuperAdmin = () => {
 
     const handleNotificationCategoryFilter = (value) => {
         setNotificationCategoryFilter(value);
-        closeAllInvoiceRows();
     };
 
     // Pagination utility functions
@@ -1670,123 +1704,86 @@ const SuperAdmin = () => {
                 <div className="pb-4 mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
+                            <div className="relative notification-filter-modal">
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] hover:text-white w-full sm:w-auto"
                                     onClick={() => setNotificationTimeFilterModal(!notificationTimeFilterModal)}
                                 >
-                                    <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                     <span>{notificationTimeFilter || 'All Time'}</span>
+                                    <MdOutlineKeyboardArrowDown className="w-4 h-4" />
                                 </button>
 
                                 {notificationTimeFilterModal && (
-                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    <div className="notification-filter-modal absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-50 border border-[#E5E7EB] sm:left-0 left-1/2 transform -translate-x-1/2 transition-all duration-200 ease-in-out">
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-[14px] font-medium text-[#111827]">Time</span>
                                             <button
                                                 className="text-[12px] text-[#2563EB] hover:underline"
                                                 onClick={() => {
-                                                    setNotificationTimeFilter('all');
-                                                    closeAllInvoiceRows();
+                                                    setNotificationTimeFilter('All Time');
                                                 }}
                                             >
                                                 Clear
                                             </button>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
                                                 checked={notificationTimeFilter === 'All Time'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="allTime">All Time</label>
+                                            <label htmlFor="allTime" className="cursor-pointer">All Time</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
                                                 checked={notificationTimeFilter === 'today'}
-                                                onClick={(e) => {
-                                                    if (notificationTimeFilter === e.target.value) {
-                                                        setNotificationTimeFilter('All Time');
-                                                        closeAllInvoiceRows();
-                                                    }
-                                                }}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="today">Today</label>
+                                            <label htmlFor="today" className="cursor-pointer">Today</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
                                                 checked={notificationTimeFilter === 'yesterday'}
-                                                onClick={(e) => {
-                                                    if (notificationTimeFilter === e.target.value) {
-                                                        setNotificationTimeFilter('All Time');
-                                                        closeAllInvoiceRows();
-                                                    }
-                                                }}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="yesterday">Yesterday</label>
+                                            <label htmlFor="yesterday" className="cursor-pointer">Yesterday</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
                                                 checked={notificationTimeFilter === 'last7Days'}
-                                                onClick={(e) => {
-                                                    if (notificationTimeFilter === e.target.value) {
-                                                        setNotificationTimeFilter('All Time');
-                                                        closeAllInvoiceRows();
-                                                    }
-                                                }}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="last7Days">Last 7 Days</label>
+                                            <label htmlFor="last7Days" className="cursor-pointer">Last 7 Days</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
                                                 checked={notificationTimeFilter === 'last14Days'}
-                                                onClick={(e) => {
-                                                    if (notificationTimeFilter === e.target.value) {
-                                                        setNotificationTimeFilter('All Time');
-                                                        closeAllInvoiceRows();
-                                                    }
-                                                }}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="last14Days">Last 14 Days</label>
+                                            <label htmlFor="last14Days" className="cursor-pointer">Last 14 Days</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
                                                 checked={notificationTimeFilter === 'last30Days'}
-                                                onClick={(e) => {
-                                                    if (notificationTimeFilter === e.target.value) {
-                                                        setNotificationTimeFilter('All Time');
-                                                        closeAllInvoiceRows();
-                                                    }
-                                                }}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
-                                                    closeAllInvoiceRows();
                                                 }}
                                             />
-                                            <label htmlFor="last30Days">Last 30 Days</label>
+                                            <label htmlFor="last30Days" className="cursor-pointer">Last 30 Days</label>
                                         </div>
                                     </div>
                                 )}
                             </div>
-                            <div className="relative">
-                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
+                            <div className="relative notification-filter-modal">
+                                <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] hover:text-white w-full sm:w-auto"
                                     onClick={() => setNotificationCategoryFilterModal(!notificationCategoryFilterModal)}
                                 >
                                     <span>{notificationCategoryFilter || 'All Categories'}</span>
@@ -1794,94 +1791,64 @@ const SuperAdmin = () => {
                                 </button>
 
                                 {notificationCategoryFilterModal && (
-                                    <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000 border border-[#E5E7EB]">
+                                    <div className="notification-filter-modal absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-50 border border-[#E5E7EB] sm:left-0 left-1/2 transform -translate-x-1/2 transition-all duration-200 ease-in-out">
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-[14px] font-medium text-[#111827]">Category</span>
                                             <button
                                                 className="text-[12px] text-[#2563EB] hover:underline"
-                                                onClick={() => handleNotificationCategoryFilter('all')}
+                                                onClick={() => handleNotificationCategoryFilter('All Categories')}
                                             >
                                                 Clear
                                             </button>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="allCategories" value="All Categories"
                                                 checked={notificationCategoryFilter === 'All Categories'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="allCategories">All Categories</label>
+                                            <label htmlFor="allCategories" className="cursor-pointer">All Categories</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
                                                 checked={notificationCategoryFilter === 'account access'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="accountAccess">Account & Access</label>
+                                            <label htmlFor="accountAccess" className="cursor-pointer">Account & Access</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
                                                 checked={notificationCategoryFilter === 'billing & payments'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="billingPayments">Billing & Payments</label>
+                                            <label htmlFor="billingPayments" className="cursor-pointer">Billing & Payments</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
                                                 checked={notificationCategoryFilter === 'technical errors'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
                                             <label htmlFor="technicalErrors">Technical Errors</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
                                                 checked={notificationCategoryFilter === 'feature requests'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="featureRequests">Feature Requests</label>
+                                            <label htmlFor="featureRequests" className="cursor-pointer">Feature Requests</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
                                                 checked={notificationCategoryFilter === 'proposal issues'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="proposalIssues">Proposal Issues</label>
+                                            <label htmlFor="proposalIssues" className="cursor-pointer">Proposal Issues</label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
                                                 checked={notificationCategoryFilter === 'others'}
-                                                onClick={(e) => {
-                                                    if (notificationCategoryFilter === e.target.value) {
-                                                        handleNotificationCategoryFilter('All Categories');
-                                                    }
-                                                }}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
                                             />
-                                            <label htmlFor="others">Others</label>
+                                            <label htmlFor="others" className="cursor-pointer">Others</label>
                                         </div>
                                     </div>
                                 )}
@@ -1897,7 +1864,6 @@ const SuperAdmin = () => {
                                 value={notificationSearchTerm}
                                 onChange={(e) => {
                                     setNotificationSearchTerm(e.target.value);
-                                    closeAllInvoiceRows();
                                 }}
                                 className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-[#4B5563] rounded-lg leading-5 bg-white placeholder-[#4B5563] focus:outline-none focus:placeholder-[#4B5563] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
@@ -1948,14 +1914,12 @@ const SuperAdmin = () => {
                             totalPages={getTotalPages(filteredNotifications, rowsPerPage)}
                             onPageChange={(page) => {
                                 setCurrentPageNotifications(page);
-                                closeAllInvoiceRows();
                             }}
                             totalItems={filteredNotifications.length}
                             rowsPerPage={rowsPerPage}
                             onRowsPerPageChange={(newRowsPerPage) => {
                                 setRowsPerPage(newRowsPerPage);
                                 setCurrentPageNotifications(1); // Reset to first page when changing rows per page
-                                closeAllInvoiceRows();
                             }}
                         />
                     </div>
@@ -2454,8 +2418,10 @@ const SuperAdmin = () => {
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
                                     onClick={() => {
-                                        const newState = !showConversationRef.current;
-                                        showConversationRef.current = newState;
+                                        console.log('🔍 [DEBUG] View Conversation button clicked');
+                                        console.log('🔍 [DEBUG] Current showConversation state:', showConversation);
+                                        const newState = !showConversation;
+                                        console.log('🔍 [DEBUG] Setting showConversation to:', newState);
                                         setShowConversation(newState);
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
@@ -2475,10 +2441,9 @@ const SuperAdmin = () => {
                             </div>
 
                             {/* Collapsible Conversation Section */}
-
+                            {console.log('🔍 [DEBUG] Rendering conversation section - showConversation:', showConversation)}
                             {showConversation && (
                                 <>
-                                    {console.log("I am here")}
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
@@ -2611,8 +2576,8 @@ const SuperAdmin = () => {
                                         supportResolvedDescriptionRef.current.value = '';
                                     }
                                     // Reset conversation state when closing
+                                    console.log('🔍 [DEBUG] Resetting conversation state when closing modal (Close button)');
                                     setShowConversation(false);
-                                    showConversationRef.current = false;
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
@@ -2916,7 +2881,10 @@ const SuperAdmin = () => {
 
             {/* Modals */}
             {viewUserModal && <UserViewModal />}
-            {viewSupportModal && <SupportViewModal />}
+            {viewSupportModal && (
+                console.log('🔍 [DEBUG] Rendering SupportViewModal - showConversation:', showConversation),
+                <SupportViewModal />
+            )}
 
             {/* Top Header Bar */}
             <div className="bg-white border-b border-[#0000001A] px-8 md:px-12 py-4">
