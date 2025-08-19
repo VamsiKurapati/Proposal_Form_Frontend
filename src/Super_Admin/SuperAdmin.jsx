@@ -2588,7 +2588,7 @@ const SuperAdmin = () => {
                 )}
             </div>
         </div>
-    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate]);
+    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate, showConversation]);
 
     // Invoice utility functions
     const downloadInvoiceAsPDF = async (data) => {
@@ -2883,7 +2883,10 @@ const SuperAdmin = () => {
             {viewUserModal && <UserViewModal />}
             {viewSupportModal && (
                 console.log('🔍 [DEBUG] Rendering SupportViewModal - showConversation:', showConversation),
-                <SupportViewModal />
+                <SupportViewModal
+                    showConversation={showConversation}
+                    setShowConversation={setShowConversation}
+                />
             )}
 
             {/* Top Header Bar */}
