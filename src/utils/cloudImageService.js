@@ -1,10 +1,12 @@
+import axios from 'axios';
+
 // Cloud Image Service for handling image uploads and lazy loading
 class CloudImageService {
   constructor() {
     // Use environment variables from .env file
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://127.0.0.1:5000';
-    this.maxFileSize = parseInt(import.meta.env.VITE_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
-    this.maxImages = parseInt(import.meta.env.VITE_MAX_IMAGES) || 15;
+    this.baseUrl = 'https://proposal-form-backend.vercel.app/api/image';
+    this.maxFileSize = 1024 * 1024; // 1MB
+    this.maxImages = 15;
     this.uploadedImages = this.loadUploadedImages();
   }
 
@@ -110,34 +112,25 @@ class CloudImageService {
 
       // Create form data
       const formData = new FormData();
-      formData.append('file', processedFile);
+      formData.append('image', processedFile);
 
       // Upload to cloud
-      const response = await fetch(`${this.baseUrl}/upload_image`, {
-        method: 'POST',
-        body: formData,
-        // Handle potential SSL certificate issues for local development
-        mode: 'cors',
-        credentials: 'omit'
+      const response = await axios.post(`${this.baseUrl}/upload_image`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
       }
 
-      let result;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error('Failed to parse response as JSON:', parseError);
-        // If response is not JSON, try to get text
-        const responseText = await response.text();
-        throw new Error(`Upload succeeded but invalid response format: ${responseText}`);
-      }
+      // With axios, response.data contains the parsed JSON
+      const result = response.data;
 
       // Check for success based on your API response format
-      const isSuccess = result.message === 'File uploaded successfully' || response.status === 201;
+      const isSuccess = result.message === 'Image uploaded successfully' || response.status === 200 || response.status === 201;
 
       if (!isSuccess) {
         throw new Error(result.error || result.message || 'Upload failed');
@@ -145,12 +138,13 @@ class CloudImageService {
 
       // Add to local storage
       const imageData = {
-        id: Date.now() + Math.random(),
+        id: result.fileId,
         name: file.name,
-        filename: result.filename || file.name, // Store the actual filename from API
+        filename: file.name, // Store the actual filename from API
+        fileId: result.fileId, // Store fileId for API requests
         type: file.type,
         size: processedFile.size,
-        cloudUrl: `${this.baseUrl}/download_uploaded_image?name=${result.filename || file.name}`,
+        cloudUrl: `${this.baseUrl}/get_image_by_name/${file.name}`,
         uploadedAt: new Date().toISOString()
       };
 
@@ -170,20 +164,19 @@ class CloudImageService {
   }
 
   // Download image from cloud (uploaded images)
-  async downloadImage(imageName) {
+  async downloadImage(fileId) {
     try {
-      const response = await fetch(`${this.baseUrl}/download_uploaded_image?name=${encodeURIComponent(imageName)}`, {
-        mode: 'cors',
-        credentials: 'omit'
+      const response = await axios.get(`${this.baseUrl}/get_image/${fileId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Download failed: ${response.status} ${response.statusText} - ${errorText}`);
+      if (response.status !== 200) {
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
       }
 
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
+      return response.data;
     } catch (error) {
       console.error('Download error:', error);
       throw error;
@@ -193,18 +186,19 @@ class CloudImageService {
   // Get template image (template images)
   async getTemplateImage(imageName) {
     try {
-      const response = await fetch(`${this.baseUrl}/template_image?name=${encodeURIComponent(imageName)}`, {
-        mode: 'cors',
-        credentials: 'omit'
+      // For template images, we need to use the ObjectId endpoint
+      // Since frontend only has filename, we'll use the filename endpoint
+      const response = await axios.get(`${this.baseUrl}/get_template_image_by_name/${imageName}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Template download failed: ${response.status} ${response.statusText} - ${errorText}`);
+      if (response.status !== 200) {
+        throw new Error(`Template download failed: ${response.status} ${response.statusText}`);
       }
 
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
+      return response.data;
     } catch (error) {
       console.error('Template download error:', error);
       throw error;
@@ -212,33 +206,30 @@ class CloudImageService {
   }
 
   // Delete image from cloud (only for uploaded images)
-  async deleteImage(imageName) {
+  async deleteImage(fileId) {
     try {
-      const response = await fetch(`${this.baseUrl}/delete_uploaded_image?name=${encodeURIComponent(imageName)}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        credentials: 'omit'
+      const response = await axios.delete(`${this.baseUrl}/delete_image/${fileId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
-      let result;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error('Failed to parse delete response as JSON:', parseError);
-        // Response text not needed for this operation
-      }
+      // With axios, response.data contains the parsed JSON
+      const result = response.data;
 
       // Always remove from local storage, even if server deletion fails
-      this.uploadedImages = this.uploadedImages.filter(img => img.name !== imageName && img.filename !== imageName);
+      this.uploadedImages = this.uploadedImages.filter(img =>
+        img.fileId !== fileId && img.name !== fileId && img.filename !== fileId
+      );
       this.saveUploadedImages();
 
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
-        detail: { action: 'deleted', imageName }
+        detail: { action: 'deleted', fileId }
       }));
 
       // If server deletion was successful, return true
-      if (response.ok && result && result.message && result.message.includes('deleted successfully')) {
+      if (response.status === 200 && result && result.message && result.message.includes('deleted successfully')) {
         return true;
       }
 
@@ -248,12 +239,14 @@ class CloudImageService {
     } catch (error) {
       console.error('Delete error:', error);
       // Even if there's an error, remove from local storage
-      this.uploadedImages = this.uploadedImages.filter(img => img.name !== imageName && img.filename !== imageName);
+      this.uploadedImages = this.uploadedImages.filter(img =>
+        img.fileId !== fileId && img.name !== fileId && img.filename !== fileId
+      );
       this.saveUploadedImages();
 
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
-        detail: { action: 'deleted', imageName }
+        detail: { action: 'deleted', fileId }
       }));
 
       return true;
@@ -290,7 +283,15 @@ class CloudImageService {
   getCloudUrl(src) {
     if (src.startsWith('cloud://')) {
       const imageName = src.replace('cloud://', '');
-      return `${this.baseUrl}/download_uploaded_image?name=${encodeURIComponent(imageName)}`;
+      // Try to find the image by name to get fileId
+      const image = this.uploadedImages.find(img =>
+        img.name === imageName || img.filename === imageName
+      );
+      if (image && image.fileId) {
+        return `${this.baseUrl}/get_image/${image.fileId}`;
+      }
+      // Fallback to name if fileId not found
+      return `${this.baseUrl}/get_image_by_name/${imageName}`;
     }
     return src;
   }
@@ -299,7 +300,7 @@ class CloudImageService {
   getTemplateUrl(src) {
     if (src.startsWith('template://')) {
       const imageName = src.replace('template://', '');
-      return `${this.baseUrl}/template_image?name=${encodeURIComponent(imageName)}`;
+      return `${this.baseUrl}/get_template_image_by_name/${imageName}`;
     }
     return src;
   }
@@ -327,10 +328,15 @@ class CloudImageService {
     return element;
   }
 
-  // Get the actual filename from cloud URL for export
-  getCloudFilename(src) {
+  // Get the actual fileId from cloud URL for export
+  getCloudFileId(src) {
     if (src.startsWith('cloud://')) {
-      return src.replace('cloud://', '');
+      const imageName = src.replace('cloud://', '');
+      // Try to find the image by name to get fileId
+      const image = this.uploadedImages.find(img =>
+        img.name === imageName || img.filename === imageName
+      );
+      return image ? image.fileId : imageName;
     }
     return null;
   }
@@ -386,9 +392,10 @@ class CloudImageService {
                   id: Date.now() + Math.random(),
                   name: filename,
                   filename: filename,
+                  fileId: filename, // Use filename as fileId for extracted images
                   type: 'image/png', // Default type
                   size: 1024 * 1024, // Default 1MB size for extracted images
-                  cloudUrl: `${this.baseUrl}/download_uploaded_image?name=${filename}`,
+                  cloudUrl: `${this.baseUrl}/get_image_by_name/${filename}`,
                   uploadedAt: new Date().toISOString(),
                   isFromJSON: true,
                   isDeletable: true
@@ -412,9 +419,10 @@ class CloudImageService {
                 id: Date.now() + Math.random(),
                 name: templateName,
                 filename: templateName,
+                fileId: templateName, // Use template name as fileId
                 type: 'image/png', // Default type
                 size: 1024 * 1024, // Default 1MB size for extracted images
-                cloudUrl: `${this.baseUrl}/template_image?name=${templateName}`,
+                cloudUrl: `${this.baseUrl}/get_template_image_by_name/${templateName}`,
                 uploadedAt: new Date().toISOString(),
                 isFromJSON: true,
                 isTemplate: true,
@@ -439,9 +447,17 @@ class CloudImageService {
 
     return extractedImages;
   }
+
+  // Helper method to get filename from cloud URL (for backward compatibility)
+  getCloudFilename(src) {
+    if (src.startsWith('cloud://')) {
+      return src.replace('cloud://', '');
+    }
+    return null;
+  }
 }
 
 // Create singleton instance
 const cloudImageService = new CloudImageService();
 
-export default cloudImageService; 
+export default cloudImageService;

@@ -26,6 +26,7 @@ const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboa
 const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
 const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
+const ImageUpload = lazy(() => import("./Super_Admin/ImageUpload"));
 
 const App = () => {
   const { role } = useUser();
@@ -104,6 +105,12 @@ const App = () => {
           <Route path="/admin" element={
             <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
               <SuperAdmin />
+            </ProtectedRoutes>
+          } />
+
+          <Route path="/image-upload" element={
+            <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
+              <ImageUpload />
             </ProtectedRoutes>
           } />
 

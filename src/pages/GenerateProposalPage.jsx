@@ -19,7 +19,7 @@ const GenerateProposalPage = () => {
   const [showAddCaseStudy, setShowAddCaseStudy] = useState(false);
 
   useEffect(async () => {
-    if (role === "Editor" && proposal) {
+    if ((role === "Editor" || role === "Viewer") && proposal) {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(`https://proposal-form-backend.vercel.app/api/profile/getCompanyProfile`, {
@@ -71,12 +71,6 @@ const GenerateProposalPage = () => {
 
   const handleSaveAndNext = async () => {
     try {
-      // const res = await axios.get(`http://56.228.64.88:5000/run-proposal-generation`, { proposal} , {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`
-      //   }
-      // });
-
       const token = localStorage.getItem("token");
       const res = await axios.post(`https://proposal-form-backend.vercel.app/api/rfp/sendDataForProposalGeneration`, {
         proposal,

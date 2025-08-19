@@ -2390,7 +2390,7 @@ const SuperAdmin = () => {
                                                     <div>
                                                         <label className="block text-xs font-medium text-[#111827]">Attachment {index + 1}</label>
                                                         <a
-                                                            href={`https://proposal-form-backend.vercel.app/api/image/getFile/${attachment.fileUrl}`}
+                                                            href={`https://proposal-form-backend.vercel.app/api/image/get_image/${attachment.fileId}`}
                                                             target="popup"
                                                             rel="noopener noreferrer"
                                                             className="text-blue-600 hover:underline text-sm"
