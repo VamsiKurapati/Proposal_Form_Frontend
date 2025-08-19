@@ -60,8 +60,6 @@ const SuperAdmin = () => {
     // Invoice modal states for inline display
     const [openInvoiceRows, setOpenInvoiceRows] = useState(new Set());
 
-    // Support conversation messages
-
     // Ref for the resolved description textarea
     const supportResolvedDescriptionRef = useRef(null);
 
@@ -84,11 +82,6 @@ const SuperAdmin = () => {
     const [supportFilterModal, setSupportFilterModal] = useState(false);
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
-    const [showConversation, setShowConversation] = useState(false);
-
-
-
-
 
 
 
@@ -266,8 +259,7 @@ const SuperAdmin = () => {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
 
-                    // Reset conversation state for new ticket
-                    setShowConversation(false);
+
 
                     setViewSupportModal(true);
                 }
@@ -282,9 +274,6 @@ const SuperAdmin = () => {
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
-
-                // Reset conversation state for new ticket
-                setShowConversation(false);
 
                 setViewSupportModal(true);
             }
@@ -325,16 +314,7 @@ const SuperAdmin = () => {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = '';
             }
-            // Reset conversation state when closing
-            setShowConversation(false);
-        }
-    }, []);
 
-    // Close filter modals when clicking outside
-    const handleFilterModalClickOutside = useCallback((e) => {
-        if (e.target === e.currentTarget) {
-            setNotificationTimeFilterModal(false);
-            setNotificationCategoryFilterModal(false);
         }
     }, []);
 
@@ -351,8 +331,7 @@ const SuperAdmin = () => {
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = '';
                 }
-                // Reset conversation state when closing
-                setShowConversation(false);
+
                 // Close filter modals
                 setNotificationTimeFilterModal(false);
                 setNotificationCategoryFilterModal(false);
@@ -387,14 +366,9 @@ const SuperAdmin = () => {
                 adminMessageRef.current.value = '';
             }
 
-            // Reset conversation state for new ticket
-            setShowConversation(false);
+
         }
     }, [selectedSupport]);
-
-
-
-
 
 
     // User filter: single select with toggle back to 'all'
@@ -842,6 +816,10 @@ const SuperAdmin = () => {
             setFilteredUsers(base);
         } else if (userStatusFilter === 'blocked') {
             setFilteredUsers(base.filter(u => u.blocked === true));
+        } else if (userStatusFilter === 'active') {
+            setFilteredUsers(base.filter(u => !u.blocked && (u.status || '').toLowerCase() === 'active'));
+        } else if (userStatusFilter === 'inactive') {
+            setFilteredUsers(base.filter(u => !u.blocked && (u.status || '').toLowerCase() === 'inactive'));
         } else {
             setFilteredUsers(base.filter(u => !u.blocked && (u.status || '').toLowerCase() === userStatusFilter));
         }
@@ -867,8 +845,8 @@ const SuperAdmin = () => {
     useEffect(() => {
         const base = supportTicketsData || [];
         const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
-        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority === supportPriorityFilter));
-        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.type === supportTypeFilter));
+        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority.toLowerCase() === supportPriorityFilter.toLowerCase()));
+        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.category.toLowerCase() === supportTypeFilter.toLowerCase()));
         setFilteredSupport(byType);
     }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
@@ -985,43 +963,43 @@ const SuperAdmin = () => {
                                             Clear
                                         </button>
                                     </div>
-                                    <div className="flex items-start space-x-2">
+                                    <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                         <input type="radio" name="userStatusFilter" id="user_all" value="all"
                                             checked={userStatusFilter === 'all'}
                                             onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
-                                            className="mt-0.5"
+                                            className="mt-1"
                                         />
-                                        <label htmlFor="user_all" className="leading-none">All</label>
+                                        <label htmlFor="user_all" className="cursor-pointer leading-none">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="userStatusFilter" id="active" value="active"
                                                 checked={userStatusFilter === 'active'}
                                                 onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="active" className="leading-none">Active</label>
+                                            <label htmlFor="active" className="cursor-pointer leading-none">Active</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="userStatusFilter" id="blocked" value="blocked"
                                                 checked={userStatusFilter === 'blocked'}
                                                 onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="blocked" className="leading-none">Blocked</label>
+                                            <label htmlFor="blocked" className="cursor-pointer leading-none">Blocked</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="userStatusFilter" id="inactive" value="inactive"
                                                 checked={userStatusFilter === 'inactive'}
                                                 onClick={(e) => { if (userStatusFilter === e.target.value) handleUserStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleUserStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="inactive" className="leading-none">Inactive</label>
+                                            <label htmlFor="inactive" className="cursor-pointer leading-none">Inactive</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1216,92 +1194,92 @@ const SuperAdmin = () => {
                                         </button>
                                     </div>
                                     {/* All */}
-                                    <div className="flex items-start space-x-2">
+                                    <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                         <input type="radio" name="transactionAll" id="txn_all" value="all"
                                             checked={transactionStatusFilter === 'all' && transactionDateFilter === 'all'}
                                             onChange={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
-                                            className="mt-0.5"
+                                            className="mt-1"
                                         />
-                                        <label htmlFor="txn_all" className="leading-none">All</label>
+                                        <label htmlFor="txn_all" className="cursor-pointer leading-none">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionStatusFilter" id="succeeded" value="succeeded"
                                                 checked={transactionStatusFilter === 'succeeded'}
                                                 onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="succeeded" className="leading-none">Succeeded</label>
+                                            <label htmlFor="succeeded" className="cursor-pointer leading-none">Succeeded</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionStatusFilter" id="pending" value="pending"
                                                 checked={transactionStatusFilter === 'pending'}
                                                 onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="pending" className="leading-none">Pending</label>
+                                            <label htmlFor="pending" className="cursor-pointer leading-none">Pending</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionStatusFilter" id="failed" value="failed"
                                                 checked={transactionStatusFilter === 'failed'}
                                                 onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="failed" className="leading-none">Failed</label>
+                                            <label htmlFor="failed" className="cursor-pointer leading-none">Failed</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionStatusFilter" id="refunded" value="refunded"
                                                 checked={transactionStatusFilter === 'refunded'}
                                                 onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="refunded" className="leading-none">Refunded</label>
+                                            <label htmlFor="refunded" className="cursor-pointer leading-none">Refunded</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionStatusFilter" id="pending_refund" value="pending refund"
                                                 checked={transactionStatusFilter === 'pending refund'}
                                                 onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="pending_refund" className="leading-none">Pending Refund</label>
+                                            <label htmlFor="pending_refund" className="cursor-pointer leading-none">Pending Refund</label>
                                         </div>
                                     </div>
                                     {/* Date */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionDateFilter" id="last7Days" value="last7Days"
                                                 checked={transactionDateFilter === 'last7Days'}
                                                 onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="last7Days" className="leading-none">Last 7 Days</label>
+                                            <label htmlFor="last7Days" className="cursor-pointer leading-none">Last 7 Days</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionDateFilter" id="last15Days" value="last15Days"
                                                 checked={transactionDateFilter === 'last15Days'}
                                                 onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="last15Days" className="leading-none">Last 15 Days</label>
+                                            <label htmlFor="last15Days" className="cursor-pointer leading-none">Last 15 Days</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="transactionDateFilter" id="last30Days" value="last30Days"
                                                 checked={transactionDateFilter === 'last30Days'}
                                                 onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
                                                 onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="last30Days" className="leading-none">Last 30 Days</label>
+                                            <label htmlFor="last30Days" className="cursor-pointer leading-none">Last 30 Days</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1484,141 +1462,141 @@ const SuperAdmin = () => {
                                         </button>
                                     </div>
                                     {/* All */}
-                                    <div className="flex items-start space-x-2">
+                                    <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                         <input type="radio" name="supportAll" id="support_all" value="all"
                                             checked={supportStatusFilter === 'all' && supportPriorityFilter === 'all' && supportTypeFilter === 'all'}
                                             onChange={() => { handleSupportStatusChangeFilter('all'); handleSupportPriorityChangeFilter('all'); handleSupportTypeChangeFilter('all'); }}
-                                            className="mt-0.5"
+                                            className="mt-1"
                                         />
-                                        <label htmlFor="support_all" className="leading-none">All</label>
+                                        <label htmlFor="support_all" className="cursor-pointer leading-none">All</label>
                                     </div>
                                     {/* Status */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportStatusFilter" id="pending" value="Pending"
                                                 checked={supportStatusFilter === 'Pending'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="pending" className="leading-none">Pending</label>
+                                            <label htmlFor="pending" className="cursor-pointer leading-none">Pending</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportStatusFilter" id="inProgress" value="In Progress"
                                                 checked={supportStatusFilter === 'In Progress'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="inProgress" className="leading-none">In Progress</label>
+                                            <label htmlFor="inProgress" className="cursor-pointer leading-none">In Progress</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportStatusFilter" id="reopened" value="Re-Opened"
                                                 checked={supportStatusFilter === 'Re-Opened'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="reopened" className="leading-none">Re-Opened</label>
+                                            <label htmlFor="reopened" className="cursor-pointer leading-none">Re-Opened</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportStatusFilter" id="completed" value="Completed"
                                                 checked={supportStatusFilter === 'Completed'}
                                                 onClick={(e) => { if (supportStatusFilter === e.target.value) handleSupportStatusChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportStatusChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="completed" className="leading-none">Completed</label>
+                                            <label htmlFor="completed" className="cursor-pointer leading-none">Completed</label>
                                         </div>
                                     </div>
                                     {/* Priority */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Priority :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportPriorityFilter" id="low" value="low"
                                                 checked={supportPriorityFilter === 'low'}
                                                 onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="low" className="leading-none">Low</label>
+                                            <label htmlFor="low" className="cursor-pointer leading-none">Low</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportPriorityFilter" id="medium" value="medium"
                                                 checked={supportPriorityFilter === 'medium'}
                                                 onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="medium" className="leading-none">Medium</label>
+                                            <label htmlFor="medium" className="cursor-pointer leading-none">Medium</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportPriorityFilter" id="high" value="high"
                                                 checked={supportPriorityFilter === 'high'}
                                                 onClick={(e) => { if (supportPriorityFilter === e.target.value) handleSupportPriorityChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportPriorityChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="high" className="leading-none">High</label>
+                                            <label htmlFor="high" className="cursor-pointer leading-none">High</label>
                                         </div>
                                     </div>
                                     {/* Category */}
                                     <span className="text-[16px] font-medium text-[#4B5563]">Category :</span>
                                     <div className="ml-4">
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="billingPayments" value="billing & payments"
                                                 checked={supportTypeFilter === 'billing & payments'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="billingPayments" className="leading-none">Billing & Payments</label>
+                                            <label htmlFor="billingPayments" className="cursor-pointer leading-none">Billing & Payments</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="technicalErrors" value="technical errors"
                                                 checked={supportTypeFilter === 'technical errors'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="technicalErrors" className="leading-none">Technical Errors</label>
+                                            <label htmlFor="technicalErrors" className="cursor-pointer leading-none">Technical Errors</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="featureRequests" value="feature requests"
                                                 checked={supportTypeFilter === 'feature requests'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="featureRequests" className="leading-none">Feature Requests</label>
+                                            <label htmlFor="featureRequests" className="cursor-pointer leading-none">Feature Requests</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="accountAccess" value="account & access"
                                                 checked={supportTypeFilter === 'account & access'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="accountAccess" className="leading-none">Account & Access</label>
+                                            <label htmlFor="accountAccess" className="cursor-pointer leading-none">Account & Access</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="proposalIssues" value="proposal issues"
                                                 checked={supportTypeFilter === 'proposal issues'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="proposalIssues" className="leading-none">Proposal Issues</label>
+                                            <label htmlFor="proposalIssues" className="cursor-pointer leading-none">Proposal Issues</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="supportTypeFilter" id="others" value="others"
                                                 checked={supportTypeFilter === 'others'}
                                                 onClick={(e) => { if (supportTypeFilter === e.target.value) handleSupportTypeChangeFilter('all'); }}
                                                 onChange={(e) => handleSupportTypeChangeFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="others" className="leading-none">Others</label>
+                                            <label htmlFor="others" className="cursor-pointer leading-none">Others</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1765,63 +1743,63 @@ const SuperAdmin = () => {
                                                 Clear
                                             </button>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="allTime" value="All Time"
                                                 checked={notificationTimeFilter === 'All Time'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="allTime" className="cursor-pointer leading-none">All Time</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="today" value="today"
                                                 checked={notificationTimeFilter === 'today'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="today" className="cursor-pointer leading-none">Today</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="yesterday" value="yesterday"
                                                 checked={notificationTimeFilter === 'yesterday'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="yesterday" className="cursor-pointer leading-none">Yesterday</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="last7Days" value="last7Days"
                                                 checked={notificationTimeFilter === 'last7Days'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="last7Days" className="cursor-pointer leading-none">Last 7 Days</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="last14Days" value="last14Days"
                                                 checked={notificationTimeFilter === 'last14Days'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="last14Days" className="cursor-pointer leading-none">Last 14 Days</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationTimeFilter" id="last30Days" value="last30Days"
                                                 checked={notificationTimeFilter === 'last30Days'}
                                                 onChange={(e) => {
                                                     setNotificationTimeFilter(e.target.value);
                                                 }}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="last30Days" className="cursor-pointer leading-none">Last 30 Days</label>
                                         </div>
@@ -1847,59 +1825,59 @@ const SuperAdmin = () => {
                                                 Clear
                                             </button>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="allCategories" value="All Categories"
                                                 checked={notificationCategoryFilter === 'All Categories'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="allCategories" className="cursor-pointer leading-none">All Categories</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="accountAccess" value="account access"
                                                 checked={notificationCategoryFilter === 'account access'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="accountAccess" className="cursor-pointer leading-none">Account & Access</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="billingPayments" value="billing & payments"
                                                 checked={notificationCategoryFilter === 'billing & payments'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="billingPayments" className="cursor-pointer leading-none">Billing & Payments</label>
                                         </div>
-                                        <div className="flex items-start space-x-2">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="technicalErrors" value="technical errors"
                                                 checked={notificationCategoryFilter === 'technical errors'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
-                                            <label htmlFor="technicalErrors" className="leading-none">Technical Errors</label>
+                                            <label htmlFor="technicalErrors" className="cursor-pointer leading-none">Technical Errors</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="featureRequests" value="feature requests"
                                                 checked={notificationCategoryFilter === 'feature requests'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="featureRequests" className="cursor-pointer leading-none">Feature Requests</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="proposalIssues" value="proposal issues"
                                                 checked={notificationCategoryFilter === 'proposal issues'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="proposalIssues" className="cursor-pointer leading-none">Proposal Issues</label>
                                         </div>
-                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
                                             <input type="radio" name="notificationCategoryFilter" id="others" value="others"
                                                 checked={notificationCategoryFilter === 'others'}
                                                 onChange={(e) => handleNotificationCategoryFilter(e.target.value)}
-                                                className="mt-0.5"
+                                                className="mt-1"
                                             />
                                             <label htmlFor="others" className="cursor-pointer leading-none">Others</label>
                                         </div>
@@ -2332,310 +2310,306 @@ const SuperAdmin = () => {
         </div>
     );
 
-    const SupportViewModal = useCallback(() => (
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
-            <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
-                    <button
-                        onClick={() => setViewSupportModal(false)}
-                        className="text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                        <MdOutlineClose className="w-6 h-6" />
-                    </button>
-                </div>
-                {selectedSupport && (
-                    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
-                        {/* Basic Information */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                                    <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
-                                        {selectedSupport.status}
-                                    </span>
+    const SupportViewModal = () => {
+        const [showConversation, setShowConversation] = useState(false);
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50" onClick={handleModalBackdropClick}>
+                <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-[#E5E7EB]">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-gray-900">Support Ticket Details</h2>
+                        <button
+                            onClick={() => setViewSupportModal(false)}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            <MdOutlineClose className="w-6 h-6" />
+                        </button>
+                    </div>
+                    {selectedSupport && (
+                        <div className="space-y-6 bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg">
+                            {/* Basic Information */}
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Basic Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
+                                        <p className="text-gray-900 font-mono">{selectedSupport._id}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                                        <p className="text-gray-900 font-mono">{selectedSupport.userId}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.status)}`}>
+                                            {selectedSupport.status}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Ticket Details */}
-                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Ticket Details</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                        {selectedSupport.category}
-                                    </span>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
-                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                                        {selectedSupport.subCategory || 'N/A'}
-                                    </span>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
-                                        {selectedSupport.priority}
-                                    </span>
+                            {/* Ticket Details */}
+                            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Ticket Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                            {selectedSupport.category}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                            {selectedSupport.subCategory || 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
+                                            {selectedSupport.priority}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Description */}
-                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Description</h3>
-                            <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
-                        </div>
+                            {/* Description */}
+                            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Description</h3>
+                                <p className="text-gray-700 whitespace-pre-line">{selectedSupport.description || 'No description provided'}</p>
+                            </div>
 
-                        {/* Attachments */}
-                        {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
-                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
-                                <h3 className="text-lg font-medium text-gray-800 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {selectedSupport.attachments.map((attachment, index) => (
-                                        <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
-                                            <div className="space-y-2">
-                                                <div>
-                                                    <label className="block text-xs font-medium text-[#111827]">Download</label>
-                                                    <a
-                                                        href={`https://proposal-form-backend.vercel.app/api/image/getFile/${attachment.fileUrl}`}
-                                                        target="popup"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-600 hover:underline text-sm"
-                                                    >
-                                                        View Attachment
-                                                    </a>
+                            {/* Attachments */}
+                            {selectedSupport.attachments && selectedSupport.attachments.length > 0 && (
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-4 rounded-lg shadow-sm">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-3">Attachments ({selectedSupport.attachments.length})</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {selectedSupport.attachments.map((attachment, index) => (
+                                            <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-[#111827]">Attachment {index + 1}</label>
+                                                        <a
+                                                            href={`https://proposal-form-backend.vercel.app/api/image/getFile/${attachment.fileUrl}`}
+                                                            target="popup"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-600 hover:underline text-sm"
+                                                        >
+                                                            View Attachment
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Timestamps */}
-                        <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Timestamps</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
-                                    <p className="text-gray-900">
-                                        {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
-                                            selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
-                                    <p className="text-gray-900">
-                                        {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        {/* Resolved Description */}
-                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Resolved Description</h3>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Resolution Details</label>
-                                <textarea
-                                    ref={supportResolvedDescriptionRef}
-                                    placeholder="Describe how the issue was resolved..."
-                                    className="w-full p-3 border border-gray-300 rounded-lg resize-none"
-                                    rows="3"
-                                    disabled={selectedSupport.status === "Completed"}
-                                    defaultValue={selectedSupport.resolvedDescription || ''}
-                                />
-                                {selectedSupport.status === "Completed" && (
-                                    <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Conversation Interface */}
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
-                                <button
-                                    onClick={() => {
-                                        setShowConversation(!showConversation);
-                                    }}
-                                    className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
-                                >
-                                    {showConversation ? 'Hide Conversation' : 'View Conversation'}
-                                    <svg
-                                        className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-
-
-                            </div>
-
-                            {/* Collapsible Conversation Section */}
-                            {showConversation && (
-                                <>
-                                    {/* Display existing conversation */}
-                                    <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
-                                        {/* Combined Messages Sorted by Timestamp */}
-                                        {(() => {
-                                            const allMessages = [];
-
-                                            // Add user messages with type indicator
-                                            if (selectedSupport.userMessages && selectedSupport.userMessages.length > 0) {
-                                                selectedSupport.userMessages.forEach(msg => {
-                                                    allMessages.push({
-                                                        ...msg,
-                                                        type: 'user',
-                                                        timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
-                                                    });
-                                                });
-                                            }
-
-                                            // Add admin messages with type indicator
-                                            if (selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0) {
-                                                selectedSupport.adminMessages.forEach(msg => {
-                                                    allMessages.push({
-                                                        ...msg,
-                                                        type: 'admin',
-                                                        timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
-                                                    });
-                                                });
-                                            }
-
-                                            // Sort all messages by timestamp
-                                            allMessages.sort((a, b) => a.timestamp - b.timestamp);
-
-                                            return allMessages.length > 0 ? (
-                                                <div className="space-y-2">
-                                                    {allMessages.map((msg, index) => (
-                                                        <div key={index} className={`flex ${msg.type === 'user' ? 'justify-start' : 'justify-end'}`}>
-                                                            <div className={`rounded-lg p-3 max-w-xs lg:max-w-md ${msg.type === 'user'
-                                                                ? 'bg-blue-100'
-                                                                : 'bg-green-100'
-                                                                }`}>
-                                                                <div className={`text-sm ${msg.type === 'user'
-                                                                    ? 'text-blue-900'
-                                                                    : 'text-green-900'
-                                                                    }`}>
-                                                                    {msg.message}
-                                                                </div>
-                                                                <div className={`text-xs mt-1 ${msg.type === 'user'
-                                                                    ? 'text-blue-600'
-                                                                    : 'text-green-600'
-                                                                    }`}>
-                                                                    {new Date(msg.createdAt || msg.created_at || Date.now()).toLocaleString()}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : null;
-                                        })()}
-
-                                        {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
-                                            (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
-                                                <div className="text-center text-gray-500 text-sm py-4">
-                                                    No messages yet. Start the conversation below.
-                                                </div>
-                                            )}
+                                        ))}
                                     </div>
-
-                                    {/* Add Message Input Field */}
-                                    <div className="border-t border-purple-200 pt-4">
-                                        <textarea
-                                            ref={adminMessageRef}
-                                            placeholder="Enter your message..."
-                                            className="w-full p-2 border border-gray-300 rounded-lg resize-none"
-                                            rows="3"
-                                            disabled={selectedSupport.status === 'Completed'}
-                                        />
-                                    </div>
-
-                                    {/* Add Message Button in Conversation Area */}
-                                    <div className="border-t border-purple-200 pt-4">
-                                        <button
-                                            onClick={() => {
-                                                if (adminMessageRef.current && adminMessageRef.current.value.trim()) {
-                                                    handleAddMessage(selectedSupport._id);
-                                                } else {
-                                                    toast.warning('Please enter an admin message');
-                                                }
-                                            }}
-                                            disabled={selectedSupport.status === 'Completed'}
-                                            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                            </svg>
-                                            Add Message
-                                        </button>
-                                    </div>
-                                </>
+                                </div>
                             )}
 
+                            {/* Timestamps */}
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Timestamps</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Created At</label>
+                                        <p className="text-gray-900">
+                                            {selectedSupport.createdAt ? new Date(selectedSupport.createdAt).toLocaleString() :
+                                                selectedSupport.created_at ? new Date(selectedSupport.created_at).toLocaleString() : 'N/A'}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                                        <p className="text-gray-900">
+                                            {selectedSupport.updatedAt ? new Date(selectedSupport.updatedAt).toLocaleString() : 'N/A'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
+                            {/* Resolved Description */}
+                            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-lg shadow-sm">
+                                <h3 className="text-lg font-medium text-gray-800 mb-3">Resolved Description</h3>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Resolution Details</label>
+                                    <textarea
+                                        ref={supportResolvedDescriptionRef}
+                                        placeholder="Describe how the issue was resolved..."
+                                        className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                                        rows="3"
+                                        disabled={selectedSupport.status === "Completed"}
+                                        defaultValue={selectedSupport.resolvedDescription || ''}
+                                    />
+                                    {selectedSupport.status === "Completed" && (
+                                        <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
+                                    )}
+                                </div>
+                            </div>
 
-                        </div>
+                            {/* Conversation Interface */}
+                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 p-4 rounded-lg shadow-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
+                                    <button
+                                        onClick={() => {
+                                            setShowConversation(!showConversation);
+                                        }}
+                                        className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
+                                    >
+                                        {showConversation ? 'Hide Conversation' : 'View Conversation'}
+                                        <svg
+                                            className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex justify-between items-center pt-4 gap-4">
-                            <div className="flex space-x-2">
+                                {/* Collapsible Conversation Section */}
+                                {showConversation && (
+                                    <>
+                                        {/* Display existing conversation */}
+                                        <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
+                                            {/* Combined Messages Sorted by Timestamp */}
+                                            {(() => {
+                                                const allMessages = [];
+
+                                                // Add user messages with type indicator
+                                                if (selectedSupport.userMessages && selectedSupport.userMessages.length > 0) {
+                                                    selectedSupport.userMessages.forEach(msg => {
+                                                        allMessages.push({
+                                                            ...msg,
+                                                            type: 'user',
+                                                            timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
+                                                        });
+                                                    });
+                                                }
+
+                                                // Add admin messages with type indicator
+                                                if (selectedSupport.adminMessages && selectedSupport.adminMessages.length > 0) {
+                                                    selectedSupport.adminMessages.forEach(msg => {
+                                                        allMessages.push({
+                                                            ...msg,
+                                                            type: 'admin',
+                                                            timestamp: new Date(msg.createdAt || msg.created_at || Date.now()).getTime()
+                                                        });
+                                                    });
+                                                }
+
+                                                // Sort all messages by timestamp
+                                                allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+                                                return allMessages.length > 0 ? (
+                                                    <div className="space-y-2">
+                                                        {allMessages.map((msg, index) => (
+                                                            <div key={index} className={`flex ${msg.type === 'user' ? 'justify-start' : 'justify-end'}`}>
+                                                                <div className={`rounded-lg p-3 max-w-xs lg:max-w-md ${msg.type === 'user'
+                                                                    ? 'bg-blue-100'
+                                                                    : 'bg-green-100'
+                                                                    }`}>
+                                                                    <div className={`text-sm ${msg.type === 'user'
+                                                                        ? 'text-blue-900'
+                                                                        : 'text-green-900'
+                                                                        }`}>
+                                                                        {msg.message}
+                                                                    </div>
+                                                                    <div className={`text-xs mt-1 ${msg.type === 'user'
+                                                                        ? 'text-blue-600'
+                                                                        : 'text-green-600'
+                                                                        }`}>
+                                                                        {new Date(msg.createdAt || msg.created_at || Date.now()).toLocaleString()}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : null;
+                                            })()}
+
+                                            {(!selectedSupport.userMessages || selectedSupport.userMessages.length === 0) &&
+                                                (!selectedSupport.adminMessages || selectedSupport.adminMessages.length === 0) && (
+                                                    <div className="text-center text-gray-500 text-sm py-4">
+                                                        No messages yet. Start the conversation below.
+                                                    </div>
+                                                )}
+                                        </div>
+
+                                        {/* Add Message Input Field */}
+                                        <div className="border-t border-purple-200 pt-4">
+                                            <textarea
+                                                ref={adminMessageRef}
+                                                placeholder="Enter your message..."
+                                                className="w-full p-2 border border-gray-300 rounded-lg resize-none"
+                                                rows="3"
+                                                disabled={selectedSupport.status === 'Completed'}
+                                            />
+                                        </div>
+
+                                        {/* Add Message Button in Conversation Area */}
+                                        <div className="border-t border-purple-200 pt-4">
+                                            <button
+                                                onClick={() => {
+                                                    if (adminMessageRef.current && adminMessageRef.current.value.trim()) {
+                                                        handleAddMessage(selectedSupport._id);
+                                                    } else {
+                                                        toast.warning('Please enter an admin message');
+                                                    }
+                                                }}
+                                                disabled={selectedSupport.status === 'Completed'}
+                                                className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                                </svg>
+                                                Add Message
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-between items-center pt-4 gap-4">
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => {
+                                            if (supportResolvedDescriptionRef.current.value.trim()) {
+                                                handleSupportStatusUpdate(selectedSupport._id, 'Completed');
+                                            } else {
+                                                toast.warning('Please enter a resolving description for the ticket');
+                                            }
+                                        }}
+                                        disabled={selectedSupport.status === 'Completed'}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
+                                    </button>
+                                </div>
                                 <button
                                     onClick={() => {
-                                        if (supportResolvedDescriptionRef.current.value.trim()) {
-                                            handleSupportStatusUpdate(selectedSupport._id, 'Completed');
-                                        } else {
-                                            toast.warning('Please enter a resolving description for the ticket');
+                                        setViewSupportModal(false);
+                                        // Clear admin message when closing
+                                        if (adminMessageRef.current) {
+                                            adminMessageRef.current.value = '';
                                         }
+                                        // Clear resolved description when closing
+                                        if (supportResolvedDescriptionRef.current) {
+                                            supportResolvedDescriptionRef.current.value = '';
+                                        }
+
                                     }}
-                                    disabled={selectedSupport.status === 'Completed'}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                                 >
-                                    {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
+                                    Close
                                 </button>
                             </div>
-                            <button
-                                onClick={() => {
-                                    setViewSupportModal(false);
-                                    // Clear admin message when closing
-                                    if (adminMessageRef.current) {
-                                        adminMessageRef.current.value = '';
-                                    }
-                                    // Clear resolved description when closing
-                                    if (supportResolvedDescriptionRef.current) {
-                                        supportResolvedDescriptionRef.current.value = '';
-                                    }
-                                    // Reset conversation state when closing
-                                    setShowConversation(false);
-                                }}
-                                className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
-                            >
-                                Close
-                            </button>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
-    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate]);
+        );
+    };
 
     // Invoice utility functions
     const downloadInvoiceAsPDF = async (data) => {
