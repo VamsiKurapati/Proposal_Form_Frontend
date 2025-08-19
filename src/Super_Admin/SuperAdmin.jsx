@@ -87,9 +87,7 @@ const SuperAdmin = () => {
     const [showConversation, setShowConversation] = useState(false);
     const [conversationStates, setConversationStates] = useState({}); // Store conversation state per ticket
 
-    useEffect(() => {
-        console.log("Show Conversation in SuperAdmin", showConversation);
-    }, [showConversation]);
+
 
     // Data
     const [usersStats, setUsersStats] = useState({});
@@ -269,10 +267,7 @@ const SuperAdmin = () => {
                     const savedConversationState = conversationStates[updatedSupport._id] || false;
                     setShowConversation(savedConversationState);
 
-                    console.log('=== MODAL OPEN DEBUG (status change) ===');
-                    console.log('Restoring conversation view state to:', savedConversationState);
                     setViewSupportModal(true);
-                    console.log('=== END MODAL OPEN DEBUG ===');
                 }
             } else {
                 // Check if we're switching to a different ticket
@@ -290,10 +285,7 @@ const SuperAdmin = () => {
                 const savedConversationState = conversationStates[support._id] || false;
                 setShowConversation(savedConversationState);
 
-                console.log('=== MODAL OPEN DEBUG (same ticket) ===');
-                console.log('Restoring conversation view state to:', savedConversationState);
                 setViewSupportModal(true);
-                console.log('=== END MODAL OPEN DEBUG ===');
             }
         } catch (e) {
             toast.error('Failed to update support ticket');
@@ -357,10 +349,6 @@ const SuperAdmin = () => {
 
     // Initialize refs when selectedSupport changes
     useEffect(() => {
-        console.log('=== SELECTED SUPPORT CHANGED ===');
-        console.log('selectedSupport ID:', selectedSupport?._id);
-        console.log('Current showConversation before restore:', showConversation);
-
         if (selectedSupport) {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
@@ -371,33 +359,11 @@ const SuperAdmin = () => {
 
             // Restore the conversation state for this ticket
             const savedConversationState = conversationStates[selectedSupport._id] || false;
-            console.log('Restoring conversation state to:', savedConversationState);
             setShowConversation(savedConversationState);
         }
-
-        console.log('=== END SELECTED SUPPORT CHANGED ===');
     }, [selectedSupport, conversationStates]);
 
-    // Debug useEffect for showConversation state changes
-    useEffect(() => {
-        console.log('=== SHOW CONVERSATION STATE CHANGE ===');
-        console.log('showConversation state changed to:', showConversation);
-        console.log('Stack trace:', new Error().stack);
 
-        // If state is being set to false, log more details
-        if (showConversation === false) {
-            console.log('State was set to FALSE - this might be the issue!');
-            console.log('Current selectedSupport ID:', selectedSupport?._id);
-            console.log('Current conversationStates:', conversationStates);
-        }
-
-        // Log when conversation section should be visible
-        if (showConversation === true) {
-            console.log('Conversation section should now be VISIBLE');
-        }
-
-        console.log('=== END STATE CHANGE ===');
-    }, [showConversation, selectedSupport, conversationStates]);
 
 
 
@@ -2496,27 +2462,18 @@ const SuperAdmin = () => {
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
                                     onClick={() => {
-                                        console.log('=== VIEW CONVERSATION BUTTON CLICKED ===');
-                                        console.log('Button clicked! Current showConversation:', showConversation);
                                         const newState = !showConversation;
-                                        console.log('About to set showConversation to:', newState);
 
                                         // Store the conversation state for this specific ticket FIRST
                                         if (selectedSupport && selectedSupport._id) {
-                                            setConversationStates(prev => {
-                                                const updated = {
-                                                    ...prev,
-                                                    [selectedSupport._id]: newState
-                                                };
-                                                console.log('Updated conversationStates:', updated);
-                                                return updated;
-                                            });
+                                            setConversationStates(prev => ({
+                                                ...prev,
+                                                [selectedSupport._id]: newState
+                                            }));
                                         }
 
                                         // Then update the local state
                                         setShowConversation(newState);
-
-                                        console.log('=== END BUTTON CLICK ===');
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
@@ -2540,12 +2497,6 @@ const SuperAdmin = () => {
                                 <>
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
-                                        {/* Debug: Log what messages are available */}
-                                        {console.log('=== CONVERSATION DEBUG ===')}
-                                        {console.log('selectedSupport.userMessages:', selectedSupport.userMessages)}
-                                        {console.log('selectedSupport.adminMessages:', selectedSupport.adminMessages)}
-                                        {console.log('=== END CONVERSATION DEBUG ===')}
-
                                         {/* Combined Messages Sorted by Timestamp */}
                                         {(() => {
                                             const allMessages = [];
@@ -2574,8 +2525,6 @@ const SuperAdmin = () => {
 
                                             // Sort all messages by timestamp
                                             allMessages.sort((a, b) => a.timestamp - b.timestamp);
-
-                                            console.log('Combined allMessages:', allMessages);
 
                                             return allMessages.length > 0 ? (
                                                 <div className="space-y-2">
@@ -2627,7 +2576,6 @@ const SuperAdmin = () => {
                                     <div className="border-t border-purple-200 pt-4">
                                         <button
                                             onClick={() => {
-                                                console.log('Add Message clicked from conversation area');
                                                 if (adminMessageRef.current && adminMessageRef.current.value.trim()) {
                                                     handleAddMessage(selectedSupport._id);
                                                 } else {
@@ -2646,11 +2594,7 @@ const SuperAdmin = () => {
                                 </>
                             )}
 
-                            {showConversation && (
-                                <>
-                                    {console.log("Close Conversation")}
-                                </>
-                            )}
+
 
                         </div>
 
@@ -2659,7 +2603,6 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        console.log('Resolve Ticket clicked. resolvedDescription:', supportResolvedDescriptionRef.current.value, 'trimmed:', supportResolvedDescriptionRef.current.value.trim());
                                         if (supportResolvedDescriptionRef.current.value.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
