@@ -391,6 +391,11 @@ const SuperAdmin = () => {
             console.log('Current conversationStates:', conversationStates);
         }
 
+        // Log when conversation section should be visible
+        if (showConversation === true) {
+            console.log('Conversation section should now be VISIBLE');
+        }
+
         console.log('=== END STATE CHANGE ===');
     }, [showConversation, selectedSupport, conversationStates]);
 
@@ -2530,7 +2535,6 @@ const SuperAdmin = () => {
                             </div>
 
                             {/* Collapsible Conversation Section */}
-                            {console.log('Rendering conversation section, showConversation:', showConversation)}
 
                             {showConversation && (
                                 <>
