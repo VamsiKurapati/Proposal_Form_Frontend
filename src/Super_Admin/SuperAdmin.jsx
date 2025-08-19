@@ -85,6 +85,7 @@ const SuperAdmin = () => {
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
     const [showConversation, setShowConversation] = useState(false);
+    const [conversationStates, setConversationStates] = useState({}); // Store conversation state per ticket
 
     useEffect(() => {
         console.log("Show Conversation in SuperAdmin", showConversation);
@@ -263,8 +264,13 @@ const SuperAdmin = () => {
                     if (supportResolvedDescriptionRef.current) {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
+
+                    // Restore the conversation state for this ticket
+                    const savedConversationState = conversationStates[updatedSupport._id] || false;
+                    setShowConversation(savedConversationState);
+
                     console.log('=== MODAL OPEN DEBUG (status change) ===');
-                    console.log('Keeping current conversation view state:', showConversation);
+                    console.log('Restoring conversation view state to:', savedConversationState);
                     setViewSupportModal(true);
                     console.log('=== END MODAL OPEN DEBUG ===');
                 }
@@ -279,9 +285,13 @@ const SuperAdmin = () => {
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
+
+                // Restore the conversation state for this ticket
+                const savedConversationState = conversationStates[support._id] || false;
+                setShowConversation(savedConversationState);
+
                 console.log('=== MODAL OPEN DEBUG (same ticket) ===');
-                console.log('Keeping current conversation view state:', showConversation);
-                // Ensure we don't interfere with showConversation state
+                console.log('Restoring conversation view state to:', savedConversationState);
                 setViewSupportModal(true);
                 console.log('=== END MODAL OPEN DEBUG ===');
             }
@@ -354,8 +364,12 @@ const SuperAdmin = () => {
             if (adminMessageRef.current) {
                 adminMessageRef.current.value = '';
             }
+
+            // Restore the conversation state for this ticket
+            const savedConversationState = conversationStates[selectedSupport._id] || false;
+            setShowConversation(savedConversationState);
         }
-    }, [selectedSupport]);
+    }, [selectedSupport, conversationStates]);
 
     // Debug useEffect for showConversation state changes
     useEffect(() => {
@@ -2467,6 +2481,15 @@ const SuperAdmin = () => {
                                         const newState = !showConversation;
                                         console.log('About to set showConversation to:', newState);
                                         setShowConversation(newState);
+
+                                        // Store the conversation state for this specific ticket
+                                        if (selectedSupport && selectedSupport._id) {
+                                            setConversationStates(prev => ({
+                                                ...prev,
+                                                [selectedSupport._id]: newState
+                                            }));
+                                        }
+
                                         console.log('=== END BUTTON CLICK ===');
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
