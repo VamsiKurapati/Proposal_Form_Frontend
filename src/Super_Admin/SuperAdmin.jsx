@@ -2536,6 +2536,12 @@ const SuperAdmin = () => {
                                 <>
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
+                                        {/* Debug: Log what messages are available */}
+                                        {console.log('=== CONVERSATION DEBUG ===')}
+                                        {console.log('selectedSupport.userMessages:', selectedSupport.userMessages)}
+                                        {console.log('selectedSupport.adminMessages:', selectedSupport.adminMessages)}
+                                        {console.log('=== END CONVERSATION DEBUG ===')}
+
                                         {/* Combined Messages Sorted by Timestamp */}
                                         {(() => {
                                             const allMessages = [];
@@ -2564,6 +2570,8 @@ const SuperAdmin = () => {
 
                                             // Sort all messages by timestamp
                                             allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+                                            console.log('Combined allMessages:', allMessages);
 
                                             return allMessages.length > 0 ? (
                                                 <div className="space-y-2">
