@@ -8,9 +8,8 @@ export default function ImageUpload() {
     const [uploadedImages, setUploadedImages] = useState([]);
 
     useEffect(() => {
-        cloudImageService.getUploadedImages().then((res) => {
-            setUploadedImages(res);
-        });
+        const images = cloudImageService.getUploadedImages();
+        setUploadedImages(images);
     }, []);
 
     const handleFileChange = (e) => {
