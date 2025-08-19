@@ -357,6 +357,10 @@ const SuperAdmin = () => {
 
     // Initialize refs when selectedSupport changes
     useEffect(() => {
+        console.log('=== SELECTED SUPPORT CHANGED ===');
+        console.log('selectedSupport ID:', selectedSupport?._id);
+        console.log('Current showConversation before restore:', showConversation);
+
         if (selectedSupport) {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
@@ -367,8 +371,11 @@ const SuperAdmin = () => {
 
             // Restore the conversation state for this ticket
             const savedConversationState = conversationStates[selectedSupport._id] || false;
+            console.log('Restoring conversation state to:', savedConversationState);
             setShowConversation(savedConversationState);
         }
+
+        console.log('=== END SELECTED SUPPORT CHANGED ===');
     }, [selectedSupport, conversationStates]);
 
     // Debug useEffect for showConversation state changes
@@ -376,8 +383,16 @@ const SuperAdmin = () => {
         console.log('=== SHOW CONVERSATION STATE CHANGE ===');
         console.log('showConversation state changed to:', showConversation);
         console.log('Stack trace:', new Error().stack);
+
+        // If state is being set to false, log more details
+        if (showConversation === false) {
+            console.log('State was set to FALSE - this might be the issue!');
+            console.log('Current selectedSupport ID:', selectedSupport?._id);
+            console.log('Current conversationStates:', conversationStates);
+        }
+
         console.log('=== END STATE CHANGE ===');
-    }, [showConversation]);
+    }, [showConversation, selectedSupport, conversationStates]);
 
 
 
@@ -2480,15 +2495,21 @@ const SuperAdmin = () => {
                                         console.log('Button clicked! Current showConversation:', showConversation);
                                         const newState = !showConversation;
                                         console.log('About to set showConversation to:', newState);
-                                        setShowConversation(newState);
 
-                                        // Store the conversation state for this specific ticket
+                                        // Store the conversation state for this specific ticket FIRST
                                         if (selectedSupport && selectedSupport._id) {
-                                            setConversationStates(prev => ({
-                                                ...prev,
-                                                [selectedSupport._id]: newState
-                                            }));
+                                            setConversationStates(prev => {
+                                                const updated = {
+                                                    ...prev,
+                                                    [selectedSupport._id]: newState
+                                                };
+                                                console.log('Updated conversationStates:', updated);
+                                                return updated;
+                                            });
                                         }
+
+                                        // Then update the local state
+                                        setShowConversation(newState);
 
                                         console.log('=== END BUTTON CLICK ===');
                                     }}
