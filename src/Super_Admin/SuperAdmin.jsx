@@ -84,6 +84,7 @@ const SuperAdmin = () => {
     const [supportFilterModal, setSupportFilterModal] = useState(false);
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
+    const [showConversation, setShowConversation] = useState(false);
     const showConversationRef = useRef(false);
 
 
@@ -266,6 +267,7 @@ const SuperAdmin = () => {
 
                     // Reset conversation state for new ticket
                     showConversationRef.current = false;
+                    setShowConversation(false);
 
                     setViewSupportModal(true);
                 }
@@ -283,6 +285,7 @@ const SuperAdmin = () => {
 
                 // Reset conversation state for new ticket
                 showConversationRef.current = false;
+                setShowConversation(false);
 
                 setViewSupportModal(true);
             }
@@ -323,6 +326,9 @@ const SuperAdmin = () => {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = '';
             }
+            // Reset conversation state when closing
+            setShowConversation(false);
+            showConversationRef.current = false;
         }
     }, []);
 
@@ -339,6 +345,9 @@ const SuperAdmin = () => {
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = '';
                 }
+                // Reset conversation state when closing
+                setShowConversation(false);
+                showConversationRef.current = false;
             }
         };
 
@@ -358,6 +367,7 @@ const SuperAdmin = () => {
 
             // Reset conversation state for new ticket
             showConversationRef.current = false;
+            setShowConversation(false);
         }
     }, [selectedSupport]);
 
@@ -2446,12 +2456,13 @@ const SuperAdmin = () => {
                                     onClick={() => {
                                         const newState = !showConversationRef.current;
                                         showConversationRef.current = newState;
+                                        setShowConversation(newState);
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
-                                    {showConversationRef.current ? 'Hide Conversation' : 'View Conversation'}
+                                    {showConversation ? 'Hide Conversation' : 'View Conversation'}
                                     <svg
-                                        className={`w-4 h-4 transition-transform ${showConversationRef.current ? 'rotate-180' : ''}`}
+                                        className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -2465,8 +2476,9 @@ const SuperAdmin = () => {
 
                             {/* Collapsible Conversation Section */}
 
-                            {showConversationRef.current && (
+                            {showConversation && (
                                 <>
+                                    {console.log("I am here")}
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
@@ -2598,6 +2610,9 @@ const SuperAdmin = () => {
                                     if (supportResolvedDescriptionRef.current) {
                                         supportResolvedDescriptionRef.current.value = '';
                                     }
+                                    // Reset conversation state when closing
+                                    setShowConversation(false);
+                                    showConversationRef.current = false;
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
