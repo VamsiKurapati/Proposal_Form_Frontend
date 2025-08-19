@@ -86,10 +86,7 @@ const SuperAdmin = () => {
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
     const [showConversation, setShowConversation] = useState(false);
 
-    // Debug logging for conversation state changes
-    useEffect(() => {
-        console.log('🔍 [DEBUG] showConversation state changed to:', showConversation);
-    }, [showConversation]);
+
 
 
 
@@ -249,8 +246,6 @@ const SuperAdmin = () => {
     };
 
     const openSupportModal = async (support) => {
-        console.log('🔍 [DEBUG] openSupportModal called with support:', support?._id);
-        console.log('🔍 [DEBUG] Current showConversation state before opening:', showConversation);
         try {
             if (support.status !== "In Progress" && support.status !== "Completed") {
                 // Always set status to "In Progress" when opening modal
@@ -272,11 +267,9 @@ const SuperAdmin = () => {
                     }
 
                     // Reset conversation state for new ticket
-                    console.log('🔍 [DEBUG] Resetting conversation state in openSupportModal (first branch)');
                     setShowConversation(false);
 
                     setViewSupportModal(true);
-                    console.log('🔍 [DEBUG] Modal opened - showConversation should be false now');
                 }
             } else {
                 // Check if we're switching to a different ticket
@@ -291,11 +284,9 @@ const SuperAdmin = () => {
                 }
 
                 // Reset conversation state for new ticket
-                console.log('🔍 [DEBUG] Resetting conversation state in openSupportModal (second branch)');
                 setShowConversation(false);
 
                 setViewSupportModal(true);
-                console.log('🔍 [DEBUG] Modal opened (second branch) - showConversation should be false now');
             }
         } catch (e) {
             toast.error('Failed to update support ticket');
@@ -335,7 +326,6 @@ const SuperAdmin = () => {
                 supportResolvedDescriptionRef.current.value = '';
             }
             // Reset conversation state when closing
-            console.log('🔍 [DEBUG] Resetting conversation state when closing modal (backdrop click)');
             setShowConversation(false);
         }
     }, []);
@@ -362,7 +352,6 @@ const SuperAdmin = () => {
                     supportResolvedDescriptionRef.current.value = '';
                 }
                 // Reset conversation state when closing
-                console.log('🔍 [DEBUG] Resetting conversation state when closing modal (escape key)');
                 setShowConversation(false);
                 // Close filter modals
                 setNotificationTimeFilterModal(false);
@@ -390,8 +379,6 @@ const SuperAdmin = () => {
 
     // Initialize refs when selectedSupport changes
     useEffect(() => {
-        console.log('🔍 [DEBUG] useEffect triggered - selectedSupport changed to:', selectedSupport?._id);
-        console.log('🔍 [DEBUG] Current showConversation state in useEffect:', showConversation);
         if (selectedSupport) {
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
@@ -401,7 +388,6 @@ const SuperAdmin = () => {
             }
 
             // Reset conversation state for new ticket
-            console.log('🔍 [DEBUG] Resetting conversation state in useEffect (selectedSupport)');
             setShowConversation(false);
         }
     }, [selectedSupport]);
@@ -1935,7 +1921,7 @@ const SuperAdmin = () => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            console.log("Logout response: ", res);
+            //console.log("Logout response: ", res);
             if (res.status === 200) {
                 localStorage.clear();
                 sessionStorage.clear();
@@ -1945,7 +1931,7 @@ const SuperAdmin = () => {
                 }, 1000);
             }
         } catch (error) {
-            console.log("Error in logout: ", error);
+            console.error("Error in logout: ", error);
         }
     };
 
@@ -2418,11 +2404,7 @@ const SuperAdmin = () => {
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
                                     onClick={() => {
-                                        console.log('🔍 [DEBUG] View Conversation button clicked');
-                                        console.log('🔍 [DEBUG] Current showConversation state:', showConversation);
-                                        const newState = !showConversation;
-                                        console.log('🔍 [DEBUG] Setting showConversation to:', newState);
-                                        setShowConversation(newState);
+                                        setShowConversation(!showConversation);
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
@@ -2441,7 +2423,6 @@ const SuperAdmin = () => {
                             </div>
 
                             {/* Collapsible Conversation Section */}
-                            {console.log('🔍 [DEBUG] Rendering conversation section - showConversation:', showConversation)}
                             {showConversation && (
                                 <>
                                     {/* Display existing conversation */}
@@ -2576,7 +2557,6 @@ const SuperAdmin = () => {
                                         supportResolvedDescriptionRef.current.value = '';
                                     }
                                     // Reset conversation state when closing
-                                    console.log('🔍 [DEBUG] Resetting conversation state when closing modal (Close button)');
                                     setShowConversation(false);
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
@@ -2588,7 +2568,7 @@ const SuperAdmin = () => {
                 )}
             </div>
         </div>
-    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate, showConversation]);
+    ), [selectedSupport, handleModalBackdropClick, handleSupportStatusUpdate]);
 
     // Invoice utility functions
     const downloadInvoiceAsPDF = async (data) => {
@@ -2881,13 +2861,7 @@ const SuperAdmin = () => {
 
             {/* Modals */}
             {viewUserModal && <UserViewModal />}
-            {viewSupportModal && (
-                console.log('🔍 [DEBUG] Rendering SupportViewModal - showConversation:', showConversation),
-                <SupportViewModal
-                    showConversation={showConversation}
-                    setShowConversation={setShowConversation}
-                />
-            )}
+            {viewSupportModal && <SupportViewModal />}
 
             {/* Top Header Bar */}
             <div className="bg-white border-b border-[#0000001A] px-8 md:px-12 py-4">
