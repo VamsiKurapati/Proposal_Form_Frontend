@@ -1,11 +1,10 @@
 //Create a dummy page to upload images to the cloud
 
 import React, { useState, useEffect } from 'react';
-import CloudImageService from '../utils/cloudImageService';
+import cloudImageService from '../utils/cloudImageService';
 
 export default function ImageUpload() {
     const [file, setFile] = useState(null);
-    const cloudImageService = new CloudImageService();
     const [uploadedImages, setUploadedImages] = useState([]);
 
     useEffect(() => {
