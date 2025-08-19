@@ -149,7 +149,7 @@ const SuperAdmin = () => {
             // Always include resolved description if it exists (regardless of status)
             const resolvedDescription = supportResolvedDescriptionRef.current && supportResolvedDescriptionRef.current.value ? supportResolvedDescriptionRef.current.value.trim() : '';
             if (resolvedDescription) {
-                updateData.resolvedDescription = resolvedDescription;
+                updateData.Resolved_Description = resolvedDescription;
             }
 
             const res = await axios.put(`${baseUrl}/updateSupportTicket/${ticketId}`, updateData, {
@@ -163,7 +163,7 @@ const SuperAdmin = () => {
                     ...currentTicket,
                     status: newStatus,
                     adminMessages: currentAdminMessages,
-                    resolvedDescription: updateData.resolvedDescription || currentTicket.resolvedDescription
+                    resolvedDescription: updateData.Resolved_Description || currentTicket.resolvedDescription
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
@@ -201,12 +201,6 @@ const SuperAdmin = () => {
                 newAdminMessage
             };
 
-            // Always include resolved description if it exists
-            const resolvedDescription = supportResolvedDescriptionRef.current && supportResolvedDescriptionRef.current.value ? supportResolvedDescriptionRef.current.value.trim() : '';
-            if (resolvedDescription) {
-                updateData.resolvedDescription = resolvedDescription;
-            }
-
             const res = await axios.post(`${baseUrl}/addAdminMessage/${ticketId}`, updateData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -217,7 +211,7 @@ const SuperAdmin = () => {
                 const updatedTicket = {
                     ...selectedSupport,
                     adminMessages: [...(selectedSupport.adminMessages || []), { message: newAdminMessage, createdAt: new Date().toISOString() }],
-                    resolvedDescription: updateData.resolvedDescription || selectedSupport.resolvedDescription
+                    resolvedDescription: selectedSupport.resolvedDescription
                 };
 
                 setSupportTicketsData(prev => (prev || []).map(t => t._id === ticketId ? updatedTicket : t));
