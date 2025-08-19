@@ -66,7 +66,7 @@ const SuperAdmin = () => {
     const supportResolvedDescriptionRef = useRef(null);
 
     // Ref for the admin message textarea
-    const adminMessageRef = useRef(null);
+    const adminMessageRef = useRef('');
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -84,8 +84,9 @@ const SuperAdmin = () => {
     const [supportFilterModal, setSupportFilterModal] = useState(false);
     const [notificationTimeFilterModal, setNotificationTimeFilterModal] = useState(false);
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
-    const [showConversation, setShowConversation] = useState(false);
-    const [conversationStates, setConversationStates] = useState({}); // Store conversation state per ticket
+    const showConversationRef = useRef(false);
+
+
 
 
 
@@ -263,9 +264,8 @@ const SuperAdmin = () => {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
 
-                    // Restore the conversation state for this ticket
-                    const savedConversationState = conversationStates[updatedSupport._id] || false;
-                    setShowConversation(savedConversationState);
+                    // Reset conversation state for new ticket
+                    showConversationRef.current = false;
 
                     setViewSupportModal(true);
                 }
@@ -281,9 +281,8 @@ const SuperAdmin = () => {
                     supportResolvedDescriptionRef.current.value = support.resolvedDescription || '';
                 }
 
-                // Restore the conversation state for this ticket
-                const savedConversationState = conversationStates[support._id] || false;
-                setShowConversation(savedConversationState);
+                // Reset conversation state for new ticket
+                showConversationRef.current = false;
 
                 setViewSupportModal(true);
             }
@@ -357,11 +356,10 @@ const SuperAdmin = () => {
                 adminMessageRef.current.value = '';
             }
 
-            // Restore the conversation state for this ticket
-            const savedConversationState = conversationStates[selectedSupport._id] || false;
-            setShowConversation(savedConversationState);
+            // Reset conversation state for new ticket
+            showConversationRef.current = false;
         }
-    }, [selectedSupport, conversationStates]);
+    }, [selectedSupport]);
 
 
 
@@ -2382,32 +2380,16 @@ const SuperAdmin = () => {
                                         <div key={index} className="border border-[#4B5563] rounded-lg p-3 bg-white">
                                             <div className="space-y-2">
                                                 <div>
-                                                    <label className="block text-xs font-medium text-[#111827]">File Name</label>
-                                                    <p className="text-sm text-[#000000] font-medium">{attachment.name || `Attachment ${index + 1}`}</p>
+                                                    <label className="block text-xs font-medium text-[#111827]">Download</label>
+                                                    <a
+                                                        href={`https://proposal-form-backend.vercel.app/api/image/getFile/${attachment.fileUrl}`}
+                                                        target="popup"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline text-sm"
+                                                    >
+                                                        View Attachment
+                                                    </a>
                                                 </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-[#111827]">Type</label>
-                                                    <p className="text-sm text-[#000000]">{attachment.type || 'Unknown'}</p>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-[#111827]">Size</label>
-                                                    <p className="text-sm text-[#000000]">
-                                                        {attachment.size ? `${(attachment.size / 1024).toFixed(2)} KB` : 'Unknown'}
-                                                    </p>
-                                                </div>
-                                                {attachment.url && (
-                                                    <div>
-                                                        <label className="block text-xs font-medium text-[#111827]">Download</label>
-                                                        <a
-                                                            href={attachment.url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-blue-600 hover:underline text-sm"
-                                                        >
-                                                            View File
-                                                        </a>
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -2462,24 +2444,14 @@ const SuperAdmin = () => {
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
                                     onClick={() => {
-                                        const newState = !showConversation;
-
-                                        // Store the conversation state for this specific ticket FIRST
-                                        if (selectedSupport && selectedSupport._id) {
-                                            setConversationStates(prev => ({
-                                                ...prev,
-                                                [selectedSupport._id]: newState
-                                            }));
-                                        }
-
-                                        // Then update the local state
-                                        setShowConversation(newState);
+                                        const newState = !showConversationRef.current;
+                                        showConversationRef.current = newState;
                                     }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
-                                    {showConversation ? 'Hide Conversation' : 'View Conversation'}
+                                    {showConversationRef.current ? 'Hide Conversation' : 'View Conversation'}
                                     <svg
-                                        className={`w-4 h-4 transition-transform ${showConversation ? 'rotate-180' : ''}`}
+                                        className={`w-4 h-4 transition-transform ${showConversationRef.current ? 'rotate-180' : ''}`}
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -2493,7 +2465,7 @@ const SuperAdmin = () => {
 
                             {/* Collapsible Conversation Section */}
 
-                            {showConversation && (
+                            {showConversationRef.current && (
                                 <>
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
