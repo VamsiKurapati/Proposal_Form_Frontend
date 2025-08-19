@@ -188,7 +188,7 @@ class CloudImageService {
     try {
       // For template images, we need to use the ObjectId endpoint
       // Since frontend only has filename, we'll use the filename endpoint
-      const response = await axios.get(`${this.baseUrl}/get_template_image_by_name/${imageName}`, {
+      const response = await axios.get(`${this.baseUrl}/get_template_image/${imageName}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -300,7 +300,7 @@ class CloudImageService {
   getTemplateUrl(src) {
     if (src.startsWith('template://')) {
       const imageName = src.replace('template://', '');
-      return `${this.baseUrl}/get_template_image_by_name/${imageName}`;
+      return `${this.baseUrl}/get_template_image/${imageName}`;
     }
     return src;
   }
@@ -422,7 +422,7 @@ class CloudImageService {
                 fileId: templateName, // Use template name as fileId
                 type: 'image/png', // Default type
                 size: 1024 * 1024, // Default 1MB size for extracted images
-                cloudUrl: `${this.baseUrl}/get_template_image_by_name/${templateName}`,
+                cloudUrl: `${this.baseUrl}/get_template_image/${templateName}`,
                 uploadedAt: new Date().toISOString(),
                 isFromJSON: true,
                 isTemplate: true,
