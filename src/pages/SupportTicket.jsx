@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { FaChevronDown, FaChevronUp , FaTrash} from "react-icons/fa";
+
+import { TbTrashX } from "react-icons/tb";
+
+
 import NavbarComponent from "./NavbarComponent";
 import axios from "axios";
 
@@ -394,15 +398,18 @@ const SupportTicket = () => {
               >
                 {/* Header */}
                 <div className="flex justify-between items-center">
-                  <div>
+                  <div className="w-full">
+
+                    <div className="relative w-full rounded-lg p-2">
+
                     <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                       Ticket ID: {ticket._id || ticket.id || "N/A"}
                     </span>
                     
-                       <span >
+                       <span className="absolute top-2 right-[-33px] text-red-500 hover:text-red-600 font-semibold  rounded" >
                       {ticket.status!="Completed" && <button
                           title="Withdraw this ticket"
-                          className="mr-1  text-red-500 hover:text-red-600 font-semibold py-2 px-2 rounded"
+                          className="text-red-500 hover:text-red-600 font-semibold py-2 px-2 rounded"
                           onClick={async (e) => {
                             e.preventDefault();
                             try {
@@ -418,15 +425,18 @@ const SupportTicket = () => {
                             } catch (err) {
                               alert(
                                 err.response?.data?.message ||
-                                  "Failed to reopen ticket."
+                                "Failed to reopen ticket."
                               );
                             }
                           }}
-                        >
-                          <FaTrash/>
+                          >
+                            <TbTrashX className="text-red-500 text-2xl"/>
+                          {/* <FaTrash/> */}
+
                         </button>}
                         
                        </span>
+                        </div>
                     <div className="mt-2 grid grid-cols-3 gap-20 text-sm">
                       <div>
                         <p className="text-gray-500">Sub-category/Subject:</p>
@@ -456,9 +466,10 @@ const SupportTicket = () => {
                         </p>
                       </div>
                   </div>
+                  
                   <button
                     onClick={() => toggleDropdown(ticket._id || ticket.id)}
-                    className="text-white bg-blue-600 border-2 border-blue-600 rounded-full p-2"
+                    className="text-white bg-blue-600 border-2 border-blue-600 rounded-full p-1 "
                   >
                     {openTickets[ticket._id || ticket.id] ? (
                       <FaChevronUp />
