@@ -245,7 +245,7 @@ const SuperAdmin = () => {
 
     const openSupportModal = async (support) => {
         try {
-            if (support.status !== "In Progress") {
+            if (support.status !== "In Progress" && support.status !== "Completed") {
                 // Always set status to "In Progress" when opening modal
                 const res = await axios.put(`${baseUrl}/updateSupportTicket/${support._id}`, {
                     status: 'In Progress'
@@ -281,6 +281,7 @@ const SuperAdmin = () => {
                 }
                 console.log('=== MODAL OPEN DEBUG (same ticket) ===');
                 console.log('Keeping current conversation view state:', showConversation);
+                // Ensure we don't interfere with showConversation state
                 setViewSupportModal(true);
                 console.log('=== END MODAL OPEN DEBUG ===');
             }
@@ -357,6 +358,12 @@ const SuperAdmin = () => {
     }, [selectedSupport]);
 
     // Debug useEffect for showConversation state changes
+    useEffect(() => {
+        console.log('=== SHOW CONVERSATION STATE CHANGE ===');
+        console.log('showConversation state changed to:', showConversation);
+        console.log('Stack trace:', new Error().stack);
+        console.log('=== END STATE CHANGE ===');
+    }, [showConversation]);
 
 
 
@@ -2454,7 +2461,14 @@ const SuperAdmin = () => {
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-medium text-gray-800">Conversation</h3>
                                 <button
-                                    onClick={() => setShowConversation(!showConversation)}
+                                    onClick={() => {
+                                        console.log('=== VIEW CONVERSATION BUTTON CLICKED ===');
+                                        console.log('Button clicked! Current showConversation:', showConversation);
+                                        const newState = !showConversation;
+                                        console.log('About to set showConversation to:', newState);
+                                        setShowConversation(newState);
+                                        console.log('=== END BUTTON CLICK ===');
+                                    }}
                                     className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1"
                                 >
                                     {showConversation ? 'Hide Conversation' : 'View Conversation'}
@@ -2539,6 +2553,17 @@ const SuperAdmin = () => {
                                                     No messages yet. Start the conversation below.
                                                 </div>
                                             )}
+                                    </div>
+
+                                    {/* Add Message Input Field */}
+                                    <div className="border-t border-purple-200 pt-4">
+                                        <textarea
+                                            ref={adminMessageRef}
+                                            placeholder="Enter your message..."
+                                            className="w-full p-2 border border-gray-300 rounded-lg resize-none"
+                                            rows="3"
+                                            disabled={selectedSupport.status === 'Completed'}
+                                        />
                                     </div>
 
                                     {/* Add Message Button in Conversation Area */}
