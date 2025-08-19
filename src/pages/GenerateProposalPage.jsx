@@ -29,37 +29,18 @@ const GenerateProposalPage = () => {
         });
         if (res.status === 200) {
           const data = {
-            companyName: response.data.companyName,
-            adminName: response.data.adminName,
-            industry: response.data.industry,
-            location: response.data.location,
-            email: response.data.email,
-            phone: response.data.phone,
-            website: response.data.website,
-            linkedIn: response.data.linkedIn,
+            companyName: res.data.companyName,
+            adminName: res.data.adminName,
+            industry: res.data.industry,
             profile: {
-              bio: response.data.bio,
-              services: response.data.services,
-              awards: response.data.awards,
-              clients: response.data.clients,
-              preferredIndustries: response.data.preferredIndustries
+              bio: res.data.bio,
             },
-            employees: response.data.employees,
+            employees: res.data.employees,
             companyDetails: {
-              "No.of employees": { value: response.data.numberOfEmployees },
-              "Founded": { value: response.data.establishedYear }
+              "No.of employees": { value: res.data.numberOfEmployees },
             },
-            caseStudiesList: response.data.caseStudies,
-            certificationsList: response.data.licensesAndCertifications,
-            documentList: response.data.documents,
-            stats: {
-              totalProposals: response.data.totalProposals,
-              wonProposals: response.data.wonProposals,
-              successRate: response.data.successRate,
-              activeProposals: response.data.activeProposals
-            },
-            proposalList: response.data.proposals,
-            logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
+            caseStudiesList: res.data.caseStudies,
+            proposalList: res.data.proposals,
           };
           setCompanyData(data);
         }
