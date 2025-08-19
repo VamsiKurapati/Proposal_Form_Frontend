@@ -86,6 +86,10 @@ const SuperAdmin = () => {
     const [notificationCategoryFilterModal, setNotificationCategoryFilterModal] = useState(false);
     const [showConversation, setShowConversation] = useState(false);
 
+    useEffect(() => {
+        console.log("Show Conversation in SuperAdmin", showConversation);
+    }, [showConversation]);
+
     // Data
     const [usersStats, setUsersStats] = useState({});
     const [companiesData, setCompaniesData] = useState([]);
@@ -2441,24 +2445,6 @@ const SuperAdmin = () => {
                                     defaultValue={selectedSupport.resolvedDescription || ''}
                                 />
                                 {selectedSupport.status === "Completed" && (
-                                    <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Admin Message Input */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-medium text-gray-800 mb-3">Admin Message</h3>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Type your message here</label>
-                                <textarea
-                                    ref={adminMessageRef}
-                                    placeholder="Type your response or update here..."
-                                    className="w-full p-3 border border-gray-300 rounded-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                    rows="3"
-                                    disabled={selectedSupport.status === 'Completed'}
-                                />
-                                {selectedSupport.status === 'Completed' && (
                                     <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
                                 )}
                             </div>
