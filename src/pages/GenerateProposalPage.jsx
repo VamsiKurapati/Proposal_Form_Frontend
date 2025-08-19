@@ -18,38 +18,6 @@ const GenerateProposalPage = () => {
   const [showViewAllTeam, setShowViewAllTeam] = useState(false);
   const [showAddCaseStudy, setShowAddCaseStudy] = useState(false);
 
-  useEffect(async () => {
-    if ((role === "Editor" || role === "Viewer") && proposal) {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`https://proposal-form-backend.vercel.app/api/profile/getCompanyProfile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if (res.status === 200) {
-          const data = {
-            companyName: res.data.companyName,
-            adminName: res.data.adminName,
-            industry: res.data.industry,
-            profile: {
-              bio: res.data.bio,
-            },
-            employees: res.data.employees,
-            companyDetails: {
-              "No.of employees": { value: res.data.numberOfEmployees },
-            },
-            caseStudiesList: res.data.caseStudies,
-            proposalList: res.data.proposals,
-          };
-          setCompanyData(data);
-        }
-      } catch (error) {
-        console.error("Error getting proposal:", error);
-      }
-    }
-  }, [proposal]);
-
   const handleSaveAndNext = async () => {
     try {
       const token = localStorage.getItem("token");
