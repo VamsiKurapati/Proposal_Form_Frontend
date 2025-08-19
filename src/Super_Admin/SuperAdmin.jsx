@@ -65,8 +65,8 @@ const SuperAdmin = () => {
     // Ref for the resolved description textarea
     const supportResolvedDescriptionRef = useRef(null);
 
-    // State for admin message input
-    const [adminMessage, setAdminMessage] = useState('');
+    // Ref for the admin message textarea
+    const adminMessageRef = useRef(null);
 
     // Filters
     const [userStatusFilter, setUserStatusFilter] = useState('all');
@@ -170,8 +170,10 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear admin message field only
-                setAdminMessage('');
+                // Clear admin message field using ref
+                if (adminMessageRef.current) {
+                    adminMessageRef.current.value = '';
+                }
                 // Don't clear resolved description - preserve it for display
 
                 toast.success(`Ticket status updated to ${newStatus}`);
@@ -179,12 +181,12 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to update ticket status');
         }
-    }, [supportTicketsData, selectedSupport, adminMessage]);
+    }, [supportTicketsData, selectedSupport]);
 
     // Function to add messages without changing status
     const handleAddMessage = useCallback(async (ticketId) => {
         try {
-            const newAdminMessage = adminMessage.trim();
+            const newAdminMessage = adminMessageRef.current ? adminMessageRef.current.value.trim() : '';
 
             if (!newAdminMessage) {
                 toast.warning('Please enter a message');
@@ -222,8 +224,10 @@ const SuperAdmin = () => {
                     setSelectedSupport(updatedTicket);
                 }
 
-                // Clear admin message field only
-                setAdminMessage('');
+                // Clear admin message field using ref
+                if (adminMessageRef.current) {
+                    adminMessageRef.current.value = '';
+                }
                 // Don't clear resolved description - preserve it for display
 
                 toast.success('Message added successfully');
@@ -231,7 +235,7 @@ const SuperAdmin = () => {
         } catch (e) {
             toast.error('Failed to add message');
         }
-    }, [supportTicketsData, selectedSupport, adminMessage]);
+    }, [supportTicketsData, selectedSupport]);
 
 
 
@@ -257,7 +261,7 @@ const SuperAdmin = () => {
                     setSupportTicketsData(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setFilteredSupport(prev => (prev || []).map(t => t._id === support._id ? updatedSupport : t));
                     setSelectedSupport(updatedSupport);
-                    // Don't clear adminMessage here - let user keep their message
+                    // Don't clear admin message here - let user keep their message
                     if (supportResolvedDescriptionRef.current) {
                         supportResolvedDescriptionRef.current.value = updatedSupport.resolvedDescription || '';
                     }
@@ -268,7 +272,9 @@ const SuperAdmin = () => {
             } else {
                 // Check if we're switching to a different ticket
                 if (selectedSupport && selectedSupport._id !== support._id) {
-                    setAdminMessage(''); // Clear message when switching tickets
+                    if (adminMessageRef.current) {
+                        adminMessageRef.current.value = ''; // Clear message when switching tickets
+                    }
                 }
                 setSelectedSupport(support);
                 if (supportResolvedDescriptionRef.current) {
@@ -309,7 +315,9 @@ const SuperAdmin = () => {
             setViewUserModal(false);
             setViewSupportModal(false);
             // Clear admin message when closing
-            setAdminMessage('');
+            if (adminMessageRef.current) {
+                adminMessageRef.current.value = '';
+            }
             if (supportResolvedDescriptionRef.current) {
                 supportResolvedDescriptionRef.current.value = '';
             }
@@ -323,7 +331,9 @@ const SuperAdmin = () => {
                 setViewUserModal(false);
                 setViewSupportModal(false);
                 // Clear admin message when closing
-                setAdminMessage('');
+                if (adminMessageRef.current) {
+                    adminMessageRef.current.value = '';
+                }
                 if (supportResolvedDescriptionRef.current) {
                     supportResolvedDescriptionRef.current.value = '';
                 }
@@ -336,8 +346,13 @@ const SuperAdmin = () => {
 
     // Initialize refs when selectedSupport changes
     useEffect(() => {
-        if (selectedSupport && supportResolvedDescriptionRef.current) {
-            supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
+        if (selectedSupport) {
+            if (supportResolvedDescriptionRef.current) {
+                supportResolvedDescriptionRef.current.value = selectedSupport.resolvedDescription || '';
+            }
+            if (adminMessageRef.current) {
+                adminMessageRef.current.value = '';
+            }
         }
     }, [selectedSupport]);
 
@@ -2437,20 +2452,12 @@ const SuperAdmin = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Type your message here</label>
                                 <textarea
-                                    value={adminMessage}
-                                    onChange={(e) => {
-                                        console.log('Textarea onChange:', e.target.value);
-                                        setAdminMessage(e.target.value);
-                                    }}
+                                    ref={adminMessageRef}
                                     placeholder="Type your response or update here..."
                                     className="w-full p-3 border border-gray-300 rounded-lg resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                                     rows="3"
                                     disabled={selectedSupport.status === 'Completed'}
                                 />
-                                {/* Debug: Show current adminMessage value */}
-                                <div className="text-xs text-gray-500 mt-1">
-                                    Debug - Current value: "{adminMessage}" (Length: {adminMessage.length})
-                                </div>
                                 {selectedSupport.status === 'Completed' && (
                                     <p className="text-sm text-gray-500 mt-1">This field is read-only for completed tickets.</p>
                                 )}
@@ -2485,6 +2492,7 @@ const SuperAdmin = () => {
                             {/* Collapsible Conversation Section */}
                             {showConversation && (
                                 <>
+                                    {console.log("Open Conversation")}
                                     {/* Display existing conversation */}
                                     <div className="mb-4 max-h-64 overflow-y-auto space-y-3">
                                         {/* Combined Messages Sorted by Timestamp */}
@@ -2550,8 +2558,36 @@ const SuperAdmin = () => {
                                                 </div>
                                             )}
                                     </div>
+
+                                    {/* Add Message Button in Conversation Area */}
+                                    <div className="border-t border-purple-200 pt-4">
+                                        <button
+                                            onClick={() => {
+                                                console.log('Add Message clicked from conversation area');
+                                                if (adminMessageRef.current && adminMessageRef.current.value.trim()) {
+                                                    handleAddMessage(selectedSupport._id);
+                                                } else {
+                                                    toast.warning('Please enter an admin message');
+                                                }
+                                            }}
+                                            disabled={selectedSupport.status === 'Completed'}
+                                            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                            </svg>
+                                            Add Message
+                                        </button>
+                                    </div>
                                 </>
                             )}
+
+                            {showConversation && (
+                                <>
+                                    {console.log("Close Conversation")}
+                                </>
+                            )}
+
                         </div>
 
                         {/* Action Buttons */}
@@ -2559,11 +2595,11 @@ const SuperAdmin = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => {
-                                        console.log('Resolve Ticket clicked. adminMessage:', adminMessage, 'trimmed:', adminMessage.trim());
-                                        if (adminMessage.trim()) {
+                                        console.log('Resolve Ticket clicked. resolvedDescription:', supportResolvedDescriptionRef.current.value, 'trimmed:', supportResolvedDescriptionRef.current.value.trim());
+                                        if (supportResolvedDescriptionRef.current.value.trim()) {
                                             handleSupportStatusUpdate(selectedSupport._id, 'Completed');
                                         } else {
-                                            toast.warning('Please enter an admin message before resolving the ticket');
+                                            toast.warning('Please enter a resolving description for the ticket');
                                         }
                                     }}
                                     disabled={selectedSupport.status === 'Completed'}
@@ -2571,26 +2607,18 @@ const SuperAdmin = () => {
                                 >
                                     {selectedSupport.status === 'Completed' ? 'Already Resolved' : 'Resolve Ticket'}
                                 </button>
-                                <button
-                                    onClick={() => {
-                                        console.log('Add Message clicked. adminMessage:', adminMessage, 'trimmed:', adminMessage.trim());
-                                        if (adminMessage.trim()) {
-                                            handleAddMessage(selectedSupport._id);
-                                        } else {
-                                            toast.warning('Please enter an admin message');
-                                        }
-                                    }}
-                                    disabled={selectedSupport.status === 'Completed'}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Add Message
-                                </button>
                             </div>
                             <button
                                 onClick={() => {
                                     setViewSupportModal(false);
                                     // Clear admin message when closing
-                                    setAdminMessage('');
+                                    if (adminMessageRef.current) {
+                                        adminMessageRef.current.value = '';
+                                    }
+                                    // Clear resolved description when closing
+                                    if (supportResolvedDescriptionRef.current) {
+                                        supportResolvedDescriptionRef.current.value = '';
+                                    }
                                 }}
                                 className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]"
                             >
