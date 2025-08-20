@@ -12,6 +12,16 @@ export const useProject = () => {
   });
 
   const [selectedElement, setSelectedElement] = useState({ pageIndex: 0, elementId: null });
+
+  // Wrapper function to ensure selectedElement always has valid structure
+  const safeSetSelectedElement = (newValue) => {
+    if (newValue && typeof newValue === 'object' && newValue.pageIndex !== undefined) {
+      setSelectedElement(newValue);
+    } else {
+      // Fallback to safe default
+      setSelectedElement({ pageIndex: 0, elementId: null });
+    }
+  };
   const [currentEditingPage, setCurrentEditingPage] = useState(0);
 
   // Auto-save to localStorage
@@ -322,7 +332,7 @@ export const useProject = () => {
     project,
     setProject,
     selectedElement,
-    setSelectedElement,
+    setSelectedElement: safeSetSelectedElement,
     currentEditingPage,
     setCurrentEditingPage,
     getCurrentPage,

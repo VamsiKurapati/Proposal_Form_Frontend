@@ -355,13 +355,16 @@ const CanvaApp = () => {
 
   // Get selected element
   const getSelectedElement = () => {
+    // Store selectedElement in a local variable to prevent race conditions
+    const currentSelectedElement = selectedElement;
+
     // Validate selectedElement and pageIndex before accessing
-    if (!selectedElement ||
-      selectedElement.pageIndex === undefined ||
-      selectedElement.pageIndex < 0 ||
-      selectedElement.pageIndex >= project.pages.length) {
+    if (!currentSelectedElement ||
+      currentSelectedElement.pageIndex === undefined ||
+      currentSelectedElement.pageIndex < 0 ||
+      currentSelectedElement.pageIndex >= project.pages.length) {
       // Reset selectedElement to a valid state if it's invalid
-      if (selectedElement && selectedElement.pageIndex !== undefined) {
+      if (currentSelectedElement && currentSelectedElement.pageIndex !== undefined) {
         // Use currentEditingPage or fall back to 0 if it's also invalid
         const safePageIndex = (currentEditingPage >= 0 && currentEditingPage < project.pages.length) ? currentEditingPage : 0;
         setSelectedElement({ pageIndex: safePageIndex, elementId: null });
@@ -369,9 +372,9 @@ const CanvaApp = () => {
       return null;
     }
 
-    const page = project.pages[selectedElement.pageIndex];
+    const page = project.pages[currentSelectedElement.pageIndex];
     if (!page) return null;
-    return page.elements.find(el => el.id === selectedElement.elementId);
+    return page.elements.find(el => el.id === currentSelectedElement.elementId);
   };
 
   const selectedEl = getSelectedElement();
