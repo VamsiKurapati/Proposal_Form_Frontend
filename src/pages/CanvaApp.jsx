@@ -1040,6 +1040,8 @@ const CanvaApp = () => {
           }}
         />
 
+        {console.log('Debug currentEditingPage:', currentEditingPage, typeof currentEditingPage)}
+
         <ToolsPanel
           show={panelState.showToolsPanel}
           onClose={() => panelState.setShowToolsPanel(false)}
@@ -1098,7 +1100,7 @@ const CanvaApp = () => {
               printWindow.document.close();
             }
           }}
-          currentPage={currentEditingPage + 1}
+          currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
           totalPages={project.pages.length}
         />
 
@@ -1181,7 +1183,7 @@ const CanvaApp = () => {
             }
           }}
           onGridClick={() => setIsGridView(!isGridView)}
-          currentPage={currentEditingPage + 1}
+          currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
           totalPages={project.pages.length}
           zoom={zoom}
           onZoomChange={setZoom}
