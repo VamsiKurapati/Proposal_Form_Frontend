@@ -355,6 +355,20 @@ const CanvaApp = () => {
 
   // Get selected element
   const getSelectedElement = () => {
+    // Validate selectedElement and pageIndex before accessing
+    if (!selectedElement ||
+      selectedElement.pageIndex === undefined ||
+      selectedElement.pageIndex < 0 ||
+      selectedElement.pageIndex >= project.pages.length) {
+      // Reset selectedElement to a valid state if it's invalid
+      if (selectedElement && selectedElement.pageIndex !== undefined) {
+        // Use currentEditingPage or fall back to 0 if it's also invalid
+        const safePageIndex = (currentEditingPage >= 0 && currentEditingPage < project.pages.length) ? currentEditingPage : 0;
+        setSelectedElement({ pageIndex: safePageIndex, elementId: null });
+      }
+      return null;
+    }
+
     const page = project.pages[selectedElement.pageIndex];
     if (!page) return null;
     return page.elements.find(el => el.id === selectedElement.elementId);
@@ -519,13 +533,13 @@ const CanvaApp = () => {
         if (canRedo) redo();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         // Delete selected element
-        if (selectedEl && selectedElement) {
+        if (selectedEl && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length) {
           e.preventDefault();
           deleteElementWithHistory(selectedElement.pageIndex, selectedElement.elementId);
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
         // Cut selected element (copy then delete)
-        if (selectedEl && selectedElement) {
+        if (selectedEl && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length) {
           e.preventDefault();
           // Store element data in localStorage for internal copy/paste
           const elementData = {
@@ -547,7 +561,7 @@ const CanvaApp = () => {
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         // Copy selected element
-        if (selectedEl && selectedElement) {
+        if (selectedEl && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length) {
           e.preventDefault();
           // Store element data in localStorage for internal copy/paste
           const elementData = {

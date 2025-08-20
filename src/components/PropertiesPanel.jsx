@@ -71,7 +71,7 @@ const PropertiesPanel = ({
 
             {/* Element-specific properties */}
             <div className="space-y-6">
-              {selectedEl.type === 'text' && (
+              {selectedEl.type === 'text' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <TextProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -79,7 +79,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'image' && (
+              {selectedEl.type === 'image' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <ImageProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -87,7 +87,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'shape' && (
+              {selectedEl.type === 'shape' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <ShapeProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -95,7 +95,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'svg' && (
+              {selectedEl.type === 'svg' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">SVG Properties</h4>
                   <div>
@@ -117,20 +117,22 @@ const PropertiesPanel = ({
               )}
 
               {/* Common properties for all elements */}
-              <CommonProperties
-                element={selectedEl}
-                selectedElement={selectedElement}
-                updateElement={updateElement}
-                deleteElement={deleteElement}
-                duplicateElement={duplicateElement}
-                project={project}
-              />
+              {selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
+                <CommonProperties
+                  element={selectedEl}
+                  selectedElement={selectedElement}
+                  updateElement={updateElement}
+                  deleteElement={deleteElement}
+                  duplicateElement={duplicateElement}
+                  project={project}
+                />
+              )}
             </div>
           </>
         )}
 
         {/* Actions */}
-        {selectedEl && (
+        {selectedEl && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
           <div className="border-t pt-4 mt-6">
             <h4 className="text-sm font-medium text-gray-700 mb-3">Actions</h4>
             <div className="space-y-3">

@@ -100,7 +100,11 @@ const App = () => {
             </ProtectedRoutes>
           } />
 
-          <Route path="/editor" element={<CanvaApp />} />
+          <Route path="/editor" element={
+            <ProtectedRoutes allowedRoles={["company", "Editor"]}>
+              <CanvaApp />
+            </ProtectedRoutes>
+          } />
 
           <Route path="/admin" element={
             <ProtectedRoutes allowedRoles={["SuperAdmin"]}>

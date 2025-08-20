@@ -117,16 +117,14 @@ export const useProject = () => {
       return;
     }
 
+    // Calculate the new current page before the setProject call
+    let newCurrentPage = project.currentPage;
+    if (pageIndex <= project.currentPage) {
+      newCurrentPage = Math.max(0, project.currentPage - 1);
+    }
+
     setProject(prev => {
       const newPages = prev.pages.filter((_, index) => index !== pageIndex);
-      let newCurrentPage = prev.currentPage;
-
-      // If we're deleting the current page or a page before it
-      if (pageIndex <= prev.currentPage) {
-        // Move to the previous page (current-1), but don't go below 0
-        newCurrentPage = Math.max(0, prev.currentPage - 1);
-      }
-      // If we're deleting a page after the current page, current page stays the same
 
       const newProject = {
         ...prev,
@@ -150,8 +148,8 @@ export const useProject = () => {
       return prev;
     });
 
-    // Clear selected element
-    setSelectedElement({ pageIndex: 0, elementId: null });
+    // Clear selected element and set to the new current page
+    setSelectedElement({ pageIndex: newCurrentPage, elementId: null });
   };
 
   const clearCurrentPage = (onComplete) => {
@@ -172,7 +170,7 @@ export const useProject = () => {
 
       return newProject;
     });
-    setSelectedElement({ pageIndex: 0, elementId: null });
+    setSelectedElement({ pageIndex: prev.currentPage, elementId: null });
   };
 
   const clearAllPages = (onComplete) => {
