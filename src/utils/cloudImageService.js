@@ -271,12 +271,12 @@ class CloudImageService {
 
   // Check if image is cloud-based (uploaded images)
   isCloudImage(src) {
-    return src && (src.startsWith('cloud://') || src.includes('download_uploaded_image'));
+    return src && src.startsWith('cloud://');
   }
 
   // Check if image is a template image
   isTemplateImage(src) {
-    return src && (src.startsWith('template://') || src.includes('template_image'));
+    return src && src.startsWith('template://');
   }
 
   // Get cloud URL for uploaded image

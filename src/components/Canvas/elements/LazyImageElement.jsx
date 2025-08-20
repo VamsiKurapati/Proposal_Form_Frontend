@@ -51,21 +51,11 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
 
         // Handle cloud images (uploaded images)
         if (cloudImageService.isCloudImage(src)) {
-          if (src.startsWith('cloud://')) {
-            const imageName = src.replace('cloud://', '');
-            finalSrc = await cloudImageService.downloadImage(imageName);
-          } else {
-            finalSrc = cloudImageService.getCloudUrl(src);
-          }
+          finalSrc = cloudImageService.getCloudUrl(src);
         }
         // Handle template images
         else if (cloudImageService.isTemplateImage(src)) {
-          if (src.startsWith('template://')) {
-            const imageName = src.replace('template://', '');
-            finalSrc = await cloudImageService.getTemplateImage(imageName);
-          } else {
-            finalSrc = cloudImageService.getTemplateUrl(src);
-          }
+          finalSrc = cloudImageService.getTemplateUrl(src);
         }
 
         setImageSrc(finalSrc);
