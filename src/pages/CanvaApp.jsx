@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
 import { useInteraction } from '../hooks/useInteraction';
@@ -13,7 +14,7 @@ import Canvas from '../components/Canvas/Canvas.jsx';
 import GridView from '../components/Canvas/GridView.jsx';
 import FloatingToolbar from '../components/Toolbar/FloatingToolbar.jsx';
 import Footer from '../components/Footer.jsx';
-import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON } from '../utils/export';
+import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON, importFromJSONData } from '../utils/export';
 import { getTemplateSets } from '../utils/loadTemplates';
 
 import PropertiesPanel from '../components/PropertiesPanel.jsx';
@@ -23,6 +24,7 @@ import ToolsPanel from '../components/ToolsPanel.jsx';
 import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
 const CanvaApp = () => {
+  const location = useLocation();
   const [zoom, setZoom] = React.useState(100);
   const [isGridView, setIsGridView] = React.useState(false);
   const [sets, setSets] = React.useState({});
@@ -317,8 +319,24 @@ const CanvaApp = () => {
   const canvasRefs = useRef([]);
   const scrollContainerRef = useRef(null);
   const imageInputRef = useRef(null);
-  const jsonInputRef = useRef(null);
   const svgInputRef = useRef(null);
+  const jsonInputRef = useRef(null);
+
+  const [hasLoadedJSON, setHasLoadedJSON] = useState(false);
+
+  // Handle JSON data from navigation state
+  useEffect(() => {
+    if (location.state?.jsonData && !hasLoadedJSON) {
+      try {
+        const jsonData = location.state.jsonData;
+        // Import the JSON data into the project
+        importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
+        setHasLoadedJSON(true);
+      } catch (error) {
+        console.error('Error loading JSON data from navigation state:', error);
+      }
+    }
+  }, [location.state, setProject, setCurrentEditingPage, setSelectedElement, hasLoadedJSON]);
 
   // Load template sets asynchronously
   useEffect(() => {
@@ -855,13 +873,6 @@ const CanvaApp = () => {
     }
   };
 
-  // Import from JSON
-  const handleImportFromJSON = (event) => {
-    importFromJSON(event, setProject, setSelectedElement, clearHistory);
-  };
-
-
-
   return (
     <div
       className="w-screen overflow-hidden"
@@ -930,7 +941,7 @@ const CanvaApp = () => {
               currentEditingPage={currentEditingPage}
               clearCurrentPage={clearCurrentPageWithHistory}
               clearAllPages={clearAllPagesWithHistory}
-              jsonInputRef={jsonInputRef}
+              jsonInputRef={null} // Removed jsonInputRef
               exportToJSON={() => exportToJSON(project)}
               exportToPDF={async () => await exportToPDF(project)}
               exportToSVG={() => exportToOptimizedSVG(project)}
@@ -1020,10 +1031,6 @@ const CanvaApp = () => {
           onDeletePage={() => deletePageWithHistory(currentEditingPage)}
           onInsertPage={addPageWithHistory}
           onDuplicatePage={() => duplicatePageWithHistory(currentEditingPage)}
-          onLoadJSON={(file) => {
-            const event = { target: { files: [file] } };
-            importFromJSON(event, setProject, setSelectedElement, clearHistory);
-          }}
           onExportJSON={() => exportToJSON(project)}
           onExportPDF={async () => await exportToPDF(project)}
           onPrint={() => {
@@ -1171,13 +1178,6 @@ const CanvaApp = () => {
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
-        className="hidden"
-      />
-      <input
-        ref={jsonInputRef}
-        type="file"
-        accept=".json"
-        onChange={handleImportFromJSON}
         className="hidden"
       />
     </div>

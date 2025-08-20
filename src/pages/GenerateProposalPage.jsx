@@ -32,12 +32,16 @@ const GenerateProposalPage = () => {
 
       if (res.status === 200) {
         console.log(res.data);
+        // Navigate to CanvaApp with the API response data
+        navigate('/editor', {
+          state: {
+            jsonData: res.data
+          }
+        });
       }
     } catch (error) {
       console.error("Error saving company data:", error);
     }
-    console.log("Save and Next");
-    // navigate('/company_profile_dashboard');
   };
 
   return (

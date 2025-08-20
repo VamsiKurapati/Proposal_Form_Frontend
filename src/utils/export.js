@@ -114,6 +114,84 @@ export function importFromJSON(event, setProject, setSelectedElement, clearHisto
   }
 }
 
+export function importFromJSONData(jsonData, setProject, setSelectedElement, clearHistory) {
+  try {
+    let migratedProject = jsonData;
+    if (jsonData.pageSettings && jsonData.elements) {
+      migratedProject = {
+        pages: [{
+          id: 1,
+          pageSettings: jsonData.pageSettings,
+          elements: jsonData.elements
+        }],
+        currentPage: 0
+      };
+    }
+    migratedProject.pages = migratedProject.pages.map(page => ({
+      ...page,
+      elements: page.elements.map(element => {
+        if (element.type === 'text') {
+          return {
+            ...element,
+            properties: {
+              text: element.properties?.text || 'Click to edit text',
+              fontSize: element.properties?.fontSize || 16,
+              fontFamily: element.properties?.fontFamily || 'Arial',
+              color: element.properties?.color || '#000000',
+              bold: element.properties?.bold || false,
+              italic: element.properties?.italic || false,
+              underline: element.properties?.underline || false,
+              textAlign: element.properties?.textAlign || 'left',
+              listStyle: element.properties?.listStyle || 'none',
+              lineHeight: element.properties?.lineHeight || 1.2,
+              letterSpacing: element.properties?.letterSpacing || 0
+            }
+          };
+        } else if (element.type === 'image') {
+          // Process image elements for import (handle cloud URLs)
+          return cloudImageService.processImageForImport(element);
+        } else if (element.type === 'shape') {
+          // Ensure shape elements have all required properties
+          return {
+            ...element,
+            shapeType: element.shapeType || 'rectangle',
+            properties: {
+              fill: element.properties?.fill || '#f3f4f6',
+              stroke: element.properties?.stroke || '#111827',
+              strokeWidth: element.properties?.strokeWidth || 2,
+              opacity: element.properties?.opacity || 1,
+              rx: element.properties?.rx || 0,
+              strokeDasharray: element.properties?.strokeDasharray || 'none',
+              shadow: element.properties?.shadow || false,
+              shadowBlur: element.properties?.shadowBlur || 0,
+              shadowColor: element.properties?.shadowColor || '#000',
+              ...element.properties
+            }
+          };
+        }
+        return element;
+      })
+    }));
+
+    // Extract images from JSON and add to uploads panel
+    cloudImageService.extractImagesFromJSON(migratedProject);
+
+    // Add flag to indicate this is a newly imported project
+    migratedProject._isNewlyImported = true;
+
+    // Clear history first if clearHistory function is provided
+    if (clearHistory && typeof clearHistory === 'function') {
+      clearHistory();
+    }
+
+    setProject(migratedProject);
+    setSelectedElement({ pageIndex: 0, elementId: null });
+  } catch (error) {
+    console.error('Import error:', error);
+    throw error;
+  }
+}
+
 // Image compression utility
 async function compressImage(src, maxWidth = 1920, quality = 0.8) {
   return new Promise((resolve) => {
