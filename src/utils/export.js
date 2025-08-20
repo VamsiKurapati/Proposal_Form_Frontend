@@ -262,7 +262,7 @@ export const exportToPDF = async (project) => {
   document.body.appendChild(loadingDiv);
 
   try {
-    const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposal/generatePDF', {
+    const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
       project: project
     });
 
