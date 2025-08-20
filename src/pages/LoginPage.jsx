@@ -40,12 +40,14 @@ const LoginPage = () => {
     return newErrors;
   };
 
-  const triggerRFPDiscovery = () => {
-    axios.post(`https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery`, {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
+  const triggerRFPDiscovery = (token, role) => {
+    if (role !== "SuperAdmin") {
+      axios.post(`https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
   };
 
   const handleLogin = async () => {
@@ -59,7 +61,7 @@ const LoginPage = () => {
     try {
       const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
       if (res.status === 200) {
-        triggerRFPDiscovery();
+        triggerRFPDiscovery(res.data.token, res.data.user.role);
         toast.success("Login successful");
         const token = res.data.token;
         const role = res.data.user.role;

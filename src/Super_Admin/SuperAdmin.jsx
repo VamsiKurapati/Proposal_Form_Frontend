@@ -108,6 +108,16 @@ const SuperAdmin = () => {
 
 
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const userLocale = navigator.language || 'en-US';
+        return date.toLocaleDateString(userLocale, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
     // New functions for user blocking/unblocking
     const handleUserBlockToggle = async (userId, currentBlockedStatus) => {
         try {
@@ -1620,6 +1630,9 @@ const SuperAdmin = () => {
                                 Description
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                Created At
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
                                 Priority
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
@@ -1646,6 +1659,9 @@ const SuperAdmin = () => {
                                             <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
                                                 <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
                                             </div>
+                                        </td>
+                                        <td className="p-4 whitespace-nowrap">
+                                            {formatDate(ticket.createdAt)}
                                         </td>
                                         <td className="p-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
