@@ -17,7 +17,7 @@ export default function ImageUpload() {
     };
 
     const handleUpload = () => {
-        cloudImageService.uploadImage(file).then((res) => {
+        cloudImageService.uploadTemplateImage(file).then((res) => {
             console.log(res);
             setUploadedImages([...uploadedImages, res]);
         }).catch((err) => {

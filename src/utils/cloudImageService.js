@@ -167,6 +167,56 @@ class CloudImageService {
     }
   }
 
+  async uploadTemplateImage(file) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axios.post(`${this.baseUrl}/upload_template_image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const result = response.data;
+
+      if (!result.message || !result.message.includes('Image uploaded successfully')) {
+        throw new Error(result.error || result.message || 'Upload failed');
+      }
+
+      const imageData = {
+        id: result.fileId,
+        name: result.originalName || file.name,
+        filename: result.filename,
+        fileId: result.fileId,
+        type: file.type,
+        size: file.size,
+        cloudUrl: `${this.baseUrl}/get_template_image/${result.filename}`,
+        uploadedAt: new Date().toISOString(),
+        isTemplate: true,
+        isDeletable: false
+      };
+
+      this.uploadedImages.unshift(imageData);
+      this.saveUploadedImages();
+
+      window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
+        detail: { action: 'uploaded', image: imageData }
+      }));
+
+      return imageData;
+    } catch (error) {
+      console.error('Upload template image error:', error);
+      throw error;
+    }
+  }
+
   // Delete image from cloud
   async deleteImage(filename) {
     try {
