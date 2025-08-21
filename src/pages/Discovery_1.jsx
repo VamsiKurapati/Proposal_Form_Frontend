@@ -416,7 +416,6 @@ const DiscoverRFPs = () => {
   const [currentTablePage, setCurrentTablePage] = useState(1);
   const [currentGrantTablePage, setCurrentGrantTablePage] = useState(1);
   const [currentOtherRFPsPage, setCurrentOtherRFPsPage] = useState(1);
-  const [currentRecentGrantsPage, setCurrentRecentGrantsPage] = useState(1);
   const [currentOtherGrantsPage, setCurrentOtherGrantsPage] = useState(1);
 
   // Active tab state
@@ -442,7 +441,6 @@ const DiscoverRFPs = () => {
     setCurrentTablePage(1);
     setCurrentGrantTablePage(1);
     setCurrentOtherRFPsPage(1);
-    setCurrentRecentGrantsPage(1);
     setCurrentOtherGrantsPage(1);
   }, [searchQuery, filters, selectedIndustries]);
 
@@ -1699,25 +1697,16 @@ const DiscoverRFPs = () => {
                 <span className="ml-3 text-[16px] text-[#4B5563]">Loading recent grants...</span>
               </div>
             ) : filteredRecentGrants.length ? (
-              <>
-                <div className="flex overflow-x-auto pb-2 custom-scroll">
-                  {getCurrentPageItems(applyGrantFilters(filteredRecentGrants), currentRecentGrantsPage, itemsPerPage).map((grant) => (
-                    <GrantCard
-                      key={grant._id}
-                      grant={grant}
-                      isSaved={!!savedGrants.find((s) => s._id === grant._id)}
-                      handleGenerateProposal={handleGenerateGrantProposal}
-                    />
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <Pagination
-                    currentPage={currentRecentGrantsPage}
-                    totalPages={getTotalPages(applyGrantFilters(filteredRecentGrants).length, itemsPerPage)}
-                    onPageChange={(page) => handlePageChange(page, setCurrentRecentGrantsPage)}
+              <div className="flex overflow-x-auto pb-2 custom-scroll">
+                {filteredRecentGrants.map((grant) => (
+                  <GrantCard
+                    key={grant._id}
+                    grant={grant}
+                    isSaved={!!savedGrants.find((s) => s._id === grant._id)}
+                    handleGenerateProposal={handleGenerateGrantProposal}
                   />
-                </div>
-              </>
+                ))}
+              </div>
             ) : (
               (!error && (
                 <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recent grants.</p>
