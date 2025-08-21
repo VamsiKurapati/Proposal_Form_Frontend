@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
 import { useInteraction } from '../hooks/useInteraction';
@@ -26,6 +26,7 @@ import ProjectsPanel from '../components/ProjectsPanel.jsx';
 import NavbarComponent from './NavbarComponent.jsx';
 
 const CanvaApp = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [zoom, setZoom] = React.useState(100);
   const [isGridView, setIsGridView] = React.useState(false);
@@ -932,6 +933,11 @@ const CanvaApp = () => {
   return (
     <>
       <NavbarComponent />
+      {/* Add "Back" button to go back to the previous page, and "Save" button to continue to the next page */}
+      <div className="flex justify-between items-center p-4">
+        <button className="text-blue-500" onClick={() => navigate(-1)}>Back</button>
+        <button className="text-blue-500" onClick={() => window.location.href = '/dashboard'}>Continue</button>
+      </div>
       <div
         className="w-screen overflow-hidden"
         style={{
