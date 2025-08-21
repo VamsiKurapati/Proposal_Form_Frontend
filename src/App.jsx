@@ -11,7 +11,7 @@ const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
-const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
+const Discovery = lazy(() => import("./pages/Discovery_1"));
 
 const Proposals = lazy(() => import("./pages/Proposals"));
 const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
@@ -49,8 +49,8 @@ const App = () => {
             <ChangePassword />
           </ProtectedRoutes>} />
 
-          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
-            <RFPDiscovery />
+          <Route path="/discover" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
+            <Discovery />
           </ProtectedRoutes>} />
 
           {/* <Route path="/rfp_discovery" element={<RFPDiscovery />} /> */}
