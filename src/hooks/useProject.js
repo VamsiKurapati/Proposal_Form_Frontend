@@ -32,6 +32,18 @@ export const useProject = () => {
     }
   }, [project]);
 
+  // Validate project structure whenever pages change
+  useEffect(() => {
+    const hasInvalidPages = project.pages.some(page => !page.pageSettings || !page.elements);
+    if (hasInvalidPages) {
+      console.warn('Invalid page structure detected, fixing...');
+      setProject(prev => ({
+        ...prev,
+        pages: ensurePageStructure(prev.pages)
+      }));
+    }
+  }, [project.pages]);
+
   // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('canva-project');
@@ -50,7 +62,16 @@ export const useProject = () => {
           };
           setProject(migratedProject);
         } else {
-          setProject(parsed);
+          // Ensure all pages have proper pageSettings
+          const validatedProject = {
+            ...parsed,
+            pages: parsed.pages.map(page => ({
+              ...page,
+              pageSettings: page.pageSettings || DEFAULT_PAGE_SETTINGS,
+              elements: page.elements || []
+            }))
+          };
+          setProject(validatedProject);
         }
       } catch (e) {
         console.error('Error loading saved project:', e);
@@ -58,7 +79,52 @@ export const useProject = () => {
     }
   }, []);
 
-  const getCurrentPage = () => project.pages[project.currentPage];
+  const getCurrentPage = () => {
+    const currentPage = project.pages[project.currentPage];
+    if (!currentPage || !currentPage.pageSettings) {
+      console.warn('Invalid current page structure detected, fixing...');
+      // Fix the page structure
+      const fixedPages = ensurePageStructure(project.pages);
+      setProject(prev => ({
+        ...prev,
+        pages: fixedPages
+      }));
+      return null; // Return null until the structure is fixed
+    }
+    return currentPage;
+  };
+
+  // Utility function to ensure all pages have proper structure
+  const ensurePageStructure = (pages) => {
+    return pages.map(page => ({
+      ...page,
+      pageSettings: page.pageSettings || DEFAULT_PAGE_SETTINGS,
+      elements: page.elements || []
+    }));
+  };
+
+  // Function to validate and fix entire project structure
+  const validateProjectStructure = () => {
+    setProject(prev => ({
+      ...prev,
+      pages: ensurePageStructure(prev.pages)
+    }));
+  };
+
+  // Getter for pages that ensures structure is valid
+  const getValidatedPages = () => {
+    const hasInvalidPages = project.pages.some(page => !page.pageSettings || !page.elements);
+    if (hasInvalidPages) {
+      console.warn('Invalid page structure detected, fixing...');
+      const fixedPages = ensurePageStructure(project.pages);
+      setProject(prev => ({
+        ...prev,
+        pages: fixedPages
+      }));
+      return fixedPages;
+    }
+    return project.pages;
+  };
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -74,6 +140,10 @@ export const useProject = () => {
       pageSettings: DEFAULT_PAGE_SETTINGS,
       elements: []
     };
+
+    // Ensure the new page has proper structure
+    const validatedNewPage = ensurePageStructure([newPage])[0];
+
     // Allow caller to specify the insertion base index; default to currentEditingPage
     let insertAfterIndex = currentEditingPage;
     if (typeof onComplete === 'number' && insertAfterIndexParam === undefined) {
@@ -88,7 +158,7 @@ export const useProject = () => {
     setProject(prev => {
       const pagesBefore = prev.pages.slice(0, insertionIndex);
       const pagesAfter = prev.pages.slice(insertionIndex);
-      const updatedPages = [...pagesBefore, newPage, ...pagesAfter];
+      const updatedPages = [...pagesBefore, validatedNewPage, ...pagesAfter];
 
       const newProject = {
         ...prev,
@@ -113,6 +183,18 @@ export const useProject = () => {
 
   const goToPage = (pageIndex) => {
     if (pageIndex >= 0 && pageIndex < project.pages.length) {
+      // Validate page structure before navigation
+      const targetPage = project.pages[pageIndex];
+      if (!targetPage || !targetPage.pageSettings) {
+        console.warn('Invalid page structure detected before navigation, fixing...');
+        const fixedPages = ensurePageStructure(project.pages);
+        setProject(prev => ({
+          ...prev,
+          pages: fixedPages
+        }));
+        return; // Exit early, the navigation will be retried on next render
+      }
+
       setProject(prev => ({
         ...prev,
         currentPage: pageIndex
@@ -125,6 +207,18 @@ export const useProject = () => {
     if (project.pages.length <= 1) {
       alert('Cannot delete the only page. At least one page must remain.');
       return;
+    }
+
+    // Validate page structure before deletion
+    const hasInvalidPages = project.pages.some(page => !page.pageSettings);
+    if (hasInvalidPages) {
+      console.warn('Invalid page structure detected before deletion, fixing...');
+      const fixedPages = ensurePageStructure(project.pages);
+      setProject(prev => ({
+        ...prev,
+        pages: fixedPages
+      }));
+      return; // Exit early, the deletion will be retried on next render
     }
 
     // Calculate the new current page before the setProject call
@@ -164,6 +258,23 @@ export const useProject = () => {
 
   const clearCurrentPage = (onComplete) => {
     setProject(prev => {
+      const currentPage = prev.pages[prev.currentPage];
+      if (!currentPage || !currentPage.pageSettings) {
+        console.error('Page or pageSettings not found in clearCurrentPage');
+        // Fix the page structure first
+        const fixedPages = ensurePageStructure(prev.pages);
+        const newProject = {
+          ...prev,
+          pages: fixedPages
+        };
+
+        if (onComplete) {
+          onComplete(newProject);
+        }
+
+        return newProject;
+      }
+
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
@@ -186,11 +297,11 @@ export const useProject = () => {
   const clearAllPages = (onComplete) => {
     setProject(prev => {
       const newProject = {
-        pages: [{
+        pages: ensurePageStructure([{
           id: 1,
           pageSettings: DEFAULT_PAGE_SETTINGS,
           elements: []
-        }],
+        }]),
         currentPage: 0
       };
 
@@ -206,6 +317,39 @@ export const useProject = () => {
 
   const setBackground = (type, value, onComplete) => {
     setProject(prev => {
+      const currentPage = prev.pages[prev.currentPage];
+      if (!currentPage || !currentPage.pageSettings) {
+        console.error('Page or pageSettings not found in setBackground');
+        // Fix the page structure first
+        const fixedPages = ensurePageStructure(prev.pages);
+        const newProject = {
+          ...prev,
+          pages: fixedPages
+        };
+
+        // Now set the background on the fixed page
+        const updatedProject = {
+          ...newProject,
+          pages: newProject.pages.map((page, index) =>
+            index === newProject.currentPage
+              ? {
+                ...page,
+                pageSettings: {
+                  ...page.pageSettings,
+                  background: { type, value }
+                }
+              }
+              : page
+          )
+        };
+
+        if (onComplete) {
+          onComplete(updatedProject);
+        }
+
+        return updatedProject;
+      }
+
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
@@ -240,6 +384,17 @@ export const useProject = () => {
     if (!pageToDuplicate) {
       console.error('Page to duplicate not found');
       return;
+    }
+
+    if (!pageToDuplicate.pageSettings) {
+      console.error('Page settings not found for page to duplicate');
+      // Fix the page structure first
+      const fixedPages = ensurePageStructure(project.pages);
+      setProject(prev => ({
+        ...prev,
+        pages: fixedPages
+      }));
+      return; // Exit early, the duplicate will be retried on next render
     }
 
     // Create a deep copy of the page with new IDs for all elements
@@ -282,6 +437,18 @@ export const useProject = () => {
 
   const reorderPages = (fromIndex, toIndex, onComplete) => {
     if (fromIndex === toIndex) return;
+
+    // Validate page structure before reordering
+    const hasInvalidPages = project.pages.some(page => !page.pageSettings);
+    if (hasInvalidPages) {
+      console.warn('Invalid page structure detected before reordering, fixing...');
+      const fixedPages = ensurePageStructure(project.pages);
+      setProject(prev => ({
+        ...prev,
+        pages: fixedPages
+      }));
+      return; // Exit early, the reorder will be retried on next render
+    }
 
     // Calculate new currentEditingPage before the setProject call
     let newCurrentEditingPage = currentEditingPage;
@@ -344,6 +511,8 @@ export const useProject = () => {
     reorderPages,
     clearCurrentPage,
     clearAllPages,
-    setBackground
+    setBackground,
+    validateProjectStructure,
+    getValidatedPages
   };
 };

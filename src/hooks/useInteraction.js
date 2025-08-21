@@ -110,7 +110,11 @@ export const useInteraction = (zoom, updateElement, project, setSelectedElement,
       if (deltaX > 1 || deltaY > 1) {
         // Check if element is outside canvas before updating
         const currentPage = project.pages[currentEditingPage];
-        const element = currentPage?.elements.find(el => el.id === dragState.element);
+        if (!currentPage || !currentPage.pageSettings) {
+          console.error('Page or pageSettings not found in useInteraction');
+          return;
+        }
+        const element = currentPage.elements.find(el => el.id === dragState.element);
 
         if (element) {
           const isOutsideCanvas =
@@ -152,7 +156,11 @@ export const useInteraction = (zoom, updateElement, project, setSelectedElement,
     if (resizeState.isResizing && canvasRefs.current[currentEditingPage]) {
       // Check if the element still exists before trying to update it
       const currentPage = project.pages[resizeState.pageIndex];
-      const element = currentPage?.elements.find(el => el.id === resizeState.element);
+      if (!currentPage || !currentPage.pageSettings) {
+        console.error('Page or pageSettings not found in useInteraction resize');
+        return;
+      }
+      const element = currentPage.elements.find(el => el.id === resizeState.element);
 
       if (!element) {
         // Element was deleted, stop resizing

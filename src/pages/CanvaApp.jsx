@@ -46,7 +46,9 @@ const CanvaApp = () => {
     reorderPages,
     clearCurrentPage,
     clearAllPages,
-    setBackground
+    setBackground,
+    validateProjectStructure,
+    getValidatedPages
   } = useProject();
 
   // History management
@@ -353,6 +355,13 @@ const CanvaApp = () => {
     loadTemplateSets();
   }, []);
 
+  // Validate project structure on mount
+  useEffect(() => {
+    if (project && project.pages) {
+      validateProjectStructure();
+    }
+  }, []); // Only run once on mount
+
   // Get selected element
   const getSelectedElement = () => {
     // Store selectedElement in a local variable to prevent race conditions
@@ -372,8 +381,18 @@ const CanvaApp = () => {
       return null;
     }
 
-    const page = project.pages[currentSelectedElement.pageIndex];
+    // Ensure pages are valid before accessing
+    const validatedPages = getValidatedPages();
+    const page = validatedPages[currentSelectedElement.pageIndex];
     if (!page) return null;
+
+    // Ensure page has proper structure
+    if (!page.pageSettings || !page.elements) {
+      console.warn('Invalid page structure detected, triggering validation...');
+      validateProjectStructure();
+      return null;
+    }
+
     return page.elements.find(el => el.id === currentSelectedElement.elementId);
   };
 
@@ -635,13 +654,21 @@ const CanvaApp = () => {
             }
           } else {
             // Create a new text element with the copied text
+            const validatedPages = getValidatedPages();
+            const page = validatedPages[currentEditingPage];
+            if (!page || !page.pageSettings) {
+              console.error('Page or pageSettings not found, cannot create text element');
+              return;
+            }
             const newTextElement = {
               id: generateId(),
               type: 'text',
               x: 100,
               y: 100,
-              width: Math.min(200, project.pages[currentEditingPage].pageSettings.width),
-              height: Math.min(100, project.pages[currentEditingPage].pageSettings.height),
+              width: Math.min(200, page.pageSettings.width),
+              height: Math.min(100, page.pageSettings.height),
+              rotation: 0,
+              zIndex: page.elements.length + 1,
               properties: {
                 text: externalText,
                 fontSize: 16,
@@ -711,7 +738,12 @@ const CanvaApp = () => {
                   }
                 } else {
                   // Create a new text element with the external text
-                  const page = project.pages[currentEditingPage];
+                  const validatedPages = getValidatedPages();
+                  const page = validatedPages[currentEditingPage];
+                  if (!page || !page.pageSettings) {
+                    console.error('Page or pageSettings not found, cannot create text element');
+                    return;
+                  }
                   const newTextElement = {
                     id: generateId(),
                     type: 'text',
@@ -813,7 +845,12 @@ const CanvaApp = () => {
 
         if (externalText && externalText.trim()) {
           // Create a new text element with the external text
-          const page = project.pages[currentEditingPage];
+          const validatedPages = getValidatedPages();
+          const page = validatedPages[currentEditingPage];
+          if (!page || !page.pageSettings) {
+            console.error('Page or pageSettings not found, cannot create text element');
+            return;
+          }
           const newTextElement = {
             id: generateId(),
             type: 'text',
@@ -1054,51 +1091,54 @@ const CanvaApp = () => {
           onExportPDF={async () => await exportToPDF(project)}
           onPrint={() => {
             // Create a simple print function that opens the current page in a new window
-            const currentPageData = project.pages[currentEditingPage];
-            if (currentPageData) {
-              const printWindow = window.open('', '_blank');
-              printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                  <title>Print - Page ${currentEditingPage + 1}</title>
-                  <style>
-                    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                    .page { 
-                      width: ${currentPageData.pageSettings.width}px; 
-                      height: ${currentPageData.pageSettings.height}px; 
-                      margin: 0 auto; 
-                      position: relative;
-                      background: ${currentPageData.pageSettings.background.type === 'color' ? currentPageData.pageSettings.background.value : '#ffffff'};
-                      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                    }
-                    @media print {
-                      body { padding: 0; }
-                      .page { box-shadow: none; }
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="page">
-                    <!-- Page content would be rendered here -->
-                    <div style="padding: 20px; text-align: center;">
-                      <h2>Page ${currentEditingPage + 1}</h2>
-                      <p>Print functionality - Page content would be rendered here</p>
-                    </div>
-                  </div>
-                  <script>
-                    window.onload = function() {
-                      setTimeout(() => {
-                        window.print();
-                        setTimeout(() => window.close(), 100);
-                      }, 500);
-                    };
-                  </script>
-                </body>
-                </html>
-              `);
-              printWindow.document.close();
+            const validatedPages = getValidatedPages();
+            const currentPageData = validatedPages[currentEditingPage];
+            if (!currentPageData || !currentPageData.pageSettings) {
+              console.error('Page or pageSettings not found, cannot print');
+              return;
             }
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Print - Page ${currentEditingPage + 1}</title>
+                <style>
+                  body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                  .page { 
+                    width: ${currentPageData.pageSettings.width}px; 
+                    height: ${currentPageData.pageSettings.height}px; 
+                    margin: 0 auto; 
+                    position: relative;
+                    background: ${currentPageData.pageSettings.background.type === 'color' ? currentPageData.pageSettings.background.value : '#ffffff'};
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                  }
+                  @media print {
+                    body { padding: 0; }
+                    .page { box-shadow: none; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="page">
+                  <!-- Page content would be rendered here -->
+                  <div style="padding: 20px; text-align: center;">
+                    <h2>Page ${currentEditingPage + 1}</h2>
+                    <p>Print functionality - Page content would be rendered here</p>
+                  </div>
+                </div>
+                <script>
+                  window.onload = function() {
+                    setTimeout(() => {
+                      window.print();
+                      setTimeout(() => window.close(), 100);
+                    }, 500);
+                  };
+                </script>
+              </body>
+              </html>
+            `);
+            printWindow.document.close();
           }}
           currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
           totalPages={project.pages.length}
