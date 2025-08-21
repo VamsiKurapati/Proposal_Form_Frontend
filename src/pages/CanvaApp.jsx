@@ -23,6 +23,8 @@ import UploadsPanel from '../components/UploadsPanel.jsx';
 import ToolsPanel from '../components/ToolsPanel.jsx';
 import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
+import NavbarComponent from './NavbarComponent.jsx';
+
 const CanvaApp = () => {
   const location = useLocation();
   const [zoom, setZoom] = React.useState(100);
@@ -928,177 +930,179 @@ const CanvaApp = () => {
   };
 
   return (
-    <div
-      className="w-screen overflow-hidden"
-      style={{
-        display: 'grid',
-        gridTemplateRows: '1fr 32px',
-        gridTemplateColumns: '72px 1fr',
-        gridTemplateAreas: `
+    <>
+      <NavbarComponent />
+      <div
+        className="w-screen overflow-hidden"
+        style={{
+          display: 'grid',
+          gridTemplateRows: '1fr 32px',
+          gridTemplateColumns: '72px 1fr',
+          gridTemplateAreas: `
           "sidebar main"
           "footer footer"
         `,
-        height: '100vh'
-      }}
-    >
-
-
-      {/* Side Panel - Grid area sidebar */}
-      <div
-        className="bg-white border-r flex flex-col items-center shadow-md z-40"
-        style={{
-          gridArea: 'sidebar',
-          overflowY: 'auto'
+          height: '100vh'
         }}
       >
-        <SidePanel
-          onDesignClick={() => panelState.showDesignPanel ? panelState.setShowDesignPanel(false) : panelState.openDesignPanel()}
-          onElementsClick={() => panelState.showElementsPanel ? panelState.setShowElementsPanel(false) : panelState.openElementsPanel()}
-          onTextClick={() => panelState.showTextPanel ? panelState.setShowTextPanel(false) : panelState.openTextPanel()}
-          onHistoryClick={() => panelState.showHistoryPanel ? panelState.setShowHistoryPanel(false) : panelState.openHistoryPanel()}
-          onUploadsClick={() => panelState.showUploadsPanel ? panelState.setShowUploadsPanel(false) : panelState.openUploadsPanel()}
-          onToolsClick={() => panelState.showToolsPanel ? panelState.setShowToolsPanel(false) : panelState.openToolsPanel()}
-          onProjectsClick={() => panelState.showProjectsPanel ? panelState.setShowProjectsPanel(false) : panelState.openProjectsPanel()}
-          onPropertiesClick={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
-          onBackgroundClick={setBackgroundWithHistory}
-          onLayoutTemplateClick={() => alert('Layout templates coming soon!')}
-          onResetBackgroundClick={() => setBackgroundWithHistory('color', '#ffffff')}
-          showDesignPanel={panelState.showDesignPanel}
-          showElementsPanel={panelState.showElementsPanel}
-          showTextPanel={panelState.showTextPanel}
-          showHistoryPanel={panelState.showHistoryPanel}
-          showUploadsPanel={panelState.showUploadsPanel}
-          showToolsPanel={panelState.showToolsPanel}
-          showProjectsPanel={panelState.showProjectsPanel}
-          showPropertiesPanel={panelState.showPropertiesPanel}
-        />
-      </div>
 
-      {/* Main Content Area */}
-      <div
-        className="relative overflow-hidden bg-gray-100"
-        style={{
-          gridArea: 'main',
-          overscrollBehavior: 'contain'
-        }}
-      >
-        {/* Floating Toolbar */}
-        {!isGridView && (
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
-            <FloatingToolbar
-              addTextElement={addTextElementWithHistory}
-              imageInputRef={imageInputRef}
-              showBackgroundPanel={panelState.showBackgroundPanel}
-              setShowBackgroundPanel={panelState.setShowBackgroundPanel}
-              addPage={addPageWithHistory}
-              deletePage={deletePageWithHistory}
-              currentEditingPage={currentEditingPage}
-              clearCurrentPage={clearCurrentPageWithHistory}
-              clearAllPages={clearAllPagesWithHistory}
-              jsonInputRef={null} // Removed jsonInputRef
-              exportToJSON={() => exportToJSON(project)}
-              exportToPDF={async () => await exportToPDF(project)}
-              exportToSVG={() => exportToOptimizedSVG(project)}
-              totalPages={project.pages.length}
-              selectedElement={selectedElement}
-              selectedEl={selectedEl}
-              updateElement={updateElementWithHistory}
-              deleteElement={deleteElementWithHistory}
-              duplicateElement={duplicateElementWithHistory}
-              onDeselect={() => setSelectedElement({ pageIndex: currentEditingPage, elementId: null })}
-              onOpenProperties={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
-              setProject={setProject}
-            />
-          </div>
-        )}
 
-        {/* Copy/Cut/Paste Feedback */}
-        {copyFeedback && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-300">
-            {lastOperation === 'cut' ? 'Element cut! Press Ctrl+V to paste' :
-              lastOperation === 'copy' ? 'Element copied! Press Ctrl+V to paste' :
-                lastOperation === 'external-copy' ? 'Text copied! Press Ctrl+V to paste' :
-                  lastOperation === 'external-paste' ? 'External text pasted!' :
-                    lastOperation === 'text-paste' ? 'Text pasted!' :
-                      'Element copied! Press Ctrl+V to paste'}
-          </div>
-        )}
-        {/* Panels */}
-        <DesignPanel
-          show={panelState.showDesignPanel}
-          view={panelState.designPanelView}
-          onClose={() => panelState.setShowDesignPanel(false)}
-          onBack={() => panelState.setDesignPanelView('main')}
-          selectedTemplateSet={panelState.selectedTemplateSet}
-          onTemplateSetClick={(set) => {
-            panelState.setSelectedTemplateSet(set);
-            panelState.setDesignPanelView('preview');
+        {/* Side Panel - Grid area sidebar */}
+        <div
+          className="bg-white border-r flex flex-col items-center shadow-md z-40"
+          style={{
+            gridArea: 'sidebar',
+            overflowY: 'auto'
           }}
-          sets={sets}
-          svgPreviews={svgPreviews}
-          svgInputRef={svgInputRef}
-          setBackground={setBackgroundWithHistory}
-        />
+        >
+          <SidePanel
+            onDesignClick={() => panelState.showDesignPanel ? panelState.setShowDesignPanel(false) : panelState.openDesignPanel()}
+            onElementsClick={() => panelState.showElementsPanel ? panelState.setShowElementsPanel(false) : panelState.openElementsPanel()}
+            onTextClick={() => panelState.showTextPanel ? panelState.setShowTextPanel(false) : panelState.openTextPanel()}
+            onHistoryClick={() => panelState.showHistoryPanel ? panelState.setShowHistoryPanel(false) : panelState.openHistoryPanel()}
+            onUploadsClick={() => panelState.showUploadsPanel ? panelState.setShowUploadsPanel(false) : panelState.openUploadsPanel()}
+            onToolsClick={() => panelState.showToolsPanel ? panelState.setShowToolsPanel(false) : panelState.openToolsPanel()}
+            onProjectsClick={() => panelState.showProjectsPanel ? panelState.setShowProjectsPanel(false) : panelState.openProjectsPanel()}
+            onPropertiesClick={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
+            onBackgroundClick={setBackgroundWithHistory}
+            onLayoutTemplateClick={() => alert('Layout templates coming soon!')}
+            onResetBackgroundClick={() => setBackgroundWithHistory('color', '#ffffff')}
+            showDesignPanel={panelState.showDesignPanel}
+            showElementsPanel={panelState.showElementsPanel}
+            showTextPanel={panelState.showTextPanel}
+            showHistoryPanel={panelState.showHistoryPanel}
+            showUploadsPanel={panelState.showUploadsPanel}
+            showToolsPanel={panelState.showToolsPanel}
+            showProjectsPanel={panelState.showProjectsPanel}
+            showPropertiesPanel={panelState.showPropertiesPanel}
+          />
+        </div>
 
-        <ElementsPanel
-          show={panelState.showElementsPanel}
-          onClose={() => panelState.setShowElementsPanel(false)}
-          addTextElement={addTextElementWithHistory}
-          imageInputRef={imageInputRef}
-          addShapeElement={addShapeElementWithHistory}
-        />
-
-        <TextPanel
-          show={panelState.showTextPanel}
-          onClose={() => panelState.setShowTextPanel(false)}
-          addTextElement={addTextElementWithHistory}
-          addCustomTextElement={addCustomTextElementWithHistory}
-          currentPage={currentEditingPage}
-          totalPages={project.pages.length}
-          project={project}
-          updateElement={updateElementPropertiesOnly}
-          deleteElement={deleteElementWithHistory}
-        />
-
-        <HistoryPanel
-          show={panelState.showHistoryPanel}
-          onClose={() => panelState.setShowHistoryPanel(false)}
-          project={project}
-          historyList={getHistoryList()}
-          onRestoreHistoryEntry={restoreToHistoryEntry}
-        />
-
-        <UploadsPanel
-          show={panelState.showUploadsPanel}
-          onClose={() => panelState.setShowUploadsPanel(false)}
-          onImageSelect={(dataUrl) => {
-            addImageElementWithHistory(dataUrl);
-            panelState.setShowUploadsPanel(false);
+        {/* Main Content Area */}
+        <div
+          className="relative overflow-hidden bg-gray-100"
+          style={{
+            gridArea: 'main',
+            overscrollBehavior: 'contain'
           }}
-        />
+        >
+          {/* Floating Toolbar */}
+          {!isGridView && (
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+              <FloatingToolbar
+                addTextElement={addTextElementWithHistory}
+                imageInputRef={imageInputRef}
+                showBackgroundPanel={panelState.showBackgroundPanel}
+                setShowBackgroundPanel={panelState.setShowBackgroundPanel}
+                addPage={addPageWithHistory}
+                deletePage={deletePageWithHistory}
+                currentEditingPage={currentEditingPage}
+                clearCurrentPage={clearCurrentPageWithHistory}
+                clearAllPages={clearAllPagesWithHistory}
+                jsonInputRef={null} // Removed jsonInputRef
+                exportToJSON={() => exportToJSON(project)}
+                exportToPDF={async () => await exportToPDF(project)}
+                exportToSVG={() => exportToOptimizedSVG(project)}
+                totalPages={project.pages.length}
+                selectedElement={selectedElement}
+                selectedEl={selectedEl}
+                updateElement={updateElementWithHistory}
+                deleteElement={deleteElementWithHistory}
+                duplicateElement={duplicateElementWithHistory}
+                onDeselect={() => setSelectedElement({ pageIndex: currentEditingPage, elementId: null })}
+                onOpenProperties={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
+                setProject={setProject}
+              />
+            </div>
+          )}
 
-        {console.log('Debug currentEditingPage:', currentEditingPage, typeof currentEditingPage)}
+          {/* Copy/Cut/Paste Feedback */}
+          {copyFeedback && (
+            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-300">
+              {lastOperation === 'cut' ? 'Element cut! Press Ctrl+V to paste' :
+                lastOperation === 'copy' ? 'Element copied! Press Ctrl+V to paste' :
+                  lastOperation === 'external-copy' ? 'Text copied! Press Ctrl+V to paste' :
+                    lastOperation === 'external-paste' ? 'External text pasted!' :
+                      lastOperation === 'text-paste' ? 'Text pasted!' :
+                        'Element copied! Press Ctrl+V to paste'}
+            </div>
+          )}
+          {/* Panels */}
+          <DesignPanel
+            show={panelState.showDesignPanel}
+            view={panelState.designPanelView}
+            onClose={() => panelState.setShowDesignPanel(false)}
+            onBack={() => panelState.setDesignPanelView('main')}
+            selectedTemplateSet={panelState.selectedTemplateSet}
+            onTemplateSetClick={(set) => {
+              panelState.setSelectedTemplateSet(set);
+              panelState.setDesignPanelView('preview');
+            }}
+            sets={sets}
+            svgPreviews={svgPreviews}
+            svgInputRef={svgInputRef}
+            setBackground={setBackgroundWithHistory}
+          />
 
-        <ToolsPanel
-          show={panelState.showToolsPanel}
-          onClose={() => panelState.setShowToolsPanel(false)}
-          onClearPage={clearCurrentPageWithHistory}
-          onClearAll={clearAllPagesWithHistory}
-          onDeletePage={() => deletePageWithHistory(currentEditingPage)}
-          onInsertPage={addPageWithHistory}
-          onDuplicatePage={() => duplicatePageWithHistory(currentEditingPage)}
-          onExportJSON={() => exportToJSON(project)}
-          onExportPDF={async () => await exportToPDF(project)}
-          onPrint={() => {
-            // Create a simple print function that opens the current page in a new window
-            const validatedPages = getValidatedPages();
-            const currentPageData = validatedPages[currentEditingPage];
-            if (!currentPageData || !currentPageData.pageSettings) {
-              console.error('Page or pageSettings not found, cannot print');
-              return;
-            }
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
+          <ElementsPanel
+            show={panelState.showElementsPanel}
+            onClose={() => panelState.setShowElementsPanel(false)}
+            addTextElement={addTextElementWithHistory}
+            imageInputRef={imageInputRef}
+            addShapeElement={addShapeElementWithHistory}
+          />
+
+          <TextPanel
+            show={panelState.showTextPanel}
+            onClose={() => panelState.setShowTextPanel(false)}
+            addTextElement={addTextElementWithHistory}
+            addCustomTextElement={addCustomTextElementWithHistory}
+            currentPage={currentEditingPage}
+            totalPages={project.pages.length}
+            project={project}
+            updateElement={updateElementPropertiesOnly}
+            deleteElement={deleteElementWithHistory}
+          />
+
+          <HistoryPanel
+            show={panelState.showHistoryPanel}
+            onClose={() => panelState.setShowHistoryPanel(false)}
+            project={project}
+            historyList={getHistoryList()}
+            onRestoreHistoryEntry={restoreToHistoryEntry}
+          />
+
+          <UploadsPanel
+            show={panelState.showUploadsPanel}
+            onClose={() => panelState.setShowUploadsPanel(false)}
+            onImageSelect={(dataUrl) => {
+              addImageElementWithHistory(dataUrl);
+              panelState.setShowUploadsPanel(false);
+            }}
+          />
+
+          {console.log('Debug currentEditingPage:', currentEditingPage, typeof currentEditingPage)}
+
+          <ToolsPanel
+            show={panelState.showToolsPanel}
+            onClose={() => panelState.setShowToolsPanel(false)}
+            onClearPage={clearCurrentPageWithHistory}
+            onClearAll={clearAllPagesWithHistory}
+            onDeletePage={() => deletePageWithHistory(currentEditingPage)}
+            onInsertPage={addPageWithHistory}
+            onDuplicatePage={() => duplicatePageWithHistory(currentEditingPage)}
+            onExportJSON={() => exportToJSON(project)}
+            onExportPDF={async () => await exportToPDF(project)}
+            onPrint={() => {
+              // Create a simple print function that opens the current page in a new window
+              const validatedPages = getValidatedPages();
+              const currentPageData = validatedPages[currentEditingPage];
+              if (!currentPageData || !currentPageData.pageSettings) {
+                console.error('Page or pageSettings not found, cannot print');
+                return;
+              }
+              const printWindow = window.open('', '_blank');
+              printWindow.document.write(`
               <!DOCTYPE html>
               <html>
               <head>
@@ -1138,108 +1142,109 @@ const CanvaApp = () => {
               </body>
               </html>
             `);
-            printWindow.document.close();
-          }}
-          currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
-          totalPages={project.pages.length}
-        />
-
-        <ProjectsPanel
-          show={panelState.showProjectsPanel}
-          onClose={() => panelState.setShowProjectsPanel(false)}
-        />
-
-        {!isGridView && (
-          <PropertiesPanel
-            show={panelState.showPropertiesPanel}
-            selectedElement={selectedElement}
-            selectedEl={selectedEl}
-            updateElement={updateElementPropertiesOnly}
-            deleteElement={deleteElementWithHistory}
-            duplicateElement={() => duplicateElementWithHistory(selectedEl, selectedElement)}
-            onClose={() => panelState.setShowPropertiesPanel(false)}
-            project={project}
-
+              printWindow.document.close();
+            }}
+            currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
+            totalPages={project.pages.length}
           />
-        )}
 
-        {/* Canvas Area - Full height with no scroll interference */}
-        <div
-          className="absolute inset-0 w-full h-full"
-          ref={scrollContainerRef}
-        >
-          {isGridView ? (
-            <GridView
-              project={project}
-              zoom={zoom / 100}
-              scrollContainerRef={scrollContainerRef}
-              currentEditingPage={currentEditingPage}
-              onPageClick={(pageIndex) => {
-                setCurrentEditingPage(pageIndex);
-                // Also update the project's currentPage to ensure consistency
-                setProject(prev => ({
-                  ...prev,
-                  currentPage: pageIndex
-                }));
-                setIsGridView(false);
-              }}
-              onReorderPages={reorderPagesWithHistory}
-            />
-          ) : (
-            <Canvas
-              project={project}
-              zoom={zoom / 100}
-              currentEditingPage={currentEditingPage}
+          <ProjectsPanel
+            show={panelState.showProjectsPanel}
+            onClose={() => panelState.setShowProjectsPanel(false)}
+          />
+
+          {!isGridView && (
+            <PropertiesPanel
+              show={panelState.showPropertiesPanel}
               selectedElement={selectedElement}
-              canvasRefs={canvasRefs}
-              scrollContainerRef={scrollContainerRef}
-              handleMouseDown={(e, pageIndex, elementId) => handleMouseDown(e, pageIndex, elementId, canvasRefs, panelState.setShowProperties)}
-              handleResizeMouseDown={(e, elementId, handle) => handleResizeMouseDown(e, elementId, handle, selectedElement, canvasRefs)}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              updateElement={updateElementWithHistory}
-              setSelectedElement={setSelectedElement}
-              setCurrentEditingPage={setCurrentEditingPage}
-              draggedElement={draggedElement}
+              selectedEl={selectedEl}
+              updateElement={updateElementPropertiesOnly}
+              deleteElement={deleteElementWithHistory}
+              duplicateElement={() => duplicateElementWithHistory(selectedEl, selectedElement)}
+              onClose={() => panelState.setShowPropertiesPanel(false)}
+              project={project}
+
             />
           )}
-        </div>
-      </div>
 
-      {/* Footer */}
-      <div
-        className="bg-white border-t z-50 shadow-lg"
-        style={{
-          gridArea: 'footer'
-        }}
-      >
-        <Footer
-          onHelpClick={() => alert('Keyboard Shortcuts:\n\nCtrl/Cmd + C: Copy element\nCtrl/Cmd + X: Cut element\nCtrl/Cmd + V: Paste last copied item\nCtrl/Cmd + Z: Undo\nCtrl/Cmd + Shift + Z: Redo\nDelete/Backspace: Delete element\n\nPaste Behavior:\n- Ctrl+V pastes whatever was last copied (element or external text)\n- If you copy/cut an element, that gets pasted\n- If you copy text from outside, that gets pasted\n- Last copied item always takes precedence\n\nHelp documentation coming soon!')}
-          onFullscreenClick={() => {
-            if (!document.fullscreenElement) {
-              document.documentElement.requestFullscreen();
-            } else {
-              document.exitFullscreen();
-            }
+          {/* Canvas Area - Full height with no scroll interference */}
+          <div
+            className="absolute inset-0 w-full h-full"
+            ref={scrollContainerRef}
+          >
+            {isGridView ? (
+              <GridView
+                project={project}
+                zoom={zoom / 100}
+                scrollContainerRef={scrollContainerRef}
+                currentEditingPage={currentEditingPage}
+                onPageClick={(pageIndex) => {
+                  setCurrentEditingPage(pageIndex);
+                  // Also update the project's currentPage to ensure consistency
+                  setProject(prev => ({
+                    ...prev,
+                    currentPage: pageIndex
+                  }));
+                  setIsGridView(false);
+                }}
+                onReorderPages={reorderPagesWithHistory}
+              />
+            ) : (
+              <Canvas
+                project={project}
+                zoom={zoom / 100}
+                currentEditingPage={currentEditingPage}
+                selectedElement={selectedElement}
+                canvasRefs={canvasRefs}
+                scrollContainerRef={scrollContainerRef}
+                handleMouseDown={(e, pageIndex, elementId) => handleMouseDown(e, pageIndex, elementId, canvasRefs, panelState.setShowProperties)}
+                handleResizeMouseDown={(e, elementId, handle) => handleResizeMouseDown(e, elementId, handle, selectedElement, canvasRefs)}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+                updateElement={updateElementWithHistory}
+                setSelectedElement={setSelectedElement}
+                setCurrentEditingPage={setCurrentEditingPage}
+                draggedElement={draggedElement}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="bg-white border-t z-50 shadow-lg"
+          style={{
+            gridArea: 'footer'
           }}
-          onGridClick={() => setIsGridView(!isGridView)}
-          currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
-          totalPages={project.pages.length}
-          zoom={zoom}
-          onZoomChange={setZoom}
-          isGridView={isGridView}
+        >
+          <Footer
+            onHelpClick={() => alert('Keyboard Shortcuts:\n\nCtrl/Cmd + C: Copy element\nCtrl/Cmd + X: Cut element\nCtrl/Cmd + V: Paste last copied item\nCtrl/Cmd + Z: Undo\nCtrl/Cmd + Shift + Z: Redo\nDelete/Backspace: Delete element\n\nPaste Behavior:\n- Ctrl+V pastes whatever was last copied (element or external text)\n- If you copy/cut an element, that gets pasted\n- If you copy text from outside, that gets pasted\n- Last copied item always takes precedence\n\nHelp documentation coming soon!')}
+            onFullscreenClick={() => {
+              if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+              } else {
+                document.exitFullscreen();
+              }
+            }}
+            onGridClick={() => setIsGridView(!isGridView)}
+            currentPage={typeof currentEditingPage === 'number' ? currentEditingPage + 1 : 1}
+            totalPages={project.pages.length}
+            zoom={zoom}
+            onZoomChange={setZoom}
+            isGridView={isGridView}
+          />
+        </div>
+
+        {/* Hidden file inputs */}
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden"
         />
       </div>
-
-      {/* Hidden file inputs */}
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
-    </div>
+    </>
   );
 };
 
