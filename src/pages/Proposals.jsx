@@ -186,8 +186,6 @@ const Proposals = () => {
         if (!fetchedProposals) {
             fetchProposals();
             setFetchedProposals(true);
-        } else {
-            setFetchedProposals(false);
         }
     }, [fetchedProposals]);
 
