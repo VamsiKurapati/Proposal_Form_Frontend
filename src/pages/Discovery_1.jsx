@@ -45,8 +45,6 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters }) => {
   };
 
   const content = (
-
-
     <div className="p-4 w-64 bg-white h-full overflow-y-auto border-r">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-[22px] font-semibold text-[#000000]">Filters</h3>
@@ -88,12 +86,179 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters }) => {
   );
 };
 
+// Grants Filter Sidebar Component
+const GrantsFilterSidebar = ({ isOpen, onClose, grantFilters, setGrantFilters }) => {
+  const fundingInstrumentTypes = ['Grant', 'Cooperative Agreement', 'Procurement Contract', 'Other'];
+  const expectedNumberOfAwards = ['0-10', '10-25', '25-50', '50-100', '>100'];
+  const awardCeiling = ['0-10000', '10000-50000', '50000-100000', '>100000'];
+  const costSharingMatchRequirement = ['Yes', 'No'];
+  const opportunityStatus = ['Posted', 'Forecasted'];
+  const deadlineRange = ['30', '90', '180'];
+
+  const handleChange = (type, value) => {
+    setGrantFilters((prev) => {
+      const updated = { ...prev };
+      updated[type] = prev[type]?.includes(value)
+        ? prev[type].filter((v) => v !== value)
+        : [...(prev[type] || []), value];
+      return updated;
+    });
+  };
+
+  const resetFilters = () => {
+    setGrantFilters({
+      fundingInstrumentType: [],
+      expectedNumberOfAwards: [],
+      awardCeiling: [],
+      costSharingMatchRequirement: [],
+      opportunityStatus: [],
+      deadlineRange: []
+    });
+  };
+
+  const content = (
+    <div className="p-4 w-64 bg-white h-full overflow-y-auto border-r">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-[22px] font-semibold text-[#000000]">Grants Filters</h3>
+        <button
+          onClick={onClose}
+          className="hover:cursor-pointer"
+          aria-label="Close filters"
+          title="Close filters"
+        >
+          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827]" />
+        </button>
+      </div>
+
+      {/* Funding Instrument Type */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Funding Instrument Type</h3>
+        {fundingInstrumentTypes.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.fundingInstrumentType?.includes(value) || false}
+              onChange={() => handleChange('fundingInstrumentType', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">{value}</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Expected Number of Awards */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Expected Number of Awards</h3>
+        {expectedNumberOfAwards.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.expectedNumberOfAwards?.includes(value) || false}
+              onChange={() => handleChange('expectedNumberOfAwards', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">{value}</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Award Ceiling */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Award Ceiling</h3>
+        {awardCeiling.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.awardCeiling?.includes(value) || false}
+              onChange={() => handleChange('awardCeiling', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">{value}</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Cost Sharing Match Requirement */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Cost Sharing Match Requirement</h3>
+        {costSharingMatchRequirement.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.costSharingMatchRequirement?.includes(value) || false}
+              onChange={() => handleChange('costSharingMatchRequirement', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">{value}</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Opportunity Status */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Opportunity Status</h3>
+        {opportunityStatus.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.opportunityStatus?.includes(value) || false}
+              onChange={() => handleChange('opportunityStatus', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">{value}</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Deadline Range */}
+      <div className="mb-4">
+        <h3 className="text-[16px] font-medium text-[#111827] mb-2">Deadline Range (Days)</h3>
+        {deadlineRange.map((value) => (
+          <div key={value} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-2 text-[#4B5563] mt-1 w-3 h-3"
+              checked={grantFilters.deadlineRange?.includes(value) || false}
+              onChange={() => handleChange('deadlineRange', value)}
+            />
+            <label className="text-[16px] text-[#6B7280]">≤ {value} days</label>
+          </div>
+        ))}
+      </div>
+
+      {/* Reset Button */}
+      <div className="mt-6">
+        <button
+          onClick={resetFilters}
+          className="w-full px-4 py-2 bg-[#EF4444] text-white rounded-md hover:bg-[#DC2626] transition-colors"
+        >
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] z-40">
+      {isOpen && content}
+    </div>
+  );
+};
+
 // PropTypes for LeftSidebar
 LeftSidebar.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   filters: PropTypes.object.isRequired,
   setFilters: PropTypes.func.isRequired,
+};
+
+// PropTypes for GrantsFilterSidebar
+GrantsFilterSidebar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  grantFilters: PropTypes.object.isRequired,
+  setGrantFilters: PropTypes.func.isRequired,
 };
 
 // Custom MultiSelect Component for Industries
@@ -447,6 +612,16 @@ const DiscoverRFPs = () => {
   // Active tab state
   const [activeTab, setActiveTab] = useState("rfp");
 
+  // Grant filters state
+  const [grantFilters, setGrantFilters] = useState({
+    fundingInstrumentType: [],
+    expectedNumberOfAwards: [],
+    awardCeiling: [],
+    costSharingMatchRequirement: [],
+    opportunityStatus: [],
+    deadlineRange: []
+  });
+
   // Pagination functions
   const getCurrentPageItems = (items, currentPage, itemsPerPage) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -468,7 +643,27 @@ const DiscoverRFPs = () => {
     setCurrentGrantTablePage(1);
     setCurrentOtherRFPsPage(1);
     setCurrentOtherGrantsPage(1);
-  }, [searchQuery, filters, selectedIndustries]);
+  }, [searchQuery, filters, selectedIndustries, grantFilters]);
+
+  // Close filter sidebar when switching tabs
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setIsSearchFocused(false); // Close filter sidebar when switching tabs
+
+    // Reset filters when switching tabs
+    if (tab === "rfp") {
+      setFilters({ category: [], deadline: [] });
+    } else if (tab === "grants") {
+      setGrantFilters({
+        fundingInstrumentType: [],
+        expectedNumberOfAwards: [],
+        awardCeiling: [],
+        costSharingMatchRequirement: [],
+        opportunityStatus: [],
+        deadlineRange: []
+      });
+    }
+  };
 
   // Set available industries statically
   useEffect(() => {
@@ -605,7 +800,27 @@ const DiscoverRFPs = () => {
         },
       });
       if (res.status === 200) {
+        // Update saved grants
         setSavedGrants((prev) => [...prev, grant]);
+
+        // Update recent grants to show as saved
+        setRecentGrants((prev) =>
+          prev.map(g => g._id === grant._id ? { ...g, isSaved: true } : g)
+        );
+
+        // Update other grants to show as saved
+        setOtherGrants((prev) =>
+          prev.map(g => g._id === grant._id ? { ...g, isSaved: true } : g)
+        );
+
+        // Update original arrays to maintain consistency
+        setOriginalRecentGrants((prev) =>
+          prev.map(g => g._id === grant._id ? { ...g, isSaved: true } : g)
+        );
+        setOriginalOtherGrants((prev) =>
+          prev.map(g => g._id === grant._id ? { ...g, isSaved: true } : g)
+        );
+
         alert("Grant saved successfully!");
       }
     } catch (err) {
@@ -625,7 +840,27 @@ const DiscoverRFPs = () => {
         },
       });
       if (res.status === 200) {
+        // Remove from saved grants
         setSavedGrants((prev) => prev.filter((g) => g._id !== grantId));
+
+        // Update recent grants to show as not saved
+        setRecentGrants((prev) =>
+          prev.map(g => g._id === grantId ? { ...g, isSaved: false } : g)
+        );
+
+        // Update other grants to show as not saved
+        setOtherGrants((prev) =>
+          prev.map(g => g._id === grantId ? { ...g, isSaved: false } : g)
+        );
+
+        // Update original arrays to maintain consistency
+        setOriginalRecentGrants((prev) =>
+          prev.map(g => g._id === grantId ? { ...g, isSaved: false } : g)
+        );
+        setOriginalOtherGrants((prev) =>
+          prev.map(g => g._id === grantId ? { ...g, isSaved: false } : g)
+        );
+
         alert("Grant unsaved successfully!");
       }
     } catch (err) {
@@ -775,7 +1010,99 @@ const DiscoverRFPs = () => {
 
   // Grant filtering function
   const applyGrantFilters = (grants) => {
-    return grants.filter((grant) => {
+    const filtered = grants.filter((grant) => {
+      // Apply funding instrument type filter
+      if (grantFilters.fundingInstrumentType.length > 0) {
+        const fundingType = grant.FUNDING_INSTRUMENT_TYPE || 'Other';
+        if (!grantFilters.fundingInstrumentType.includes(fundingType)) {
+          return false;
+        }
+      }
+
+      // Apply expected number of awards filter
+      if (grantFilters.expectedNumberOfAwards.length > 0) {
+        const expectedAwards = parseInt(grant.EXPECTED_NUMBER_OF_AWARDS) || 0;
+        const hasMatchingRange = grantFilters.expectedNumberOfAwards.some(range => {
+          switch (range) {
+            case '0-10':
+              return expectedAwards >= 0 && expectedAwards <= 10;
+            case '10-25':
+              return expectedAwards > 10 && expectedAwards <= 25;
+            case '25-50':
+              return expectedAwards > 25 && expectedAwards <= 50;
+            case '50-100':
+              return expectedAwards > 50 && expectedAwards <= 100;
+            case '>100':
+              return expectedAwards > 100;
+            default:
+              return true;
+          }
+        });
+        if (!hasMatchingRange) return false;
+      }
+
+      // Apply award ceiling filter
+      if (grantFilters.awardCeiling.length > 0) {
+        const awardCeiling = parseInt(grant.AWARD_CEILING?.replace(/[^0-9]/g, '')) || 0;
+        const hasMatchingRange = grantFilters.awardCeiling.some(range => {
+          switch (range) {
+            case '0-10000':
+              return awardCeiling >= 0 && awardCeiling <= 10000;
+            case '10000-50000':
+              return awardCeiling > 10000 && awardCeiling <= 50000;
+            case '50000-100000':
+              return awardCeiling > 50000 && awardCeiling <= 100000;
+            case '>100000':
+              return awardCeiling > 100000;
+            default:
+              return true;
+          }
+        });
+        if (!hasMatchingRange) return false;
+      }
+
+      // Apply cost sharing match requirement filter
+      if (grantFilters.costSharingMatchRequirement.length > 0) {
+        const costSharing = grant.COST_SHARING_MATCH_REQUIRMENT || 'No';
+        if (!grantFilters.costSharingMatchRequirement.includes(costSharing)) {
+          return false;
+        }
+      }
+
+      // Apply opportunity status filter
+      if (grantFilters.opportunityStatus.length > 0) {
+        const status = grant.OPPORTUNITY_STATUS || 'Posted';
+        if (!grantFilters.opportunityStatus.includes(status)) {
+          return false;
+        }
+      }
+
+      // Apply deadline range filter
+      if (grantFilters.deadlineRange.length > 0) {
+        const now = new Date();
+        const deadlineDate = grant.ESTIMATED_APPLICATION_DUE_DATE === "Not Provided" || grant.ESTIMATED_APPLICATION_DUE_DATE === "Not Disclosed" ?
+          new Date(now.getFullYear(), now.getMonth() + 6, now.getDate()) :
+          new Date(grant.ESTIMATED_APPLICATION_DUE_DATE);
+
+        if (isNaN(deadlineDate.getTime())) return true; // Skip invalid dates
+
+        const hasMatchingRange = grantFilters.deadlineRange.some(range => {
+          const daysDiff = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+          switch (range) {
+            case '30':
+              return daysDiff <= 30;
+            case '90':
+              return daysDiff <= 90;
+            case '180':
+              return daysDiff <= 180;
+            default:
+              return true;
+          }
+        });
+        if (!hasMatchingRange) return false;
+      }
+
+      // Apply existing category and deadline filters
       if (
         filters.category.length &&
         (filters.category.includes("None") ? false : !filters.category.includes(grant.CATEGORY_OF_FUNDING_ACTIVITY))
@@ -813,6 +1140,8 @@ const DiscoverRFPs = () => {
 
       return true;
     });
+
+    return filtered;
   };
 
   const handleSave = async (rfp) => {
@@ -824,7 +1153,27 @@ const DiscoverRFPs = () => {
         },
       });
       if (res.status === 201 || res.status === 200) {
+        // Update saved RFPs
         setSaved((prev) => [...prev, rfp]);
+
+        // Update recommended RFPs to show as saved
+        setRecommended((prev) =>
+          prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
+        );
+
+        // Update other RFPs to show as saved
+        setOtherRFPs((prev) =>
+          prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
+        );
+
+        // Update original arrays to maintain consistency
+        setOriginalRecommended((prev) =>
+          prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
+        );
+        setOriginalOtherRFPs((prev) =>
+          prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
+        );
+
         //console.log("RFP data:", rfp);
       }
     } catch (err) {
@@ -846,7 +1195,26 @@ const DiscoverRFPs = () => {
       });
       if (res.status === 200) {
         //console.log("Handling Unsave...");
+        // Remove from saved RFPs
         setSaved((prev) => prev.filter((r) => r._id !== rfpId));
+
+        // Update recommended RFPs to show as not saved
+        setRecommended((prev) =>
+          prev.map(r => r._id === rfpId ? { ...r, isSaved: false } : r)
+        );
+
+        // Update other RFPs to show as not saved
+        setOtherRFPs((prev) =>
+          prev.map(r => r._id === rfpId ? { ...r, isSaved: false } : r)
+        );
+
+        // Update original arrays to maintain consistency
+        setOriginalRecommended((prev) =>
+          prev.map(r => r._id === rfpId ? { ...r, isSaved: false } : r)
+        );
+        setOriginalOtherRFPs((prev) =>
+          prev.map(r => r._id === rfpId ? { ...r, isSaved: false } : r)
+        );
       }
     } catch (err) {
       //console.error(err);
@@ -1194,6 +1562,11 @@ const DiscoverRFPs = () => {
           <div className="w-8 h-8 bg-[#15803D] rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-lg">G</span>
           </div>
+          {grant.matchScore && (
+            <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
+              {grant.matchScore}% Match
+            </span>
+          )}
         </div>
         <h3 className="font-semibold text-[#111827] text-[18px] mb-1 line-clamp-2">{grant.OPPORTUNITY_TITLE}</h3>
         <p className="text-[16px] text-[#4B5563] mb-2 line-clamp-3">{grant.FUNDING_DESCRIPTION}</p>
@@ -1298,20 +1671,33 @@ const DiscoverRFPs = () => {
             <span className="text-[12px] text-[#6B7280] bg-[#F3F4F6] px-2 py-1 rounded">
               {grant.CATEGORY_OF_FUNDING_ACTIVITY}
             </span>
+            {grant.matchScore && (
+              <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
+                {grant.matchScore}% Match
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       <div className="flex justify-between items-center">
         <span className="font-semibold text-[#111827]">{grant.AWARD_CEILING === "Not Provided" ? "Not Disclosed" : grant.AWARD_CEILING}</span>
-        <a
-          href={grant.OPPORTUNITY_NUMBER_LINK}
-          className="text-[14px] text-[#2563EB]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Details
-        </a>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleGenerateGrantProposal(grant)}
+            className="text-[#2563EB] text-[14px] font-medium hover:underline"
+          >
+            Generate
+          </button>
+          <a
+            href={grant.OPPORTUNITY_NUMBER_LINK}
+            className="text-[14px] text-white bg-[#2563EB] px-2 py-1 rounded-md"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -1563,15 +1949,52 @@ const DiscoverRFPs = () => {
   const filteredOtherGrants = useMemo(() => getFilteredGrantData(originalOtherGrants), [getFilteredGrantData, originalOtherGrants]);
   const filteredSavedGrants = useMemo(() => getFilteredGrantData(originalSavedGrants), [getFilteredGrantData, originalSavedGrants]);
 
+  // Clear all filters function
+  const clearAllFilters = () => {
+    setFilters({ category: [], deadline: [] });
+    setGrantFilters({
+      fundingInstrumentType: [],
+      expectedNumberOfAwards: [],
+      awardCeiling: [],
+      costSharingMatchRequirement: [],
+      opportunityStatus: [],
+      deadlineRange: []
+    });
+    setSelectedIndustries([]);
+    setSearchQuery("");
+  };
+
+  // Check if any grant filters are active
+  const hasActiveGrantFilters = () => {
+    return Object.values(grantFilters).some(filterArray => filterArray.length > 0);
+  };
+
+  // Check if any RFP filters are active
+  const hasActiveRFPFilters = () => {
+    return Object.values(filters).some(filterArray => filterArray.length > 0);
+  };
+
+  // Check if any filters are active (including search and industries)
+  const hasAnyActiveFilters = () => {
+    return hasActiveRFPFilters() || hasActiveGrantFilters() || selectedIndustries.length > 0 || searchQuery.trim() !== "";
+  };
+
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <NavbarComponent />
 
       <LeftSidebar
-        isOpen={isSearchFocused}
+        isOpen={isSearchFocused && activeTab === "rfp"}
         onClose={() => setIsSearchFocused(false)}
         filters={filters}
         setFilters={setFilters}
+      />
+
+      <GrantsFilterSidebar
+        isOpen={isSearchFocused && activeTab === "grants"}
+        onClose={() => setIsSearchFocused(false)}
+        grantFilters={grantFilters}
+        setGrantFilters={setGrantFilters}
       />
       <main className="pt-20 px-8 md:px-12 py-6 ml-0">
         {/* Search Bar Section */}
@@ -1581,7 +2004,7 @@ const DiscoverRFPs = () => {
               ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
               : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
               }`}
-            onClick={() => setActiveTab("rfp")}
+            onClick={() => handleTabChange("rfp")}
           >
             RFP's
           </button>
@@ -1591,7 +2014,7 @@ const DiscoverRFPs = () => {
               ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
               : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
               }`}
-            onClick={() => setActiveTab("grants")}
+            onClick={() => handleTabChange("grants")}
           >
             Grant's
           </button>
@@ -1607,18 +2030,39 @@ const DiscoverRFPs = () => {
                     <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                     <input
                       type="text"
-                      placeholder="Search RFPs by title, organization or category"
+                      placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
                       className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <button
-                      className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
+                      className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
+                        ? hasAnyActiveFilters()
+                          ? "bg-[#2563EB] text-white"
+                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                        : hasActiveGrantFilters()
+                          ? "bg-[#2563EB] text-white"
+                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                        }`}
                       onClick={() => setIsSearchFocused(true)}
                     >
-                      Advanced Search
+                      {activeTab === "rfp"
+                        ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
+                        : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
+                      }
                     </button>
                   </div>
+
+                  {/* Clear Filters Button */}
+                  {hasAnyActiveFilters() && (
+                    <button
+                      onClick={clearAllFilters}
+                      className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
+                    >
+                      <MdOutlineClose className="w-4 h-4" />
+                      Clear All Filters
+                    </button>
+                  )}
                 </div>
 
                 {/* Upload RFP Button */}
@@ -1808,18 +2252,39 @@ const DiscoverRFPs = () => {
                     <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
                     <input
                       type="text"
-                      placeholder="Search Grants by title, agency or category"
+                      placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
                       className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <button
-                      className="absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 bg-[#F3F4F6] text-[#111827] text-[14px] hover:bg-[#2563EB] hover:text-white transition-colors"
+                      className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
+                        ? hasAnyActiveFilters()
+                          ? "bg-[#2563EB] text-white"
+                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                        : hasActiveGrantFilters()
+                          ? "bg-[#2563EB] text-white"
+                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                        }`}
                       onClick={() => setIsSearchFocused(true)}
                     >
-                      Advanced Search
+                      {activeTab === "rfp"
+                        ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
+                        : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
+                      }
                     </button>
                   </div>
+
+                  {/* Clear Filters Button */}
+                  {hasAnyActiveFilters() && (
+                    <button
+                      onClick={clearAllFilters}
+                      className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
+                    >
+                      <MdOutlineClose className="w-4 h-4" />
+                      Clear All Filters
+                    </button>
+                  )}
                 </div>
 
 
@@ -1845,8 +2310,8 @@ const DiscoverRFPs = () => {
               </div>
             ) : filteredRecentGrants.length ? (
               <div className="flex overflow-x-auto pb-2 custom-scroll">
-                {filteredRecentGrants.map((grant) => (
-                  <GrantCard
+                {applyGrantFilters(filteredRecentGrants).map((grant) => (
+                  <RecentGrantCard
                     key={grant._id}
                     grant={grant}
                     isSaved={!!savedGrants.find((s) => s._id === grant._id)}
@@ -1910,10 +2375,11 @@ const DiscoverRFPs = () => {
               <>
                 <div className="flex overflow-x-auto pb-2 custom-scroll">
                   {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
-                    <RecentGrantCard
+                    <GrantCard
                       key={grant._id}
                       grant={grant}
                       isSaved={!!savedGrants.find((s) => s._id === grant._id)}
+                      handleGenerateProposal={handleGenerateGrantProposal}
                     />
                   ))}
                 </div>
@@ -1967,7 +2433,7 @@ const DiscoverRFPs = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {getCurrentPageItems(filteredSavedGrants, currentGrantTablePage, tableItemsPerPage).map((grant) => (
+                          {getCurrentPageItems(applyGrantFilters(filteredSavedGrants), currentGrantTablePage, tableItemsPerPage).map((grant) => (
                             <SavedGrantCard
                               key={grant._id}
                               grant={grant}
@@ -1981,7 +2447,7 @@ const DiscoverRFPs = () => {
                   <div className="mt-6">
                     <Pagination
                       currentPage={currentGrantTablePage}
-                      totalPages={getTotalPages(filteredSavedGrants.length, tableItemsPerPage)}
+                      totalPages={getTotalPages(applyGrantFilters(filteredSavedGrants).length, tableItemsPerPage)}
                       onPageChange={(page) => handlePageChange(page, setCurrentGrantTablePage)}
                     />
                   </div>
