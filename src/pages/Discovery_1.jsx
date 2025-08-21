@@ -410,6 +410,32 @@ const DiscoverRFPs = () => {
   const [loadingSaveGrant, setLoadingSaveGrant] = useState({});
   const [fetchedGrants, setFetchedGrants] = useState(false);
 
+  // Grant proposal modal state
+  const [showGrantProposalModal, setShowGrantProposalModal] = useState(false);
+  const [selectedGrant, setSelectedGrant] = useState(null);
+  const [grantProposalData, setGrantProposalData] = useState({
+    summary: "",
+    objectives: [""],
+    activities: [""],
+    beneficiaries: [""],
+    geography: "",
+    start_date: "",
+    estimated_duration: "",
+    budget: {
+      total_requested: "",
+      cost_sharing: "",
+      categories: {
+        personnel: "",
+        training_materials: "",
+        technology_and_equipment: "",
+        travel_and_logistics: "",
+        evaluation_and_reporting: "",
+        administration: ""
+      }
+    },
+    methods_for_measuring_success: [""]
+  });
+
   // Pagination state variables
   const [itemsPerPage] = useState(6); // 6 items per page for cards
   const [tableItemsPerPage] = useState(10); // 10 items per page for tables
@@ -847,8 +873,132 @@ const DiscoverRFPs = () => {
 
   const handleGenerateGrantProposal = (grant) => {
     //console.log("Generating grant proposal for:", grant.OPPORTUNITY_TITLE);
-    // Navigate to grant proposal page or open modal
-    navigate("/grant_proposal_page", { state: { grant: grant } });
+    // Open the grant proposal modal
+    setSelectedGrant(grant);
+
+    // Reset form data to empty
+    setGrantProposalData({
+      summary: "",
+      objectives: [""],
+      activities: [""],
+      beneficiaries: [""],
+      geography: "",
+      start_date: "",
+      estimated_duration: "",
+      budget: {
+        total_requested: "",
+        cost_sharing: "",
+        categories: {
+          personnel: "",
+          training_materials: "",
+          technology_and_equipment: "",
+          travel_and_logistics: "",
+          evaluation_and_reporting: "",
+          administration: ""
+        }
+      },
+      methods_for_measuring_success: [""]
+    });
+
+    setShowGrantProposalModal(true);
+  };
+
+  // Helper functions for grant proposal modal
+  const addArrayItem = (field) => {
+    setGrantProposalData(prev => ({
+      ...prev,
+      [field]: [...prev[field], ""]
+    }));
+  };
+
+  const removeArrayItem = (field, index) => {
+    setGrantProposalData(prev => ({
+      ...prev,
+      [field]: prev[field].length > 1 ? prev[field].filter((_, i) => i !== index) : [""]
+    }));
+  };
+
+  const updateArrayItem = (field, index, value) => {
+    setGrantProposalData(prev => ({
+      ...prev,
+      [field]: prev[field].map((item, i) => i === index ? value : item)
+    }));
+  };
+
+  const updateBudgetCategory = (category, value) => {
+    setGrantProposalData(prev => ({
+      ...prev,
+      budget: {
+        ...prev.budget,
+        categories: {
+          ...prev.budget.categories,
+          [category]: value
+        }
+      }
+    }));
+  };
+
+  const handleSubmitGrantProposal = () => {
+    // Validate required fields
+    const requiredFields = [
+      'summary',
+      'objectives',
+      'activities',
+      'beneficiaries',
+      'geography',
+      'start_date',
+      'estimated_duration'
+    ];
+
+    const missingFields = requiredFields.filter(field => {
+      if (field === 'objectives' || field === 'activities' || field === 'beneficiaries') {
+        return !grantProposalData[field].some(item => item.trim() !== '');
+      }
+      if (field === 'summary' || field === 'geography' || field === 'estimated_duration') {
+        return !grantProposalData[field] || grantProposalData[field].trim() === '';
+      }
+      return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
+    });
+
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    // Here you can handle the submission of the grant proposal data
+    console.log("Grant Proposal Data:", grantProposalData);
+    console.log("Selected Grant:", selectedGrant);
+
+    // Close the modal
+    setShowGrantProposalModal(false);
+    setSelectedGrant(null);
+
+    // Reset form data
+    setGrantProposalData({
+      summary: "",
+      objectives: [""],
+      activities: [""],
+      beneficiaries: [""],
+      geography: "",
+      start_date: "",
+      estimated_duration: "",
+      budget: {
+        total_requested: "",
+        cost_sharing: "",
+        categories: {
+          personnel: "",
+          training_materials: "",
+          technology_and_equipment: "",
+          travel_and_logistics: "",
+          evaluation_and_reporting: "",
+          administration: ""
+        }
+      },
+      methods_for_measuring_success: [""]
+    });
+
+    // You can add navigation or other logic here
+    // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
   };
 
   const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
@@ -1041,12 +1191,9 @@ const DiscoverRFPs = () => {
     <div className="bg-[#F8FAFC] rounded-xl p-4 shadow w-[355px] mr-4 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#15803D] rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-lg">G</span>
           </div>
-          <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
-            {grant.matchScore || 0}% Match
-          </span>
         </div>
         <h3 className="font-semibold text-[#111827] text-[18px] mb-1 line-clamp-2">{grant.OPPORTUNITY_TITLE}</h3>
         <p className="text-[16px] text-[#4B5563] mb-2 line-clamp-3">{grant.FUNDING_DESCRIPTION}</p>
@@ -1852,6 +1999,374 @@ const DiscoverRFPs = () => {
         isOpen={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}
       />
+
+      {/* Grant Proposal Modal */}
+      {showGrantProposalModal && selectedGrant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Grant Proposal Form</h2>
+                <button
+                  onClick={() => setShowGrantProposalModal(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-gray-600 mt-2">{selectedGrant.OPPORTUNITY_TITLE}</p>
+            </div>
+
+            <div className="p-6 space-y-8">
+              {/* Sample Data Note */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 text-sm">
+                  <strong>Note:</strong> Please fill in all required fields marked with <span className="text-red-500">*</span>. You can use the "Clear Form" button to reset all fields.
+                </p>
+              </div>
+
+              {/* Summary */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Summary <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={grantProposalData.summary}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, summary: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Provide a comprehensive summary of your proposed project..."
+                />
+              </div>
+
+              {/* Objectives */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Objectives <span className="text-red-500">*</span>
+                </label>
+                {grantProposalData.objectives.map((objective, index) => (
+                  <div key={index} className="mb-4">
+                    <textarea
+                      value={objective}
+                      onChange={(e) => updateArrayItem('objectives', index, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder={`Objective ${index + 1}...`}
+                    />
+                    {grantProposalData.objectives.length > 1 && (
+                      <button
+                        onClick={() => removeArrayItem('objectives', index)}
+                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove Objective
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => addArrayItem('objectives')}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  + Add Objective
+                </button>
+              </div>
+
+              {/* Activities */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Activities <span className="text-red-500">*</span>
+                </label>
+                {grantProposalData.activities.map((activity, index) => (
+                  <div key={index} className="mb-4">
+                    <textarea
+                      value={activity}
+                      onChange={(e) => updateArrayItem('activities', index, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder={`Activity ${index + 1}...`}
+                    />
+                    {grantProposalData.activities.length > 1 && (
+                      <button
+                        onClick={() => removeArrayItem('activities', index)}
+                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove Activity
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => addArrayItem('activities')}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  + Add Activity
+                </button>
+              </div>
+
+              {/* Beneficiaries */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Beneficiaries <span className="text-red-500">*</span>
+                </label>
+                {grantProposalData.beneficiaries.map((beneficiary, index) => (
+                  <div key={index} className="mb-4">
+                    <textarea
+                      value={beneficiary}
+                      onChange={(e) => updateArrayItem('beneficiaries', index, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder={`Beneficiary ${index + 1}...`}
+                    />
+                    {grantProposalData.beneficiaries.length > 1 && (
+                      <button
+                        onClick={() => removeArrayItem('beneficiaries', index)}
+                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove Beneficiary
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => addArrayItem('beneficiaries')}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  + Add Beneficiary
+                </button>
+              </div>
+
+              {/* Geography */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Geography <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={grantProposalData.geography}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, geography: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Describe the geographic scope of your project..."
+                />
+              </div>
+
+              {/* Start Date and Duration */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={grantProposalData.start_date}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, start_date: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Estimated Duration <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.estimated_duration}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, estimated_duration: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="e.g., 24 months, 3 years..."
+                  />
+                </div>
+              </div>
+
+              {/* Budget */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Budget <span className="text-gray-500 text-xs">(Optional)</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Total Requested Amount
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.total_requested}
+                      onChange={(e) => setGrantProposalData(prev => ({
+                        ...prev,
+                        budget: { ...prev.budget, total_requested: e.target.value }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter total requested amount..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cost Sharing
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.cost_sharing}
+                      onChange={(e) => setGrantProposalData(prev => ({
+                        ...prev,
+                        budget: { ...prev.budget, cost_sharing: e.target.value }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter cost sharing details..."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Personnel
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.personnel}
+                      onChange={(e) => updateBudgetCategory('personnel', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter personnel budget details..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Training Materials
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.training_materials}
+                      onChange={(e) => updateBudgetCategory('training_materials', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter training materials budget details..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Technology & Equipment
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.technology_and_equipment}
+                      onChange={(e) => updateBudgetCategory('technology_and_equipment', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter technology & equipment budget details..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Travel & Logistics
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.travel_and_logistics}
+                      onChange={(e) => updateBudgetCategory('travel_and_logistics', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter travel & logistics budget details..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Evaluation & Reporting
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.evaluation_and_reporting}
+                      onChange={(e) => updateBudgetCategory('evaluation_and_reporting', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter evaluation & reporting budget details..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Administration
+                    </label>
+                    <textarea
+                      value={grantProposalData.budget.categories.administration}
+                      onChange={(e) => updateBudgetCategory('administration', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Enter administration budget details..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Methods for Measuring Success */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
+                </label>
+                {grantProposalData.methods_for_measuring_success.map((method, index) => (
+                  <div key={index} className="mb-4">
+                    <textarea
+                      value={method}
+                      onChange={(e) => updateArrayItem('methods_for_measuring_success', index, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder={`Method ${index + 1}...`}
+                    />
+                    {grantProposalData.methods_for_measuring_success.length > 1 && (
+                      <button
+                        onClick={() => removeArrayItem('methods_for_measuring_success', index)}
+                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove Method
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => addArrayItem('methods_for_measuring_success')}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  + Add Method
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowGrantProposalModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setGrantProposalData({
+                  summary: "",
+                  objectives: [""],
+                  activities: [""],
+                  beneficiaries: [""],
+                  geography: "",
+                  start_date: "",
+                  estimated_duration: "",
+                  budget: {
+                    total_requested: "",
+                    cost_sharing: "",
+                    categories: {
+                      personnel: "",
+                      training_materials: "",
+                      technology_and_equipment: "",
+                      travel_and_logistics: "",
+                      evaluation_and_reporting: "",
+                      administration: ""
+                    }
+                  },
+                  methods_for_measuring_success: [""]
+                })}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Clear Form
+              </button>
+              <button
+                onClick={handleSubmitGrantProposal}
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Submit Proposal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
