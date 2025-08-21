@@ -525,17 +525,17 @@ const DiscoverRFPs = () => {
     setLoadingRecentGrants(true);
     setError(null);
     try {
-      const res = await axios.get(`${API_BASE_URL}/getRecommendedAndSavedGrants`, {
+      const res = await axios.get(`${API_BASE_URL}/getRecentAndSavedGrants`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      const { recommendedGrants: recGrants, savedGrants: savGrants } = res.data;
+      const { recentGrants, savedGrants } = res.data;
 
-      setRecentGrants(recGrants ?? []);
-      setOriginalRecentGrants(recGrants ?? []);
-      setSavedGrants(savGrants ?? []);
-      setOriginalSavedGrants(savGrants ?? []);
+      setRecentGrants(recentGrants ?? []);
+      setOriginalRecentGrants(recentGrants ?? []);
+      setSavedGrants(savedGrants ?? []);
+      setOriginalSavedGrants(savedGrants ?? []);
       setRetryCount(0);
     } catch (err) {
       console.error("Failed to load grants:", err);
