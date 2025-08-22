@@ -6,6 +6,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteForever, MdPersonAddAlt1, MdOutlineClose } from "react-icons/md";
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
+import Swal from 'sweetalert2';
 
 const localizer = momentLocalizer(moment);
 
@@ -163,20 +164,53 @@ const Dashboard = () => {
     }, []);
 
     const handleSetCurrentEditor = async (idx, editorId) => {
-        const token = localStorage.getItem('token');
-        const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/setCurrentEditor', {
-            proposalId: proposalsState[idx]._id,
-            editorId: editorId
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+        const editor = employees.find(emp => emp.employeeId === editorId);
+
+        const result = await Swal.fire({
+            title: 'Assign Editor',
+            text: `Are you sure you want to assign ${editor.name} as the current editor for this proposal?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#2563EB',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Yes, assign editor!',
+            cancelButtonText: 'Cancel'
         });
-        if (res.status === 200) {
-            const editor = employees.find(emp => emp.employeeId === editorId);
-            setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { _id: editor.employeeId, fullName: editor.name, email: editor.email } } : p));
-            setShowAddPersonIdx(null);
-            alert("Editor set successfully");
+
+        if (result.isConfirmed) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/setCurrentEditor', {
+                    proposalId: proposalsState[idx]._id,
+                    editorId: editorId
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (res.status === 200) {
+                    setProposalsState(prev => prev.map((p, i) => i === idx ? { ...p, currentEditor: { _id: editor.employeeId, fullName: editor.name, email: editor.email } } : p));
+                    setShowAddPersonIdx(null);
+
+                    Swal.fire(
+                        'Editor Assigned!',
+                        `${editor.name} has been assigned as the current editor.`,
+                        'success'
+                    );
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'Failed to assign editor.',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                Swal.fire(
+                    'Error!',
+                    'Failed to assign editor.',
+                    'error'
+                );
+            }
         }
     };
 
@@ -185,64 +219,134 @@ const Dashboard = () => {
     };
 
     const handleDeleteProposals = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/deleteProposals', {
-                proposalIds: selectedProposals.map(idx => proposalsState[idx]._id)
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        const result = await Swal.fire({
+            title: 'Delete Proposals',
+            text: `Are you sure you want to delete ${selectedProposals.length} proposal(s)? They will be moved to deleted proposals and can be restored within 15 days.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Yes, delete them!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/deleteProposals', {
+                    proposalIds: selectedProposals.map(idx => proposalsState[idx]._id)
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (res.status === 200) {
+                    // Add restoreIn field to proposals being moved to deletedProposals
+                    const proposalsToDelete = proposalsState.filter((_, idx) => selectedProposals.includes(idx));
+                    console.log("proposalsToDelete", proposalsToDelete);
+                    const proposalsWithRestoreIn = proposalsToDelete.map(proposal => ({
+                        ...proposal,
+                        restoreIn: "15 days"
+                    }));
+
+                    console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
+
+                    setDeletedProposals(prev => [...prev, ...proposalsWithRestoreIn]);
+                    setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
+                    setSelectedProposals([]);
+                    setShowDeleteOptions(false);
+
+                    Swal.fire(
+                        'Deleted!',
+                        'Proposals have been moved to deleted proposals.',
+                        'success'
+                    );
+                } else {
+                    setError('Failed to delete proposals');
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete proposals.',
+                        'error'
+                    );
                 }
-            });
-            if (res.status === 200) {
-                // Add restoreIn field to proposals being moved to deletedProposals
-                const proposalsToDelete = proposalsState.filter((_, idx) => selectedProposals.includes(idx));
-                console.log("proposalsToDelete", proposalsToDelete);
-                const proposalsWithRestoreIn = proposalsToDelete.map(proposal => ({
-                    ...proposal,
-                    restoreIn: "15 days"
-                }));
-
-                console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
-
-                setDeletedProposals(prev => [...prev, ...proposalsWithRestoreIn]);
-                setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
-                setSelectedProposals([]);
-                setShowDeleteOptions(false);
-            } else {
+            } catch (error) {
                 setError('Failed to delete proposals');
+                Swal.fire(
+                    'Error!',
+                    'Failed to delete proposals.',
+                    'error'
+                );
             }
-        } catch (error) {
-            setError('Failed to delete proposals');
         }
     };
 
     const handleRestoreProposal = async (idx) => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/restoreProposal', {
-                proposalId: deletedProposals[idx]._id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        const result = await Swal.fire({
+            title: 'Restore Proposal',
+            text: 'Are you sure you want to restore this proposal?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#16A34A',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Yes, restore it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/restoreProposal', {
+                    proposalId: deletedProposals[idx]._id
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (res.status === 200) {
+                    // Remove restoreIn field when restoring proposal
+                    const { restoreIn, ...proposalWithoutRestoreIn } = deletedProposals[idx];
+                    setProposalsState(prev => [...prev, proposalWithoutRestoreIn]);
+                    setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
+
+                    Swal.fire(
+                        'Restored!',
+                        'Proposal has been restored successfully.',
+                        'success'
+                    );
+                } else {
+                    setError('Failed to restore proposal');
+                    Swal.fire(
+                        'Error!',
+                        'Failed to restore proposal.',
+                        'error'
+                    );
                 }
-            });
-            if (res.status === 200) {
-                // Remove restoreIn field when restoring proposal
-                const { restoreIn, ...proposalWithoutRestoreIn } = deletedProposals[idx];
-                setProposalsState(prev => [...prev, proposalWithoutRestoreIn]);
-                setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
-            } else {
+            } catch (error) {
                 setError('Failed to restore proposal');
+                Swal.fire(
+                    'Error!',
+                    'Failed to restore proposal.',
+                    'error'
+                );
             }
-        } catch (error) {
-            setError('Failed to restore proposal');
         }
     };
 
     const handleDeletePermanently = async (idx) => {
-        try {
-            if (window.confirm('Are you sure you want to delete this proposal permanently?')) {
+        const result = await Swal.fire({
+            title: 'Delete Permanently',
+            text: 'Are you sure you want to delete this proposal permanently? This action cannot be undone!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Yes, delete permanently!',
+            cancelButtonText: 'Cancel',
+            dangerMode: true
+        });
+
+        if (result.isConfirmed) {
+            try {
                 const token = localStorage.getItem('token');
                 const res = await axios.put('https://proposal-form-backend.vercel.app/api/dashboard/deletePermanently', {
                     proposalId: deletedProposals[idx]._id
@@ -274,14 +378,28 @@ const Dashboard = () => {
                     }));
 
                     setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
+
+                    Swal.fire(
+                        'Deleted Permanently!',
+                        'Proposal has been permanently deleted.',
+                        'success'
+                    );
                 } else {
                     setError('Failed to delete proposal permanently');
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete proposal permanently.',
+                        'error'
+                    );
                 }
-            } else {
-                // do nothing
+            } catch (error) {
+                setError('Failed to delete proposal permanently');
+                Swal.fire(
+                    'Error!',
+                    'Failed to delete proposal permanently.',
+                    'error'
+                );
             }
-        } catch (error) {
-            setError('Failed to delete proposal permanently');
         }
     };
 

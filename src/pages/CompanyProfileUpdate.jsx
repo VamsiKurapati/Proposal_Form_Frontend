@@ -248,7 +248,7 @@ const PhoneInputField = ({
 
 const CompanyProfileUpdate = () => {
     const navigate = useNavigate();
-    const { companyData, loading, error, refreshProfile } = useProfile();
+    const { companyData, loading } = useProfile();
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
@@ -519,6 +519,9 @@ const CompanyProfileUpdate = () => {
                                     disabled={loading}
                                     placeholder="Enter company name"
                                 />
+                            </div>
+
+                            <div className="col-span-2 md:col-span-1">
                                 <FormInput
                                     id="adminName"
                                     label="Admin Name"
