@@ -264,16 +264,49 @@ export const exportToPDF = async (project) => {
   try {
     const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
       project: project
+    }, {
+      responseType: 'blob' // Important: tell axios to expect binary data
     });
 
-    console.log(res.data);
+    console.log('PDF response received:', res.data);
 
-    // Create blob URL instead of using data URL to avoid length limits
-    const blob = new Blob([res.data], { type: 'text/html' });
+    // Create blob URL for the PDF
+    const blob = new Blob([res.data], { type: 'application/pdf' });
     const blobUrl = URL.createObjectURL(blob);
 
-    // Open in new window
-    window.open(blobUrl, '_blank');
+    // Create download link for the PDF
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `proposal-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Also provide option to view in new tab
+    const viewLink = document.createElement('a');
+    viewLink.href = blobUrl;
+    viewLink.target = '_blank';
+    viewLink.textContent = 'View PDF';
+    viewLink.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      z-index: 10000;
+      font-family: Arial, sans-serif;
+    `;
+    document.body.appendChild(viewLink);
+
+    // Remove view link after 10 seconds
+    setTimeout(() => {
+      if (document.body.contains(viewLink)) {
+        document.body.removeChild(viewLink);
+      }
+    }, 10000);
 
     // Clean up blob URL after a delay
     setTimeout(() => {
