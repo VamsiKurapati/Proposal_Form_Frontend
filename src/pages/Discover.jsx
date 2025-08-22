@@ -1335,17 +1335,22 @@ const DiscoverRFPs = () => {
       'geography',
       'start_date',
       'estimated_duration',
-      'budget.total_project_cost',
-      'budget.total_requested_amount',
-      'budget.cost_share_required',
-      'budget.budget_breakdown',
+      'total_project_cost',
+      'total_requested_amount',
+      'cost_share_required',
+      'budget_breakdown',
       'methods_for_measuring_success'
     ];
 
     const missingFields = requiredFields.filter(field => {
-      if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries') {
+      if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries' || field === 'methods_for_measuring_success') {
         return !grantProposalData[field] || grantProposalData[field].trim() === '';
       }
+
+      if (field === 'total_project_cost' || field === 'total_requested_amount' || field === 'cost_share_required' || field === 'budget_breakdown') {
+        return !grantProposalData.budget[field] || grantProposalData.budget[field].toString().trim() === '';
+      }
+
       return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
     });
 
