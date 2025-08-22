@@ -316,7 +316,16 @@ export const exportToPDF = async (project) => {
           // Check if the entire JSON content is actually PDF data
           if (jsonText.startsWith('%PDF-')) {
             console.log('JSON content is actually PDF data, creating blob...');
-            pdfBlob = new Blob([jsonText], { type: 'application/pdf' });
+
+            // Find the end of the PDF content
+            const pdfEndIndex = jsonText.lastIndexOf('%%EOF');
+            let finalContent = jsonText;
+            if (pdfEndIndex !== -1) {
+              finalContent = jsonText.substring(0, pdfEndIndex + 5);
+              console.log('Truncating JSON content to PDF end marker, new length:', finalContent.length);
+            }
+
+            pdfBlob = new Blob([finalContent], { type: 'application/pdf' });
           } else {
             // Check if any of the JSON values contain PDF data
             const jsonValues = Object.values(jsonData);
@@ -336,10 +345,38 @@ export const exportToPDF = async (project) => {
               const reconstructedContent = sortedKeys.map(key => jsonData[key]).join('');
 
               console.log('Reconstructed content preview:', reconstructedContent.substring(0, 100));
+              console.log('Total reconstructed length:', reconstructedContent.length);
+              console.log('Expected length from keys:', sortedKeys.length);
+
+              // Check for PDF structure
+              const pdfEndIndex = reconstructedContent.lastIndexOf('%%EOF');
+              if (pdfEndIndex !== -1) {
+                console.log('PDF end marker found at position:', pdfEndIndex);
+                console.log('Content after end marker:', reconstructedContent.substring(pdfEndIndex + 5, pdfEndIndex + 20));
+              } else {
+                console.log('No PDF end marker found');
+              }
+
+              // Check for xref table
+              const xrefIndex = reconstructedContent.indexOf('xref');
+              if (xrefIndex !== -1) {
+                console.log('XREF table found at position:', xrefIndex);
+                console.log('XREF content preview:', reconstructedContent.substring(xrefIndex, xrefIndex + 100));
+              } else {
+                console.log('No XREF table found');
+              }
 
               if (reconstructedContent.startsWith('%PDF-')) {
                 console.log('PDF content reconstructed from characters, creating blob...');
-                pdfBlob = new Blob([reconstructedContent], { type: 'application/pdf' });
+
+                // Try to find the actual end of the PDF content
+                let finalContent = reconstructedContent;
+                if (pdfEndIndex !== -1) {
+                  finalContent = reconstructedContent.substring(0, pdfEndIndex + 5);
+                  console.log('Truncating content to PDF end marker, new length:', finalContent.length);
+                }
+
+                pdfBlob = new Blob([finalContent], { type: 'application/pdf' });
               } else {
                 console.log('Available JSON keys:', Object.keys(jsonData));
                 console.log('JSON values preview:', jsonValues.map(v =>
