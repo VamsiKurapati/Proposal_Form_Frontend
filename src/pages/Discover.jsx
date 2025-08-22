@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaRegBookmark } from "react-icons/fa";
 import PropTypes from "prop-types";
+import Swal from 'sweetalert2';
 import {
   MdOutlineShare,
   MdOutlineBookmark,
@@ -550,6 +551,7 @@ const DiscoverRFPs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadGrantModalOpen, setUploadGrantModalOpen] = useState(false);
   const [selectedIndustries, setSelectedIndustries] = useState([]);
   const [availableIndustries, setAvailableIndustries] = useState([]);
   const [loadingOtherRFPs, setLoadingOtherRFPs] = useState(false);
@@ -580,25 +582,19 @@ const DiscoverRFPs = () => {
   const [selectedGrant, setSelectedGrant] = useState(null);
   const [grantProposalData, setGrantProposalData] = useState({
     summary: "",
-    objectives: [""],
-    activities: [""],
-    beneficiaries: [""],
+    objectives: "",
+    activities: "",
+    beneficiaries: "",
     geography: "",
     start_date: "",
     estimated_duration: "",
     budget: {
-      total_requested: "",
-      cost_sharing: "",
-      categories: {
-        personnel: "",
-        training_materials: "",
-        technology_and_equipment: "",
-        travel_and_logistics: "",
-        evaluation_and_reporting: "",
-        administration: ""
-      }
+      total_project_cost: "",
+      total_requested_amount: "",
+      cost_share_required: "",
+      budget_breakdown: ""
     },
-    methods_for_measuring_success: [""]
+    methods_for_measuring_success: ""
   });
 
   // Pagination state variables
@@ -690,7 +686,12 @@ const DiscoverRFPs = () => {
   // Function to fetch other RFPs based on selected industries
   const fetchOtherRFPs = async () => {
     if (selectedIndustries.length === 0) {
-      alert("Please select at least one industry to search for RFPs.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Industries Selected',
+        text: 'Please select at least one industry to search for RFPs.',
+        confirmButtonColor: '#2563EB'
+      });
       return;
     }
 
@@ -766,7 +767,12 @@ const DiscoverRFPs = () => {
 
   const fetchOtherGrants = async () => {
     if (selectedIndustries.length === 0) {
-      alert("Please select at least one industry to search for grants.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Industries Selected',
+        text: 'Please select at least one industry to search for grants.',
+        confirmButtonColor: '#2563EB'
+      });
       return;
     }
 
@@ -821,11 +827,21 @@ const DiscoverRFPs = () => {
           prev.map(g => g._id === grant._id ? { ...g, isSaved: true } : g)
         );
 
-        alert("Grant saved successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Grant saved successfully!',
+          confirmButtonColor: '#2563EB'
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to save grant. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: 'Failed to save grant. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
     } finally {
       setLoadingSaveGrant(prev => ({ ...prev, [grant._id]: false }));
     }
@@ -861,11 +877,21 @@ const DiscoverRFPs = () => {
           prev.map(g => g._id === grantId ? { ...g, isSaved: false } : g)
         );
 
-        alert("Grant unsaved successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Grant unsaved successfully!',
+          confirmButtonColor: '#2563EB'
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to unsave grant. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Unsave Failed',
+        text: 'Failed to unsave grant. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
     } finally {
       setLoadingSaveGrant(prev => ({ ...prev, [grantId]: false }));
     }
@@ -1178,7 +1204,12 @@ const DiscoverRFPs = () => {
       }
     } catch (err) {
       //console.error(err);
-      alert("Failed to save RFP. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: 'Failed to save RFP. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
     } finally {
       setLoadingSave(prev => ({ ...prev, [rfp._id]: false }));
     }
@@ -1218,7 +1249,12 @@ const DiscoverRFPs = () => {
       }
     } catch (err) {
       //console.error(err);
-      alert("Failed to unsave RFP. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Unsave Failed',
+        text: 'Failed to unsave RFP. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
     } finally {
       setLoadingSave(prev => ({ ...prev, [rfpId]: false }));
     }
@@ -1226,10 +1262,22 @@ const DiscoverRFPs = () => {
 
   const handleShare = (link) => {
     navigator.clipboard.writeText(link).then(() => {
-      alert("Link copied to clipboard!");
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Link copied to clipboard!',
+        confirmButtonColor: '#2563EB',
+        timer: 2000,
+        showConfirmButton: false
+      });
     }).catch((err) => {
       //console.error("Failed to copy link:", err);
-      alert("Failed to copy link to clipboard");
+      Swal.fire({
+        icon: 'error',
+        title: 'Copy Failed',
+        text: 'Failed to copy link to clipboard',
+        confirmButtonColor: '#2563EB'
+      });
     });
   };
 
@@ -1247,66 +1295,37 @@ const DiscoverRFPs = () => {
     // Reset form data to empty
     setGrantProposalData({
       summary: "",
-      objectives: [""],
-      activities: [""],
-      beneficiaries: [""],
+      objectives: "",
+      activities: "",
+      beneficiaries: "",
       geography: "",
       start_date: "",
       estimated_duration: "",
       budget: {
-        total_requested: "",
-        cost_sharing: "",
-        categories: {
-          personnel: "",
-          training_materials: "",
-          technology_and_equipment: "",
-          travel_and_logistics: "",
-          evaluation_and_reporting: "",
-          administration: ""
-        }
+        total_project_cost: "",
+        total_requested_amount: "",
+        cost_share_required: "",
+        budget_breakdown: ""
       },
-      methods_for_measuring_success: [""]
+      methods_for_measuring_success: ""
     });
 
     setShowGrantProposalModal(true);
   };
 
-  // Helper functions for grant proposal modal
-  const addArrayItem = (field) => {
-    setGrantProposalData(prev => ({
-      ...prev,
-      [field]: [...prev[field], ""]
-    }));
-  };
 
-  const removeArrayItem = (field, index) => {
-    setGrantProposalData(prev => ({
-      ...prev,
-      [field]: prev[field].length > 1 ? prev[field].filter((_, i) => i !== index) : [""]
-    }));
-  };
 
-  const updateArrayItem = (field, index, value) => {
-    setGrantProposalData(prev => ({
-      ...prev,
-      [field]: prev[field].map((item, i) => i === index ? value : item)
-    }));
-  };
-
-  const updateBudgetCategory = (category, value) => {
+  const updateBudgetField = (field, value) => {
     setGrantProposalData(prev => ({
       ...prev,
       budget: {
         ...prev.budget,
-        categories: {
-          ...prev.budget.categories,
-          [category]: value
-        }
+        [field]: value
       }
     }));
   };
 
-  const handleSubmitGrantProposal = () => {
+  const handleSubmitGrantProposal = async () => {
     // Validate required fields
     const requiredFields = [
       'summary',
@@ -1315,25 +1334,129 @@ const DiscoverRFPs = () => {
       'beneficiaries',
       'geography',
       'start_date',
-      'estimated_duration'
+      'estimated_duration',
+      'budget.total_project_cost',
+      'budget.total_requested_amount',
+      'budget.cost_share_required',
+      'budget.budget_breakdown',
+      'methods_for_measuring_success'
     ];
 
     const missingFields = requiredFields.filter(field => {
-      if (field === 'objectives' || field === 'activities' || field === 'beneficiaries') {
-        return !grantProposalData[field].some(item => item.trim() !== '');
-      }
-      if (field === 'summary' || field === 'geography' || field === 'estimated_duration') {
+      if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries') {
         return !grantProposalData[field] || grantProposalData[field].trim() === '';
       }
       return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
     });
 
     if (missingFields.length > 0) {
-      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+      Swal.fire({
+        icon: 'warning',
+        title: 'Required Fields Missing',
+        text: `Please fill in the following required fields: ${missingFields.join(', ')}`,
+        confirmButtonColor: '#2563EB'
+      });
+      return;
+    }
+
+    // Validate budget fields
+    const totalProjectCost = parseFloat(grantProposalData.budget.total_project_cost);
+    const totalRequestedAmount = parseFloat(grantProposalData.budget.total_requested_amount);
+
+    if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Budget',
+        text: 'Total project cost must be a positive number.',
+        confirmButtonColor: '#2563EB'
+      });
+      return;
+    }
+
+    if (isNaN(totalRequestedAmount) || totalRequestedAmount <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Budget',
+        text: 'Total requested amount must be a positive number.',
+        confirmButtonColor: '#2563EB'
+      });
+      return;
+    }
+
+    // Check if total requested amount exceeds grant award ceiling
+    if (selectedGrant.AWARD_CEILING && selectedGrant.AWARD_CEILING !== "Not Provided") {
+      const awardCeiling = parseFloat(selectedGrant.AWARD_CEILING.replace(/[^0-9.]/g, ''));
+      if (!isNaN(awardCeiling) && totalRequestedAmount > awardCeiling) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Budget Exceeds Limit',
+          text: `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
+          confirmButtonColor: '#2563EB'
+        });
+        return;
+      }
+    }
+
+    if (totalRequestedAmount > totalProjectCost) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Budget',
+        text: 'Total requested amount cannot exceed total project cost.',
+        confirmButtonColor: '#2563EB'
+      });
       return;
     }
 
     // Here you can handle the submission of the grant proposal data
+    const res = await axios.post(`${API_BASE_URL}/sendGrantDataForProposalGeneration`, {
+      formData: grantProposalData,
+      grant: selectedGrant
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (res.status === 200) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Grant proposal generated successfully!',
+        confirmButtonColor: '#2563EB'
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to generate grant proposal. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
+    }
+
+    // Close the modal
+    setShowGrantProposalModal(false);
+    setSelectedGrant(null);
+
+    // Reset form data
+    setGrantProposalData({
+      summary: "",
+      objectives: "",
+      activities: "",
+      beneficiaries: "",
+      geography: "",
+      start_date: "",
+      estimated_duration: "",
+      budget: {
+        total_project_cost: "",
+        total_requested_amount: "",
+        cost_share_required: "",
+        budget_breakdown: ""
+      },
+      methods_for_measuring_success: ""
+    });
+
+    // You can add navigation or other logic here
+    // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
     console.log("Grant Proposal Data:", grantProposalData);
     console.log("Selected Grant:", selectedGrant);
 
@@ -1344,25 +1467,19 @@ const DiscoverRFPs = () => {
     // Reset form data
     setGrantProposalData({
       summary: "",
-      objectives: [""],
-      activities: [""],
-      beneficiaries: [""],
+      objectives: "",
+      activities: "",
+      beneficiaries: "",
       geography: "",
       start_date: "",
       estimated_duration: "",
       budget: {
-        total_requested: "",
-        cost_sharing: "",
-        categories: {
-          personnel: "",
-          training_materials: "",
-          technology_and_equipment: "",
-          travel_and_logistics: "",
-          evaluation_and_reporting: "",
-          administration: ""
-        }
+        total_project_cost: "",
+        total_requested_amount: "",
+        cost_share_required: "",
+        budget_breakdown: ""
       },
-      methods_for_measuring_success: [""]
+      methods_for_measuring_success: ""
     });
 
     // You can add navigation or other logic here
@@ -1780,7 +1897,12 @@ const DiscoverRFPs = () => {
           setFormData({ ...formData, file: file });
           setFilePreview(file.name);
         } else {
-          alert('Please upload only PDF or TXT files.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid File Type',
+            text: 'Please upload only PDF or TXT files.',
+            confirmButtonColor: '#2563EB'
+          });
           e.target.value = '';
         }
       }
@@ -1790,7 +1912,12 @@ const DiscoverRFPs = () => {
       e.preventDefault();
 
       if (!formData.file) {
-        alert('Please upload a file.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'No File Selected',
+          text: 'Please upload a file.',
+          confirmButtonColor: '#2563EB'
+        });
         return;
       }
 
@@ -1809,17 +1936,32 @@ const DiscoverRFPs = () => {
           });
 
         if (response.status === 200) {
-          alert(response.data.message);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: response.data.message,
+            confirmButtonColor: '#2563EB'
+          });
           onClose();
           // Optionally refresh the RFP list after successful upload
           // window.location.reload();
         } else {
-          alert('Failed to add document. Please try again.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: 'Failed to add document. Please try again.',
+            confirmButtonColor: '#2563EB'
+          });
         }
       } catch (error) {
         console.error('Error adding document:', error);
         const errorMessage = error.response?.data?.message || 'Failed to add document. Please try again.';
-        alert(errorMessage);
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: errorMessage,
+          confirmButtonColor: '#2563EB'
+        });
       } finally {
         setIsUploading(false);
       }
@@ -1913,7 +2055,178 @@ const DiscoverRFPs = () => {
     );
   };
 
+  const UploadGrantModal = ({ isOpen, onClose }) => {
+    const [formData, setFormData] = useState({
+      file: null,
+    });
 
+    const [filePreview, setFilePreview] = useState(null);
+
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Check if file is PDF or TXT
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf') || file.name.endsWith('.txt')) {
+          setFormData({ ...formData, file: file });
+          setFilePreview(file.name);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid File Type',
+            text: 'Please upload only PDF or TXT files.',
+            confirmButtonColor: '#2563EB'
+          });
+          e.target.value = '';
+        }
+      }
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (!formData.file) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No File Selected',
+          text: 'Please upload a file.',
+          confirmButtonColor: '#2563EB'
+        });
+        return;
+      }
+
+      setIsUploading(true);
+
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append('file', formData.file);
+
+        const response = await axios.post(`${API_BASE_URL}/uploadGrant`, formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+
+        if (response.status === 200) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: response.data.message,
+            confirmButtonColor: '#2563EB'
+          });
+          onClose();
+          // Optionally refresh the grant list after successful upload
+          // window.location.reload();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: 'Failed to add document. Please try again.',
+            confirmButtonColor: '#2563EB'
+          });
+        }
+      } catch (error) {
+        console.error('Error adding document:', error);
+        const errorMessage = error.response?.data?.message || 'Failed to add document. Please try again.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: errorMessage,
+          confirmButtonColor: '#2563EB'
+        });
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+      <>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Upload Grant File</h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <MdOutlineClose className="w-6 h-6" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload Grant</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#2563EB] transition-colors">
+                <input
+                  type="file"
+                  accept=".pdf, .txt"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="grant-document-upload"
+                  required
+                />
+                <label htmlFor="grant-document-upload" className="cursor-pointer">
+                  <div className="space-y-2">
+                    <div className="text-gray-600">
+                      <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium text-[#2563EB] hover:text-[#1d4ed8]">Click to upload</span> or drag and drop
+                    </div>
+                    <div className="text-xs text-gray-500">PDF or TXT file only</div>
+                  </div>
+                </label>
+              </div>
+              {filePreview && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-green-700">{filePreview}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, file: null });
+                        setFilePreview(null);
+                        document.getElementById('grant-document-upload').value = '';
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <MdOutlineClose className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isUploading}
+                className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  'Upload'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </>
+    );
+  };
 
   // Filter data based on search query with memoization
   const getFilteredData = useCallback((originalData) => {
@@ -2291,7 +2604,16 @@ const DiscoverRFPs = () => {
               </div>
             </div>
 
-            <h2 className="text-[24px] text-[#000000] font-semibold mb-4">Recent Grants</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-[24px] text-[#000000] font-semibold">Recent Grants</h2>
+              {/* Upload Grant Button */}
+              <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+                onClick={() => setUploadGrantModalOpen(true)}
+              >
+                <MdOutlineUpload className="w-5 h-5" />
+                Upload Grant
+              </button>
+            </div>
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
                 <p className="text-red-700">{error}</p>
@@ -2466,6 +2788,11 @@ const DiscoverRFPs = () => {
         onClose={() => setUploadModalOpen(false)}
       />
 
+      <UploadGrantModal
+        isOpen={uploadGrantModalOpen}
+        onClose={() => setUploadGrantModalOpen(false)}
+      />
+
       {/* Grant Proposal Modal */}
       {showGrantProposalModal && selectedGrant && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -2510,31 +2837,13 @@ const DiscoverRFPs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Objectives <span className="text-red-500">*</span>
                 </label>
-                {grantProposalData.objectives.map((objective, index) => (
-                  <div key={index} className="mb-4">
-                    <textarea
-                      value={objective}
-                      onChange={(e) => updateArrayItem('objectives', index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder={`Objective ${index + 1}...`}
-                    />
-                    {grantProposalData.objectives.length > 1 && (
-                      <button
-                        onClick={() => removeArrayItem('objectives', index)}
-                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
-                      >
-                        Remove Objective
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={() => addArrayItem('objectives')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  + Add Objective
-                </button>
+                <textarea
+                  value={grantProposalData.objectives}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, objectives: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Describe the main objectives of your proposed project..."
+                />
               </div>
 
               {/* Activities */}
@@ -2542,31 +2851,13 @@ const DiscoverRFPs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Activities <span className="text-red-500">*</span>
                 </label>
-                {grantProposalData.activities.map((activity, index) => (
-                  <div key={index} className="mb-4">
-                    <textarea
-                      value={activity}
-                      onChange={(e) => updateArrayItem('activities', index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder={`Activity ${index + 1}...`}
-                    />
-                    {grantProposalData.activities.length > 1 && (
-                      <button
-                        onClick={() => removeArrayItem('activities', index)}
-                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
-                      >
-                        Remove Activity
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={() => addArrayItem('activities')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  + Add Activity
-                </button>
+                <textarea
+                  value={grantProposalData.activities}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, activities: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Describe the key activities and tasks of your proposed project..."
+                />
               </div>
 
               {/* Beneficiaries */}
@@ -2574,31 +2865,13 @@ const DiscoverRFPs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Beneficiaries <span className="text-red-500">*</span>
                 </label>
-                {grantProposalData.beneficiaries.map((beneficiary, index) => (
-                  <div key={index} className="mb-4">
-                    <textarea
-                      value={beneficiary}
-                      onChange={(e) => updateArrayItem('beneficiaries', index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder={`Beneficiary ${index + 1}...`}
-                    />
-                    {grantProposalData.beneficiaries.length > 1 && (
-                      <button
-                        onClick={() => removeArrayItem('beneficiaries', index)}
-                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
-                      >
-                        Remove Beneficiary
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={() => addArrayItem('beneficiaries')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  + Add Beneficiary
-                </button>
+                <textarea
+                  value={grantProposalData.beneficiaries}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, beneficiaries: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Describe the beneficiaries and target population of your proposed project..."
+                />
               </div>
 
               {/* Geography */}
@@ -2650,107 +2923,57 @@ const DiscoverRFPs = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Total Requested Amount
+                      Total Project Cost <span className="text-red-500">*</span>
                     </label>
-                    <textarea
-                      value={grantProposalData.budget.total_requested}
-                      onChange={(e) => setGrantProposalData(prev => ({
-                        ...prev,
-                        budget: { ...prev.budget, total_requested: e.target.value }
-                      }))}
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={grantProposalData.budget.total_project_cost}
+                      onChange={(e) => updateBudgetField('total_project_cost', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter total requested amount..."
+                      placeholder="Enter total project cost..."
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Cost Sharing
+                      Total Requested Amount <span className="text-red-500">*</span>
                     </label>
-                    <textarea
-                      value={grantProposalData.budget.cost_sharing}
-                      onChange={(e) => setGrantProposalData(prev => ({
-                        ...prev,
-                        budget: { ...prev.budget, cost_sharing: e.target.value }
-                      }))}
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={grantProposalData.budget.total_requested_amount}
+                      onChange={(e) => updateBudgetField('total_requested_amount', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter cost sharing details..."
+                      placeholder="Enter amount requesting from funder..."
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Personnel
+                      Cost Share Required
                     </label>
                     <textarea
-                      value={grantProposalData.budget.categories.personnel}
-                      onChange={(e) => updateBudgetCategory('personnel', e.target.value)}
+                      value={grantProposalData.budget.cost_share_required}
+                      onChange={(e) => updateBudgetField('cost_share_required', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter personnel budget details..."
+                      rows={3}
+                      placeholder="Describe your cost share contribution and any partner contributions..."
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Training Materials
+                      Budget Breakdown
                     </label>
                     <textarea
-                      value={grantProposalData.budget.categories.training_materials}
-                      onChange={(e) => updateBudgetCategory('training_materials', e.target.value)}
+                      value={grantProposalData.budget.budget_breakdown}
+                      onChange={(e) => updateBudgetField('budget_breakdown', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter training materials budget details..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Technology & Equipment
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.categories.technology_and_equipment}
-                      onChange={(e) => updateBudgetCategory('technology_and_equipment', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter technology & equipment budget details..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Travel & Logistics
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.categories.travel_and_logistics}
-                      onChange={(e) => updateBudgetCategory('travel_and_logistics', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter travel & logistics budget details..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Evaluation & Reporting
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.categories.evaluation_and_reporting}
-                      onChange={(e) => updateBudgetCategory('evaluation_and_reporting', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter evaluation & reporting budget details..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Administration
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.categories.administration}
-                      onChange={(e) => updateBudgetCategory('administration', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Enter administration budget details..."
+                      rows={3}
+                      placeholder="Provide detailed budget breakdown with amounts, reasons, and justifications..."
                     />
                   </div>
                 </div>
@@ -2761,31 +2984,13 @@ const DiscoverRFPs = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
                 </label>
-                {grantProposalData.methods_for_measuring_success.map((method, index) => (
-                  <div key={index} className="mb-4">
-                    <textarea
-                      value={method}
-                      onChange={(e) => updateArrayItem('methods_for_measuring_success', index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder={`Method ${index + 1}...`}
-                    />
-                    {grantProposalData.methods_for_measuring_success.length > 1 && (
-                      <button
-                        onClick={() => removeArrayItem('methods_for_measuring_success', index)}
-                        className="mt-2 px-3 py-1 text-red-600 hover:text-red-800 text-sm"
-                      >
-                        Remove Method
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={() => addArrayItem('methods_for_measuring_success')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  + Add Method
-                </button>
+                <textarea
+                  value={grantProposalData.methods_for_measuring_success}
+                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, methods_for_measuring_success: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Describe the methods and metrics you will use to measure the success of your project..."
+                />
               </div>
             </div>
 
@@ -2799,25 +3004,19 @@ const DiscoverRFPs = () => {
               <button
                 onClick={() => setGrantProposalData({
                   summary: "",
-                  objectives: [""],
-                  activities: [""],
-                  beneficiaries: [""],
+                  objectives: "",
+                  activities: "",
+                  beneficiaries: "",
                   geography: "",
                   start_date: "",
                   estimated_duration: "",
                   budget: {
-                    total_requested: "",
-                    cost_sharing: "",
-                    categories: {
-                      personnel: "",
-                      training_materials: "",
-                      technology_and_equipment: "",
-                      travel_and_logistics: "",
-                      evaluation_and_reporting: "",
-                      administration: ""
-                    }
+                    total_project_cost: "",
+                    total_requested_amount: "",
+                    cost_share_required: "",
+                    budget_breakdown: ""
                   },
-                  methods_for_measuring_success: [""]
+                  methods_for_measuring_success: ""
                 })}
                 className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
               >
