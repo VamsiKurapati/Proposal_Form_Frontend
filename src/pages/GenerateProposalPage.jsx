@@ -33,10 +33,8 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
-        console.log(res.data);
-        //Set the proposal in localStorage
-        localStorage.setItem('canva-project', JSON.stringify(res.data));
-        // Navigate to CanvaApp with the API response data
+        setIsGeneratingProposal(false);
+        //Navigate to editor with the generated proposal
         navigate('/editor', {
           state: {
             jsonData: res.data
@@ -44,8 +42,10 @@ const GenerateProposalPage = () => {
         });
       }
     } catch (error) {
-      console.error("Error saving company data:", error);
+      console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
+      //Don't navigate to editor if there is an error
+      return;
     }
   };
 
@@ -60,7 +60,7 @@ const GenerateProposalPage = () => {
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2563EB] mx-auto mb-6"></div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Generating Your Proposal</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Please wait while we generate your proposal. This process may take a few moments as we analyze your requirements and create a customized solution.
+              Please wait while we generate your proposal. This process may take a few moments as we analyze your profile and generate a proposal.
             </p>
           </div>
         </div>

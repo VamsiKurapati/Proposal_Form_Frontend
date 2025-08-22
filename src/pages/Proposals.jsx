@@ -422,9 +422,7 @@ const Proposals = () => {
     };
 
     const handleContinue = (proposal) => {
-        console.log("proposal", proposal);
-        console.log("proposal.generatedProposal", proposal.generatedProposal);
-        navigate('/editor', { state: { proposal: proposal.generatedProposal || null } });
+        navigate('/editor', { state: { jsonData: proposal.generatedProposal || null } });
     };
 
     const isSaved = (rfpId) => {

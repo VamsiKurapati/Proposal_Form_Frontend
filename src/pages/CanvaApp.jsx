@@ -334,7 +334,14 @@ const CanvaApp = () => {
   useEffect(() => {
     if (location.state?.jsonData && !hasLoadedJSON) {
       try {
+        // Use the JSON data from the navigation state if it exists, otherwise use the project from localStorage
         const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
+
+        // After using jsonData for 1st time, delete it from the navigation state for security reasons to prevent users from manipulating the JSON data and also to avoid resetting the project when the user refreshes the page
+        if (location.state.jsonData) {
+          delete location.state.jsonData;
+        }
+
         // Import the JSON data into the project
         importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
         setHasLoadedJSON(true);
