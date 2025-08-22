@@ -937,9 +937,11 @@ const CanvaApp = () => {
     <div className="h-full relative">
       <NavbarComponent />
       {/* Add "Back" button to go back to the previous page, and "Save" button to continue to the next page */}
-      <div className="mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-100 flex justify-between items-center p-4">
-        <button className="text-blue-500" onClick={() => navigate(-1)}>Back</button>
-        <button className="text-blue-500" onClick={() => window.location.href = '/dashboard'}>Continue</button>
+      <div className="fixed mt-16 left-0 right-0 z-100 flex justify-between items-center px-8">
+        <div className="flex items-center gap-4">
+          <button className="rounded-lg bg-[#2563EB] text-white p-2" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-4 h-4" /></button>
+          <button className="rounded-lg bg-[#2563EB] text-white p-2" onClick={() => window.location.href = '/dashboard'}>Continue</button>
+        </div>
       </div>
       <div
         className="mt-10 w-screen overflow-hidden"

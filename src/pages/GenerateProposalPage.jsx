@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavbarComponent from './NavbarComponent';
-import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment } from 'react-icons/md';
+import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment, MdOutlineArrowBack } from 'react-icons/md';
 import { useProfile } from '../context/ProfileContext';
 import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
@@ -48,7 +48,10 @@ const GenerateProposalPage = () => {
     <div className="min-h-screen bg-[#F8F9FB] pb-10">
       <NavbarComponent />
       <div className="w-full mx-auto px-8 md:px-12 mt-20">
-        <h1 className="text-[32px] font-semibold mb-1">{proposal?.title}</h1>
+        <div className="w-full flex justify-between items-center mb-6">
+          <button className="text-blue-500 text-[16px] font-medium" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-4 h-4" /></button>
+          <h1 className="text-[32px] font-semibold">{proposal?.title}</h1>
+        </div>
 
         <p className="text-[#4B5563] text-[20px] mb-6">1. Edit & preview user information</p>
 
