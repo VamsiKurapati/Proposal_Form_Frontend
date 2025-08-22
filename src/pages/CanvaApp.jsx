@@ -333,7 +333,10 @@ const CanvaApp = () => {
   useEffect(() => {
     if (location.state?.jsonData && !hasLoadedJSON) {
       try {
-        const jsonData = location.state.jsonData;
+        // Check if there's a project in localStorage, if not, use the JSON data from the navigation state
+        // This is to ensure that the project is not lost if the user refreshes the page
+        // If there's a project in localStorage, use that instead of the JSON data from the navigation state
+        const jsonData = localStorage.getItem('canva-project') || location.state.jsonData;
         // Import the JSON data into the project
         importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
         setHasLoadedJSON(true);
@@ -931,15 +934,15 @@ const CanvaApp = () => {
   };
 
   return (
-    <>
+    <div className="h-full relative">
       <NavbarComponent />
       {/* Add "Back" button to go back to the previous page, and "Save" button to continue to the next page */}
-      <div className="flex justify-between items-center p-4">
+      <div className="mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-100 flex justify-between items-center p-4">
         <button className="text-blue-500" onClick={() => navigate(-1)}>Back</button>
         <button className="text-blue-500" onClick={() => window.location.href = '/dashboard'}>Continue</button>
       </div>
       <div
-        className="w-screen overflow-hidden"
+        className="mt-10 w-screen overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateRows: '1fr 32px',
@@ -1250,7 +1253,7 @@ const CanvaApp = () => {
           className="hidden"
         />
       </div>
-    </>
+    </div>
   );
 };
 
