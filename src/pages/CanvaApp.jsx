@@ -334,10 +334,7 @@ const CanvaApp = () => {
   useEffect(() => {
     if (location.state?.jsonData && !hasLoadedJSON) {
       try {
-        // Check if there's a project in localStorage, if not, use the JSON data from the navigation state
-        // This is to ensure that the project is not lost if the user refreshes the page
-        // If there's a project in localStorage, use that instead of the JSON data from the navigation state
-        const jsonData = localStorage.getItem('canva-project') || location.state.jsonData;
+        const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
         // Import the JSON data into the project
         importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
         setHasLoadedJSON(true);
@@ -945,7 +942,7 @@ const CanvaApp = () => {
         </div>
       </div>
       <div
-        className="mt-10 w-screen overflow-hidden"
+        className="mt-16 w-screen overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateRows: '1fr 32px',
