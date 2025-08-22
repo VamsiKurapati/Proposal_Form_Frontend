@@ -268,192 +268,28 @@ export const exportToPDF = async (project) => {
       responseType: 'blob' // Important: tell axios to expect binary data
     });
 
-    console.log('PDF response received:', res.data);
-    console.log('Response type:', res.data.type);
-    console.log('Response size:', res.data.size);
-
-    let pdfBlob;
-
-    // Check if the response is actually JSON (backend might be sending base64 PDF in JSON)
-    if (res.data.type === 'application/json') {
-      // Convert blob to text to read the JSON content
-      const jsonText = await res.data.text();
-      console.log('JSON content preview:', jsonText.substring(0, 200));
-
-      try {
-        const jsonData = JSON.parse(jsonText);
-        console.log('Parsed JSON keys:', Object.keys(jsonData));
-
-        // Check if the JSON contains PDF data in various possible fields
-        let pdfData = null;
-        if (jsonData.pdfData || jsonData.data || jsonData.content) {
-          pdfData = jsonData.pdfData || jsonData.data || jsonData.content;
-        } else if (jsonData.pdf || jsonData.file || jsonData.document) {
-          pdfData = jsonData.pdf || jsonData.file || jsonData.document;
-        }
-
-        if (pdfData) {
-          // Check if it's already PDF data (starts with %PDF)
-          if (pdfData.startsWith('%PDF-')) {
-            console.log('Direct PDF data detected, creating blob...');
-            pdfBlob = new Blob([pdfData], { type: 'application/pdf' });
-          } else {
-            // Try to convert base64 to blob
-            console.log('Converting base64 to PDF blob...');
-            try {
-              const binaryString = atob(pdfData);
-              const bytes = new Uint8Array(binaryString.length);
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-              }
-              pdfBlob = new Blob([bytes], { type: 'application/pdf' });
-            } catch (base64Error) {
-              console.log('Base64 conversion failed, treating as direct PDF data...');
-              pdfBlob = new Blob([pdfData], { type: 'application/pdf' });
-            }
-          }
-        } else {
-          // Check if the entire JSON content is actually PDF data
-          if (jsonText.startsWith('%PDF-')) {
-            console.log('JSON content is actually PDF data, creating blob...');
-
-            // Find the end of the PDF content
-            const pdfEndIndex = jsonText.lastIndexOf('%%EOF');
-            let finalContent = jsonText;
-            if (pdfEndIndex !== -1) {
-              finalContent = jsonText.substring(0, pdfEndIndex + 5);
-              console.log('Truncating JSON content to PDF end marker, new length:', finalContent.length);
-            }
-
-            pdfBlob = new Blob([finalContent], { type: 'application/pdf' });
-          } else {
-            // Check if any of the JSON values contain PDF data
-            const jsonValues = Object.values(jsonData);
-            const pdfValue = jsonValues.find(value =>
-              typeof value === 'string' && value.startsWith('%PDF-')
-            );
-
-            if (pdfValue) {
-              console.log('PDF data found in JSON values, creating blob...');
-              pdfBlob = new Blob([pdfValue], { type: 'application/pdf' });
-            } else {
-              // Check if the PDF content is split into individual characters
-              console.log('Checking if PDF content is split into characters...');
-
-              // Reconstruct PDF content from individual characters
-              const sortedKeys = Object.keys(jsonData).sort((a, b) => parseInt(a) - parseInt(b));
-              const reconstructedContent = sortedKeys.map(key => jsonData[key]).join('');
-
-              console.log('Reconstructed content preview:', reconstructedContent.substring(0, 100));
-              console.log('Total reconstructed length:', reconstructedContent.length);
-              console.log('Expected length from keys:', sortedKeys.length);
-
-              // Check for PDF structure
-              const pdfEndIndex = reconstructedContent.lastIndexOf('%%EOF');
-              if (pdfEndIndex !== -1) {
-                console.log('PDF end marker found at position:', pdfEndIndex);
-                console.log('Content after end marker:', reconstructedContent.substring(pdfEndIndex + 5, pdfEndIndex + 20));
-              } else {
-                console.log('No PDF end marker found');
-              }
-
-              // Check for xref table
-              const xrefIndex = reconstructedContent.indexOf('xref');
-              if (xrefIndex !== -1) {
-                console.log('XREF table found at position:', xrefIndex);
-                console.log('XREF content preview:', reconstructedContent.substring(xrefIndex, xrefIndex + 100));
-              } else {
-                console.log('No XREF table found');
-              }
-
-              if (reconstructedContent.startsWith('%PDF-')) {
-                console.log('PDF content reconstructed from characters, creating blob...');
-
-                // Try to find the actual end of the PDF content
-                let finalContent = reconstructedContent;
-                if (pdfEndIndex !== -1) {
-                  finalContent = reconstructedContent.substring(0, pdfEndIndex + 5);
-                  console.log('Truncating content to PDF end marker, new length:', finalContent.length);
-                }
-
-                pdfBlob = new Blob([finalContent], { type: 'application/pdf' });
-              } else {
-                console.log('Available JSON keys:', Object.keys(jsonData));
-                console.log('JSON values preview:', jsonValues.map(v =>
-                  typeof v === 'string' ? v.substring(0, 50) : typeof v
-                ));
-                throw new Error('No PDF data found in JSON response');
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing JSON response:', error);
-        throw new Error('Invalid response format from backend');
-      }
-    } else if (res.data.type === 'application/pdf') {
-      // Direct PDF response
-      pdfBlob = res.data;
-    } else {
-      // Try to treat as PDF anyway
-      pdfBlob = new Blob([res.data], { type: 'application/pdf' });
-    }
-
+    const pdfBlob = new Blob([res.data], { type: "application/pdf" });
     const blobUrl = URL.createObjectURL(pdfBlob);
 
-    // Create download link for the PDF
-    const link = document.createElement('a');
+    // Download automatically
+    const link = document.createElement("a");
     link.href = blobUrl;
-    link.download = `proposal-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`;
+    link.download = `proposal-${new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace(/:/g, "-")}.pdf`;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
 
-    // Also provide option to view in new tab
-    const viewLink = document.createElement('a');
-    viewLink.href = blobUrl;
-    viewLink.target = '_blank';
-    viewLink.textContent = 'View PDF';
-    viewLink.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      z-index: 10000;
-      font-family: Arial, sans-serif;
-    `;
-    document.body.appendChild(viewLink);
+    // Optional: open in new tab
+    window.open(blobUrl, "_blank");
 
-    // Remove view link after 10 seconds
-    setTimeout(() => {
-      if (document.body.contains(viewLink)) {
-        document.body.removeChild(viewLink);
-      }
-    }, 10000);
-
-    // Clean up blob URL after a delay
-    setTimeout(() => {
-      URL.revokeObjectURL(blobUrl);
-    }, 10000);
-
-  } catch (error) {
-    console.error('PDF export error:', error);
-
-    // Show more detailed error message
-    let errorMessage = 'Error exporting PDF. ';
-    if (error.message.includes('Invalid response format')) {
-      errorMessage += 'Backend returned invalid format. Please check backend logs.';
-    } else if (error.message.includes('No PDF data found')) {
-      errorMessage += 'No PDF data found in response. Please check backend implementation.';
-    } else {
-      errorMessage += 'Please try again or contact support.';
-    }
-
-    alert(errorMessage);
+    // Cleanup
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch (err) {
+    console.error("PDF export error:", err);
+    alert("Failed to generate PDF. Please try again.");
   } finally {
     // Remove loading indicator
     document.body.removeChild(loadingDiv);
