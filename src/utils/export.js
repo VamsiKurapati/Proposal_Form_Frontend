@@ -328,11 +328,25 @@ export const exportToPDF = async (project) => {
               console.log('PDF data found in JSON values, creating blob...');
               pdfBlob = new Blob([pdfValue], { type: 'application/pdf' });
             } else {
-              console.log('Available JSON keys:', Object.keys(jsonData));
-              console.log('JSON values preview:', jsonValues.map(v =>
-                typeof v === 'string' ? v.substring(0, 50) : typeof v
-              ));
-              throw new Error('No PDF data found in JSON response');
+              // Check if the PDF content is split into individual characters
+              console.log('Checking if PDF content is split into characters...');
+
+              // Reconstruct PDF content from individual characters
+              const sortedKeys = Object.keys(jsonData).sort((a, b) => parseInt(a) - parseInt(b));
+              const reconstructedContent = sortedKeys.map(key => jsonData[key]).join('');
+
+              console.log('Reconstructed content preview:', reconstructedContent.substring(0, 100));
+
+              if (reconstructedContent.startsWith('%PDF-')) {
+                console.log('PDF content reconstructed from characters, creating blob...');
+                pdfBlob = new Blob([reconstructedContent], { type: 'application/pdf' });
+              } else {
+                console.log('Available JSON keys:', Object.keys(jsonData));
+                console.log('JSON values preview:', jsonValues.map(v =>
+                  typeof v === 'string' ? v.substring(0, 50) : typeof v
+                ));
+                throw new Error('No PDF data found in JSON response');
+              }
             }
           }
         }
