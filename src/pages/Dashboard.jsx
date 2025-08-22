@@ -591,12 +591,12 @@ const Dashboard = () => {
                                                         </button>
                                                     </div>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#FFFFFF] bg-opacity-50 backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
+                                                        <div className="absolute bg-[#F3F4F6] bg-opacity-50 backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
                                                             <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
                                                             <div>
                                                                 <ul>
                                                                     {/* Only show editors to assign as current editor */}
-                                                                    {employees.filter(emp => emp.name !== userName && emp.role === "Editor").map(emp => (
+                                                                    {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
                                                                         <li key={emp.name}>
                                                                             <button
                                                                                 className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
@@ -632,12 +632,12 @@ const Dashboard = () => {
                                                         )}
                                                     </div>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#FFFFFF] bg-opacity-50 backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
+                                                        <div className="absolute bg-[#F3F4F6] backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
                                                             <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
                                                             <div>
                                                                 <ul>
                                                                     {/* Only show editors to assign as current editor */}
-                                                                    {employees.filter(emp => emp.name !== userName && emp.role === "Editor").map(emp => (
+                                                                    {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
                                                                         <li key={emp.name}>
                                                                             <button
                                                                                 className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"

@@ -195,7 +195,7 @@ const Proposals = () => {
     const getGridLayoutClass = () => {
         if (itemsPerPage === 1) return "grid-cols-1";
         if (itemsPerPage === 2) return "grid-cols-1 md:grid-cols-2";
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+        return "grid-cols-1 md:grid-cols-2";
     };
 
     // Calculate pagination for saved proposals
