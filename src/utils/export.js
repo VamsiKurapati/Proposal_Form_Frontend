@@ -269,10 +269,86 @@ export const exportToPDF = async (project) => {
     });
 
     console.log('PDF response received:', res.data);
+    console.log('Response type:', res.data.type);
+    console.log('Response size:', res.data.size);
 
-    // Create blob URL for the PDF
-    const blob = new Blob([res.data], { type: 'application/pdf' });
-    const blobUrl = URL.createObjectURL(blob);
+    let pdfBlob;
+
+    // Check if the response is actually JSON (backend might be sending base64 PDF in JSON)
+    if (res.data.type === 'application/json') {
+      // Convert blob to text to read the JSON content
+      const jsonText = await res.data.text();
+      console.log('JSON content preview:', jsonText.substring(0, 200));
+
+      try {
+        const jsonData = JSON.parse(jsonText);
+        console.log('Parsed JSON keys:', Object.keys(jsonData));
+
+        // Check if the JSON contains PDF data in various possible fields
+        let pdfData = null;
+        if (jsonData.pdfData || jsonData.data || jsonData.content) {
+          pdfData = jsonData.pdfData || jsonData.data || jsonData.content;
+        } else if (jsonData.pdf || jsonData.file || jsonData.document) {
+          pdfData = jsonData.pdf || jsonData.file || jsonData.document;
+        }
+
+        if (pdfData) {
+          // Check if it's already PDF data (starts with %PDF)
+          if (pdfData.startsWith('%PDF-')) {
+            console.log('Direct PDF data detected, creating blob...');
+            pdfBlob = new Blob([pdfData], { type: 'application/pdf' });
+          } else {
+            // Try to convert base64 to blob
+            console.log('Converting base64 to PDF blob...');
+            try {
+              const binaryString = atob(pdfData);
+              const bytes = new Uint8Array(binaryString.length);
+              for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+              }
+              pdfBlob = new Blob([bytes], { type: 'application/pdf' });
+            } catch (base64Error) {
+              console.log('Base64 conversion failed, treating as direct PDF data...');
+              pdfBlob = new Blob([pdfData], { type: 'application/pdf' });
+            }
+          }
+        } else {
+          // Check if the entire JSON content is actually PDF data
+          if (jsonText.startsWith('%PDF-')) {
+            console.log('JSON content is actually PDF data, creating blob...');
+            pdfBlob = new Blob([jsonText], { type: 'application/pdf' });
+          } else {
+            // Check if any of the JSON values contain PDF data
+            const jsonValues = Object.values(jsonData);
+            const pdfValue = jsonValues.find(value =>
+              typeof value === 'string' && value.startsWith('%PDF-')
+            );
+
+            if (pdfValue) {
+              console.log('PDF data found in JSON values, creating blob...');
+              pdfBlob = new Blob([pdfValue], { type: 'application/pdf' });
+            } else {
+              console.log('Available JSON keys:', Object.keys(jsonData));
+              console.log('JSON values preview:', jsonValues.map(v =>
+                typeof v === 'string' ? v.substring(0, 50) : typeof v
+              ));
+              throw new Error('No PDF data found in JSON response');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing JSON response:', error);
+        throw new Error('Invalid response format from backend');
+      }
+    } else if (res.data.type === 'application/pdf') {
+      // Direct PDF response
+      pdfBlob = res.data;
+    } else {
+      // Try to treat as PDF anyway
+      pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+    }
+
+    const blobUrl = URL.createObjectURL(pdfBlob);
 
     // Create download link for the PDF
     const link = document.createElement('a');
@@ -315,7 +391,18 @@ export const exportToPDF = async (project) => {
 
   } catch (error) {
     console.error('PDF export error:', error);
-    alert('Error exporting PDF. Please try again.');
+
+    // Show more detailed error message
+    let errorMessage = 'Error exporting PDF. ';
+    if (error.message.includes('Invalid response format')) {
+      errorMessage += 'Backend returned invalid format. Please check backend logs.';
+    } else if (error.message.includes('No PDF data found')) {
+      errorMessage += 'No PDF data found in response. Please check backend implementation.';
+    } else {
+      errorMessage += 'Please try again or contact support.';
+    }
+
+    alert(errorMessage);
   } finally {
     // Remove loading indicator
     document.body.removeChild(loadingDiv);
