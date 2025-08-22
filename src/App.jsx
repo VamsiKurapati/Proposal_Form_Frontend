@@ -11,14 +11,14 @@ const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
-const Discovery = lazy(() => import("./pages/Discovery_1"));
+const Discovery = lazy(() => import("./pages/Discover"));
 
 const Proposals = lazy(() => import("./pages/Proposals"));
 const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
 const BasicComplianceCheck = lazy(() => import("./pages/BasicComplianceCheck"));
 const AdvancedComplianceCheck = lazy(() => import("./pages/AdvancedComplianceCheck"));
 
-const Dashboard = lazy(() => import("./pages/Dashboard_1"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 const EmployeeProfileDashboard = lazy(() => import("./pages/EmployeeProfileDashboard"));
 const EmployeeProfileUpdate = lazy(() => import("./pages/EmployeeProfileUpdate"));
