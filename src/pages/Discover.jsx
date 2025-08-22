@@ -1941,6 +1941,14 @@ const DiscoverRFPs = () => {
           });
 
         if (response.status === 200) {
+          //Save the RFP to the useState array
+          const rfp = response.data.rfp;
+          //Add the RFP to the recommended array
+          setRecommended(prev => [rfp, ...prev]);
+
+          //Add the RFP to the originalRecommended array
+          setOriginalRecommended(prev => [rfp, ...prev]);
+
           Swal.fire({
             icon: 'success',
             title: 'Success!',
