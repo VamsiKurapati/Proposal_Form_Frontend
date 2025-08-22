@@ -47,9 +47,9 @@ const GenerateProposalPage = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FB] pb-10">
       <NavbarComponent />
-      <div className="w-full mx-auto px-8 md:px-12 mt-20">
+      <div className="w-full mx-auto px-8 md:px-12 mt-16">
         <div className="w-full flex justify-between items-center mb-6">
-          <button className="text-blue-500 text-[16px] font-medium" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-4 h-4" /></button>
+          <button className="bg-white rounded-lg p-2" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-5 h-5 shrink-0" /></button>
           <h1 className="text-[32px] font-semibold">{proposal?.title}</h1>
         </div>
 
