@@ -959,7 +959,7 @@ const CanvaApp = () => {
 
         {/* Side Panel - Grid area sidebar */}
         <div
-          className="bg-white border-r flex flex-col items-center shadow-md z-40 mt-16"
+          className="bg-white border-r flex flex-col items-center shadow-md z-40"
           style={{
             gridArea: 'sidebar',
             overflowY: 'auto'
