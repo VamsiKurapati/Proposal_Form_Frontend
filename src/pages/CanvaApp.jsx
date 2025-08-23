@@ -990,7 +990,7 @@ const CanvaApp = () => {
 
         {/* Main Content Area */}
         <div
-          className="relative overflow-hidden bg-gray-100 mt-16"
+          className="relative overflow-hidden bg-gray-100"
           style={{
             gridArea: 'main',
             overscrollBehavior: 'contain'

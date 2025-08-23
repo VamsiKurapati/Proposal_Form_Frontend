@@ -24,7 +24,7 @@ const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEnt
   if (!show) return null;
 
   return (
-    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
+    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16" style={{ height: 'calc(100vh - 32px)' }}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -72,8 +72,8 @@ const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEnt
 
           {historyList.map((item, index) => (
             <div key={item.id} className={`border rounded-lg p-3 transition-colors ${item.isCurrent
-                ? 'border-purple-300 bg-purple-50'
-                : 'border-gray-200 hover:bg-gray-50'
+              ? 'border-purple-300 bg-purple-50'
+              : 'border-gray-200 hover:bg-gray-50'
               }`}>
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">

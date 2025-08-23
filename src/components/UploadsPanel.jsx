@@ -147,7 +147,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
+    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16" style={{ height: 'calc(100vh - 32px)' }}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -166,8 +166,8 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
         <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
           <div
             className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${isDragging
-                ? 'border-blue-500 bg-blue-100'
-                : 'border-gray-300 hover:border-gray-400 bg-white'
+              ? 'border-blue-500 bg-blue-100'
+              : 'border-gray-300 hover:border-gray-400 bg-white'
               }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -250,8 +250,8 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
                         <button
                           onClick={() => handleDeleteUpload(upload)}
                           className={`transition-colors ${upload.isTemplate
-                              ? 'text-gray-300 cursor-not-allowed'
-                              : 'text-gray-400 hover:text-red-500'
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-400 hover:text-red-500'
                             }`}
                           title={upload.isTemplate ? 'Template images cannot be deleted' : 'Delete image'}
                         >
@@ -285,8 +285,8 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
               className={`w-full px-4 py-3 text-white rounded-lg transition-colors flex items-center justify-center gap-2 ${isUploading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600'
                 }`}
             >
               {isUploading ? (
