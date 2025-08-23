@@ -938,13 +938,13 @@ const Dashboard = () => {
                                                     </div>
                                                 ) : (
                                                     <button
-                                                        className={`flex items-center gap-1 transition-colors ${role === "Viewer" || (role !== "Company" && !(p.currentEditor && p.currentEditor.email === userEmail))
+                                                        className={`flex items-center gap-1 transition-colors ${role === "Viewer" || (role !== "company" && !(p.currentEditor && p.currentEditor.email === userEmail))
                                                             ? "text-[#9CA3AF] cursor-not-allowed opacity-50"
                                                             : "text-[#2563EB] hover:text-[#1D4ED8]"
                                                             }`}
-                                                        title={role === "Viewer" ? "Viewer cannot edit proposals" : (role !== "Company" && !(p.currentEditor && p.currentEditor.email === userEmail)) ? "Only current editor can edit this proposal" : "Edit Details"}
-                                                        onClick={role === "Viewer" || (role !== "Company" && !(p.currentEditor && p.currentEditor.email === userEmail)) ? undefined : () => handleEditClick(realIdx, p)}
-                                                        disabled={role === "Viewer" || (role !== "Company" && !(p.currentEditor && p.currentEditor.email === userEmail))}
+                                                        title={role === "Viewer" ? "Viewer cannot edit proposals" : (role !== "company" && !(p.currentEditor && p.currentEditor.email === userEmail)) ? "Only current editor can edit this proposal" : "Edit Details"}
+                                                        onClick={role === "Viewer" || (role !== "company" && !(p.currentEditor && p.currentEditor.email === userEmail)) ? undefined : () => handleEditClick(realIdx, p)}
+                                                        disabled={role === "Viewer" || (role !== "company" && !(p.currentEditor && p.currentEditor.email === userEmail))}
                                                     >
                                                         <MdOutlineEdit className="w-5 h-5" /> Edit
                                                     </button>

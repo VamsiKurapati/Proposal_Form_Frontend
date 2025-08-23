@@ -1199,6 +1199,9 @@ const DiscoverRFPs = () => {
         setOriginalOtherRFPs((prev) =>
           prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
         );
+        setOriginalSaved((prev) =>
+          prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
+        );
 
         //console.log("RFP data:", rfp);
       }
@@ -1245,6 +1248,9 @@ const DiscoverRFPs = () => {
         );
         setOriginalOtherRFPs((prev) =>
           prev.map(r => r._id === rfpId ? { ...r, isSaved: false } : r)
+        );
+        setOriginalSaved((prev) =>
+          prev.filter((r) => r._id !== rfpId)
         );
       }
     } catch (err) {

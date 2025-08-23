@@ -42,7 +42,6 @@ const sidebarItems = [
   { name: "Documents", icon: <MdOutlineFolder className="w-6 h-6" /> },
   { name: "Case Studies", icon: <MdOutlineAssignment className="w-6 h-6" /> },
   { name: "Certificates", icon: <MdOutlineVerifiedUser className="w-6 h-6" /> },
-  { name: "Settings", icon: <MdOutlineSettings className="w-6 h-6" /> },
 ];
 
 // Mobile Dropdown Component

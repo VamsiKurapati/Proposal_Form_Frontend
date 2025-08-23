@@ -943,7 +943,7 @@ const CanvaApp = () => {
       <NavbarComponent />
 
       {/* Back and Continue buttons below navbar */}
-      <div className="flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm">
+      <div className="mt-16 flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm">
         <div className="flex items-center gap-4">
           <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
             <MdOutlineArrowBack className="w-4 h-4" />
