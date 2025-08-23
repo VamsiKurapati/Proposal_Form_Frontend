@@ -606,7 +606,14 @@ const Dashboard = () => {
     }
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+        return <>
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+                    <p className="text-gray-500 mt-4">Please wait while we fetch the Dashboard data...</p>
+                </div>
+            </div>
+        </>;
     }
 
     return (
@@ -709,30 +716,38 @@ const Dashboard = () => {
                                                         </button>
                                                     </div>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#F3F4F6] bg-opacity-50 backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
-                                                            <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
-                                                            <div>
-                                                                <ul>
-                                                                    {/* Only show editors to assign as current editor */}
-                                                                    {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
-                                                                        <li key={emp.name}>
-                                                                            <button
-                                                                                className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
-                                                                                onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
-                                                                            >
-                                                                                {emp.name}
-                                                                            </button>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
+                                                        <>
+                                                            {/* Backdrop blur overlay for the table */}
+                                                            <div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm z-10" />
+
+                                                            {/* Dropdown with scrollable content */}
+                                                            <div className="absolute bg-white border border-[#E5E7EB] rounded-md shadow-lg z-20 mt-4 w-40 max-h-48 overflow-hidden">
+                                                                <div className="p-3 border-b border-[#E5E7EB]">
+                                                                    <h2 className="text-[14px] font-medium text-gray-800">Assign Editor</h2>
+                                                                    <button
+                                                                        className="text-gray-500 absolute top-3 right-3 hover:text-gray-700"
+                                                                        onClick={() => setShowAddPersonIdx(null)}
+                                                                    >
+                                                                        <MdOutlineClose className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="max-h-32 overflow-y-auto">
+                                                                    <ul className="p-1">
+                                                                        {/* Only show editors to assign as current editor */}
+                                                                        {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
+                                                                            <li key={emp.name} className="mb-1">
+                                                                                <button
+                                                                                    className="block px-3 py-2 bg-gray-50 rounded-md border border-gray-200 hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] w-full text-left text-[14px] transition-colors"
+                                                                                    onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
+                                                                                >
+                                                                                    {emp.name}
+                                                                                </button>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
                                                             </div>
-                                                            <button
-                                                                className="text-[#111827] absolute top-2 right-2"
-                                                                onClick={() => setShowAddPersonIdx(null)}
-                                                            >
-                                                                <MdOutlineClose className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
+                                                        </>
                                                     )}
                                                 </td>
                                             ) : (
@@ -750,30 +765,38 @@ const Dashboard = () => {
                                                         )}
                                                     </div>
                                                     {showAddPersonIdx === realIdx && (
-                                                        <div className="absolute bg-[#F3F4F6] backdrop-blur-sm border border-[#E5E7EB] rounded-md shadow z-100 mt-4 w-40 p-2">
-                                                            <h2 className="text-[14px] font-medium mb-2">Assign Editor</h2>
-                                                            <div>
-                                                                <ul>
-                                                                    {/* Only show editors to assign as current editor */}
-                                                                    {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
-                                                                        <li key={emp.name}>
-                                                                            <button
-                                                                                className="block px-4 py-2 bg-[#F3F4F6] rounded-md border hover:bg-[#2563EB] hover:text-white w-full text-left text-[14px] transition-colors"
-                                                                                onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
-                                                                            >
-                                                                                {emp.name}
-                                                                            </button>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
+                                                        <>
+                                                            {/* Backdrop blur overlay for the table */}
+                                                            <div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm z-10" />
+
+                                                            {/* Dropdown with scrollable content */}
+                                                            <div className="absolute bg-white border border-[#E5E7EB] rounded-md shadow-lg z-20 mt-4 w-40 max-h-48 overflow-hidden">
+                                                                <div className="p-3 border-b border-[#E5E7EB]">
+                                                                    <h2 className="text-[14px] font-medium text-gray-800">Assign Editor</h2>
+                                                                    <button
+                                                                        className="text-gray-500 absolute top-3 right-3 hover:text-gray-700"
+                                                                        onClick={() => setShowAddPersonIdx(null)}
+                                                                    >
+                                                                        <MdOutlineClose className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="max-h-32 overflow-y-auto">
+                                                                    <ul className="p-1">
+                                                                        {/* Only show editors to assign as current editor */}
+                                                                        {employees.filter(emp => emp.name !== userName && emp.accessLevel === "Editor").map(emp => (
+                                                                            <li key={emp.name} className="mb-1">
+                                                                                <button
+                                                                                    className="block px-3 py-2 bg-gray-50 rounded-md border border-gray-200 hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] w-full text-left text-[14px] transition-colors"
+                                                                                    onClick={() => handleSetCurrentEditor(realIdx, emp.employeeId)}
+                                                                                >
+                                                                                    {emp.name}
+                                                                                </button>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
                                                             </div>
-                                                            <button
-                                                                className="text-[#111827] absolute top-2 right-2"
-                                                                onClick={() => setShowAddPersonIdx(null)}
-                                                            >
-                                                                <MdOutlineClose className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
+                                                        </>
                                                     )}
                                                 </td>
                                             )}
