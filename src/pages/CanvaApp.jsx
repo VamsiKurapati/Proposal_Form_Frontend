@@ -944,7 +944,7 @@ const CanvaApp = () => {
 
       {/* Main editor content */}
       <div
-        className="flex-1 w-full overflow-hidden"
+        className="flex-1 w-full overflow-hidden mt-16"
         style={{
           display: 'grid',
           gridTemplateRows: '1fr 32px',
