@@ -12,14 +12,14 @@ const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const SupportTicket = lazy(() => import("./pages/SupportTicket"));
 
-const RFPDiscovery = lazy(() => import("./pages/RFPDiscovery"));
+const Discovery = lazy(() => import("./pages/Discover"));
 
 const Proposals = lazy(() => import("./pages/Proposals"));
 const GenerateProposalPage = lazy(() => import("./pages/GenerateProposalPage"));
 const BasicComplianceCheck = lazy(() => import("./pages/BasicComplianceCheck"));
 const AdvancedComplianceCheck = lazy(() => import("./pages/AdvancedComplianceCheck"));
 
-const Dashboard = lazy(() => import("./pages/Dashboard_1"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 const EmployeeProfileDashboard = lazy(() => import("./pages/EmployeeProfileDashboard"));
 const EmployeeProfileUpdate = lazy(() => import("./pages/EmployeeProfileUpdate"));
@@ -27,13 +27,14 @@ const CompanyProfileDashboard = lazy(() => import("./pages/CompanyProfileDashboa
 const CompanyProfileUpdate = lazy(() => import("./pages/CompanyProfileUpdate"));
 
 const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
+const ImageUpload = lazy(() => import("./Super_Admin/ImageUpload"));
 
 const App = () => {
   const { role } = useUser();
 
-  useEffect(() => {
-    console.log("Role in App: ", role);
-  }, [role]);
+  // useEffect(() => {
+  //   console.log("Role in App: ", role);
+  // }, [role]);
 
   return (
     <>
@@ -49,8 +50,8 @@ const App = () => {
             <ChangePassword />
           </ProtectedRoutes>} />
 
-          <Route path="/rfp_discovery" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
-            <RFPDiscovery />
+          <Route path="/discover" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
+            <Discovery />
           </ProtectedRoutes>} />
 
           {/* <Route path="/rfp_discovery" element={<RFPDiscovery />} /> */}
@@ -100,16 +101,27 @@ const App = () => {
             </ProtectedRoutes>
           } />
 
-          <Route path="/canva" element={<CanvaApp />} />
+          <Route path="/editor" element={
+            <ProtectedRoutes allowedRoles={["company", "Editor"]}>
+              <CanvaApp />
+            </ProtectedRoutes>
+          } />
 
           <Route path="/admin" element={
             <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
               <SuperAdmin />
             </ProtectedRoutes>
+          } 
+          
+          <Route path="/image-upload" element={
+            <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
+              <ImageUpload />
+            </ProtectedRoutes>
           } />
 
 
           <Route path="/support-ticket" element={<SupportTicket />} />
+
 
           <Route path="*" element={<Home />} />
         </Routes>

@@ -27,7 +27,7 @@ export const UserProvider = ({ children }) => {
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('focus', handleStorageChange);
 
-        console.log("Role in Context:", role);
+
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);

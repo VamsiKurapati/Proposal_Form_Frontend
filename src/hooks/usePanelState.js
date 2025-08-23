@@ -83,8 +83,8 @@ export const usePanelState = () => {
     setShowSettingsPanel(true);
   };
 
-  const isPanelOpen = showProperties || showBackgroundPanel || showDesignPanel || 
-    showElementsPanel || showTextPanel || showHistoryPanel || showUploadsPanel || 
+  const isPanelOpen = showProperties || showBackgroundPanel || showDesignPanel ||
+    showElementsPanel || showTextPanel || showHistoryPanel || showUploadsPanel ||
     showToolsPanel || showProjectsPanel || showPropertiesPanel || showAccountPanel || showSettingsPanel;
 
   return {

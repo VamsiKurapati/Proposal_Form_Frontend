@@ -7,9 +7,9 @@ import settingsIcon from './icons/settings.svg';
 import undoIcon from './icons/undo.svg';
 import redoIcon from './icons/redo.svg';
 
-const TopRightPanel = ({ 
-  onExportJSON, 
-  onExportPDF, 
+const TopRightPanel = ({
+  onExportJSON,
+  onExportPDF,
   onExportSVG,
   onImportJSON,
   onShowHistory,
@@ -29,11 +29,10 @@ const TopRightPanel = ({
       <button
         onClick={onUndo}
         disabled={!canUndo}
-        className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
-          canUndo 
-            ? 'text-gray-700 hover:bg-gray-100' 
+        className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${canUndo
+            ? 'text-gray-700 hover:bg-gray-100'
             : 'text-gray-400 cursor-not-allowed'
-        }`}
+          }`}
         title="Undo (Ctrl+Z)"
       >
         <img src={undoIcon} alt="Undo" className="w-4 h-4" />
@@ -44,11 +43,10 @@ const TopRightPanel = ({
       <button
         onClick={onRedo}
         disabled={!canRedo}
-        className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
-          canRedo 
-            ? 'text-gray-700 hover:bg-gray-100' 
+        className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${canRedo
+            ? 'text-gray-700 hover:bg-gray-100'
             : 'text-gray-400 cursor-not-allowed'
-        }`}
+          }`}
         title="Redo (Ctrl+Y)"
       >
         <img src={redoIcon} alt="Redo" className="w-4 h-4" />
@@ -74,7 +72,7 @@ const TopRightPanel = ({
           <img src={exportIcon} alt="Export" className="w-4 h-4" />
           <span className="text-xs font-medium">Export</span>
         </button>
-        
+
         {showExportMenu && (
           <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
             <div className="py-1">
@@ -132,7 +130,7 @@ const TopRightPanel = ({
           <img src={accountIcon} alt="Account" className="w-4 h-4" />
           <span className="text-xs font-medium">Account</span>
         </button>
-        
+
         {showAccountMenu && (
           <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
             <div className="py-1">
@@ -176,8 +174,8 @@ const TopRightPanel = ({
 
       {/* Close dropdowns when clicking outside */}
       {showExportMenu || showAccountMenu ? (
-        <div 
-          className="fixed inset-0 z-40" 
+        <div
+          className="fixed inset-0 z-40"
           onClick={() => {
             setShowExportMenu(false);
             setShowAccountMenu(false);

@@ -1,26 +1,20 @@
-import { safeSetItem, safeGetItem, STORAGE_KEYS } from './storage';
+import axios from 'axios';
 
 // Cloud Image Service for handling image uploads and lazy loading
 class CloudImageService {
   constructor() {
     // Use environment variables from .env file
-    this.baseUrl = import.meta.env.VITE_API_URL || 'https://127.0.0.1:5000';
-    this.maxFileSize = parseInt(import.meta.env.VITE_MAX_FILE_SIZE) || 1024 * 1024; // 1MB
-    this.maxImages = parseInt(import.meta.env.VITE_MAX_IMAGES) || 15;
+    this.baseUrl = 'https://proposal-form-backend.vercel.app/api/image';
+    this.maxFileSize = 1024 * 1024; // 1MB
+    this.maxImages = 15;
     this.uploadedImages = this.loadUploadedImages();
-    console.log('CloudImageService initialized with:', {
-      baseUrl: this.baseUrl,
-      maxFileSize: this.maxFileSize,
-      maxImages: this.maxImages,
-      uploadedImagesCount: this.uploadedImages.length
-    });
   }
 
   // Load uploaded images from localStorage
   loadUploadedImages() {
     try {
-      const saved = safeGetItem(STORAGE_KEYS.CLOUD_IMAGES);
-      return saved || [];
+      const saved = localStorage.getItem('canva-cloud-images');
+      return saved ? JSON.parse(saved) : [];
     } catch (error) {
       console.error('Error loading cloud images:', error);
       return [];
@@ -30,10 +24,7 @@ class CloudImageService {
   // Save uploaded images to localStorage
   saveUploadedImages() {
     try {
-      const success = safeSetItem(STORAGE_KEYS.CLOUD_IMAGES, this.uploadedImages);
-      if (!success) {
-        console.warn('Failed to save cloud images to localStorage. Data may be too large.');
-      }
+      localStorage.setItem('canva-cloud-images', JSON.stringify(this.uploadedImages));
     } catch (error) {
       console.error('Error saving cloud images:', error);
     }
@@ -121,53 +112,43 @@ class CloudImageService {
 
       // Create form data
       const formData = new FormData();
-      formData.append('file', processedFile);
+      formData.append('image', processedFile);
+
+      // Get auth token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
 
       // Upload to cloud
-      console.log('Uploading to:', `${this.baseUrl}/upload_image`);
-      const response = await fetch(`${this.baseUrl}/upload_image`, {
-        method: 'POST',
-        body: formData,
-        // Handle potential SSL certificate issues for local development
-        mode: 'cors',
-        credentials: 'omit'
+      const response = await axios.post(`${this.baseUrl}/upload_image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      console.log('Upload response status:', response.status, response.statusText);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      // Check response status
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
       }
 
-      let result;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error('Failed to parse response as JSON:', parseError);
-        // If response is not JSON, try to get text
-        const responseText = await response.text();
-        console.log('Response text:', responseText);
-        throw new Error(`Upload succeeded but invalid response format: ${responseText}`);
-      }
-
-      console.log('Upload result:', result);
+      const result = response.data;
 
       // Check for success based on your API response format
-      const isSuccess = result.message === 'File uploaded successfully' || response.status === 201;
-
-      if (!isSuccess) {
+      if (!result.message || !result.message.includes('Image uploaded successfully')) {
         throw new Error(result.error || result.message || 'Upload failed');
       }
 
       // Add to local storage
       const imageData = {
-        id: Date.now() + Math.random(),
-        name: file.name,
-        filename: result.filename || file.name, // Store the actual filename from API
+        id: result.fileId,
+        name: result.originalName || file.name,
+        filename: result.filename,
+        fileId: result.fileId,
         type: file.type,
         size: processedFile.size,
-        cloudUrl: `${this.baseUrl}/download_uploaded_image?name=${result.filename || file.name}`,
+        cloudUrl: `${this.baseUrl}/get_image_by_id/${result.fileId}`,
         uploadedAt: new Date().toISOString()
       };
 
@@ -186,102 +167,98 @@ class CloudImageService {
     }
   }
 
-  // Download image from cloud (uploaded images)
-  async downloadImage(imageName) {
+  async uploadTemplateImage(file) {
     try {
-      const response = await fetch(`${this.baseUrl}/download_uploaded_image?name=${encodeURIComponent(imageName)}`, {
-        mode: 'cors',
-        credentials: 'omit'
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Download failed: ${response.status} ${response.statusText} - ${errorText}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
       }
 
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axios.post(`${this.baseUrl}/upload_template_image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const result = response.data;
+
+      if (!result.message || !result.message.includes('Image uploaded successfully')) {
+        throw new Error(result.error || result.message || 'Upload failed');
+      }
+
+      const imageData = {
+        id: result.fileId,
+        name: result.originalName || file.name,
+        filename: result.filename,
+        fileId: result.fileId,
+        type: file.type,
+        size: file.size,
+        cloudUrl: `${this.baseUrl}/get_template_image/${result.filename}`,
+        uploadedAt: new Date().toISOString(),
+        isTemplate: true,
+        isDeletable: false
+      };
+
+      this.uploadedImages.unshift(imageData);
+      this.saveUploadedImages();
+
+      window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
+        detail: { action: 'uploaded', image: imageData }
+      }));
+
+      return imageData;
     } catch (error) {
-      console.error('Download error:', error);
+      console.error('Upload template image error:', error);
       throw error;
     }
   }
 
-  // Get template image (template images)
-  async getTemplateImage(imageName) {
+  // Delete image from cloud
+  async deleteImage(filename) {
     try {
-      const response = await fetch(`${this.baseUrl}/template_image?name=${encodeURIComponent(imageName)}`, {
-        mode: 'cors',
-        credentials: 'omit'
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Template download failed: ${response.status} ${response.statusText} - ${errorText}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
       }
 
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch (error) {
-      console.error('Template download error:', error);
-      throw error;
-    }
-  }
-
-  // Delete image from cloud (only for uploaded images)
-  async deleteImage(imageName) {
-    try {
-      const response = await fetch(`${this.baseUrl}/delete_uploaded_image?name=${encodeURIComponent(imageName)}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        credentials: 'omit'
+      const response = await axios.delete(`${this.baseUrl}/delete_image/${filename}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
 
-      let result;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error('Failed to parse delete response as JSON:', parseError);
-        const responseText = await response.text();
-        console.log('Delete response text:', responseText);
-      }
+      const result = response.data;
 
-      // Always remove from local storage, even if server deletion fails
-      this.uploadedImages = this.uploadedImages.filter(img => img.name !== imageName && img.filename !== imageName);
+      // Remove from local storage
+      this.uploadedImages = this.uploadedImages.filter(img =>
+        img.filename !== filename && img.name !== filename
+      );
       this.saveUploadedImages();
 
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
-        detail: { action: 'deleted', imageName }
+        detail: { action: 'deleted', filename }
       }));
 
-      // If server deletion was successful, return true
-      if (response.ok && result && result.message && result.message.includes('deleted successfully')) {
+      // Check if server deletion was successful
+      if (response.status === 200 && result && result.message && result.message.includes('deleted successfully')) {
         return true;
       }
 
-      // If server deletion failed but we removed from local storage, return true
-      console.log(`Image ${imageName} removed from local storage (server deletion may have failed)`);
-      return true;
+      throw new Error(result.message || 'Delete failed');
 
     } catch (error) {
       console.error('Delete error:', error);
-      // Even if there's an error, remove from local storage
-      this.uploadedImages = this.uploadedImages.filter(img => img.name !== imageName && img.filename !== imageName);
-      this.saveUploadedImages();
-
-      // Dispatch custom event to notify components
-      window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
-        detail: { action: 'deleted', imageName }
-      }));
-
-      return true;
+      throw error;
     }
   }
 
   // Get all uploaded images
   getUploadedImages() {
-    console.log('getUploadedImages called, returning:', this.uploadedImages);
     return [...this.uploadedImages];
   }
 
@@ -289,7 +266,6 @@ class CloudImageService {
   clearUploadedImages() {
     this.uploadedImages = [];
     this.saveUploadedImages();
-    console.log('All uploaded images cleared from local storage');
 
     // Dispatch custom event to notify components
     window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
@@ -299,19 +275,27 @@ class CloudImageService {
 
   // Check if image is cloud-based (uploaded images)
   isCloudImage(src) {
-    return src && (src.startsWith('cloud://') || src.includes('download_uploaded_image'));
+    return src && src.startsWith('cloud://');
   }
 
   // Check if image is a template image
   isTemplateImage(src) {
-    return src && (src.startsWith('template://') || src.includes('template_image'));
+    return src && src.startsWith('template://');
   }
 
-  // Get cloud URL for uploaded image
+  // Get cloud URL for uploaded image (prefer ID-based URLs)
   getCloudUrl(src) {
     if (src.startsWith('cloud://')) {
       const imageName = src.replace('cloud://', '');
-      return `${this.baseUrl}/download_uploaded_image?name=${encodeURIComponent(imageName)}`;
+      // Try to find the image by name to get fileId
+      const image = this.uploadedImages.find(img =>
+        img.name === imageName || img.filename === imageName
+      );
+      if (image && image.fileId) {
+        return `${this.baseUrl}/get_image_by_id/${image.fileId}`;
+      }
+      // Fallback to filename-based URL
+      return `${this.baseUrl}/get_image/${imageName}`;
     }
     return src;
   }
@@ -320,7 +304,7 @@ class CloudImageService {
   getTemplateUrl(src) {
     if (src.startsWith('template://')) {
       const imageName = src.replace('template://', '');
-      return `${this.baseUrl}/template_image?name=${encodeURIComponent(imageName)}`;
+      return `${this.baseUrl}/get_template_image/${imageName}`;
     }
     return src;
   }
@@ -348,10 +332,15 @@ class CloudImageService {
     return element;
   }
 
-  // Get the actual filename from cloud URL for export
-  getCloudFilename(src) {
+  // Get the actual fileId from cloud URL for export
+  getCloudFileId(src) {
     if (src.startsWith('cloud://')) {
-      return src.replace('cloud://', '');
+      const imageName = src.replace('cloud://', '');
+      // Try to find the image by name to get fileId
+      const image = this.uploadedImages.find(img =>
+        img.name === imageName || img.filename === imageName
+      );
+      return image ? image.fileId : imageName;
     }
     return null;
   }
@@ -381,26 +370,20 @@ class CloudImageService {
   extractImagesFromJSON(project) {
     const extractedImages = [];
     const uniqueImageLinks = new Set(); // Track unique image links during extraction
-    console.log('Starting image extraction from project:', project);
 
     project.pages?.forEach((page, pageIndex) => {
-      console.log(`Processing page ${pageIndex}:`, page);
       page.elements?.forEach((element, elementIndex) => {
-        console.log(`Processing element ${elementIndex}:`, element);
         if (element.type === 'image' && element.properties?.src) {
           const src = element.properties.src;
-          console.log('Found image element with src:', src);
 
           // Skip if this image link is already processed in this extraction
           if (uniqueImageLinks.has(src)) {
-            console.log('Image link already processed in this extraction:', src);
             return;
           }
 
           // Handle uploaded images (cloud://)
           if (this.isCloudImage(src)) {
             const filename = this.getCloudFilename(src);
-            console.log('Cloud image detected, filename:', filename);
             if (filename) {
               // Check if already exists in uploads
               const exists = this.uploadedImages.find(img =>
@@ -408,21 +391,19 @@ class CloudImageService {
               );
 
               if (!exists) {
-                console.log('Adding cloud image to uploads:', filename);
                 uniqueImageLinks.add(src); // Mark as processed
                 extractedImages.push({
                   id: Date.now() + Math.random(),
                   name: filename,
                   filename: filename,
+                  fileId: filename, // Use filename as fileId for extracted images
                   type: 'image/png', // Default type
                   size: 1024 * 1024, // Default 1MB size for extracted images
-                  cloudUrl: `${this.baseUrl}/download_uploaded_image?name=${filename}`,
+                  cloudUrl: `${this.baseUrl}/get_image/${filename}`,
                   uploadedAt: new Date().toISOString(),
                   isFromJSON: true,
                   isDeletable: true
                 });
-              } else {
-                console.log('Cloud image already exists in uploads:', filename);
               }
             }
           }
@@ -430,7 +411,6 @@ class CloudImageService {
           // Handle template images (template://)
           else if (this.isTemplateImage(src)) {
             const templateName = src.replace('template://', '');
-            console.log('Template image detected, templateName:', templateName);
 
             // Check if already exists in uploads
             const exists = this.uploadedImages.find(img =>
@@ -438,25 +418,21 @@ class CloudImageService {
             );
 
             if (!exists) {
-              console.log('Adding template image to uploads:', templateName);
               uniqueImageLinks.add(src); // Mark as processed
               extractedImages.push({
                 id: Date.now() + Math.random(),
                 name: templateName,
                 filename: templateName,
+                fileId: templateName, // Use template name as fileId
                 type: 'image/png', // Default type
                 size: 1024 * 1024, // Default 1MB size for extracted images
-                cloudUrl: `${this.baseUrl}/template_image?name=${templateName}`,
+                cloudUrl: `${this.baseUrl}/get_template_image/${templateName}`,
                 uploadedAt: new Date().toISOString(),
                 isFromJSON: true,
                 isTemplate: true,
                 isDeletable: false // Template images cannot be deleted
               });
-            } else {
-              console.log('Template image already exists in uploads:', templateName);
             }
-          } else {
-            console.log('Image is neither cloud nor template:', src);
           }
         }
       });
@@ -466,21 +442,26 @@ class CloudImageService {
     if (extractedImages.length > 0) {
       this.uploadedImages.unshift(...extractedImages);
       this.saveUploadedImages();
-      console.log(`Extracted ${extractedImages.length} unique images from JSON (${uniqueImageLinks.size} unique links found)`);
 
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
         detail: { action: 'extracted', count: extractedImages.length }
       }));
-    } else {
-      console.log('No new images to extract from JSON');
     }
 
     return extractedImages;
+  }
+
+  // Helper method to get filename from cloud URL (for backward compatibility)
+  getCloudFilename(src) {
+    if (src.startsWith('cloud://')) {
+      return src.replace('cloud://', '');
+    }
+    return null;
   }
 }
 
 // Create singleton instance
 const cloudImageService = new CloudImageService();
 
-export default cloudImageService; 
+export default cloudImageService;

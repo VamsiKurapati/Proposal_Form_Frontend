@@ -26,7 +26,7 @@ const FloatingToolbar = ({
   setProject
 }) => {
   const toolbarRef = useRef(null);
-  
+
   // Check if an element is selected
   const hasSelectedElement = selectedElement && selectedEl;
 
@@ -35,20 +35,20 @@ const FloatingToolbar = ({
   // Function to update UI state without creating history
   const updateUIState = useCallback((updates) => {
     if (!selectedEl || !selectedElement) return;
-    
+
     setProject(prev => {
       const newProject = {
         ...prev,
         pages: prev.pages.map((p, idx) =>
           idx === selectedElement.pageIndex
             ? {
-                ...p,
-                elements: p.elements.map(el => 
-                  el.id === selectedElement.elementId 
-                    ? { ...el, properties: { ...el.properties, ...updates } }
-                    : el
-                )
-              }
+              ...p,
+              elements: p.elements.map(el =>
+                el.id === selectedElement.elementId
+                  ? { ...el, properties: { ...el.properties, ...updates } }
+                  : el
+              )
+            }
             : p
         )
       };
@@ -84,7 +84,7 @@ const FloatingToolbar = ({
           showStrokeStylePanel: panelName === 'strokeStyle',
           showShapeEffectsPanel: panelName === 'shapeEffects'
         };
-        
+
         updateUIState(panelStates);
       }
     } catch (error) {
@@ -130,7 +130,6 @@ const FloatingToolbar = ({
                     <option value="Times New Roman">Times New Roman</option>
                     <option value="Georgia">Georgia</option>
                     <option value="Verdana">Verdana</option>
-                    <option value="TT Commons Pro">TT Commons Pro</option>
                   </select>
 
                   {/* Font Size Controls */}
@@ -149,7 +148,7 @@ const FloatingToolbar = ({
                     </span>
                     <button
                       onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
-                        properties: { ...selectedEl.properties, fontSize: Math.min(72, (selectedEl.properties.fontSize || 16) + 1) }
+                        properties: { ...selectedEl.properties, fontSize: Math.min(500, (selectedEl.properties.fontSize || 16) + 1) }
                       })}
                       className="w-8 h-8 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center text-sm font-medium"
                       title="Increase Font Size"
@@ -187,11 +186,10 @@ const FloatingToolbar = ({
                       onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                         properties: { ...selectedEl.properties, bold: !selectedEl.properties.bold }
                       })}
-                      className={`w-8 h-8 flex items-center justify-center text-sm font-bold rounded-md ${
-                        selectedEl.properties.bold 
-                          ? 'bg-black bg-opacity-20 text-black' 
+                      className={`w-8 h-8 flex items-center justify-center text-sm font-bold rounded-md ${selectedEl.properties.bold
+                          ? 'bg-black bg-opacity-20 text-black'
                           : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                       title="Bold"
                     >
                       B
@@ -200,11 +198,10 @@ const FloatingToolbar = ({
                       onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                         properties: { ...selectedEl.properties, italic: !selectedEl.properties.italic }
                       })}
-                      className={`w-8 h-8 flex items-center justify-center text-sm italic rounded-md ${
-                        selectedEl.properties.italic 
-                          ? 'bg-black bg-opacity-20 text-black' 
+                      className={`w-8 h-8 flex items-center justify-center text-sm italic rounded-md ${selectedEl.properties.italic
+                          ? 'bg-black bg-opacity-20 text-black'
                           : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                       title="Italic"
                     >
                       I
@@ -213,11 +210,10 @@ const FloatingToolbar = ({
                       onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                         properties: { ...selectedEl.properties, underline: !selectedEl.properties.underline }
                       })}
-                      className={`w-8 h-8 flex items-center justify-center text-sm underline rounded-md ${
-                        selectedEl.properties.underline 
-                          ? 'bg-black bg-opacity-20 text-black' 
+                      className={`w-8 h-8 flex items-center justify-center text-sm underline rounded-md ${selectedEl.properties.underline
+                          ? 'bg-black bg-opacity-20 text-black'
                           : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                       title="Underline"
                     >
                       U
@@ -228,8 +224,8 @@ const FloatingToolbar = ({
                   <button
                     onClick={() => {
                       const currentText = selectedEl.properties.text || '';
-                      const newText = currentText === currentText.toUpperCase() 
-                        ? currentText.toLowerCase() 
+                      const newText = currentText === currentText.toUpperCase()
+                        ? currentText.toLowerCase()
                         : currentText.toUpperCase();
                       updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                         properties: { ...selectedEl.properties, text: newText }
@@ -249,7 +245,7 @@ const FloatingToolbar = ({
                       const currentIndex = alignments.indexOf(currentAlign);
                       const nextIndex = (currentIndex + 1) % alignments.length;
                       const nextAlign = alignments[nextIndex];
-                      
+
                       updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                         properties: { ...selectedEl.properties, textAlign: nextAlign }
                       });
@@ -260,28 +256,28 @@ const FloatingToolbar = ({
                     {/* Using SVG icons from src/components/icons/ */}
                     {selectedEl.properties.textAlign === 'left' && (
                       <svg width="14" height="14" viewBox="-2.24 -2.24 36.48 36.48" fill="currentColor">
-                        <path d="M0 30.016h20v-4h-20v4zM0 22.016h28v-4h-28v4zM0 14.016h24v-4h-24v4zM0 6.016h32v-4h-32v4z"/>
+                        <path d="M0 30.016h20v-4h-20v4zM0 22.016h28v-4h-28v4zM0 14.016h24v-4h-24v4zM0 6.016h32v-4h-32v4z" />
                       </svg>
                     )}
                     {selectedEl.properties.textAlign === 'center' && (
                       <svg width="14" height="14" viewBox="0 0 48 48" fill="currentColor">
-                        <rect x="6.684" y="6" width="34" height="4"/>
-                        <rect x="7.684" y="26" width="32" height="4"/>
-                        <rect x="11.684" y="16" width="24" height="4"/>
-                        <rect x="15.684" y="36" width="16" height="4"/>
+                        <rect x="6.684" y="6" width="34" height="4" />
+                        <rect x="7.684" y="26" width="32" height="4" />
+                        <rect x="11.684" y="16" width="24" height="4" />
+                        <rect x="15.684" y="36" width="16" height="4" />
                       </svg>
                     )}
                     {selectedEl.properties.textAlign === 'right' && (
                       <svg width="14" height="14" viewBox="-2.24 -2.24 36.48 36.48" fill="currentColor">
-                        <path d="M0 6.016v-4h32v4h-32zM4 22.016v-4h28v4h-28zM8 14.016v-4h24v4h-24zM12 30.016v-4h20v4h-20z"/>
+                        <path d="M0 6.016v-4h32v4h-32zM4 22.016v-4h28v4h-28zM8 14.016v-4h24v4h-24zM12 30.016v-4h20v4h-20z" />
                       </svg>
                     )}
                     {selectedEl.properties.textAlign === 'justify' && (
                       <svg width="14" height="14" viewBox="-40.96 -40.96 593.92 593.92" fill="currentColor">
-                        <rect y="15.852" width="512" height="56"/>
-                        <rect y="157.276" width="512" height="56"/>
-                        <rect y="298.708" width="512" height="56"/>
-                        <rect y="440.148" width="512" height="56"/>
+                        <rect y="15.852" width="512" height="56" />
+                        <rect y="157.276" width="512" height="56" />
+                        <rect y="298.708" width="512" height="56" />
+                        <rect y="440.148" width="512" height="56" />
                       </svg>
                     )}
                   </button>
@@ -291,15 +287,14 @@ const FloatingToolbar = ({
                     onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                       properties: { ...selectedEl.properties, listStyle: selectedEl.properties.listStyle === 'bullet' ? 'none' : 'bullet' }
                     })}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md ${
-                      selectedEl.properties.listStyle === 'bullet'
+                    className={`w-8 h-8 flex items-center justify-center rounded-md ${selectedEl.properties.listStyle === 'bullet'
                         ? 'bg-black bg-opacity-20 text-black'
                         : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                      }`}
                     title="Toggle List"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                      <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
                     </svg>
                   </button>
 
@@ -318,7 +313,7 @@ const FloatingToolbar = ({
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 13H15M7 17L11.2717 7.60224C11.5031 7.09323 11.6188 6.83872 11.7791 6.75976C11.9184 6.69115 12.0816 6.69115 12.2209 6.75976C12.3812 6.83872 12.4969 7.09323 12.7283 7.60224L17 17M21 21H3M21 3H3"/>
+                      <path d="M9 13H15M7 17L11.2717 7.60224C11.5031 7.09323 11.6188 6.83872 11.7791 6.75976C11.9184 6.69115 12.0816 6.69115 12.2209 6.75976C12.3812 6.83872 12.4969 7.09323 12.7283 7.60224L17 17M21 21H3M21 3H3" />
                     </svg>
                   </button>
 
@@ -344,12 +339,11 @@ const FloatingToolbar = ({
                     <option value="fill">Fill</option>
                     <option value="none">None</option>
                   </select>
-                  
+
                   {/* Common Effects Button */}
                   <button
-                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${
-                      selectedEl.properties.showCommonEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
-                    }`}
+                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${selectedEl.properties.showCommonEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
+                      }`}
                     title="Common Effects"
                     onClick={() => {
                       const currentState = selectedEl.properties.showCommonEffectsPanel || false;
@@ -361,17 +355,16 @@ const FloatingToolbar = ({
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor">
-                      <path d="M18,11a1,1,0,0,1-1,1,5,5,0,0,0-5,5,1,1,0,0,1-2,0,5,5,0,0,0-5-5,1,1,0,0,1,0-2,5,5,0,0,0,5-5,1,1,0,0,1,2,0,5,5,0,0,0,5,5A1,1,0,0,1,18,11Z"/>
-                      <path d="M19,24a1,1,0,0,1-1,1,2,2,0,0,0-2,2,1,1,0,0,1-2,0,2,2,0,0,0-2-2,1,1,0,0,1,0-2,2,2,0,0,0,2-2,1,1,0,0,1,2,0,2,2,0,0,0,2,2A1,1,0,0,1,19,24Z"/>
-                      <path d="M28,17a1,1,0,0,1-1,1,4,4,0,0,0-4,4,1,1,0,0,1-2,0,4,4,0,0,0-4-4,1,1,0,0,1,0-2,4,4,0,0,0,4-4,1,1,0,0,1,2,0,4,4,0,0,0,4,4A1,1,0,0,1,28,17Z"/>
+                      <path d="M18,11a1,1,0,0,1-1,1,5,5,0,0,0-5,5,1,1,0,0,1-2,0,5,5,0,0,0-5-5,1,1,0,0,1,0-2,5,5,0,0,0,5-5,1,1,0,0,1,2,0,5,5,0,0,0,5,5A1,1,0,0,1,18,11Z" />
+                      <path d="M19,24a1,1,0,0,1-1,1,2,2,0,0,0-2,2,1,1,0,0,1-2,0,2,2,0,0,0-2-2,1,1,0,0,1,0-2,2,2,0,0,0,2-2,1,1,0,0,1,2,0,2,2,0,0,0,2,2A1,1,0,0,1,19,24Z" />
+                      <path d="M28,17a1,1,0,0,1-1,1,4,4,0,0,0-4,4,1,1,0,0,1-2,0,4,4,0,0,0-4-4,1,1,0,0,1,0-2,4,4,0,0,0,4-4,1,1,0,0,1,2,0,4,4,0,0,0,4,4A1,1,0,0,1,28,17Z" />
                     </svg>
                   </button>
 
                   {/* Special Effects Button */}
                   <button
-                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${
-                      selectedEl.properties.showSpecialEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
-                    }`}
+                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${selectedEl.properties.showSpecialEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
+                      }`}
                     title="Special Effects"
                     onClick={() => {
                       const currentState = selectedEl.properties.showSpecialEffectsPanel || false;
@@ -383,10 +376,10 @@ const FloatingToolbar = ({
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor">
-                      <path d="M30.87,14.23,26,22.67V8l3.77,2.18A3,3,0,0,1,30.87,14.23Z"/>
-                      <path d="M6,8.26V22.34l-4.6-8a3,3,0,0,1,1.1-4.1Z"/>
-                      <path d="M21,4H11A3,3,0,0,0,8,7V25a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V7A3,3,0,0,0,21,4ZM13,8a1,1,0,1,1-1,1A1,1,0,0,1,13,8Zm6,16a1,1,0,1,1,1-1A1,1,0,0,1,19,24Zm-3-4a4,4,0,1,1,4-4A4,4,0,0,1,16,20Z"/>
-                      <circle cx="16" cy="16" r="2"/>
+                      <path d="M30.87,14.23,26,22.67V8l3.77,2.18A3,3,0,0,1,30.87,14.23Z" />
+                      <path d="M6,8.26V22.34l-4.6-8a3,3,0,0,1,1.1-4.1Z" />
+                      <path d="M21,4H11A3,3,0,0,0,8,7V25a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V7A3,3,0,0,0,21,4ZM13,8a1,1,0,1,1-1,1A1,1,0,0,1,13,8Zm6,16a1,1,0,1,1,1-1A1,1,0,0,1,19,24Zm-3-4a4,4,0,1,1,4-4A4,4,0,0,1,16,20Z" />
+                      <circle cx="16" cy="16" r="2" />
                     </svg>
                   </button>
                 </div>
@@ -396,7 +389,7 @@ const FloatingToolbar = ({
               {selectedEl.type === 'image' && selectedEl.properties.showCommonEffectsPanel && (
                 <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 min-w-64">
                   <div className="text-sm font-medium text-gray-700 mb-3">Common Effects</div>
-                  
+
                   {/* Brightness */}
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
@@ -475,7 +468,7 @@ const FloatingToolbar = ({
               {selectedEl.type === 'image' && selectedEl.properties.showSpecialEffectsPanel && (
                 <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 min-w-64">
                   <div className="text-sm font-medium text-gray-700 mb-3">Special Effects</div>
-                  
+
                   {/* Opacity */}
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
@@ -530,7 +523,7 @@ const FloatingToolbar = ({
               {selectedEl.type === 'shape' && selectedEl.properties.showStrokeStylePanel && (
                 <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 min-w-64">
                   <div className="text-sm font-medium text-gray-700 mb-3">Stroke Style</div>
-                  
+
                   {/* Line Style Options */}
                   <div className="mb-4">
                     <div className="flex gap-2 mb-3">
@@ -538,63 +531,59 @@ const FloatingToolbar = ({
                         onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                           properties: { ...selectedEl.properties, strokeDasharray: undefined }
                         })}
-                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${
-                          !selectedEl.properties.strokeDasharray || selectedEl.properties.strokeDasharray === 'none' 
-                            ? 'border-purple-500 bg-purple-50' 
+                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${!selectedEl.properties.strokeDasharray || selectedEl.properties.strokeDasharray === 'none'
+                            ? 'border-purple-500 bg-purple-50'
                             : 'border-gray-300 hover:border-gray-400'
-                        }`}
+                          }`}
                         title="Solid Line"
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <line x1="3" y1="12" x2="21" y2="12"/>
+                          <line x1="3" y1="12" x2="21" y2="12" />
                         </svg>
                       </button>
                       <button
                         onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                           properties: { ...selectedEl.properties, strokeDasharray: '5,5' }
                         })}
-                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${
-                          selectedEl.properties.strokeDasharray === '5,5'
-                            ? 'border-purple-500 bg-purple-50' 
+                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '5,5'
+                            ? 'border-purple-500 bg-purple-50'
                             : 'border-gray-300 hover:border-gray-400'
-                        }`}
+                          }`}
                         title="Dashed Line"
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 12h4M9 12h4M15 12h4M21 12h3"/>
+                          <path d="M3 12h4M9 12h4M15 12h4M21 12h3" />
                         </svg>
                       </button>
                       <button
                         onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                           properties: { ...selectedEl.properties, strokeDasharray: '2,2' }
                         })}
-                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${
-                          selectedEl.properties.strokeDasharray === '2,2'
-                            ? 'border-purple-500 bg-purple-50' 
+                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '2,2'
+                            ? 'border-purple-500 bg-purple-50'
                             : 'border-gray-300 hover:border-gray-400'
-                        }`}
+                          }`}
                         title="Dotted Line"
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="6" cy="12" r="1"/>
-                          <circle cx="12" cy="12" r="1"/>
-                          <circle cx="18" cy="12" r="1"/>
+                          <circle cx="6" cy="12" r="1" />
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="18" cy="12" r="1" />
                         </svg>
                       </button>
                       <button
                         onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
                           properties: { ...selectedEl.properties, strokeDasharray: '5,5,2,2' }
                         })}
-                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${
-                          selectedEl.properties.strokeDasharray === '5,5,2,2'
-                            ? 'border-purple-500 bg-purple-50' 
+                        className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '5,5,2,2'
+                            ? 'border-purple-500 bg-purple-50'
                             : 'border-gray-300 hover:border-gray-400'
-                        }`}
+                          }`}
                         title="Dash-Dot Line"
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 12h3M9 12h3M15 12h3"/>
-                          <circle cx="21" cy="12" r="1"/>
+                          <path d="M3 12h3M9 12h3M15 12h3" />
+                          <circle cx="21" cy="12" r="1" />
                         </svg>
                       </button>
                     </div>
@@ -629,7 +618,7 @@ const FloatingToolbar = ({
               {selectedEl.type === 'shape' && selectedEl.properties.showShapeEffectsPanel && (
                 <div className="absolute top-full right-0 -mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 min-w-64">
                   <div className="text-sm font-medium text-gray-700 mb-3">Special Effects</div>
-                  
+
                   {/* Opacity */}
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
@@ -725,12 +714,11 @@ const FloatingToolbar = ({
                     className="w-8 h-8 border border-gray-300 rounded-md cursor-pointer"
                     title="Stroke Color"
                   />
-                  
+
                   {/* Stroke Style Button */}
                   <button
-                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${
-                      selectedEl.properties.showStrokeStylePanel ? 'bg-black bg-opacity-20 text-black' : ''
-                    }`}
+                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${selectedEl.properties.showStrokeStylePanel ? 'bg-black bg-opacity-20 text-black' : ''
+                      }`}
                     title="Stroke Style"
                     onClick={() => {
                       const currentState = selectedEl.properties.showStrokeStylePanel || false;
@@ -742,17 +730,16 @@ const FloatingToolbar = ({
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 12h18"/>
-                      <path d="M3 6h18"/>
-                      <path d="M3 18h18"/>
+                      <path d="M3 12h18" />
+                      <path d="M3 6h18" />
+                      <path d="M3 18h18" />
                     </svg>
                   </button>
 
                   {/* Special Effects Button */}
                   <button
-                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${
-                      selectedEl.properties.showShapeEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
-                    }`}
+                    className={`w-8 h-8 text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md ${selectedEl.properties.showShapeEffectsPanel ? 'bg-black bg-opacity-20 text-black' : ''
+                      }`}
                     title="Special Effects"
                     onClick={() => {
                       const currentState = selectedEl.properties.showShapeEffectsPanel || false;
@@ -764,10 +751,10 @@ const FloatingToolbar = ({
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor">
-                      <path d="M30.87,14.23,26,22.67V8l3.77,2.18A3,3,0,0,1,30.87,14.23Z"/>
-                      <path d="M6,8.26V22.34l-4.6-8a3,3,0,0,1,1.1-4.1Z"/>
-                      <path d="M21,4H11A3,3,0,0,0,8,7V25a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V7A3,3,0,0,0,21,4ZM13,8a1,1,0,1,1-1,1A1,1,0,0,1,13,8Zm6,16a1,1,0,1,1,1-1A1,1,0,0,1,19,24Zm-3-4a4,4,0,1,1,4-4A4,4,0,0,1,16,20Z"/>
-                      <circle cx="16" cy="16" r="2"/>
+                      <path d="M30.87,14.23,26,22.67V8l3.77,2.18A3,3,0,0,1,30.87,14.23Z" />
+                      <path d="M6,8.26V22.34l-4.6-8a3,3,0,0,1,1.1-4.1Z" />
+                      <path d="M21,4H11A3,3,0,0,0,8,7V25a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V7A3,3,0,0,0,21,4ZM13,8a1,1,0,1,1-1,1A1,1,0,0,1,13,8Zm6,16a1,1,0,1,1,1-1A1,1,0,0,1,19,24Zm-3-4a4,4,0,1,1,4-4A4,4,0,0,1,16,20Z" />
+                      <circle cx="16" cy="16" r="2" />
                     </svg>
                   </button>
                 </div>
@@ -799,7 +786,7 @@ const FloatingToolbar = ({
               title="Duplicate"
             >
               <svg width="14" height="14" viewBox="-1.68 -1.68 27.36 27.36" fill="currentColor">
-                <path d="M24,24H6V6h18V24z M8,22h14V8H8V22z M4,18H0v-4h2v2h2V18z M2,12H0V6h2V12z M18,4h-2V2h-2V0h4V4z M2,4H0V0h4v2H2V4z M12,2 H6V0h6V2z"/>
+                <path d="M24,24H6V6h18V24z M8,22h14V8H8V22z M4,18H0v-4h2v2h2V18z M2,12H0V6h2V12z M18,4h-2V2h-2V0h4V4z M2,4H0V0h4v2H2V4z M12,2 H6V0h6V2z" />
               </svg>
             </button>
             <button
@@ -843,13 +830,12 @@ const FloatingToolbar = ({
           </button>
           <button
             onClick={addPage}
-            disabled={totalPages >= 20}
-            className={`p-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg ${
-              totalPages >= 20 
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+            disabled={totalPages >= 50}
+            className={`p-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg ${totalPages >= 50
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:scale-105'
-            }`}
-            title={totalPages >= 20 ? "Maximum page limit reached (20 pages)" : "Add Page"}
+              }`}
+            title={totalPages >= 50 ? "Maximum page limit reached (50 pages)" : "Add Page"}
           >
             <Plus size={20} />
           </button>

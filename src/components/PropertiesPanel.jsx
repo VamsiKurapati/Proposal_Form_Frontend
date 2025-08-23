@@ -3,6 +3,7 @@ import TextProperties from './Properties/TextProperties';
 import ImageProperties from './Properties/ImageProperties';
 import ShapeProperties from './Properties/ShapeProperties';
 import CommonProperties from './Properties/CommonProperties';
+import { truncateText } from '../utils/text';
 
 const PropertiesPanel = ({
   show,
@@ -12,7 +13,7 @@ const PropertiesPanel = ({
   deleteElement,
   duplicateElement,
   onClose,
-  project
+  project,
 }) => {
   if (!show) return null;
 
@@ -61,7 +62,7 @@ const PropertiesPanel = ({
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {selectedEl.type === 'text' && (selectedEl.properties?.text || 'Text element')}
+                {selectedEl.type === 'text' && (selectedEl.properties?.text ? truncateText(selectedEl.properties.text, 30) : 'Text element')}
                 {selectedEl.type === 'image' && 'Image element'}
                 {selectedEl.type === 'shape' && `${selectedEl.shapeType || 'Shape'} element`}
                 {selectedEl.type === 'svg' && 'SVG element'}
@@ -70,7 +71,7 @@ const PropertiesPanel = ({
 
             {/* Element-specific properties */}
             <div className="space-y-6">
-              {selectedEl.type === 'text' && (
+              {selectedEl.type === 'text' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <TextProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -78,7 +79,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'image' && (
+              {selectedEl.type === 'image' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <ImageProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -86,7 +87,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'shape' && (
+              {selectedEl.type === 'shape' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <ShapeProperties
                   element={selectedEl}
                   selectedElement={selectedElement}
@@ -94,7 +95,7 @@ const PropertiesPanel = ({
                 />
               )}
 
-              {selectedEl.type === 'svg' && (
+              {selectedEl.type === 'svg' && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">SVG Properties</h4>
                   <div>
@@ -116,20 +117,22 @@ const PropertiesPanel = ({
               )}
 
               {/* Common properties for all elements */}
-              <CommonProperties
-                element={selectedEl}
-                selectedElement={selectedElement}
-                updateElement={updateElement}
-                deleteElement={deleteElement}
-                duplicateElement={duplicateElement}
-                project={project}
-              />
+              {selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
+                <CommonProperties
+                  element={selectedEl}
+                  selectedElement={selectedElement}
+                  updateElement={updateElement}
+                  deleteElement={deleteElement}
+                  duplicateElement={duplicateElement}
+                  project={project}
+                />
+              )}
             </div>
           </>
         )}
 
         {/* Actions */}
-        {selectedEl && (
+        {selectedEl && selectedElement && selectedElement.pageIndex !== undefined && selectedElement.pageIndex >= 0 && selectedElement.pageIndex < project.pages.length && (
           <div className="border-t pt-4 mt-6">
             <h4 className="text-sm font-medium text-gray-700 mb-3">Actions</h4>
             <div className="space-y-3">

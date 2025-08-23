@@ -8,33 +8,87 @@ import { useLocation } from "react-router-dom";
 const BasicComplianceCheck = () => {
     const location = useLocation();
     const [data, setData] = useState(null);
-    const [basicComplianceCheck, setBasicComplianceCheck] = useState(null);
+    const [complianceData, setComplianceData] = useState(null);
 
     useEffect(() => {
         const data = location.state && location.state.data;
         if (data) {
             setData(data);
-            setBasicComplianceCheck(data.basicComplianceCheck);
+            setComplianceData(data);
         } else {
             setData(null);
-            // console.log("No data found");
-            setBasicComplianceCheck([{
-                title: "Critical Issues Found",
-                description: "Please address these issues before submission",
-                issues: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Missing Sections",
-                description: "Please address these issues before submission",
-                sections: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Completed Sections",
-                description: "Recheck before submission if needed",
-                sections: ["Complete section", "Partnership Overview", "Financial Summary"],
-            }]);
+            // Fallback data structure for testing
+            setComplianceData({
+                missing_sections: ["Executive Summary", "Scope of Work / Deliverables"],
+                format_issues: {
+                    "Budget & Cost Breakdown": [
+                        "Doesn't start with a capital letter at section: Budget & Cost Breakdown"
+                    ]
+                },
+                empty_sections: ["Executive Summary", "Scope of Work / Deliverables"]
+            });
         }
     }, []);
+
+    // Helper function to get unique sections from all categories
+    const getAllSections = () => {
+        if (!complianceData) return [];
+
+        const sections = new Set();
+
+        // Add missing sections
+        if (complianceData.missing_sections) {
+            complianceData.missing_sections.forEach(section => sections.add(section));
+        }
+
+        // Add sections with format issues
+        if (complianceData.format_issues) {
+            Object.keys(complianceData.format_issues).forEach(section => sections.add(section));
+        }
+
+        // Add empty sections
+        if (complianceData.empty_sections) {
+            complianceData.empty_sections.forEach(section => sections.add(section));
+        }
+
+        return Array.from(sections);
+    };
+
+    // Helper function to get issues for a specific section
+    const getIssuesForSection = (sectionName) => {
+        if (!complianceData) return [];
+
+        const issues = [];
+
+        // Check if section is missing
+        if (complianceData.missing_sections && complianceData.missing_sections.includes(sectionName)) {
+            issues.push("Section is missing from the document");
+        }
+
+        // Check if section has format issues
+        if (complianceData.format_issues && complianceData.format_issues[sectionName]) {
+            issues.push(...complianceData.format_issues[sectionName]);
+        }
+
+        // Check if section is empty
+        if (complianceData.empty_sections && complianceData.empty_sections.includes(sectionName)) {
+            issues.push("Section exists but is empty");
+        }
+
+        return issues;
+    };
+
+    // Helper function to get section status
+    const getSectionStatus = (sectionName) => {
+        const issues = getIssuesForSection(sectionName);
+
+        if (issues.length === 0) return "completed";
+        if (issues.some(issue => issue.includes("missing"))) return "missing";
+        if (issues.some(issue => issue.includes("empty"))) return "empty";
+        return "format_issues";
+    };
+
+    const allSections = getAllSections();
 
     return (
         <div className="min-h-screen overflow-y-auto">
@@ -56,66 +110,130 @@ const BasicComplianceCheck = () => {
                     <span className="text-black text-[20px] font-semibold mt-4 mb-4">
                         Basic Compliance Check
                     </span>
-                    {/* Compliance Cards */}
+
+                    {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        {/* Critical Issues */}
-                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#7F1D1D]">{basicComplianceCheck && basicComplianceCheck[0] && basicComplianceCheck[0].title}</h2>
-                            <p className="text-[#B91C1C] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[0] && basicComplianceCheck[0].description}</p>
-                            <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck[0] && basicComplianceCheck[0].issues && basicComplianceCheck[0].issues.map((issue, idx) => (
-                                    <li key={idx} className="flex items-center justify-start gap-2">
-                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">{issue}</span>
-                                    </li>
-                                ))}
-                                {basicComplianceCheck && basicComplianceCheck && basicComplianceCheck[0].issues && basicComplianceCheck[0].issues.length === 0 && (
-                                    <li className="flex items-center justify-start gap-2">
-                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">No critical issues found</span>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
                         {/* Missing Sections */}
-                        <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#713F12]">{basicComplianceCheck && basicComplianceCheck[1].title}</h2>
-                            <p className="text-[#713F12] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[1].description}</p>
+                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
+                            <h2 className="text-[16px] font-semibold text-[#7F1D1D]">Missing Sections</h2>
+                            <p className="text-[#B91C1C] text-[14px] mb-4">Critical sections that need to be added</p>
                             <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck && basicComplianceCheck[1].sections && basicComplianceCheck[1].sections.map((section, idx) => (
-                                    <li key={idx} className="flex items-center justify-start gap-2">
-                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
-                                        <span className="text-[#111827] text-[16px]">{section}</span>
-                                    </li>
-                                ))}
-                                {basicComplianceCheck && basicComplianceCheck && basicComplianceCheck[1].sections && basicComplianceCheck[1].sections.length === 0 && (
+                                {complianceData && complianceData.missing_sections && complianceData.missing_sections.length > 0 ? (
+                                    complianceData.missing_sections.map((section, idx) => (
+                                        <li key={idx} className="flex items-center justify-start gap-2">
+                                            <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
+                                            <span className="text-[#111827] text-[16px]">{section}</span>
+                                        </li>
+                                    ))
+                                ) : (
                                     <li className="flex items-center justify-start gap-2">
-                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
-                                        <span className="text-[#111827] text-[16px]">No missing sections found</span>
+                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <span className="text-[#111827] text-[16px]">No missing sections</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
-                        {/* Completed Sections */}
-                        <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#14532D]">{basicComplianceCheck && basicComplianceCheck[2].title}</h2>
-                            <p className="text-[#14532D] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[2].description}</p>
+
+                        {/* Format Issues */}
+                        <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6">
+                            <h2 className="text-[16px] font-semibold text-[#713F12]">Format Issues</h2>
+                            <p className="text-[#713F12] text-[14px] mb-4">Sections with formatting problems</p>
                             <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck[2].sections && basicComplianceCheck[2].sections.map((section, idx) => (
-                                    <li key={idx} className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
-                                        <span className="text-[#111827] text-[16px]">{section}</span>
-                                    </li>
-                                ))}
-                                {basicComplianceCheck && basicComplianceCheck && basicComplianceCheck[2].sections && basicComplianceCheck[2].sections.length === 0 && (
+                                {complianceData && complianceData.format_issues && Object.keys(complianceData.format_issues).length > 0 ? (
+                                    Object.entries(complianceData.format_issues).map(([section, issues], idx) => (
+                                        <li key={idx} className="flex items-start justify-start gap-2">
+                                            <MdOutlineError className="text-[20px] text-[#EAB308] mt-1 flex-shrink-0" />
+                                            <div className="flex flex-col">
+                                                <span className="text-[#111827] text-[16px] font-medium">{section}</span>
+                                                {issues.map((issue, issueIdx) => (
+                                                    <span key={issueIdx} className="text-[#713F12] text-[14px] ml-2">• {issue}</span>
+                                                ))}
+                                            </div>
+                                        </li>
+                                    ))
+                                ) : (
                                     <li className="flex items-center justify-start gap-2">
                                         <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
-                                        <span className="text-[#111827] text-[16px]">No completed sections found</span>
+                                        <span className="text-[#111827] text-[16px]">No format issues found</span>
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* Empty Sections */}
+                        <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
+                            <h2 className="text-[16px] font-semibold text-[#14532D]">Empty Sections</h2>
+                            <p className="text-[#14532D] text-[14px] mb-4">Sections that need content</p>
+                            <ul className="space-y-3">
+                                {complianceData && complianceData.empty_sections && complianceData.empty_sections.length > 0 ? (
+                                    complianceData.empty_sections.map((section, idx) => (
+                                        <li key={idx} className="flex items-center justify-start gap-2">
+                                            <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                            <span className="text-[#111827] text-[16px]">{section}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="flex items-center justify-start gap-2">
+                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <span className="text-[#111827] text-[16px]">No empty sections</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
                     </div>
+
+                    {/* Detailed Section Analysis */}
+                    {allSections.length > 0 && (
+                        <div className="mb-10">
+                            <h3 className="text-[18px] font-semibold text-[#111827] mb-4">Detailed Section Analysis</h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                {allSections.map((section, idx) => {
+                                    const status = getSectionStatus(section);
+                                    const issues = getIssuesForSection(section);
+
+                                    const getStatusColor = (status) => {
+                                        switch (status) {
+                                            case "completed": return "bg-[#F0FDF4] border-[#BBF7D0]";
+                                            case "missing": return "bg-[#FEF2F2] border-[#FECACA]";
+                                            case "empty": return "bg-[#FEFCE8] border-[#FEF0C7]";
+                                            case "format_issues": return "bg-[#FEFCE8] border-[#FEF0C7]";
+                                            default: return "bg-[#F8F9FA] border-[#E5E7EB]";
+                                        }
+                                    };
+
+                                    const getStatusIcon = (status) => {
+                                        switch (status) {
+                                            case "completed": return <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />;
+                                            case "missing": return <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />;
+                                            case "empty": return <MdOutlineError className="text-[20px] text-[#EAB308]" />;
+                                            case "format_issues": return <MdOutlineError className="text-[20px] text-[#EAB308]" />;
+                                            default: return <MdOutlineError className="text-[20px] text-[#6B7280]" />;
+                                        }
+                                    };
+
+                                    return (
+                                        <div key={idx} className={`border-2 rounded-lg p-4 ${getStatusColor(status)}`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="text-[16px] font-semibold text-[#111827]">{section}</h4>
+                                                {getStatusIcon(status)}
+                                            </div>
+                                            {issues.length > 0 ? (
+                                                <ul className="space-y-1">
+                                                    {issues.map((issue, issueIdx) => (
+                                                        <li key={issueIdx} className="text-[14px] text-[#6B7280] ml-6">
+                                                            • {issue}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-[14px] text-[#16A34A] ml-6">✓ Section is compliant</p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Advanced Compliance Check Section */}

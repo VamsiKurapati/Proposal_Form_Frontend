@@ -51,26 +51,16 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
 
         // Handle cloud images (uploaded images)
         if (cloudImageService.isCloudImage(src)) {
-          if (src.startsWith('cloud://')) {
-            const imageName = src.replace('cloud://', '');
-            finalSrc = await cloudImageService.downloadImage(imageName);
-          } else {
-            finalSrc = cloudImageService.getCloudUrl(src);
-          }
+          finalSrc = cloudImageService.getCloudUrl(src);
         }
         // Handle template images
         else if (cloudImageService.isTemplateImage(src)) {
-          if (src.startsWith('template://')) {
-            const imageName = src.replace('template://', '');
-            finalSrc = await cloudImageService.getTemplateImage(imageName);
-          } else {
-            finalSrc = cloudImageService.getTemplateUrl(src);
-          }
+          finalSrc = cloudImageService.getTemplateUrl(src);
         }
 
         setImageSrc(finalSrc);
         setIsLoading(false);
-        
+
         if (onLoad) {
           onLoad();
         }
@@ -78,7 +68,7 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
         console.error('Error loading image:', error);
         setHasError(true);
         setIsLoading(false);
-        
+
         if (onError) {
           onError(error);
         }
@@ -90,15 +80,15 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
 
   // Build transform string for flip effects
   const transforms = [];
-  
+
   if (element.properties.flipHorizontal) {
     transforms.push('scaleX(-1)');
   }
-  
+
   if (element.properties.flipVertical) {
     transforms.push('scaleY(-1)');
   }
-  
+
   const transformStyle = transforms.length > 0 ? transforms.join(' ') : 'none';
 
   // Loading placeholder
@@ -148,7 +138,9 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
       alt=""
       className="w-full h-full"
       style={{
-        objectFit: element.properties.fit === 'stretch' ? 'fill' : element.properties.fit,
+        objectFit: element.properties.fit === 'stretch' ? 'fill' :
+          element.properties.fit === 'scale-down' ? 'scale-down' :
+            element.properties.fit || 'contain',
         opacity: element.properties.opacity ?? 1,
         filter: `brightness(${element.properties.brightness ?? 1}) contrast(${element.properties.contrast ?? 1}) saturate(${element.properties.saturate ?? 1}) blur(${element.properties.blur ?? 0}px)`,
         borderRadius: (element.properties.borderRadius ?? 0) + 'px',

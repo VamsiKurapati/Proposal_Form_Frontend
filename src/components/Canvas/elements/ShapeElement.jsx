@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ShapeElement = ({ element }) => {
-  
+
   const {
     fill = '#f3f4f6',
     stroke = '#111827',
@@ -18,10 +18,10 @@ const ShapeElement = ({ element }) => {
   // Shadow filter
   const filterId = `shape-shadow-${element.id}`;
   const filter = shadow && shadowBlur > 0 ? `url(#${filterId})` : undefined;
-  
+
   const renderShape = () => {
     const shapeType = element.shapeType || 'rectangle';
-    
+
     switch (shapeType) {
       case 'rectangle':
         return (
@@ -56,10 +56,10 @@ const ShapeElement = ({ element }) => {
               </filter>
             )}
             <ellipse
-              cx={element.width/2}
-              cy={element.height/2}
-              rx={(element.width - (strokeWidth || 0))/2}
-              ry={(element.height - (strokeWidth || 0))/2}
+              cx={element.width / 2}
+              cy={element.height / 2}
+              rx={(element.width - (strokeWidth || 0)) / 2}
+              ry={(element.height - (strokeWidth || 0)) / 2}
               fill={fill}
               stroke={stroke}
               strokeWidth={strokeWidth}
@@ -73,7 +73,7 @@ const ShapeElement = ({ element }) => {
         const w = element.width, h = element.height;
         const strokeOffset = (strokeWidth || 0); // Use full stroke width instead of half
         // Adjust points to account for stroke width with more margin
-        const points = `${w/2},${strokeOffset} ${w - strokeOffset},${h - strokeOffset} ${strokeOffset},${h - strokeOffset}`;
+        const points = `${w / 2},${strokeOffset} ${w - strokeOffset},${h - strokeOffset} ${strokeOffset},${h - strokeOffset}`;
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -101,7 +101,7 @@ const ShapeElement = ({ element }) => {
         }
         const lineStrokeWidth = !strokeWidth || strokeWidth === 0 ? 2 : strokeWidth;
         const selectionWidth = Math.max(40, h * 0.3); // Much wider selection area - at least 40px or 30% of height
-        
+
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -135,7 +135,7 @@ const ShapeElement = ({ element }) => {
         );
       }
       case 'diamond': {
-        const points = `${element.width/2},0 ${element.width},${element.height/2} ${element.width/2},${element.height} 0,${element.height/2}`;
+        const points = `${element.width / 2},0 ${element.width},${element.height / 2} ${element.width / 2},${element.height} 0,${element.height / 2}`;
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${element.width} ${element.height}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -267,7 +267,7 @@ const ShapeElement = ({ element }) => {
         const r = Math.min(element.width, element.height) / 2;
         const cx = element.width / 2;
         const cy = element.height / 2;
-        const points = Array.from({length: 8}).map((_, i) => {
+        const points = Array.from({ length: 8 }).map((_, i) => {
           const angle = (Math.PI / 8) + (i * 2 * Math.PI / 8);
           return `${cx + r * Math.cos(angle)},${cy - r * Math.sin(angle)}`;
         }).join(' ');
@@ -359,7 +359,7 @@ const ShapeElement = ({ element }) => {
       case 'bookmark': {
         const w = element.width;
         const h = element.height;
-        const path = `M0,0 H${w} V${h} L${w/2},${h*0.7} L0,${h} Z`;
+        const path = `M0,0 H${w} V${h} L${w / 2},${h * 0.7} L0,${h} Z`;
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -383,9 +383,9 @@ const ShapeElement = ({ element }) => {
         const w = element.width, h = element.height;
         // Stretchable heart using full width and height
         const path = `
-          M ${w/2},${h*0.8}
-          C ${w*0.05},${h*0.55} ${w*0.2},${h*0.05} ${w/2},${h*0.3}
-          C ${w*0.8},${h*0.05} ${w*0.95},${h*0.55} ${w/2},${h*0.8}
+          M ${w / 2},${h * 0.8}
+          C ${w * 0.05},${h * 0.55} ${w * 0.2},${h * 0.05} ${w / 2},${h * 0.3}
+          C ${w * 0.8},${h * 0.05} ${w * 0.95},${h * 0.55} ${w / 2},${h * 0.8}
           Z
         `;
         return (
@@ -408,7 +408,7 @@ const ShapeElement = ({ element }) => {
       }
       case 'cloud': {
         const w = element.width, h = element.height;
-        const path = `M${w*0.25},${h*0.7} Q0,${h*0.7} 0,${h*0.5} Q0,${h*0.3} ${w*0.2},${h*0.3} Q${w*0.25},0 ${w*0.5},${h*0.1} Q${w*0.75},0 ${w*0.8},${h*0.3} Q${w},${h*0.3} ${w},${h*0.5} Q${w},${h*0.7} ${w*0.75},${h*0.7} Z`;
+        const path = `M${w * 0.25},${h * 0.7} Q0,${h * 0.7} 0,${h * 0.5} Q0,${h * 0.3} ${w * 0.2},${h * 0.3} Q${w * 0.25},0 ${w * 0.5},${h * 0.1} Q${w * 0.75},0 ${w * 0.8},${h * 0.3} Q${w},${h * 0.3} ${w},${h * 0.5} Q${w},${h * 0.7} ${w * 0.75},${h * 0.7} Z`;
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -430,14 +430,14 @@ const ShapeElement = ({ element }) => {
       }
       case 'sun': {
         const w = element.width, h = element.height;
-        const cx = w/2, cy = h/2, r = Math.min(w, h) * 0.25;
-        const rays = Array.from({length: 12}).map((_, i) => {
+        const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.25;
+        const rays = Array.from({ length: 12 }).map((_, i) => {
           const angle = (i * 2 * Math.PI) / 12;
           const x1 = cx + Math.cos(angle) * r;
           const y1 = cy + Math.sin(angle) * r;
           const x2 = cx + Math.cos(angle) * r * 1.5;
           const y2 = cy + Math.sin(angle) * r * 1.5;
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={strokeWidth/2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter}/>;
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={strokeWidth / 2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter} />;
         });
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
@@ -446,7 +446,7 @@ const ShapeElement = ({ element }) => {
                 <feDropShadow dx="0" dy="0" stdDeviation={shadowBlur} floodColor={shadowColor} floodOpacity="1" />
               </filter>
             )}
-            <circle cx={cx} cy={cy} r={r} fill={fill} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter}/>
+            <circle cx={cx} cy={cy} r={r} fill={fill} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter} />
             {rays}
           </svg>
         );
@@ -457,10 +457,10 @@ const ShapeElement = ({ element }) => {
         const cy = h / 2;
         const r = Math.min(w, h) / 2 * 0.9;
         const d = r * 0.4; // Distance between circle centers
-        
+
         // Calculate intersection points
         const intersectY = Math.sqrt(r * r - d * d);
-        
+
         // Create crescent using a single path
         const path = `
           M ${cx} ${cy - r}
@@ -470,7 +470,7 @@ const ShapeElement = ({ element }) => {
           A ${r} ${r} 0 0 1 ${cx} ${cy - r}
           Z
         `;
-        
+
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -500,15 +500,15 @@ const ShapeElement = ({ element }) => {
         const bubbleHeight = h - tailSize;
         // Clean speech bubble with tail pointing down-left
         const path = `M${radius},0 
-                 L${w-radius},0 
+                 L${w - radius},0 
                  Q${w},0 ${w},${radius} 
-                 L${w},${bubbleHeight-radius} 
-                 Q${w},${bubbleHeight} ${w-radius},${bubbleHeight} 
-                 L${w*0.3},${bubbleHeight} 
-                 L${w*0.2},${h} 
-                 L${w*0.25},${bubbleHeight} 
+                 L${w},${bubbleHeight - radius} 
+                 Q${w},${bubbleHeight} ${w - radius},${bubbleHeight} 
+                 L${w * 0.3},${bubbleHeight} 
+                 L${w * 0.2},${h} 
+                 L${w * 0.25},${bubbleHeight} 
                  L${radius},${bubbleHeight} 
-                 Q0,${bubbleHeight} 0,${bubbleHeight-radius} 
+                 Q0,${bubbleHeight} 0,${bubbleHeight - radius} 
                  L0,${radius} 
                  Q0,0 ${radius},0 Z`;
         return (
@@ -534,66 +534,73 @@ const ShapeElement = ({ element }) => {
       }
       case 'arrow': {
         const w = element.width, h = element.height;
-        const strokeOffset = (strokeWidth || 0) / 2; // Center the stroke
-        // Use proportional values instead of fixed pixels
-        const arrowHeadSize = Math.max(10, h * 0.15); // Proportional arrow head size
-        const shaftEnd = w - arrowHeadSize;
-        const arrowTip = w - strokeOffset;
-        const arrowTop = h / 2 - arrowHeadSize / 2;
-        const arrowBottom = h / 2 + arrowHeadSize / 2;
+        const strokeOffset = (strokeWidth || 0) / 2;
+
+        // Improved proportional arrow head size with min/max bounds
+        const arrowHeadLength = Math.min(Math.max(12, Math.min(w, h) * 0.25), w * 0.35);
+        const arrowHeadHeight = Math.min(Math.max(8, h * 0.3), arrowHeadLength * 0.8);
+        const shaftEnd = w - arrowHeadLength;
+        const arrowTip = w - 2; // Keep tip within bounds with small margin
+        const arrowTop = h / 2 - arrowHeadHeight / 2;
+        const arrowBottom = h / 2 + arrowHeadHeight / 2;
         const filterId = `arrow-shadow-${Math.random().toString(36).substr(2, 9)}`;
 
         return (
-          <svg width="60%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '60%', height: '100%', margin: '0 20%' }}>
+          <svg
+            width="80%"
+            height="100%"
+            viewBox={`0 0 ${w} ${h}`}
+            style={{ width: '80%', height: '100%', margin: '0 10%' }}
+          >
             {shadow && shadowBlur > 0 && (
               <defs>
                 <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="0" stdDeviation={shadowBlur} floodColor={shadowColor} floodOpacity="1" />
+                  <feDropShadow
+                    dx="0"
+                    dy="0"
+                    stdDeviation={shadowBlur}
+                    floodColor={shadowColor}
+                    floodOpacity="1"
+                  />
                 </filter>
               </defs>
             )}
 
-            {/* Arrow shaft */}
-            <line
-              x1={strokeOffset}
-              y1={h/2}
-              x2={arrowTip}
-              y2={h/2}
+            <g
               stroke={stroke}
               strokeWidth={strokeWidth}
               opacity={opacity}
               strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined}
               filter={shadow && shadowBlur > 0 ? `url(#${filterId})` : undefined}
-            />
-
-            {/* Arrow head - top line */}
-            <line
-              x1={shaftEnd}
-              y1={arrowTop}
-              x2={arrowTip}
-              y2={h/2}
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-              opacity={opacity}
-              strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined}
-              filter={shadow && shadowBlur > 0 ? `url(#${filterId})` : undefined}
-            />
-
-            {/* Arrow head - bottom line */}
+            >
+              {/* Arrow shaft */}
               <line
-              x1={shaftEnd}
-              y1={arrowBottom}
-              x2={arrowTip}
-              y2={h/2}
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-              opacity={opacity}
-              strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined}
-              filter={shadow && shadowBlur > 0 ? `url(#${filterId})` : undefined}
-            />
+                x1={strokeOffset}
+                y1={h / 2}
+                x2={arrowTip}
+                y2={h / 2}
+              />
+
+              {/* Arrow head - top line */}
+              <line
+                x1={shaftEnd}
+                y1={arrowTop}
+                x2={arrowTip}
+                y2={h / 2}
+              />
+
+              {/* Arrow head - bottom line */}
+              <line
+                x1={shaftEnd}
+                y1={arrowBottom}
+                x2={arrowTip}
+                y2={h / 2}
+              />
+            </g>
           </svg>
         );
-}     
+      }
+
       case 'rightArrow': {
         const w = element.width, h = element.height;
         // Thinner shaft for right arrow
@@ -754,7 +761,7 @@ const ShapeElement = ({ element }) => {
         const verticalEnd = h * (1 + lineLength) / 2;
         const horizontalStart = w * (1 - lineLength) / 2;
         const horizontalEnd = w * (1 + lineLength) / 2;
-        
+
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
             {shadow && shadowBlur > 0 && (
@@ -762,8 +769,8 @@ const ShapeElement = ({ element }) => {
                 <feDropShadow dx="0" dy="0" stdDeviation={shadowBlur} floodColor={shadowColor} floodOpacity="1" />
               </filter>
             )}
-            <line x1={w/2} y1={verticalStart} x2={w/2} y2={verticalEnd} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter}/>
-            <line x1={horizontalStart} y1={h/2} x2={horizontalEnd} y2={h/2} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter}/>
+            <line x1={w / 2} y1={verticalStart} x2={w / 2} y2={verticalEnd} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter} />
+            <line x1={horizontalStart} y1={h / 2} x2={horizontalEnd} y2={h / 2} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter} />
           </svg>
         );
       }
@@ -776,7 +783,7 @@ const ShapeElement = ({ element }) => {
                 <feDropShadow dx="0" dy="0" stdDeviation={shadowBlur} floodColor={shadowColor} floodOpacity="1" />
               </filter>
             )}
-            <line x1={w*0.2} y1={h/2} x2={w*0.8} y2={h/2} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter}/>
+            <line x1={w * 0.2} y1={h / 2} x2={w * 0.8} y2={h / 2} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} filter={filter} />
           </svg>
         );
       }
@@ -789,8 +796,8 @@ const ShapeElement = ({ element }) => {
                 <feDropShadow dx="0" dy="0" stdDeviation={shadowBlur} floodColor={shadowColor} floodOpacity="1" />
               </filter>
             )}
-            <rect x={w/2-2} y={h*0.2} width={4} height={h*0.5} fill={stroke} opacity={opacity} filter={filter}/>
-            <circle cx={w/2} cy={h*0.8} r={4} fill={stroke} opacity={opacity} filter={filter}/>
+            <rect x={w / 2 - 2} y={h * 0.2} width={4} height={h * 0.5} fill={stroke} opacity={opacity} filter={filter} />
+            <circle cx={w / 2} cy={h * 0.8} r={4} fill={stroke} opacity={opacity} filter={filter} />
           </svg>
         );
       }
@@ -798,8 +805,8 @@ const ShapeElement = ({ element }) => {
         const w = element.width, h = element.height;
         return (
           <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }}>
-            <line x1={w*0.2} y1={h*0.2} x2={w*0.8} y2={h*0.8} stroke={stroke} strokeWidth={strokeWidth * 2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} />
-            <line x1={w*0.8} y1={h*0.2} x2={w*0.2} y2={h*0.8} stroke={stroke} strokeWidth={strokeWidth * 2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} />
+            <line x1={w * 0.2} y1={h * 0.2} x2={w * 0.8} y2={h * 0.8} stroke={stroke} strokeWidth={strokeWidth * 2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} />
+            <line x1={w * 0.8} y1={h * 0.2} x2={w * 0.2} y2={h * 0.8} stroke={stroke} strokeWidth={strokeWidth * 2} opacity={opacity} strokeDasharray={strokeDasharray !== 'none' ? strokeDasharray : undefined} />
           </svg>
         );
       }

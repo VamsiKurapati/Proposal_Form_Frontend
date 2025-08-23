@@ -98,7 +98,7 @@ const SidePanel = ({
         <span className={`text-xs font-medium ${showToolsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Tools</span>
       </button>
-      <button
+      {/* <button
         className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showProjectsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
@@ -107,7 +107,7 @@ const SidePanel = ({
         <img src={projectsIcon} alt="Projects" className="w-7 h-7 mb-1" />
         <span className={`text-xs font-medium ${showProjectsPanel ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
           }`}>Projects</span>
-      </button>
+      </button> */}
       <button
         className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showPropertiesPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}

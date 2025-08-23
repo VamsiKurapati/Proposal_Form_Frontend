@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEntry }) => {
 
@@ -22,7 +22,7 @@ const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEnt
   };
 
   if (!show) return null;
-  
+
   return (
     <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
       <div className="p-4">
@@ -44,15 +44,23 @@ const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEnt
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-purple-700">Current Version</span>
             <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-              {historyList.length > 0 && historyList[historyList.length - 1]?.version 
-                ? `v${historyList[historyList.length - 1].version}` 
-                : `v${historyList.length}`
+              {historyList.length > 0
+                ? (() => {
+                  const currentEntry = historyList.find(entry => entry.isCurrent);
+                  return currentEntry && currentEntry.version !== undefined ? `v${currentEntry.version}` : 'v0';
+                })()
+                : 'v0'
               }
             </span>
           </div>
           <p className="text-sm text-gray-600">
-            {historyList.length > 0 
-              ? `Last saved ${formatTime(historyList[historyList.length - 1]?.timestamp || new Date())}`
+            {historyList.length > 0
+              ? (() => {
+                const currentEntry = historyList.find(entry => entry.isCurrent);
+                return currentEntry
+                  ? `Last saved ${formatTime(currentEntry.timestamp)}`
+                  : `Last saved ${formatTime(historyList[historyList.length - 1]?.timestamp || new Date())}`;
+              })()
               : 'No history available'
             }
           </p>
@@ -61,22 +69,20 @@ const HistoryPanel = ({ show, onClose, project, historyList, onRestoreHistoryEnt
         {/* History List */}
         <div className="space-y-4">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Recent Changes</h4>
-          
+
           {historyList.map((item, index) => (
-            <div key={item.id} className={`border rounded-lg p-3 transition-colors ${
-              item.isCurrent 
-                ? 'border-purple-300 bg-purple-50' 
+            <div key={item.id} className={`border rounded-lg p-3 transition-colors ${item.isCurrent
+                ? 'border-purple-300 bg-purple-50'
                 : 'border-gray-200 hover:bg-gray-50'
-            }`}>
+              }`}>
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    item.isCurrent ? 'bg-purple-500' : index === 0 ? 'bg-green-500' : 'bg-gray-400'
-                  }`}></div>
+                  <div className={`w-2 h-2 rounded-full ${item.isCurrent ? 'bg-purple-500' : index === 0 ? 'bg-green-500' : 'bg-gray-400'
+                    }`}></div>
                   <span className="text-sm font-medium text-gray-800">{item.action}</span>
                 </div>
                 <span className="text-xs text-gray-500">
-                  {item.version ? `v${item.version}` : `v${index + 1}`}
+                  {`v${item.version !== undefined ? item.version : index}`}
                 </span>
               </div>
               <p className="text-xs text-gray-600 mb-2">{item.description}</p>

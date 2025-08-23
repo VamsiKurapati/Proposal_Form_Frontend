@@ -31,8 +31,8 @@ const GridTextElement = ({ element }) => {
         fontSize: textStyle.fontSize,
       }}>
         {lines.map((line, idx) => (
-          <li key={idx} style={{ 
-            textAlign: element.properties.textAlign, 
+          <li key={idx} style={{
+            textAlign: element.properties.textAlign,
             color: element.properties.color,
             fontSize: textStyle.fontSize,
             lineHeight: textStyle.lineHeight
@@ -45,7 +45,7 @@ const GridTextElement = ({ element }) => {
   };
 
   const isPageNumber = element.properties?.elementType === 'pageNumber';
-  
+
   return (
     <div
       className={`w-full h-full relative ${isPageNumber ? 'page-number-element' : ''}`}
@@ -61,7 +61,7 @@ const GridTextElement = ({ element }) => {
           {renderBulletList(element.properties.text)}
         </div>
       ) : (
-        <div 
+        <div
           className="w-full h-full overflow-hidden"
           style={textStyle}
           dangerouslySetInnerHTML={{ __html: element.properties.text.replace(/\n/g, '<br>') }}

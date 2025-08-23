@@ -1519,7 +1519,7 @@ const CompanyProfileDashboard = () => {
                       <div className="text-[14px] text-[#6B7280] mb-1 truncate">{proposal.client}</div>
                       <div className="flex items-center gap-2 text-[13px] text-[#6B7280] mb-1">
                         <MdOutlineCalendarToday className="w-4 h-4 text-[#9CA3AF]" />
-                        <span>{proposal.deadline.toLocaleDateString()}</span>
+                        <span>{new Date(proposal.deadline).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))

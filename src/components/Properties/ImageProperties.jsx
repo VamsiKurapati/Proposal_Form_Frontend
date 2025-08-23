@@ -43,31 +43,29 @@ const ImageProperties = ({ element, selectedElement, updateElement }) => {
         <div className="flex gap-2">
           <button
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
-              properties: { 
-                ...element.properties, 
-                flipHorizontal: !element.properties.flipHorizontal 
+              properties: {
+                ...element.properties,
+                flipHorizontal: !element.properties.flipHorizontal
               }
             })}
-            className={`flex-1 p-2 border rounded-md text-sm font-medium transition-colors ${
-              element.properties.flipHorizontal 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 p-2 border rounded-md text-sm font-medium transition-colors ${element.properties.flipHorizontal
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             Flip Horizontal
           </button>
           <button
             onClick={() => updateElement(selectedElement.pageIndex, selectedElement.elementId, {
-              properties: { 
-                ...element.properties, 
-                flipVertical: !element.properties.flipVertical 
+              properties: {
+                ...element.properties,
+                flipVertical: !element.properties.flipVertical
               }
             })}
-            className={`flex-1 p-2 border rounded-md text-sm font-medium transition-colors ${
-              element.properties.flipVertical 
-                ? 'bg-blue-500 text-white border-blue-500' 
+            className={`flex-1 p-2 border rounded-md text-sm font-medium transition-colors ${element.properties.flipVertical
+                ? 'bg-blue-500 text-white border-blue-500'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             Flip Vertical
           </button>

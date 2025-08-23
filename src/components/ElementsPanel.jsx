@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ElementsPanel = ({ show, onClose, addTextElement, imageInputRef, addShapeElement, svgIconInputRef, handleSVGIconUpload }) => {
+const ElementsPanel = ({ show, onClose, addTextElement, imageInputRef, addShapeElement }) => {
   if (!show) return null;
   return (
     <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel" style={{ height: 'calc(100vh - 32px)' }}>
@@ -42,24 +42,6 @@ const ElementsPanel = ({ show, onClose, addTextElement, imageInputRef, addShapeE
                 Add Image
               </button>
             </div>
-          </div>
-
-          {/* SVG Icon Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">SVG Icon</label>
-            <button
-              onClick={() => svgIconInputRef.current?.click()}
-              className="w-full px-4 py-3 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-            >
-              Upload SVG Icon
-            </button>
-            <input
-              ref={svgIconInputRef}
-              type="file"
-              accept=".svg"
-              onChange={handleSVGIconUpload}
-              className="hidden"
-            />
           </div>
 
           {/* Shapes Section */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineArrowBack, MdOutlineSave, MdOutlineCancel, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineDescription, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday, MdOutlineClose } from "react-icons/md";
+import { MdOutlineSave, MdOutlineBusinessCenter, MdOutlineDescription, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineClose } from "react-icons/md";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -248,7 +248,7 @@ const PhoneInputField = ({
 
 const CompanyProfileUpdate = () => {
     const navigate = useNavigate();
-    const { companyData, loading, error, refreshProfile } = useProfile();
+    const { companyData, loading } = useProfile();
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
@@ -519,6 +519,9 @@ const CompanyProfileUpdate = () => {
                                     disabled={loading}
                                     placeholder="Enter company name"
                                 />
+                            </div>
+
+                            <div className="col-span-2 md:col-span-1">
                                 <FormInput
                                     id="adminName"
                                     label="Admin Name"

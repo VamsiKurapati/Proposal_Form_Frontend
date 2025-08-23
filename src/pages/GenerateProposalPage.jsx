@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavbarComponent from './NavbarComponent';
-import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment } from 'react-icons/md';
+import { MdOutlineEdit, MdOutlineAdd, MdOutlineAssignment, MdOutlineArrowBack } from 'react-icons/md';
 import { useProfile } from '../context/ProfileContext';
+import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
 import axios from 'axios';
 
@@ -10,20 +11,17 @@ const GenerateProposalPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const proposal = location.state?.proposal;
-  const { companyData, loading, error } = useProfile();
+  const { companyData, loading, error, setCompanyData } = useProfile();
+  const { role } = useUser();
 
   const [showAddTeam, setShowAddTeam] = useState(false);
   const [showViewAllTeam, setShowViewAllTeam] = useState(false);
   const [showAddCaseStudy, setShowAddCaseStudy] = useState(false);
+  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
 
   const handleSaveAndNext = async () => {
+    setIsGeneratingProposal(true);
     try {
-      // const res = await axios.get(`http://56.228.64.88:5000/run-proposal-generation`, { proposal} , {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`
-      //   }
-      // });
-
       const token = localStorage.getItem("token");
       const res = await axios.post(`https://proposal-form-backend.vercel.app/api/rfp/sendDataForProposalGeneration`, {
         proposal,
@@ -35,20 +33,44 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
-        console.log(res.data);
+        setIsGeneratingProposal(false);
+        //Navigate to editor with the generated proposal
+        navigate('/editor', {
+          state: {
+            jsonData: res.data
+          }
+        });
       }
     } catch (error) {
-      console.error("Error saving company data:", error);
+      console.error("Error generating proposal:", error);
+      setIsGeneratingProposal(false);
+      //Don't navigate to editor if there is an error
+      return;
     }
-    console.log("Save and Next");
-    // navigate('/company_profile_dashboard');
   };
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] pb-10">
       <NavbarComponent />
-      <div className="w-full mx-auto px-8 md:px-12 mt-20">
-        <h1 className="text-[32px] font-semibold mb-1">{proposal?.title}</h1>
+
+      {/* Loading Overlay */}
+      {isGeneratingProposal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2563EB] mx-auto mb-6"></div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Generating Your Proposal</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Please wait while we generate your proposal. This process may take a few moments as we analyze your profile and generate a proposal.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full mx-auto px-8 md:px-12 mt-16">
+        <div className="w-full flex justify-between items-center mb-6">
+          <button className="bg-white rounded-lg p-2 mr-4 text-[#2563EB]" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-5 h-5 shrink-0" /></button>
+          <h1 className="text-[32px] font-semibold">{proposal?.title}</h1>
+        </div>
 
         <p className="text-[#4B5563] text-[20px] mb-6">1. Edit & preview user information</p>
 
