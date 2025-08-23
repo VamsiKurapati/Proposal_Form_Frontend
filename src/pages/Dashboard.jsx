@@ -692,7 +692,7 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2 font-semibold">
                                                 <a
-                                                    href={`https://proposal-form-backend.vercel.app/api/proposal/${p._id}`}
+                                                    href={`https://proposal-form-backend.vercel.app/api/proposal/${p.link}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-[#2563EB] hover:underline"

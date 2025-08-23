@@ -939,17 +939,24 @@ const CanvaApp = () => {
   };
 
   return (
-    <div className="h-full relative">
+    <div className="h-full flex flex-col">
       <NavbarComponent />
-      {/* Add "Back" button to go back to the previous page, and "Save" button to continue to the next page */}
-      <div className="fixed top-16 mt-16 left-0 right-0 z-100 flex justify-between items-center px-8">
+
+      {/* Back and Continue buttons below navbar */}
+      <div className="flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm">
         <div className="flex items-center gap-4">
-          <button className="rounded-lg bg-[#2563EB] text-white p-2" onClick={() => navigate(-1)}><MdOutlineArrowBack className="w-4 h-4" /></button>
-          <button className="rounded-lg bg-[#2563EB] text-white p-2" onClick={() => window.location.href = '/dashboard'}>Continue</button>
+          <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
+            <MdOutlineArrowBack className="w-4 h-4" />
+          </button>
+          <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
+            Continue
+          </button>
         </div>
       </div>
+
+      {/* Main editor content */}
       <div
-        className="mt-16 w-screen overflow-hidden"
+        className="flex-1 w-full overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateRows: '1fr 32px',
@@ -957,8 +964,7 @@ const CanvaApp = () => {
           gridTemplateAreas: `
           "sidebar main"
           "footer footer"
-        `,
-          height: '100vh'
+        `
         }}
       >
 
