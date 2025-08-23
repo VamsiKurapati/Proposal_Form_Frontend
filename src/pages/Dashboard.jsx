@@ -123,11 +123,38 @@ const Dashboard = () => {
                 );
 
                 setEditIdx(null); // exit edit mode
-                alert("Proposal updated!");
+                Swal.fire(
+                    'Success!',
+                    'Proposal updated!',
+                    'success'
+                );
+
+                //Update the Summary Stats for the proposal that was updated
+                setSummaryStats(prev => {
+                    // Find the proposal to get its old status
+                    const oldProposal = proposalsState.find(p => p._id === proposalId);
+                    if (!oldProposal) return prev;
+
+                    return prev.map(stat => {
+                        // Subtract 1 from the old status
+                        if (stat.label === oldProposal.status) {
+                            return { ...stat, value: Math.max(0, stat.value - 1) };
+                        }
+                        // Add 1 to the new status
+                        if (stat.label === editForm.status) {
+                            return { ...stat, value: stat.value + 1 };
+                        }
+                        return stat;
+                    });
+                });
             }
         } catch (err) {
             console.error("Error updating proposal:", err);
-            alert("Failed to update proposal");
+            Swal.fire(
+                'Error!',
+                'Failed to update proposal',
+                'error'
+            );
         }
     };
 
@@ -251,6 +278,26 @@ const Dashboard = () => {
 
                     console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
 
+                    // Update summary stats when proposals are moved to deleted
+                    setSummaryStats(prev => {
+                        let newStats = [...prev];
+                        proposalsToDelete.forEach(proposal => {
+                            // Subtract from All Proposals
+                            newStats = newStats.map(stat =>
+                                stat.label === "All Proposals"
+                                    ? { ...stat, value: Math.max(0, stat.value - 1) }
+                                    : stat
+                            );
+                            // Subtract from specific status
+                            newStats = newStats.map(stat =>
+                                stat.label === proposal.status
+                                    ? { ...stat, value: Math.max(0, stat.value - 1) }
+                                    : stat
+                            );
+                        });
+                        return newStats;
+                    });
+
                     setDeletedProposals(prev => [...prev, ...proposalsWithRestoreIn]);
                     setProposalsState(prev => prev.filter((_, idx) => !selectedProposals.includes(idx)));
                     setSelectedProposals([]);
@@ -305,6 +352,25 @@ const Dashboard = () => {
                 if (res.status === 200) {
                     // Remove restoreIn field when restoring proposal
                     const { restoreIn, ...proposalWithoutRestoreIn } = deletedProposals[idx];
+
+                    // Update summary stats when proposal is restored
+                    setSummaryStats(prev => {
+                        let newStats = [...prev];
+                        // Add 1 to All Proposals
+                        newStats = newStats.map(stat =>
+                            stat.label === "All Proposals"
+                                ? { ...stat, value: stat.value + 1 }
+                                : stat
+                        );
+                        // Add 1 to specific status
+                        newStats = newStats.map(stat =>
+                            stat.label === proposalWithoutRestoreIn.status
+                                ? { ...stat, value: stat.value + 1 }
+                                : stat
+                        );
+                        return newStats;
+                    });
+
                     setProposalsState(prev => [...prev, proposalWithoutRestoreIn]);
                     setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
 
@@ -448,7 +514,11 @@ const Dashboard = () => {
                     setFormData({ title: '', start: '', end: '' });
                     setCalendarError('');
                     setErrors({});
-                    alert('Event added successfully');
+                    Swal.fire(
+                        'Success!',
+                        'Event added successfully',
+                        'success'
+                    );
                     onClose();
                 } else {
                     setCalendarError('Failed to add event');
@@ -754,7 +824,7 @@ const Dashboard = () => {
                                                 <td className="px-4 py-2 relative">
                                                     <div className="flex items-center gap-2">
                                                         <span>{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</span>
-                                                        {role === "Company" && (
+                                                        {role === "company" && (
                                                             <button
                                                                 className="text-[#2563EB]"
                                                                 title="Assign Editor"
