@@ -6,31 +6,36 @@ export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
     const [role, setRole] = useState(localStorage.getItem("userRole") || null);
+    const [userId, setUserId] = useState(() => {
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser)._id : null;
+    });
 
     useEffect(() => {
         const handleStorageChange = () => {
             const newRole = localStorage.getItem("userRole");
+            const storedUser = localStorage.getItem("user");
+            const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+            
+            setUserId(parsedUser?._id || null);
+
             if (newRole !== role) {
                 setRole(newRole);
             }
         };
 
-        // Listen for storage changes
         window.addEventListener('storage', handleStorageChange);
-
-        // Also check for changes on focus (in case localStorage was changed in another tab)
         window.addEventListener('focus', handleStorageChange);
 
-        // console.log("Role in Context: ", role);
+
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('focus', handleStorageChange);
         };
-    }, []);
+    }, [role]);
 
-    // Memoize the context value to prevent unnecessary re-renders
-    const contextValue = useMemo(() => ({ role, setRole }), [role]);
+    const contextValue = useMemo(() => ({ role, setRole, userId, setUserId }), [role, userId]);
 
     return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };
