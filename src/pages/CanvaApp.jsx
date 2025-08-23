@@ -1000,7 +1000,7 @@ const CanvaApp = () => {
           {!isGridView && (
             //Add a back button to go back to the previous page
             <>
-              <div className="absolute top-2 left-2 z-10">
+              <div className="absolute top-2 left-4 z-10">
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
                   <MdOutlineArrowBack className="w-4 h-4" />
                 </button>
@@ -1031,7 +1031,7 @@ const CanvaApp = () => {
                   setProject={setProject}
                 />
               </div>
-              <div className="absolute top-2 right-2 z-10">
+              <div className="absolute top-2 right-4 z-10">
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
                   Continue
                 </button>
@@ -1103,8 +1103,6 @@ const CanvaApp = () => {
               panelState.setShowUploadsPanel(false);
             }}
           />
-
-          {console.log('Debug currentEditingPage:', currentEditingPage, typeof currentEditingPage)}
 
           <ToolsPanel
             show={panelState.showToolsPanel}
