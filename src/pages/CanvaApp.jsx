@@ -990,7 +990,7 @@ const CanvaApp = () => {
 
         {/* Main Content Area */}
         <div
-          className="relative overflow-hidden bg-gray-100"
+          className="relative overflow-hidden bg-gray-100 h-[calc(100vh-10rem)]"
           style={{
             gridArea: 'main',
             overscrollBehavior: 'contain'
@@ -1031,7 +1031,7 @@ const CanvaApp = () => {
                   setProject={setProject}
                 />
               </div>
-              <div className="absolute top-2 right-4 z-10">
+              <div className="absolute top-2 right-12 z-10">
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
                   Continue
                 </button>
@@ -1190,7 +1190,7 @@ const CanvaApp = () => {
 
           {/* Canvas Area - Full height with no scroll interference */}
           <div
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-[calc(100vh-10rem)]"
             ref={scrollContainerRef}
           >
             {isGridView ? (
