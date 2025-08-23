@@ -959,7 +959,7 @@ const CanvaApp = () => {
 
         {/* Side Panel - Grid area sidebar */}
         <div
-          className="bg-white border-r flex flex-col items-center shadow-md z-40"
+          className="bg-white border-r flex flex-col items-center shadow-md z-40 mt-16"
           style={{
             gridArea: 'sidebar',
             overflowY: 'auto'
@@ -990,7 +990,7 @@ const CanvaApp = () => {
 
         {/* Main Content Area */}
         <div
-          className="relative overflow-hidden bg-gray-100 h-[calc(100vh-10rem)]"
+          className="relative overflow-hidden bg-gray-100 mt-16"
           style={{
             gridArea: 'main',
             overscrollBehavior: 'contain'
@@ -1190,7 +1190,7 @@ const CanvaApp = () => {
 
           {/* Canvas Area - Full height with no scroll interference */}
           <div
-            className="absolute inset-0 w-full h-[calc(100vh-10rem)]"
+            className="absolute inset-0 w-full h-full"
             ref={scrollContainerRef}
           >
             {isGridView ? (
@@ -1233,7 +1233,7 @@ const CanvaApp = () => {
 
         {/* Footer */}
         <div
-          className="bg-white border-t z-50 shadow-lg"
+          className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 shadow-lg"
           style={{
             gridArea: 'footer'
           }}
