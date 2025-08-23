@@ -942,18 +942,6 @@ const CanvaApp = () => {
     <div className="h-full flex flex-col">
       <NavbarComponent />
 
-      {/* Back and Continue buttons below navbar */}
-      <div className="mt-16 flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm">
-        <div className="flex items-center gap-4">
-          <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
-            <MdOutlineArrowBack className="w-4 h-4" />
-          </button>
-          <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
-            Continue
-          </button>
-        </div>
-      </div>
-
       {/* Main editor content */}
       <div
         className="flex-1 w-full overflow-hidden"
@@ -1010,32 +998,45 @@ const CanvaApp = () => {
         >
           {/* Floating Toolbar */}
           {!isGridView && (
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
-              <FloatingToolbar
-                addTextElement={addTextElementWithHistory}
-                imageInputRef={imageInputRef}
-                showBackgroundPanel={panelState.showBackgroundPanel}
-                setShowBackgroundPanel={panelState.setShowBackgroundPanel}
-                addPage={addPageWithHistory}
-                deletePage={deletePageWithHistory}
-                currentEditingPage={currentEditingPage}
-                clearCurrentPage={clearCurrentPageWithHistory}
-                clearAllPages={clearAllPagesWithHistory}
-                jsonInputRef={null} // Removed jsonInputRef
-                exportToJSON={() => exportToJSON(project)}
-                exportToPDF={async () => await exportToPDF(project)}
-                exportToSVG={() => exportToOptimizedSVG(project)}
-                totalPages={project.pages.length}
-                selectedElement={selectedElement}
-                selectedEl={selectedEl}
-                updateElement={updateElementWithHistory}
-                deleteElement={deleteElementWithHistory}
-                duplicateElement={duplicateElementWithHistory}
-                onDeselect={() => setSelectedElement({ pageIndex: currentEditingPage, elementId: null })}
-                onOpenProperties={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
-                setProject={setProject}
-              />
-            </div>
+            //Add a back button to go back to the previous page
+            <>
+              <div className="absolute top-2 left-2 z-10">
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
+                  <MdOutlineArrowBack className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+                <FloatingToolbar
+                  addTextElement={addTextElementWithHistory}
+                  imageInputRef={imageInputRef}
+                  showBackgroundPanel={panelState.showBackgroundPanel}
+                  setShowBackgroundPanel={panelState.setShowBackgroundPanel}
+                  addPage={addPageWithHistory}
+                  deletePage={deletePageWithHistory}
+                  currentEditingPage={currentEditingPage}
+                  clearCurrentPage={clearCurrentPageWithHistory}
+                  clearAllPages={clearAllPagesWithHistory}
+                  jsonInputRef={null} // Removed jsonInputRef
+                  exportToJSON={() => exportToJSON(project)}
+                  exportToPDF={async () => await exportToPDF(project)}
+                  exportToSVG={() => exportToOptimizedSVG(project)}
+                  totalPages={project.pages.length}
+                  selectedElement={selectedElement}
+                  selectedEl={selectedEl}
+                  updateElement={updateElementWithHistory}
+                  deleteElement={deleteElementWithHistory}
+                  duplicateElement={duplicateElementWithHistory}
+                  onDeselect={() => setSelectedElement({ pageIndex: currentEditingPage, elementId: null })}
+                  onOpenProperties={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
+                  setProject={setProject}
+                />
+              </div>
+              <div className="absolute top-2 right-2 z-10">
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
+                  Continue
+                </button>
+              </div>
+            </>
           )}
 
           {/* Copy/Cut/Paste Feedback */}
