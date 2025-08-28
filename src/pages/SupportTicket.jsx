@@ -71,6 +71,107 @@ const SupportTicket = () => {
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Helper function to update a specific ticket locally
+    const updateTicketLocally = (ticketId, updates) => {
+        setTickets(prevTickets =>
+            prevTickets.map(ticket =>
+                ticket._id === ticketId || ticket.id === ticketId
+                    ? { ...ticket, ...updates }
+                    : ticket
+            )
+        );
+    };
+
+    // Helper function to add a new ticket locally
+    const addTicketLocally = (newTicket) => {
+        setTickets(prevTickets => [newTicket, ...prevTickets]);
+    };
+
+    // Helper function to remove a ticket locally
+    const removeTicketLocally = (ticketId) => {
+        setTickets(prevTickets =>
+            prevTickets.filter(ticket =>
+                ticket._id !== ticketId && ticket.id !== ticketId
+            )
+        );
+    };
+
+    // Helper function to update conversation messages locally
+    const addMessageLocally = (ticketId, message) => {
+        if (showConversationPopup === ticketId) {
+            setConversationMessages(prev => [...prev, message]);
+        }
+    };
+
+    // Function to check for admin responses and update tickets locally
+    const checkForAdminUpdates = async () => {
+        if (!userId) return;
+
+        setRefreshing(true);
+        try {
+            const { data } = await axios.get(
+                `${BASE_URL}/api/support/tickets?userId=${userId}`
+            );
+
+            if (data?.tickets) {
+                // Check if there are any updates
+                const hasUpdates = data.tickets.some(newTicket => {
+                    const oldTicket = tickets.find(t =>
+                        t._id === newTicket._id || t.id === newTicket.id
+                    );
+                    return !oldTicket ||
+                        oldTicket.status !== newTicket.status ||
+                        oldTicket.Resolved_Description !== newTicket.Resolved_Description;
+                });
+
+                if (hasUpdates) {
+                    // Update tickets that have changed
+                    setTickets(prevTickets => {
+                        const updatedTickets = prevTickets.map(prevTicket => {
+                            const newTicket = data.tickets.find(t =>
+                                t._id === prevTicket._id || t.id === prevTicket.id
+                            );
+                            return newTicket || prevTicket;
+                        });
+                        return updatedTickets;
+                    });
+
+                    // Show success message
+                    setSuccessMsg("Tickets updated successfully!");
+                    setTimeout(() => setSuccessMsg(""), 3000);
+                } else {
+                    setSuccessMsg("No updates found");
+                    setTimeout(() => setSuccessMsg(""), 2000);
+                }
+            }
+        } catch (error) {
+            console.error("Error checking for admin updates:", error);
+            setErrorMsg("Failed to check for updates");
+            setTimeout(() => setErrorMsg(""), 3000);
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
+    // Function to handle admin message updates
+    const handleAdminMessageUpdate = (ticketId, adminMessage) => {
+        // Update conversation if the popup is open for this ticket
+        if (showConversationPopup === ticketId) {
+            const newMsg = {
+                text: adminMessage.message,
+                createdAt: adminMessage.createdAt,
+                sender: "admin"
+            };
+            addMessageLocally(ticketId, newMsg);
+        }
+
+        // Update ticket status if it changed
+        if (adminMessage.status) {
+            updateTicketLocally(ticketId, { status: adminMessage.status });
+        }
+    };
 
     const fetchConversationMessages = async (ticketId) => {
         setLoadingMessages(true);
@@ -143,6 +244,15 @@ const SupportTicket = () => {
         fetchTickets();
     }, [userId]);
 
+    // Periodically check for admin updates
+    useEffect(() => {
+        if (!userId) return;
+
+        const interval = setInterval(checkForAdminUpdates, 30000); // Check every 30 seconds
+
+        return () => clearInterval(interval);
+    }, [userId]);
+
     // Pre-open dropdowns for "Created" and "In Progress"
     useEffect(() => {
         const initialOpen = {};
@@ -194,6 +304,19 @@ const SupportTicket = () => {
             );
 
             if (res.status === 200) {
+                // Add the new ticket locally immediately
+                const newTicket = res.data.ticket || res.data;
+                if (newTicket) {
+                    addTicketLocally(newTicket);
+
+                    // Open dropdown for the new ticket
+                    setOpenTickets(prev => ({
+                        ...prev,
+                        [newTicket._id || newTicket.id]: true
+                    }));
+                }
+
+                // Clear form
                 setCategory("");
                 setSubCategory("");
                 setDescription("");
@@ -202,27 +325,8 @@ const SupportTicket = () => {
                 const fileInput = document.getElementById("fileUpload");
                 if (fileInput) fileInput.value = "";
 
-                // Fetch updated tickets
-                const updatedTickets = await axios.get(
-                    `${BASE_URL}/api/support/tickets?userId=${userId}`
-                );
-
-                if (updatedTickets.data?.tickets) {
-                    setTickets(updatedTickets.data.tickets); // ensure new array reference
-                    // Open dropdowns for newly added ticket(s)
-                    const newOpen = {};
-                    updatedTickets.data.tickets.forEach((ticket) => {
-                        if (
-                            ticket.status === "Created" ||
-                            ticket.status === "In Progress" ||
-                            ticket.status === "Re-Opened"
-                        ) {
-                            newOpen[ticket._id] = true;
-                        }
-                    });
-                    setOpenTickets(newOpen);
-                }
-
+                setSuccessMsg("Support ticket submitted successfully!");
+                setTimeout(() => setSuccessMsg(""), 3000);
             } else {
                 setErrorMsg(res.data.message || "Failed to submit ticket.");
             }
@@ -230,12 +334,6 @@ const SupportTicket = () => {
             setErrorMsg(err.response?.data?.message || "An error occurred.");
         }
         setSubmitting(false);
-        setSuccessMsg("Support ticket submitted successfully!");
-        setTimeout(() => setSuccessMsg(""), 3000);
-        setCategory("");
-        setSubCategory("");
-        setDescription("");
-        setAttachments(null);
     };
 
     const getStepStatusDynamic = (currentStatus, step, steps) => {
@@ -382,12 +480,45 @@ const SupportTicket = () => {
 
                 {/* Ticket List */}
                 <div className="p-6 bg-grey min-h-screen">
-                    <h2 className="text-xl text-blue-600 font-semibold mb-1">
-                        Track Support Ticket
-                    </h2>
-                    <p className="text-gray-500 mb-6">
-                        Track the status of your support ticket
-                    </p>
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="text-xl text-blue-600 font-semibold mb-1">
+                                Track Support Ticket
+                            </h2>
+                            <p className="text-gray-500">
+                                Track the status of your support ticket
+                            </p>
+                        </div>
+                        <button
+                            onClick={checkForAdminUpdates}
+                            disabled={refreshing}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                            title="Check for updates"
+                        >
+                            {refreshing ? (
+                                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            )}
+                            {refreshing ? "Checking..." : "Refresh"}
+                        </button>
+                    </div>
+
+                    {/* Success and Error Messages */}
+                    {successMsg && (
+                        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                            {successMsg}
+                        </div>
+                    )}
+                    {errorMsg && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                            {errorMsg}
+                        </div>
+                    )}
 
                     {tickets.map((ticket) => {
                         return (
@@ -416,14 +547,16 @@ const SupportTicket = () => {
                                                                 `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id
                                                                 }/withdrawn`
                                                             );
-                                                            const updatedTickets = await axios.get(
-                                                                `${BASE_URL}/api/support/tickets?userId=${userId}`
-                                                            );
-                                                            setTickets(updatedTickets.data.tickets || []);
+
+                                                            // Update ticket locally immediately
+                                                            updateTicketLocally(ticket._id || ticket.id, {
+                                                                status: "Withdrawn"
+                                                            });
+
                                                         } catch (err) {
                                                             alert(
                                                                 err.response?.data?.message ||
-                                                                "Failed to reopen ticket."
+                                                                "Failed to withdraw ticket."
                                                             );
                                                         }
                                                     }}
@@ -620,12 +753,21 @@ const SupportTicket = () => {
                                                             if (!newMessage.trim()) return;
                                                             setSendingMessage(true);
                                                             try {
-                                                                await axios.post(
+                                                                const response = await axios.post(
                                                                     `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id}/userMessages`,
-                                                                    { message: newMessage }   // ✅ changed text → message
+                                                                    { message: newMessage }
                                                                 );
-                                                                // Refetch messages
-                                                                await fetchConversationMessages(ticket._id || ticket.id);
+
+                                                                // Add message locally immediately
+                                                                if (response.data.userMessage) {
+                                                                    const newMsg = {
+                                                                        text: response.data.userMessage.message,
+                                                                        createdAt: response.data.userMessage.createdAt,
+                                                                        sender: "user"
+                                                                    };
+                                                                    addMessageLocally(ticket._id || ticket.id, newMsg);
+                                                                }
+
                                                                 setNewMessage("");
                                                             } catch (err) {
                                                                 alert(
@@ -687,10 +829,19 @@ const SupportTicket = () => {
                                                                 `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id
                                                                 }/reopen`
                                                             );
-                                                            const updatedTickets = await axios.get(
-                                                                `${BASE_URL}/api/support/tickets?userId=${userId}`
-                                                            );
-                                                            setTickets(updatedTickets.data.tickets || []);
+
+                                                            // Update ticket locally immediately
+                                                            updateTicketLocally(ticket._id || ticket.id, {
+                                                                status: "Re-Opened",
+                                                                isOpen: true
+                                                            });
+
+                                                            // Open the dropdown for the reopened ticket
+                                                            setOpenTickets(prev => ({
+                                                                ...prev,
+                                                                [ticket._id || ticket.id]: true
+                                                            }));
+
                                                         } catch (err) {
                                                             alert(
                                                                 err.response?.data?.message ||

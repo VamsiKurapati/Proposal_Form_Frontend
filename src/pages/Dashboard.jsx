@@ -17,13 +17,6 @@ const statusStyles = {
     "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
 };
 
-const statsStyles = {
-    "All Proposals": "bg-[#EFF6FF] text-[#2563EB]",
-    "In Progress": "bg-[#EEF2FF] text-[#4F46E5]",
-    "Submitted": "bg-[#F0FDF4] text-[#16A34A]",
-    "Won": "bg-[#FEFCE8] text-[#CA8A04]",
-}
-
 // Helper: bg color map for calendar
 const bgColor = {
     'In Progress': 'bg-[#DBEAFE] bg-opacity-50',
@@ -58,6 +51,36 @@ function statusBadge(status) {
     );
 }
 
+const getSummaryCardBgColor = (label) => {
+    switch (label) {
+        case "All Proposals":
+            return "linear-gradient(180deg, #EFF6FF 0%, #99B9FF 100%)";
+        case "In Progress":
+            return "linear-gradient(180deg, #EEF2FF 0%, #C1BDFF 100%)";
+        case "Submitted":
+            return "linear-gradient(180deg, #F0FDF4 0%, #A0FFC3 100%)";
+        case "Won":
+            return "linear-gradient(180deg, #FEFCE8 0%, #FFD171 100%)";
+        default:
+            return "linear-gradient(180deg, #F3F4F6 0%, #F3F4F6 100%)";
+    }
+};
+
+const getSummaryCardTextColor = (label) => {
+    switch (label) {
+        case "All Proposals":
+            return "#2563EB";
+        case "In Progress":
+            return "#4F46E5";
+        case "Submitted":
+            return "#16A34A";
+        case "Won":
+            return "#CA8A04";
+        default:
+            return "#000000";
+    }
+};
+
 const PAGE_SIZE = 5;
 
 const Dashboard = () => {
@@ -85,6 +108,7 @@ const Dashboard = () => {
     const [addEventModalOpen, setAddEventModalOpen] = useState(false);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [employees, setEmployees] = useState([]);
+    const [fetchedDashboardData, setFetchedDashboardData] = useState(false);
 
     const [editIdx, setEditIdx] = useState(null);
     const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
@@ -187,8 +211,11 @@ const Dashboard = () => {
     }, []);
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        if (!fetchedDashboardData) {
+            fetchDashboardData();
+            setFetchedDashboardData(true);
+        }
+    }, [fetchedDashboardData]);
 
     const handleSetCurrentEditor = async (idx, editorId) => {
         const editor = employees.find(emp => emp.employeeId === editorId);
@@ -695,8 +722,10 @@ const Dashboard = () => {
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 mb-4">
                     {summaryStats.map((stat) => (
-                        <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left ${statsStyles[stat.label]}`}>
-                            <div className="text-[11px] sm:text-[13px] md:text-[16px]  capitalize">{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
+                        <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left`} style={{
+                            background: getSummaryCardBgColor(stat.label)
+                        }}>
+                            <div className="text-[11px] sm:text-[13px] md:text-[16px] capitalize" style={{ color: getSummaryCardTextColor(stat.label) }}>{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
                             <div className={`text-[18px] sm:text-[24px] md:text-[32px] font-semibold`}>{stat.value}</div>
                         </div>
                     ))}
