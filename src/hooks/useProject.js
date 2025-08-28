@@ -278,7 +278,7 @@ export const useProject = () => {
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
-          index === prev.currentPage
+          index === currentEditingPage
             ? { ...page, elements: [] }
             : page
         )
