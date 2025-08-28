@@ -613,10 +613,16 @@ const SuperAdmin = () => {
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
             case 'Refunded':
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'Low':
+                return 'bg-[#DCFCE7] text-[#15803D]';
+            case 'Medium':
+                return 'bg-[#FEF9C3] text-[#CA8A04]';
+            case 'High':
+                return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Completed':
                 return 'bg-[#DCFCE7] text-[#15803D]';
             case 'In Progress':
-                return 'bg-[#FEF9C3] text-[#CA8A04]';
+                return 'bg-[#DBEAFE] text-[#2563EB]';
             case 'Re-Opened':
                 return 'bg-[#FEE2E2] text-[#DC2626]';
             case 'Withdrawn':
