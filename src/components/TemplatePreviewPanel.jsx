@@ -27,7 +27,7 @@ const TemplatePreviewPanel = ({ show, folder, svgPreviews, onClose, setBackgroun
           <h3 className="text-lg font-semibold text-gray-800">{folder} - Pages</h3>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
         </div>
-        <div className="grid grid-cols-2 gap-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+        <div className="grid grid-cols-2 gap-3 overflow-y-auto">
           {previews.map((svgUrl, idx) => (
             <button
               key={idx}
