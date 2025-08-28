@@ -27,7 +27,7 @@ const CanvasArea = ({
   const selectedEl = getSelectedElement();
 
   return (
-    <div ref={scrollContainerRef} className="h-full overflow-auto bg-gray-200 relative" style={{ overscrollBehavior: 'contain' }}>
+    <div ref={scrollContainerRef} className="h-[calc(100vh-4rem)] overflow-hidden bg-gray-200 relative" style={{ overscrollBehavior: 'contain' }}>
       <div className="flex flex-col items-center w-full bg-gray-200" style={{ minHeight: '100%' }}>
         <div
           style={{

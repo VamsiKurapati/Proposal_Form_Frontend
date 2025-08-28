@@ -1233,7 +1233,7 @@ const CanvaApp = () => {
 
         {/* Footer */}
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 shadow-lg"
+          className="fixed bottom-0 left-0 right-0 bg-white border-t z-10 shadow-lg"
           style={{
             gridArea: 'footer'
           }}
