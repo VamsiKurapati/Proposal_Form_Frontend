@@ -2619,19 +2619,18 @@ const DiscoverRFPs = () => {
                   )}
                 </div>
 
-
+                {/* Upload Grant Button */}
+                <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+                  onClick={() => setUploadGrantModalOpen(true)}
+                >
+                  <MdOutlineUpload className="w-5 h-5" />
+                  Upload Grant
+                </button>
               </div>
             </div>
 
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[24px] text-[#000000] font-semibold">Recent Grants</h2>
-              {/* Upload Grant Button */}
-              <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
-                onClick={() => setUploadGrantModalOpen(true)}
-              >
-                <MdOutlineUpload className="w-5 h-5" />
-                Upload Grant
-              </button>
             </div>
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">

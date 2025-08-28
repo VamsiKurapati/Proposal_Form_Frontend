@@ -33,7 +33,7 @@ const SidePanel = ({
   return (
     <div className="w-[70px] min-w-[70px] max-w-[70px] bg-white border-r flex flex-col items-center shadow-md sidebar-panel">
       {/* Design Button */}
-      <div className="mb-2 w-full">
+      <div className="mb-[3px] w-full">
         <button
           className={`flex flex-col items-center group w-full justify-center transition-colors ${showDesignPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
             }`}
@@ -47,7 +47,7 @@ const SidePanel = ({
       </div>
 
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showElementsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showElementsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onElementsClick}
@@ -57,7 +57,7 @@ const SidePanel = ({
           }`}>Elements</span>
       </button>
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showTextPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showTextPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onTextClick}
@@ -67,7 +67,7 @@ const SidePanel = ({
           }`}>Text</span>
       </button>
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showHistoryPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showHistoryPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onHistoryClick}
@@ -79,7 +79,7 @@ const SidePanel = ({
           }`}>History</span>
       </button>
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showUploadsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showUploadsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onUploadsClick}
@@ -89,7 +89,7 @@ const SidePanel = ({
           }`}>Uploads</span>
       </button>
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showToolsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showToolsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onToolsClick}
@@ -99,7 +99,7 @@ const SidePanel = ({
           }`}>Tools</span>
       </button>
       {/* <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showProjectsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showProjectsPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onProjectsClick}
@@ -109,7 +109,7 @@ const SidePanel = ({
           }`}>Projects</span>
       </button> */}
       <button
-        className={`mb-2 flex flex-col items-center group w-full justify-center transition-colors ${showPropertiesPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+        className={`mb-[3px] flex flex-col items-center group w-full justify-center transition-colors ${showPropertiesPanel ? 'bg-blue-50 border-l-4 border-blue-500' : ''
           }`}
         style={{ height: 74 }}
         onClick={onPropertiesClick}
