@@ -93,6 +93,7 @@ const Dashboard = () => {
     const [proposalsState, setProposalsState] = useState([]);
     const [deletedProposals, setDeletedProposals] = useState([]);
     const [summaryStats, setSummaryStats] = useState([]);
+    const [proposalsData, setProposalsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -193,6 +194,7 @@ const Dashboard = () => {
                 }
             });
             const data = res.data;
+            setProposalsData(data.proposalsInfo || []);
             setProposalsState(data.proposals || []);
             setDeletedProposals(data.deletedProposals || []);
             setSummaryStats([
@@ -717,15 +719,76 @@ const Dashboard = () => {
         <div className="min-h-screen">
             <NavbarComponent />
             <main className="w-full mx-auto py-8 px-4 md:px-12 mt-12">
+
+                {/* Proposals Data */}
+                <div className="bg-[#F3CCFF] rounded-lg p-6 mb-6">
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-4">Welcome {userName}!</h1>
+
+                            {/* Progress Bars */}
+                            <div className="space-y-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Proposals Left</label>
+                                    <div className="w-full bg-gray-200 rounded-full h-3">
+                                        <div className="bg-purple-600 h-3 rounded-full" style={{ width: '33.33%' }}></div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1">2 out of 6</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Grants Left</label>
+                                    <div className="w-full bg-gray-200 rounded-full h-3">
+                                        <div className="bg-purple-600 h-3 rounded-full" style={{ width: '33.33%' }}></div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1">2 out of 6</p>
+                                </div>
+                            </div>
+
+                            <p className="text-purple-600 font-medium mb-3">Current plan: Basic</p>
+                            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                                Upgrade
+                            </button>
+                        </div>
+
+                        {/* Illustration */}
+                        <div className="hidden md:block ml-8">
+                            <svg width="120" height="120" viewBox="0 0 120 120" className="text-pink-500">
+                                <g fill="none" stroke="currentColor" strokeWidth="2">
+                                    {/* Woman */}
+                                    <circle cx="40" cy="35" r="8" fill="none" />
+                                    <path d="M 40 43 L 40 60 L 35 70 L 45 70 L 40 60" />
+                                    <path d="M 35 45 L 30 40" />
+                                    <path d="M 45 45 L 50 40" />
+                                    <path d="M 40 60 L 50 55" />
+                                    <rect x="35" y="55" width="10" height="15" fill="none" />
+
+                                    {/* Man */}
+                                    <circle cx="70" cy="40" r="8" fill="none" />
+                                    <path d="M 70 48 L 70 65 L 65 75 L 75 75 L 70 65" />
+                                    <path d="M 65 50 L 60 45" />
+                                    <path d="M 75 50 L 80 45" />
+                                    <rect x="65" y="60" width="10" height="15" fill="none" />
+
+                                    {/* Laptop */}
+                                    <rect x="60" y="70" width="20" height="12" fill="none" />
+                                    <rect x="62" y="72" width="16" height="8" fill="none" />
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
                 <h2 className="text-[24px] font-semibold mb-4">Tracking Dashboard</h2>
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 mb-4">
                     {summaryStats.map((stat) => (
                         <div key={stat.label} className={`p-3 sm:p-4 rounded shadow text-left`} style={{
-                            background: getSummaryCardBgColor(stat.label)
+                            background: getSummaryCardBgColor(stat.label),
+                            color: getSummaryCardTextColor(stat.label)
                         }}>
-                            <div className="text-[11px] sm:text-[13px] md:text-[16px] capitalize" style={{ color: getSummaryCardTextColor(stat.label) }}>{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className="text-[11px] sm:text-[13px] md:text-[16px] capitalize">{stat.label.replace(/([A-Z])/g, " $1").trim()}</div>
                             <div className={`text-[18px] sm:text-[24px] md:text-[32px] font-semibold`}>{stat.value}</div>
                         </div>
                     ))}

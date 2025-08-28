@@ -580,6 +580,7 @@ const DiscoverRFPs = () => {
   // Grant proposal modal state
   const [showGrantProposalModal, setShowGrantProposalModal] = useState(false);
   const [selectedGrant, setSelectedGrant] = useState(null);
+  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const [grantProposalData, setGrantProposalData] = useState({
     summary: "",
     objectives: "",
@@ -1332,169 +1333,166 @@ const DiscoverRFPs = () => {
   };
 
   const handleSubmitGrantProposal = async () => {
-    // Validate required fields
-    const requiredFields = [
-      'summary',
-      'objectives',
-      'activities',
-      'beneficiaries',
-      'geography',
-      'start_date',
-      'estimated_duration',
-      'total_project_cost',
-      'total_requested_amount',
-      'cost_share_required',
-      'budget_breakdown',
-      'methods_for_measuring_success'
-    ];
+    // Set loading state to true
+    setIsGeneratingProposal(true);
 
-    const missingFields = requiredFields.filter(field => {
-      if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries' || field === 'methods_for_measuring_success') {
-        return !grantProposalData[field] || grantProposalData[field].trim() === '';
-      }
+    try {
+      // Validate required fields
+      const requiredFields = [
+        'summary',
+        'objectives',
+        'activities',
+        'beneficiaries',
+        'geography',
+        'start_date',
+        'estimated_duration',
+        'total_project_cost',
+        'total_requested_amount',
+        'cost_share_required',
+        'budget_breakdown',
+        'methods_for_measuring_success'
+      ];
 
-      if (field === 'total_project_cost' || field === 'total_requested_amount' || field === 'cost_share_required' || field === 'budget_breakdown') {
-        return !grantProposalData.budget[field] || grantProposalData.budget[field].toString().trim() === '';
-      }
+      const missingFields = requiredFields.filter(field => {
+        if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries' || field === 'methods_for_measuring_success') {
+          return !grantProposalData[field] || grantProposalData[field].trim() === '';
+        }
 
-      return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
-    });
+        if (field === 'total_project_cost' || field === 'total_requested_amount' || field === 'cost_share_required' || field === 'budget_breakdown') {
+          return !grantProposalData.budget[field] || grantProposalData.budget[field].toString().trim() === '';
+        }
 
-    if (missingFields.length > 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Required Fields Missing',
-        text: `Please fill in the following required fields: ${missingFields.join(', ')}`,
-        confirmButtonColor: '#2563EB'
+        return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
       });
-      return;
-    }
 
-    // Validate budget fields
-    const totalProjectCost = parseFloat(grantProposalData.budget.total_project_cost);
-    const totalRequestedAmount = parseFloat(grantProposalData.budget.total_requested_amount);
-
-    if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Budget',
-        text: 'Total project cost must be a positive number.',
-        confirmButtonColor: '#2563EB'
-      });
-      return;
-    }
-
-    if (isNaN(totalRequestedAmount) || totalRequestedAmount <= 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Budget',
-        text: 'Total requested amount must be a positive number.',
-        confirmButtonColor: '#2563EB'
-      });
-      return;
-    }
-
-    // Check if total requested amount exceeds grant award ceiling
-    if (selectedGrant.AWARD_CEILING && selectedGrant.AWARD_CEILING !== "Not Provided") {
-      const awardCeiling = parseFloat(selectedGrant.AWARD_CEILING.replace(/[^0-9.]/g, ''));
-      if (!isNaN(awardCeiling) && totalRequestedAmount > awardCeiling) {
+      if (missingFields.length > 0) {
+        setIsGeneratingProposal(false);
         Swal.fire({
-          icon: 'error',
-          title: 'Budget Exceeds Limit',
-          text: `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
+          icon: 'warning',
+          title: 'Required Fields Missing',
+          text: `Please fill in the following required fields: ${missingFields.join(', ')}`,
           confirmButtonColor: '#2563EB'
         });
         return;
       }
-    }
 
-    if (totalRequestedAmount > totalProjectCost) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Budget',
-        text: 'Total requested amount cannot exceed total project cost.',
-        confirmButtonColor: '#2563EB'
+      // Validate budget fields
+      const totalProjectCost = parseFloat(grantProposalData.budget.total_project_cost);
+      const totalRequestedAmount = parseFloat(grantProposalData.budget.total_requested_amount);
+
+      if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
+        setIsGeneratingProposal(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Budget',
+          text: 'Total project cost must be a positive number.',
+          confirmButtonColor: '#2563EB'
+        });
+        return;
+      }
+
+      if (isNaN(totalRequestedAmount) || totalRequestedAmount <= 0) {
+        setIsGeneratingProposal(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Budget',
+          text: 'Total requested amount must be a positive number.',
+          confirmButtonColor: '#2563EB'
+        });
+        return;
+      }
+
+      // Check if total requested amount exceeds grant award ceiling
+      if (selectedGrant.AWARD_CEILING && selectedGrant.AWARD_CEILING !== "Not Provided") {
+        const awardCeiling = parseFloat(selectedGrant.AWARD_CEILING.replace(/[^0-9.]/g, ''));
+        if (!isNaN(awardCeiling) && totalRequestedAmount > awardCeiling) {
+          setIsGeneratingProposal(false);
+          Swal.fire({
+            icon: 'error',
+            title: 'Budget Exceeds Limit',
+            text: `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
+            confirmButtonColor: '#2563EB'
+          });
+          return;
+        }
+      }
+
+      if (totalRequestedAmount > totalProjectCost) {
+        setIsGeneratingProposal(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Budget',
+          text: 'Total requested amount cannot exceed total project cost.',
+          confirmButtonColor: '#2563EB'
+        });
+        return;
+      }
+
+      // Here you can handle the submission of the grant proposal data
+      const res = await axios.post(`${API_BASE_URL}/sendGrantDataForProposalGeneration`, {
+        formData: grantProposalData,
+        grant: selectedGrant
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      return;
-    }
 
-    // Here you can handle the submission of the grant proposal data
-    const res = await axios.post(`${API_BASE_URL}/sendGrantDataForProposalGeneration`, {
-      formData: grantProposalData,
-      grant: selectedGrant
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+      if (res.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Grant proposal generated successfully!',
+          confirmButtonColor: '#2563EB'
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to generate grant proposal. Please try again.',
+          confirmButtonColor: '#2563EB'
+        });
+      }
 
-    if (res.status === 200) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Grant proposal generated successfully!',
-        confirmButtonColor: '#2563EB'
+      // Close the modal
+      setShowGrantProposalModal(false);
+      setSelectedGrant(null);
+
+      // Reset form data
+      setGrantProposalData({
+        summary: "",
+        objectives: "",
+        activities: "",
+        beneficiaries: "",
+        geography: "",
+        start_date: "",
+        estimated_duration: "",
+        budget: {
+          total_project_cost: "",
+          total_requested_amount: "",
+          cost_share_required: "",
+          budget_breakdown: ""
+        },
+        methods_for_measuring_success: ""
       });
-    } else {
+
+      // You can add navigation or other logic here
+      // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
+      console.log("Grant Proposal Data:", grantProposalData);
+      console.log("Selected Grant:", selectedGrant);
+
+    } catch (error) {
+      console.error("Error generating proposal:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'Failed to generate grant proposal. Please try again.',
         confirmButtonColor: '#2563EB'
       });
+    } finally {
+      // Always set loading to false
+      setIsGeneratingProposal(false);
     }
-
-    // Close the modal
-    setShowGrantProposalModal(false);
-    setSelectedGrant(null);
-
-    // Reset form data
-    setGrantProposalData({
-      summary: "",
-      objectives: "",
-      activities: "",
-      beneficiaries: "",
-      geography: "",
-      start_date: "",
-      estimated_duration: "",
-      budget: {
-        total_project_cost: "",
-        total_requested_amount: "",
-        cost_share_required: "",
-        budget_breakdown: ""
-      },
-      methods_for_measuring_success: ""
-    });
-
-    // You can add navigation or other logic here
-    // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
-    console.log("Grant Proposal Data:", grantProposalData);
-    console.log("Selected Grant:", selectedGrant);
-
-    // Close the modal
-    setShowGrantProposalModal(false);
-    setSelectedGrant(null);
-
-    // Reset form data
-    setGrantProposalData({
-      summary: "",
-      objectives: "",
-      activities: "",
-      beneficiaries: "",
-      geography: "",
-      start_date: "",
-      estimated_duration: "",
-      budget: {
-        total_project_cost: "",
-        total_requested_amount: "",
-        cost_share_required: "",
-        budget_breakdown: ""
-      },
-      methods_for_measuring_success: ""
-    });
-
-    // You can add navigation or other logic here
-    // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
   };
 
   const RFPCard = ({ rfp, isSaved, handleGenerateProposal }) => (
@@ -2313,6 +2311,19 @@ const DiscoverRFPs = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
+      {/* Loading Overlay */}
+      {isGeneratingProposal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2563EB] mx-auto mb-6"></div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Generating Your Proposal</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Please wait while we generate your proposal. This process may take a few moments as we analyze your data and generate a proposal.
+            </p>
+          </div>
+        </div>
+      )}
+
       <NavbarComponent />
 
       <LeftSidebar
@@ -3042,9 +3053,16 @@ const DiscoverRFPs = () => {
               </button>
               <button
                 onClick={handleSubmitGrantProposal}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                disabled={isGeneratingProposal}
+                className={`px-6 py-2 text-white rounded-md flex items-center gap-2 ${isGeneratingProposal
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
               >
-                Submit Proposal
+                {isGeneratingProposal && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                )}
+                {isGeneratingProposal ? 'Generating...' : 'Continue'}
               </button>
             </div>
           </div>
