@@ -31,7 +31,7 @@ const SidePanel = ({
   showPropertiesPanel
 }) => {
   return (
-    <div className="w-[72px] min-w-[72px] max-w-[72px] bg-white border-r flex flex-col items-center shadow-md sidebar-panel">
+    <div className="w-[70px] min-w-[70px] max-w-[70px] bg-white border-r flex flex-col items-center shadow-md sidebar-panel">
       {/* Design Button */}
       <div className="mb-2 w-full">
         <button

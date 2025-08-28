@@ -36,16 +36,16 @@ const DesignPanel = ({
   if (view === 'preview' && selectedTemplateSet) {
     const previews = svgPreviews[selectedTemplateSet] || [];
     return (
-      <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16 h-[calc(100vh-16px)]">
+      <div className="fixed left-[70px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <button onClick={e => { e.stopPropagation(); onBack(); }} className="text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 mr-2">← Back</button>
+              <button onClick={e => { e.stopPropagation(); onBack(); }} className="text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 mr-2">←</button>
               <h3 className="text-lg font-semibold text-gray-800">{selectedTemplateSet} - Pages</h3>
             </div>
             <button onClick={e => { e.stopPropagation(); onClose(); }} className="text-gray-500 hover:text-gray-700">✕</button>
           </div>
-          <div className="grid grid-cols-2 gap-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+          <div className="grid grid-cols-2 gap-3 overflow-y-auto h-full">
             {previews.map((svgUrl, idx) => (
               <button
                 key={idx}
@@ -65,7 +65,7 @@ const DesignPanel = ({
 
   // Main design tools view
   return (
-    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16 h-full">
+    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16">
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

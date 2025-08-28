@@ -149,7 +149,7 @@ const TextPanel = ({
   };
 
   return (
-    <div className="fixed left-[72px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16 h-[calc(100vh-16px)]">
+    <div className="fixed left-[70px] top-0 w-80 bg-white border-r border-gray-200 shadow-lg overflow-y-auto z-20 sidebar-panel mt-16">
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
