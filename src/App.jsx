@@ -111,8 +111,8 @@ const App = () => {
             <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
               <SuperAdmin />
             </ProtectedRoutes>
-          } 
-          
+          } />
+
           <Route path="/image-upload" element={
             <ProtectedRoutes allowedRoles={["SuperAdmin"]}>
               <ImageUpload />
