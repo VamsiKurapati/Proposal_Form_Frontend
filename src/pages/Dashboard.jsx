@@ -101,6 +101,7 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
 
     const [search, setSearch] = useState('');
+    const [grantSearch, setGrantSearch] = useState('');
     const [showAddPersonIdx, setShowAddPersonIdx] = useState(null);
     const [showAddGrantPersonIdx, setShowAddGrantPersonIdx] = useState(null);
     const [selectedProposals, setSelectedProposals] = useState([]);
@@ -909,7 +910,7 @@ const Dashboard = () => {
     const paginatedDeletedProposals = deletedProposals.slice((currentDeletedPage - 1) * PAGE_SIZE, currentDeletedPage * PAGE_SIZE);
 
     // Pagination logic for grant proposals
-    const filteredGrantProposals = grantProposals.filter(p => (p.name || p.title || '').toLowerCase().includes(search.toLowerCase()));
+    const filteredGrantProposals = grantProposals.filter(p => (p.name || p.title || '').toLowerCase().includes(grantSearch.toLowerCase()));
     const totalGrantPages = Math.ceil(filteredGrantProposals.length / PAGE_SIZE);
     const paginatedGrantProposals = filteredGrantProposals.slice((currentGrantPage - 1) * PAGE_SIZE, currentGrantPage * PAGE_SIZE);
 
@@ -1008,18 +1009,18 @@ const Dashboard = () => {
             <main className="w-full mx-auto py-8 px-4 md:px-12 mt-12">
 
                 {/* Proposals Data */}
-                <div className="bg-[#F3CCFF] rounded-lg p-6 mb-6">
+                <div className="rounded-lg p-6 mb-6" style={{ background: "url('/dashboard-bg.png') no-repeat center center", backgroundSize: "cover" }}>
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-4">Welcome {userName}!</h1>
+                            <h1 className="text-[36px] text-[#000000] mb-4">Welcome <span className="font-semibold">{userName}</span>!</h1>
 
                             {/* Progress Bars */}
                             <div className="space-y-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">RFP Proposals Left</label>
+                                    <label className="block text-[18px] text-[#000000] mb-2">Proposals Left</label>
                                     <div className="w-full bg-gray-200 rounded-full h-3">
                                         <div
-                                            className="bg-purple-600 h-3 rounded-full"
+                                            className="bg-[#8300AB] h-3 rounded-full"
                                             style={{
                                                 width: subscriptionData ? `${Math.max(0, (subscriptionData.maxRFPs - subscriptionData.currentRFPs) / subscriptionData.maxRFPs * 100)}%` : '0%'
                                             }}
@@ -1031,10 +1032,10 @@ const Dashboard = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Grant Proposals Left</label>
+                                    <label className="block text-[18px] text-[#000000] mb-2">Grants Left</label>
                                     <div className="w-full bg-gray-200 rounded-full h-3">
                                         <div
-                                            className="bg-purple-600 h-3 rounded-full"
+                                            className="bg-[#8300AB] h-3 rounded-full"
                                             style={{
                                                 width: subscriptionData ? `${Math.max(0, (subscriptionData.maxGrants - subscriptionData.currentGrants) / subscriptionData.maxGrants * 100)}%` : '0%'
                                             }}
@@ -1046,38 +1047,14 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            <p className="text-purple-600 font-medium mb-3">
-                                Current plan: {subscriptionData ? `${subscriptionData.maxRFPs} RFP + ${subscriptionData.maxGrants} Grant Proposals` : 'Loading...'}
+                            <p className="text-[#8300AB] font-medium mb-3">
+                                Current plan: {subscriptionData ? subscriptionData.plan_name : 'Loading...'}
                             </p>
-                            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                                Upgrade
-                            </button>
-                        </div>
-
-                        {/* Illustration */}
-                        <div className="hidden md:block ml-8">
-                            <svg width="120" height="120" viewBox="0 0 120 120" className="text-pink-500">
-                                <g fill="none" stroke="currentColor" strokeWidth="2">
-                                    {/* Woman */}
-                                    <circle cx="40" cy="35" r="8" fill="none" />
-                                    <path d="M 40 43 L 40 60 L 35 70 L 45 70 L 40 60" />
-                                    <path d="M 35 45 L 30 40" />
-                                    <path d="M 45 45 L 50 40" />
-                                    <path d="M 40 60 L 50 55" />
-                                    <rect x="35" y="55" width="10" height="15" fill="none" />
-
-                                    {/* Man */}
-                                    <circle cx="70" cy="40" r="8" fill="none" />
-                                    <path d="M 70 48 L 70 65 L 65 75 L 75 75 L 70 65" />
-                                    <path d="M 65 50 L 60 45" />
-                                    <path d="M 75 50 L 80 45" />
-                                    <rect x="65" y="60" width="10" height="15" fill="none" />
-
-                                    {/* Laptop */}
-                                    <rect x="60" y="70" width="20" height="12" fill="none" />
-                                    <rect x="62" y="72" width="16" height="8" fill="none" />
-                                </g>
-                            </svg>
+                            {subscriptionData && subscriptionData.plan_name !== "Enterprise" && (
+                                <button className="bg-[#8300AB] text-white px-4 py-2 rounded-lg hover:bg-[#8300AB] transition-colors">
+                                    Upgrade
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1121,13 +1098,13 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Search and Actions */}
+                {/* Search and Actions for RFP Proposals */}
                 <div className="flex flex-row items-center justify-between mb-4 gap-2">
                     <div className="flex relative w-full md:w-1/3 items-center gap-2">
                         <MdOutlineSearch className="absolute left-3 text-gray-500" />
                         <input
                             type="text"
-                            placeholder="Search proposals and grants"
+                            placeholder="Search RFP proposals"
                             className="border rounded px-3 py-2 w-full bg-white border-[#E5E7EB] text-[#9CA3AF] pl-10 focus:outline-none focus:ring-1 focus:ring-[#111827]"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
@@ -1141,25 +1118,15 @@ const Dashboard = () => {
                                 }`}
                             onClick={role === "Viewer" ? undefined : () => setShowDeleteOptions(true)}
                             disabled={role === "Viewer"}
-                            title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete proposals"}
+                            title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete RFP proposals"}
                         >
                             <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete RFP
-                        </button>
-                        <button
-                            className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
-                                ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
-                                : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
-                                }`}
-                            onClick={role === "Viewer" ? undefined : () => setShowGrantDeleteOptions(true)}
-                            disabled={role === "Viewer"}
-                            title={role === "Viewer" ? "Viewer cannot delete grant proposals" : "Delete grant proposals"}
-                        >
-                            <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete Grants
                         </button>
                     </div>
                 </div>
 
-                {/* Proposals Table */}
+                {/* RFP Proposals Table */}
+                <h3 className="text-[18px] sm:text-[24px] font-semibold mb-2">RFP Proposals</h3>
                 <div className="bg-white rounded-lg shadow overflow-x-auto mb-8">
                     <table className="min-w-full text-sm">
                         <thead>
@@ -1430,6 +1397,33 @@ const Dashboard = () => {
                             </button>
                         </div>
                     )}
+                </div>
+
+                {/* Search and Actions for Grant Proposals */}
+                <div className="flex flex-row items-center justify-between mb-4 gap-2">
+                    <div className="flex relative w-full md:w-1/3 items-center gap-2">
+                        <MdOutlineSearch className="absolute left-3 text-gray-500" />
+                        <input
+                            type="text"
+                            placeholder="Search grant proposals"
+                            className="border rounded px-3 py-2 w-full bg-white border-[#E5E7EB] text-[#9CA3AF] pl-10 focus:outline-none focus:ring-1 focus:ring-[#111827]"
+                            value={grantSearch}
+                            onChange={e => setGrantSearch(e.target.value)}
+                        />
+                    </div>
+                    <div className="justify-end group flex gap-2">
+                        <button
+                            className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
+                                ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
+                                : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
+                                }`}
+                            onClick={role === "Viewer" ? undefined : () => setShowGrantDeleteOptions(true)}
+                            disabled={role === "Viewer"}
+                            title={role === "Viewer" ? "Viewer cannot delete grant proposals" : "Delete grant proposals"}
+                        >
+                            <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete Grants
+                        </button>
+                    </div>
                 </div>
 
                 {/* Grant Proposals Table */}
@@ -1755,8 +1749,8 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Deleted Proposals Table */}
-                <h3 className="text-[18px] sm:text-[24px] font-semibold mb-2">Deleted Proposals</h3>
+                {/* Deleted RFP Proposals Table */}
+                <h3 className="text-[18px] sm:text-[24px] font-semibold mb-2">Deleted RFP Proposals</h3>
                 <div className="bg-white rounded-lg overflow-x-auto shadow mb-8">
                     <table className="min-w-full text-sm ">
                         <thead>
