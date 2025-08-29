@@ -67,6 +67,8 @@ const LoginPage = () => {
         const role = res.data.user.role;
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("token", token);
+        const subscription = res.data.subscription;
+        localStorage.setItem("subscription", JSON.stringify(subscription));
         setRole(role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
         localStorage.setItem("userRole", role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
         role === "SuperAdmin" ? navigate("/admin") : role === "company" ? navigate("/company_profile_dashboard") : navigate("/employee_profile_dashboard");

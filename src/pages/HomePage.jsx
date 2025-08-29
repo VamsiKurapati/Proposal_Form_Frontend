@@ -1,120 +1,188 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlay } from "react-icons/fa";
-import { MdOutlineSearch, MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineVerifiedUser, MdGroupAdd, MdOutlineCheckCircle } from "react-icons/md";
+import { MdOutlineSearch, MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineCheckCircle, MdOutlineRocketLaunch, MdOutlineCalendarMonth, MdOutlineCancel } from "react-icons/md";
 import { BiTrophy } from "react-icons/bi";
-
+import { IoMdStats } from "react-icons/io";
+import axios from "axios";
+import Swal from "sweetalert2";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const features = [
-  { title: "AI RFP Discovery", desc: "Find relevant RFPs matched to your business capabilities", image: <MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
-  { title: "Smart Templates", desc: "Industry-specific templates with AI-powered customization", image: <MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
-  { title: "Compliance Check", desc: "Automated compliance against RFP verification", image: <MdOutlineSecurity className="w-10 h-10 text-[#2563EB]" /> },
-  { title: "Win Probability Score", desc: "AI-powered scoring system to predict proposal success", image: <BiTrophy className="w-10 h-10 text-[#2563EB]" /> },
-];
-
-const proposalManagement = [
-  {
-    title: "Real-time Proposal Monitoring",
-    desc: "Monitor all your proposals at one place",
-    image: <MdOutlineAnalytics className="w-[34px] h-[34px] text-[#2563EB]" />,
-  },
-  {
-    title: "Team Collaboration Tools",
-    desc: "Work together seamlessly with your team",
-    image: <MdGroupAdd className="w-[34px] h-[34px] text-[#2563EB]" />,
-  },
-  {
-    title: "Performance Analytics",
-    desc: "Data-driven insights for better decisions",
-    image: <MdChat className="w-[34px] h-[34px] text-[#2563EB]" />,
-  },
-  {
-    title: "Automated Compliance",
-    desc: "Ensure your proposals meet all regulatory requirements",
-    image: <MdOutlineVerifiedUser className="w-[34px] h-[34px] text-[#2563EB]" />,
-  },
-];
-
-const benefits = [
-  {
-    title: "DISCOVER",
-    subtitle: "AI RFP Discovery",
-    desc: "Uncover the right opportunities faster with AI-powered search and personalized RFP recommendations based on your industry, preferences, and history.",
-    image: "/why_1.png",
-  },
-  {
-    title: "GENERATE",
-    subtitle: "Smart Templates",
-    desc: "Build compelling, high-converting proposals instantly using dynamic templates, auto-filled sections, and real-time AI-driven content enhancements.",
-    image: "/why_2.png",
-  },
-  {
-    title: "COLLABORATE",
-    subtitle: "Team Collaboration Tools",
-    desc: "Bring your entire team together with live co-editing, threaded comments, version control, and seamless workflow — all in one collaborative workspace.",
-    image: "/why_3.png",
-  },
-  {
-    title: "ANALYZE",
-    subtitle: "Performance Analytics",
-    desc: "Run instant compliance checks to flag missing sections, formatting errors, and legal gaps — so your proposals are error-free and submission-ready.",
-    image: "/why_4.png",
-  },
-  {
-    title: "MANAGE",
-    subtitle: "Real-time Proposal Tracking",
-    desc: "Visualize every stage of your proposal lifecycle — from drafting to submission — with real-time status updates, deadline alerts, and performance insights.",
-    image: "/why_5.png",
-  },
-];
-
-const plans = [
-  {
-    name: "Starter",
-    price: "$99",
-    features: [
-      "Basic RFP Discovery",
-      "5 Smart Templates",
-      "Basic Compliance Check",
-      "Email Support",
-    ],
-    button: "Get Started",
-  },
-  {
-    name: "Professional",
-    price: "$199",
-    popular: true,
-    features: [
-      "Advanced RFP Discovery",
-      "Unlimited Templates",
-      "Advanced Compliance Check",
-      "Win Probability Score",
-      "Team Collaboration",
-      "Priority Support",
-    ],
-    button: "Get Started",
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    features: [
-      "Custom RFP Discovery",
-      "Custom Templates",
-      "Enterprise Compliance",
-      "Custom Integration",
-    ],
-    button: "Contact Sales",
-  },
-];
+const BASE_URL = "https://proposal-form-backend.vercel.app/getSubscriptionPlansData";
 
 export default function HomePage() {
   const navigate = useNavigate();
 
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [hasFetchedPlans, setHasFetchedPlans] = useState(false);
+  const [isMonthly, setIsMonthly] = useState([true, true, true]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      if (!hasFetchedPlans) {
+        try {
+          const response = await axios.get(`${BASE_URL}`);
+          setSubscriptionPlans(response.data.plans);
+          setHasFetchedPlans(true);
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to fetch plans. Please try again later.",
+            icon: "error",
+          });
+          setSubscriptionPlans([]);
+          setHasFetchedPlans(true);
+        }
+      }
+    };
+
+    fetchPlans();
+  }, [hasFetchedPlans]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  const features = [
+    { title: "AI RFP Discovery", desc: "Find relevant RFPs matched to your business capabilities", image: <MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Smart Templates", desc: "Industry-specific templates with AI-powered customization", image: <MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Collaborative Teams", desc: "Work efficiently by teaming up with your employees.", image: <BiTrophy className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Compliance Check", desc: "Automated compliance against RFP verification", image: <MdOutlineSecurity className="w-10 h-10 text-[#2563EB]" /> },
+  ];
+
+  const features_2 = [
+    { title: "Discover", desc: "Find the right grant opportunities with AI suggestions.", image: <MdOutlineSearch className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Draft", desc: "Use guided templates and AI assistance to write strong grants.", image: <MdViewQuilt className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Collaborate", desc: "Work with your entire team on one platform.", image: <BiTrophy className="w-10 h-10 text-[#2563EB]" /> },
+    { title: "Comply", desc: "Run compliance & eligibility checks before submission.", image: <MdOutlineSecurity className="w-10 h-10 text-[#2563EB]" /> },
+  ];
+
+  const proposalManagement = [
+    {
+      title: "AI Recommended Proposals",
+      desc: "Get AI based recommendations for proposals",
+      image: <MdOutlineRocketLaunch className="w-[34px] h-[34px] text-[#2563EB]" />,
+    },
+    {
+      title: "Real-time Proposal Monitoring",
+      desc: "Monitor all your proposals at one place",
+      image: <MdOutlineAnalytics className="w-[34px] h-[34px] text-[#2563EB]" />,
+    },
+    {
+      title: "Real-Time Status Updates",
+      desc: "Check real time updates",
+      image: <IoMdStats className="w-[34px] h-[34px] text-[#2563EB]" />,
+    },
+    {
+      title: "Calendar Tracking",
+      desc: "Track your proposals on your calendar",
+      image: <MdOutlineCalendarMonth className="w-[34px] h-[34px] text-[#2563EB]" />,
+    }
+  ];
+
+  const benefits = [
+    {
+      title: "DISCOVER",
+      subtitle: "RFP & Grant Discovery",
+      desc: "Uncover the right opportunities faster with AI-powered search and personalized RFP recommendations based on your industry, preferences, and history.",
+      image: "/why_1.png",
+    },
+    {
+      title: "GENERATE",
+      subtitle: "Smart Templates",
+      desc: "Build compelling, high-converting proposals instantly using dynamic templates, auto-filled sections, and real-time AI-driven content enhancements.",
+      image: "/why_2.png",
+    },
+    {
+      title: "COLLABORATE",
+      subtitle: "Team Collaboration Tools",
+      desc: "Bring your entire team together with live co-editing, threaded comments, version control, and seamless workflow — all in one collaborative workspace.",
+      image: "/why_3.png",
+    },
+    {
+      title: "ANALYZE",
+      subtitle: "Compliance Check Analysis",
+      desc: "Run instant compliance checks to flag missing sections, formatting errors, and legal gaps — so your proposals are error-free and submission-ready.",
+      image: "/why_4.png",
+    },
+    {
+      title: "MANAGE",
+      subtitle: "Real time Proposal Tracking",
+      desc: "Visualize every stage of your proposal lifecycle — from drafting to submission — with real-time status updates, deadline alerts, and performance insights.",
+      image: "/why_5.png",
+    },
+  ];
+
+  const plans = [
+    {
+      name: "Basic",
+      headerColor: "bg-teal-500",
+      monthlyPrice: subscriptionPlans[0]?.monthlyPrice || "$10",
+      annualPrice: subscriptionPlans[0]?.annualPrice || "$100",
+      features: [
+        `Up to ${subscriptionPlans[0]?.max_rfp_proposal_generations || 5} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans[0]?.max_grant_proposal_generations || 5} AI - Grant Proposal Generations`,
+        "AI-Driven RFP Discovery",
+        "AI-Driven Grant Discovery",
+        "AI-Proposal Recommendation",
+        "Basic Compliance Check",
+        "Proposal Tracking Dashboard",
+        `${subscriptionPlans[0]?.maxEditors || 3} Editors, ${subscriptionPlans[0]?.maxViewers || 4} Viewers, Unlimited Members`,
+        "Team Collaboration",
+        "Support",
+      ],
+      missingFeatures: [
+        "Advanced Compliance Check",
+      ],
+      button: "Get Started",
+    },
+    {
+      name: "Pro",
+      headerColor: "bg-purple-500",
+      monthlyPrice: subscriptionPlans[1]?.monthlyPrice || "$25",
+      annualPrice: subscriptionPlans[1]?.annualPrice || "$250",
+      features: [
+        "Includes All Basic Features",
+        `Up to ${subscriptionPlans[1]?.max_rfp_proposal_generations || 20} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans[1]?.max_grant_proposal_generations || 20} AI - Grant Proposal Generations`,
+        `${subscriptionPlans[1]?.maxEditors || 7} Editors, ${subscriptionPlans[1]?.maxViewers || 10} Viewers, Unlimited Members`,
+        "Advanced Compliance Check",
+      ],
+      missingFeatures: [
+        "Dedicated Support",
+      ],
+      button: "Get Started",
+    },
+    {
+      name: "Enterprise",
+      headerColor: "bg-gray-700",
+      monthlyPrice: subscriptionPlans[2]?.monthlyPrice || "$50",
+      annualPrice: subscriptionPlans[2]?.annualPrice || "$500",
+      features: [
+        "Includes All Basic & Pro Features",
+        `Up to ${subscriptionPlans[2]?.max_rfp_proposal_generations || 45} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans[2]?.max_grant_proposal_generations || 45} AI - Grant Proposal Generations`,
+        "Unlimited Editors, Unlimited Viewers, Unlimited Members",
+        "Dedicated Support",
+      ],
+      missingFeatures: [],
+      button: "Get Started",
+    },
+  ];
+
+  const handleBillingToggle = (planIndex, isMonthlyBilling) => {
+    const newIsMonthly = [...isMonthly];
+    newIsMonthly[planIndex] = isMonthlyBilling;
+    setIsMonthly(newIsMonthly);
+  };
+
+  const getBorderColor = (planName) => {
+    if (planName === "Enterprise") return "border-[#2F3349]";
+    if (planName === "Pro") return "border-[#614DDB]";
+    return "border-[#03D4CC]";
+  };
 
   return (
     <section className="w-full font-inter bg-white">
@@ -135,12 +203,12 @@ export default function HomePage() {
         style={{ background: "linear-gradient(180deg, #EEF4FF 50%, #FFFFFF 100%)" }} >
         <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-8 md:py-16">
           {/* Left Text Section */}
-          <div className="w-full md:w-1/2 text-left mb-10 md:mb-0">
+          <div className="w-full md:w-1/2 text-left mb-10 md:mb-0 lg:ml-24">
             <h1 className="text-[28px] sm:text-[32px] lg:text-[36px] font-semibold text-[#000000] leading-tight">
-              Transform Your RFP Process with AI-Powered Intelligence
+              From Requests to Results - Smarter, Faster.
             </h1>
             <p className="text-[14px] lg:text-[16px] text-[#6B7280] font-medium mt-4">
-              Transform your RFP process with intelligent suggestions, compliance checks, and win probability scoring.
+              AI-powered drafting, compliance, and collaboration to help you secure proposals & grants with confidence.
             </p>
             <div className="md:hidden w-full xs:w-[70%] h-[200px] mx-auto md:h-full lg:w-1/2 mt-4">
               <img
@@ -179,11 +247,28 @@ export default function HomePage() {
       <section id="about" className="bg-white scroll-mt-20">
         <div className="py-8 md:py-16 px-8 md:px-16">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="mx-auto text-[30px] text-[#000000] font-semi-bold">Streamline your RFP Process</h2>
+            <h2 className="mx-auto text-[30px] text-[#2F3349] font-semibold">Streamline your <span className="text-[#2563EB]">RFP</span> Process</h2>
           </div>
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
             {features.map((item, idx) => (
-              <div key={idx} className="bg-[#0000000A] border border-2 border-[#E5E7EB] p-4 rounded-xl shadow hover:shadow-md transition">
+              <div key={idx} className="bg-[#0000000A] border border-1 border-[#E5E7EB] p-4 rounded-[16px] hover:shadow transition">
+                <div className="flex items-center gap-4 mb-4"> {item.image} </div>
+                <div className="flex flex-col items-start text-left gap-2">
+                  <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
+                  <p className="font-regular text-[16px] text-[#6B7280]">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="py-8 md:py-16 px-8 md:px-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="mx-auto text-[30px] text-[#2F3349] font-semibold">Improve your <span className="text-[#2563EB]">Grant Writing</span> Process</h2>
+          </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-6">
+            {features_2.map((item, idx) => (
+              <div key={idx} className="bg-[#EEF6FF] border border-1 border-[#E5E7EB] p-4 rounded-[16px] hover:shadow transition">
                 <div className="flex items-center gap-4 mb-4"> {item.image} </div>
                 <div className="flex flex-col items-start text-left gap-2">
                   <h3 className="font-medium text-[20px] text-[#111827]">{item.title}</h3>
@@ -196,8 +281,8 @@ export default function HomePage() {
 
         {/* Comprehensive Proposal Management */}
         <div className="py-8 md:py-16 bg-white px-8 md:px-16">
-          <h2 className="text-[30px] font-semi-bold mb-4">Comprehensive Proposal Management</h2>
-          <div className="flex gap-8 flex-col md:flex-row items-center justify-between">
+          <h2 className="text-[30px] font-semibold mb-4 text-[#2F3349] text-center">Comprehensive Proposal <span className="text-[#2563EB]">Management</span></h2>
+          <div className="flex gap-8 flex-col md:flex-row items-center justify-center lg:ml-24">
             <div className="w-full md:w-1/2">
               <img src="/proposal_management.png" alt="Proposal Management" className="w-full rounded-lg shadow-lg mb-4" />
             </div>
@@ -220,7 +305,7 @@ export default function HomePage() {
 
       {/* Why Choose AI RFP */}
       <section className="py-8 md:py-16 bg-white px-8 md:px-16 scroll-mt-20" id="solutions">
-        <h2 className="text-[30px] font-semi-bold mb-4">Why Choose AI RFP?</h2>
+        <h2 className="text-[30px] font-semibold mb-4 text-[#2F3349] text-center">Why Choose <span className="text-[#2563EB]">RFP2Grant</span>?</h2>
         {benefits.map((item, idx) => (
           <div key={idx} className={`flex flex-row items-center justify-center text-left gap-4 xs:gap-8 lg:gap-20 space-y-4 lg:px-8 mb-8 lg:mb-12 ${idx % 2 === 1 ? "flex-row" : "flex-row-reverse"}`}>
             <img src={item.image} alt={item.title} className="w-[100px] xs:w-[150px] md:w-[250px] lg:w-[300px] h-[120px] xs:h-[200px] md:h-full object-cover rounded-lg mb-4" />
@@ -235,27 +320,74 @@ export default function HomePage() {
 
       {/* Plans Section */}
       <section className="pb-20 bg-white px-8 md:px-16 scroll-mt-20" id="plans">
-        <h2 className="text-[30px] text-[#000000] font-bold mb-8">Choose Your Plan</h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <h2 className="text-[30px] text-[#2F3349] font-bold mb-8 text-center">Choose Your <span className="text-[#2563EB]">Plan</span></h2>
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, idx) => (
-            <div key={idx} className={`p-6 border border-2 text-left rounded-xl ${plan.popular ? "border-[#2563EB]" : "border-[#E5E7EB] "}`}>
-              {plan.popular && (
-                <div className="text-center mb-4">
-                  <span className="text-[12px] text-[#FFFFFF] bg-[#2563EB] font-regular mb-2 py-2 px-2 rounded-lg inline-block">Most Popular</span>
-                </div>
-              )}
-              <h3 className="text-[20px] text-[#111827] font-semibold">{plan.name}</h3>
-              <p className="text-[28px] text-[#000000] font-bold">{plan.price} {plan.price !== "Custom" && (<span className="text-[20px] text-[#6B7280] font-regular"> /month</span>)}</p>
-              <ul className="text-left mt-4 space-y-2 text-sm text-gray-700">
-                {plan.features.map((feat, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <MdOutlineCheckCircle className="text-green-500 w-[20px] h-[20px]" />
-                    {feat}
+            <div key={idx} className={`relative p-6 border-2 rounded-lg ${getBorderColor(plan.name)}`}>
+              {/* Plan Header */}
+              <div className={`absolute -top-6 left-1/2 transform -translate-x-1/2 ${plan.headerColor} text-white p-4 rounded-lg px-6 py-2 mb-6`}>
+                <h3 className="text-[20px] font-semibold text-center">{plan.name}</h3>
+              </div>
+
+              {/* Price */}
+              <div className="text-center mb-6">
+                <p className="text-[28px] font-bold text-[#000000]">
+                  {isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
+                  <span className="text-[20px] text-[#6B7280] font-regular">/month</span>
+                </p>
+              </div>
+
+              {/* Features List */}
+              <ul className="space-y-3 mb-6">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <MdOutlineCheckCircle className="text-[#10B981] w-5 h-5 flex-shrink-0 mt-[1px]" />
+                    <span className="text-[16px] text-[#000000] font-regular">
+                      {feature.includes("Includes All Basic Features") || feature.includes("Includes All Basic & Pro Features") ? (
+                        <span className="text-[#2563EB] font-semibold">{feature}</span>
+                      ) : (
+                        feature
+                      )}
+                    </span>
+                  </li>
+                ))}
+                {plan.missingFeatures.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <MdOutlineCancel className="text-[#DC2622] w-5 h-5 flex-shrink-0 mt-[1px]" />
+                    <span className="text-[16px] text-[#000000] font-regular">{feature}</span>
                   </li>
                 ))}
               </ul>
-              <button className={`mt-4 w-full ${plan.popular ? "bg-[#2563EB] text-[#FFFFFF] " : "bg-[#FFFFFF] text-[#000000]"} border border-1 border-[#00000033] py-2 rounded-lg`}
-                onClick={() => navigate("/login")}
+
+              {/* Billing Toggle */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <button
+                  className={`text-sm font-medium transition-colors ${isMonthly[idx]
+                    ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
+                    : "text-[#2563EB]"
+                    }`}
+                  onClick={() => handleBillingToggle(idx, true)}
+                >
+                  Monthly
+                </button>
+                <button
+                  className={`text-sm font-medium transition-colors ${!isMonthly[idx]
+                    ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
+                    : "text-[#2563EB]"
+                    }`}
+                  onClick={() => handleBillingToggle(idx, false)}
+                >
+                  Yearly
+                </button>
+              </div>
+
+              {/* Get Started Button */}
+              <button
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${plan.name === "Enterprise"
+                  ? "bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
+                onClick={() => navigate("/sign_up")}
               >
                 {plan.button}
               </button>
@@ -266,20 +398,11 @@ export default function HomePage() {
 
       {/* Call to Action */}
       <section className="bg-[#1E293B] text-center py-12 px-8 md:px-16">
-        <h3 className="text-[36px] text-[#FFFFFF] font-semi-bold mb-2">Ready to get started</h3>
+        <h3 className="text-[36px] text-[#FFFFFF] font-semibold mb-2">Ready to get started</h3>
         <p className="text-[#FFFFFF] text-[16px] font-medium mb-4">Join thousands of satisfied customers and transform your business today.</p>
-        {/* <div className="flex flex-col sm:flex-row mx-auto justify-center gap-4">
-          <button className="mx-auto bg-[#2563EB] text-white px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular">
-            Get Started
-          </button>
-          <button className="mx-auto bg-[#FFFFFF] border border-1 border-[#00000033] px-6 py-2 rounded-lg flex items-center gap-2 text-[16px] text-[#000000] font-regular">
-            <FaPlay className="text-[#000000]" />
-            Watch Demo
-          </button>
-        </div> */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <button className="w-[140px] sm:w-auto bg-[#2563EB] hover:bg-[#1d4ed8] transition text-white px-6 py-2 rounded-lg text-[16px] font-medium shadow"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/sign_up")}
           >
             Get Started
           </button>

@@ -41,12 +41,12 @@ const NavbarComponent = () => {
         <div className="md:hidden">
           <FiMenu className="text-lg" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} />
         </div>
-        <span
-          className="font-bold text-xl cursor-pointer"
+        <div
+          className="w-[127px] h-[36px] cursor-pointer"
           onClick={() => navigate("/")}
         >
-          LOGO
-        </span>
+          <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
+        </div>
         <div className="hidden md:flex gap-6 ml-16">
           {navItems.map(({ name, path }) => (
             <button

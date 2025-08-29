@@ -2339,423 +2339,371 @@ const Discover = () => {
     return hasActiveRFPFilters() || hasActiveGrantFilters() || selectedIndustries.length > 0 || searchQuery.trim() !== "";
   };
 
+  const flag = JSON.parse(localStorage.getItem("subscription"));
+
   return (
-    <div className="min-h-screen bg-[#FFFFFF]">
-      {/* Loading Overlay */}
-      {isGeneratingProposal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2563EB] mx-auto mb-6"></div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">Generating Your Proposal</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Please wait while we generate your proposal. This process may take a few moments as we analyze your data and generate a proposal.
-            </p>
+    <>
+      {(flag && flag.plan_name == "None") ? (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-[1px] z-50">
+          <div className="">
+            <Subscription />
+
           </div>
         </div>
-      )}
+      ) : null}
 
-      <NavbarComponent />
-
-      <LeftSidebar
-        isOpen={isSearchFocused && activeTab === "rfp"}
-        onClose={() => setIsSearchFocused(false)}
-        filters={filters}
-        setFilters={setFilters}
-      />
-
-      <GrantsFilterSidebar
-        isOpen={isSearchFocused && activeTab === "grants"}
-        onClose={() => setIsSearchFocused(false)}
-        grantFilters={grantFilters}
-        setGrantFilters={setGrantFilters}
-      />
-      <main className="pt-20 px-8 md:px-12 py-6 ml-0">
-        {/* Search Bar Section */}
-        <div className="flex  justify-center mx-auto text-lg space-x-6 border-b border-gray-200 p-4">
-          <button
-            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "rfp"
-              ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
-              : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
-              }`}
-            onClick={() => handleTabChange("rfp")}
-          >
-            RFP's
-          </button>
-
-          <button
-            className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "grants"
-              ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
-              : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
-              }`}
-            onClick={() => handleTabChange("grants")}
-          >
-            Grant's
-          </button>
-        </div>
-
-        {activeTab === "rfp" && (
-          <div className="mt-4">
-            <div className="mb-8">
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                {/* Search Input with Advanced Search Button */}
-                <div className="relative flex-1 w-full md:max-w-[90%]">
-                  <div className="relative">
-                    <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
-                    <input
-                      type="text"
-                      placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
-                      className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button
-                      className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
-                        ? hasAnyActiveFilters()
-                          ? "bg-[#2563EB] text-white"
-                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
-                        : hasActiveGrantFilters()
-                          ? "bg-[#2563EB] text-white"
-                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
-                        }`}
-                      onClick={() => setIsSearchFocused(true)}
-                    >
-                      {activeTab === "rfp"
-                        ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
-                        : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
-                      }
-                    </button>
-                  </div>
-
-                  {/* Clear Filters Button */}
-                  {hasAnyActiveFilters() && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
-                    >
-                      <MdOutlineClose className="w-4 h-4" />
-                      Clear All Filters
-                    </button>
-                  )}
-                </div>
-
-                {/* Upload RFP Button */}
-                <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
-                  onClick={() => setUploadModalOpen(true)}
-                >
-                  <MdOutlineUpload className="w-5 h-5" />
-                  Upload RFP
-                </button>
-              </div>
+      <div className="min-h-screen bg-[#FFFFFF]">
+        {/* Loading Overlay */}
+        {isGeneratingProposal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2563EB] mx-auto mb-6"></div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">Generating Your Proposal</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Please wait while we generate your proposal. This process may take a few moments as we analyze your data and generate a proposal.
+              </p>
             </div>
-
-            <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-                <p className="text-red-700">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="mt-2 text-red-600 hover:text-red-800 underline"
-                >
-                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-                </button>
-              </div>
-            )}
-            {loadingRecommended ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
-                <span className="ml-3 text-[16px] text-[#4B5563]">Loading recommended RFPs...</span>
-              </div>
-            ) : filteredRecommended.length ? (
-              <div className="flex overflow-x-auto pb-2 custom-scroll">
-                {applyFilters(filteredRecommended).map((rfp) => (
-                  <RFPCard
-                    key={rfp._id}
-                    rfp={rfp}
-                    isSaved={!!saved.find((s) => s._id === rfp._id)}
-                    handleGenerateProposal={handleGenerateProposal}
-                  />
-                ))}
-              </div>
-            ) : (
-              (!error && (
-                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
-              ))
-            )}
-
-            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other RFPs</h2>
-            <div className="mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                {/* Industry Selection */}
-                <div>
-                  <label className="block text-[16px] font-medium text-[#111827] mb-2">
-                    Select Industries to Filter RFPs
-                  </label>
-                  <IndustryMultiSelect
-                    selectedIndustries={selectedIndustries}
-                    onIndustryChange={setSelectedIndustries}
-                    industries={availableIndustries}
-                  />
-                </div>
-
-                {/* Search Button */}
-                <div className="flex justify-start md:justify-end">
-                  <button
-                    onClick={fetchOtherRFPs}
-                    disabled={selectedIndustries.length === 0 || loadingOtherRFPs}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherRFPs
-                      ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
-                      : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
-                      }`}
-                  >
-                    {loadingOtherRFPs ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Searching...</span>
-                      </>
-                    ) : (
-                      <>
-                        <MdOutlineSearch className="w-5 h-5" />
-                        <span>Search RFPs</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {loadingOtherRFPs ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
-                <span className="ml-3 text-[16px] text-[#4B5563]">Loading RFPs...</span>
-              </div>
-            ) : filteredOtherRFPs.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
-                  {getCurrentPageItems(applyFilters(filteredOtherRFPs), currentOtherRFPsPage, itemsPerPage).map((rfp) => (
-                    <RecentRFPCard
-                      key={rfp._id}
-                      rfp={rfp}
-                      isSaved={!!saved.find((s) => s._id === rfp._id)}
-                    />
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <Pagination
-                    currentPage={currentOtherRFPsPage}
-                    totalPages={getTotalPages(applyFilters(filteredOtherRFPs).length, itemsPerPage)}
-                    onPageChange={(page) => handlePageChange(page, setCurrentOtherRFPsPage)}
-                  />
-                </div>
-              </>
-            ) : filteredOtherRFPs.length === 0 && selectedIndustries.length > 0 ? (
-              <div className="text-center py-8">
-                <p className="text-[16px] text-[#4B5563] mb-2">No RFPs found for the selected industries.</p>
-                <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search RFPs" to discover relevant opportunities.</p>
-                <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find RFPs that match your expertise.</p>
-              </div>
-            )}
-
-            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-                <p className="text-red-700">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="mt-2 text-red-600 hover:text-red-800 underline"
-                >
-                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-                </button>
-              </div>
-            )}
-
-            {!error && (
-              filteredSaved.length > 0 ? (
-                <>
-                  <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-[#F8FAFC]">
-                          <tr className="text-[#374151] text-[14px] font-medium">
-                            <th className="px-4 py-3 text-left">RFP Title</th>
-                            <th className="px-4 py-3 text-left">Organisation</th>
-                            <th className="px-4 py-3 text-left">Amount</th>
-                            <th className="px-4 py-3 text-left">Deadline</th>
-                            <th className="px-4 py-3 text-center">Status</th>
-                            <th className="px-4 py-3 text-center">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {getCurrentPageItems(filteredSaved, currentTablePage, tableItemsPerPage).map((rfp) => (
-                            <SavedRFPCard
-                              key={rfp._id}
-                              rfp={rfp}
-                              isSaved={true}
-                            />
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  <div className="mt-6">
-                    <Pagination
-                      currentPage={currentTablePage}
-                      totalPages={getTotalPages(filteredSaved.length, tableItemsPerPage)}
-                      onPageChange={(page) => handlePageChange(page, setCurrentTablePage)}
-                    />
-                  </div>
-                </>
-              ) : (
-                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
-              )
-            )}
           </div>
         )}
 
-        {activeTab === "grants" && (
-          <div className="mt-4">
-            <div className="mb-8">
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                {/* Search Input with Advanced Search Button */}
-                <div className="relative flex-1 w-full md:max-w-[90%]">
-                  <div className="relative">
-                    <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
-                    <input
-                      type="text"
-                      placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
-                      className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button
-                      className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
-                        ? hasAnyActiveFilters()
-                          ? "bg-[#2563EB] text-white"
-                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
-                        : hasActiveGrantFilters()
-                          ? "bg-[#2563EB] text-white"
-                          : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
-                        }`}
-                      onClick={() => setIsSearchFocused(true)}
-                    >
-                      {activeTab === "rfp"
-                        ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
-                        : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
-                      }
-                    </button>
+        <NavbarComponent />
+
+        <LeftSidebar
+          isOpen={isSearchFocused && activeTab === "rfp"}
+          onClose={() => setIsSearchFocused(false)}
+          filters={filters}
+          setFilters={setFilters}
+        />
+
+        <GrantsFilterSidebar
+          isOpen={isSearchFocused && activeTab === "grants"}
+          onClose={() => setIsSearchFocused(false)}
+          grantFilters={grantFilters}
+          setGrantFilters={setGrantFilters}
+        />
+        <main className="pt-20 px-8 md:px-12 py-6 ml-0">
+          {/* Search Bar Section */}
+          <div className="flex  justify-center mx-auto text-lg space-x-6 border-b border-gray-200 p-4">
+            <button
+              className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "rfp"
+                ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
+                : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
+                }`}
+              onClick={() => handleTabChange("rfp")}
+            >
+              RFP's
+            </button>
+
+            <button
+              className={`pb-2 px-6 rounded-t-lg transition-all duration-200 focus:outline-none ${activeTab === "grants"
+                ? "text-[#2563EB] font-bold border-b-2 border-[#2563EB] bg-[#E5E7EB] shadow"
+                : "font-bold text-[#4B5563] hover:text-[#2563EB] hover:bg-[#E5E7EB]"
+                }`}
+              onClick={() => handleTabChange("grants")}
+            >
+              Grant's
+            </button>
+          </div>
+
+          {activeTab === "rfp" && (
+            <div className="mt-4">
+              <div className="mb-8">
+                <div className="flex flex-col md:flex-row gap-4 items-center">
+                  {/* Search Input with Advanced Search Button */}
+                  <div className="relative flex-1 w-full md:max-w-[90%]">
+                    <div className="relative">
+                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
+                      <input
+                        type="text"
+                        placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
+                        className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <button
+                        className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
+                          ? hasAnyActiveFilters()
+                            ? "bg-[#2563EB] text-white"
+                            : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                          : hasActiveGrantFilters()
+                            ? "bg-[#2563EB] text-white"
+                            : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                          }`}
+                        onClick={() => setIsSearchFocused(true)}
+                      >
+                        {activeTab === "rfp"
+                          ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
+                          : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
+                        }
+                      </button>
+                    </div>
+
+                    {/* Clear Filters Button */}
+                    {hasAnyActiveFilters() && (
+                      <button
+                        onClick={clearAllFilters}
+                        className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
+                      >
+                        <MdOutlineClose className="w-4 h-4" />
+                        Clear All Filters
+                      </button>
+                    )}
                   </div>
 
-                  {/* Clear Filters Button */}
-                  {hasAnyActiveFilters() && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
-                    >
-                      <MdOutlineClose className="w-4 h-4" />
-                      Clear All Filters
-                    </button>
-                  )}
-                </div>
-
-                {/* Upload Grant Button */}
-                <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
-                  onClick={() => setUploadGrantModalOpen(true)}
-                >
-                  <MdOutlineUpload className="w-5 h-5" />
-                  Upload Grant
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[24px] text-[#000000] font-semibold">Recent Grants</h2>
-            </div>
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-                <p className="text-red-700">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="mt-2 text-red-600 hover:text-red-800 underline"
-                >
-                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-                </button>
-              </div>
-            )}
-            {loadingRecentGrants ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
-                <span className="ml-3 text-[16px] text-[#4B5563]">Loading recent grants...</span>
-              </div>
-            ) : filteredRecentGrants.length ? (
-              <div className="flex overflow-x-auto pb-2 custom-scroll">
-                {applyGrantFilters(filteredRecentGrants).map((grant) => (
-                  <RecentGrantCard
-                    key={grant._id}
-                    grant={grant}
-                    isSaved={!!savedGrants.find((s) => s._id === grant._id)}
-                    handleGenerateProposal={handleGenerateGrantProposal}
-                  />
-                ))}
-              </div>
-            ) : (
-              (!error && (
-                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recent grants.</p>
-              ))
-            )}
-
-            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other Grants</h2>
-            <div className="mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                {/* Grant Category Selection */}
-                <div>
-                  <label className="block text-[16px] font-medium text-[#111827] mb-2">
-                    Select Categories to Filter Grants
-                  </label>
-                  <IndustryMultiSelect
-                    selectedIndustries={selectedGrants}
-                    onIndustryChange={setSelectedGrants}
-                    industries={availableGrants}
-                  />
-                </div>
-
-                {/* Search Button */}
-                <div className="flex justify-start md:justify-end">
-                  <button
-                    onClick={fetchOtherGrants}
-                    disabled={selectedGrants.length === 0 || loadingOtherGrants}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedGrants.length === 0 || loadingOtherGrants
-                      ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
-                      : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
-                      }`}
+                  {/* Upload RFP Button */}
+                  <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+                    onClick={() => setUploadModalOpen(true)}
                   >
-                    {loadingOtherGrants ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Searching...</span>
-                      </>
-                    ) : (
-                      <>
-                        <MdOutlineSearch className="w-5 h-5" />
-                        <span>Search Grants</span>
-                      </>
-                    )}
+                    <MdOutlineUpload className="w-5 h-5" />
+                    Upload RFP
                   </button>
                 </div>
               </div>
-            </div>
 
-            {loadingOtherGrants ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
-                <span className="ml-3 text-[16px] text-[#4B5563]">Loading grants...</span>
+              <h2 className="text-[24px] text-[#000000] font-semibold mb-4">AI Recommended RFPs</h2>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                  <p className="text-red-700">{error}</p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-red-600 hover:text-red-800 underline"
+                  >
+                    {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                  </button>
+                </div>
+              )}
+              {loadingRecommended ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                  <span className="ml-3 text-[16px] text-[#4B5563]">Loading recommended RFPs...</span>
+                </div>
+              ) : filteredRecommended.length ? (
+                <div className="flex overflow-x-auto pb-2 custom-scroll">
+                  {applyFilters(filteredRecommended).map((rfp) => (
+                    <RFPCard
+                      key={rfp._id}
+                      rfp={rfp}
+                      isSaved={!!saved.find((s) => s._id === rfp._id)}
+                      handleGenerateProposal={handleGenerateProposal}
+                    />
+                  ))}
+                </div>
+              ) : (
+                (!error && (
+                  <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recommended RFPs.</p>
+                ))
+              )}
+
+              <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other RFPs</h2>
+              <div className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                  {/* Industry Selection */}
+                  <div>
+                    <label className="block text-[16px] font-medium text-[#111827] mb-2">
+                      Select Industries to Filter RFPs
+                    </label>
+                    <IndustryMultiSelect
+                      selectedIndustries={selectedIndustries}
+                      onIndustryChange={setSelectedIndustries}
+                      industries={availableIndustries}
+                    />
+                  </div>
+
+                  {/* Search Button */}
+                  <div className="flex justify-start md:justify-end">
+                    <button
+                      onClick={fetchOtherRFPs}
+                      disabled={selectedIndustries.length === 0 || loadingOtherRFPs}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherRFPs
+                        ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+                        : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
+                        }`}
+                    >
+                      {loadingOtherRFPs ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Searching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <MdOutlineSearch className="w-5 h-5" />
+                          <span>Search RFPs</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
-            ) : filteredOtherGrants.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-2 ">
-                  {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
+
+              {loadingOtherRFPs ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                  <span className="ml-3 text-[16px] text-[#4B5563]">Loading RFPs...</span>
+                </div>
+              ) : filteredOtherRFPs.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
+                    {getCurrentPageItems(applyFilters(filteredOtherRFPs), currentOtherRFPsPage, itemsPerPage).map((rfp) => (
+                      <RecentRFPCard
+                        key={rfp._id}
+                        rfp={rfp}
+                        isSaved={!!saved.find((s) => s._id === rfp._id)}
+                      />
+                    ))}
+                  </div>
+                  <div className="mt-6">
+                    <Pagination
+                      currentPage={currentOtherRFPsPage}
+                      totalPages={getTotalPages(applyFilters(filteredOtherRFPs).length, itemsPerPage)}
+                      onPageChange={(page) => handlePageChange(page, setCurrentOtherRFPsPage)}
+                    />
+                  </div>
+                </>
+              ) : filteredOtherRFPs.length === 0 && selectedIndustries.length > 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-[16px] text-[#4B5563] mb-2">No RFPs found for the selected industries.</p>
+                  <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search RFPs" to discover relevant opportunities.</p>
+                  <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find RFPs that match your expertise.</p>
+                </div>
+              )}
+
+              <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved RFPs</h2>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                  <p className="text-red-700">{error}</p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-red-600 hover:text-red-800 underline"
+                  >
+                    {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                  </button>
+                </div>
+              )}
+
+              {!error && (
+                filteredSaved.length > 0 ? (
+                  <>
+                    <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead className="bg-[#F8FAFC]">
+                            <tr className="text-[#374151] text-[14px] font-medium">
+                              <th className="px-4 py-3 text-left">RFP Title</th>
+                              <th className="px-4 py-3 text-left">Organisation</th>
+                              <th className="px-4 py-3 text-left">Amount</th>
+                              <th className="px-4 py-3 text-left">Deadline</th>
+                              <th className="px-4 py-3 text-center">Status</th>
+                              <th className="px-4 py-3 text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {getCurrentPageItems(filteredSaved, currentTablePage, tableItemsPerPage).map((rfp) => (
+                              <SavedRFPCard
+                                key={rfp._id}
+                                rfp={rfp}
+                                isSaved={true}
+                              />
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <Pagination
+                        currentPage={currentTablePage}
+                        totalPages={getTotalPages(filteredSaved.length, tableItemsPerPage)}
+                        onPageChange={(page) => handlePageChange(page, setCurrentTablePage)}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some RFPs to view them!</p>
+                )
+              )}
+            </div>
+          )}
+
+          {activeTab === "grants" && (
+            <div className="mt-4">
+              <div className="mb-8">
+                <div className="flex flex-col md:flex-row gap-4 items-center">
+                  {/* Search Input with Advanced Search Button */}
+                  <div className="relative flex-1 w-full md:max-w-[90%]">
+                    <div className="relative">
+                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
+                      <input
+                        type="text"
+                        placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
+                        className="w-full text-[18px] text-[#9CA3AF] bg-[#FFFFFF] pl-12 pr-32 py-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <button
+                        className={`absolute right-2 top-1/2 px-4 py-2 rounded-xl transform -translate-y-1/2 text-[14px] transition-colors ${activeTab === "rfp"
+                          ? hasAnyActiveFilters()
+                            ? "bg-[#2563EB] text-white"
+                            : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                          : hasActiveGrantFilters()
+                            ? "bg-[#2563EB] text-white"
+                            : "bg-[#F3F4F6] text-[#111827] hover:bg-[#2563EB] hover:text-white"
+                          }`}
+                        onClick={() => setIsSearchFocused(true)}
+                      >
+                        {activeTab === "rfp"
+                          ? hasAnyActiveFilters() ? "Filters Active" : "Advanced Search"
+                          : hasActiveGrantFilters() ? "Filters Active" : "Grants Filters"
+                        }
+                      </button>
+                    </div>
+
+                    {/* Clear Filters Button */}
+                    {hasAnyActiveFilters() && (
+                      <button
+                        onClick={clearAllFilters}
+                        className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
+                      >
+                        <MdOutlineClose className="w-4 h-4" />
+                        Clear All Filters
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Upload Grant Button */}
+                  <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
+                    onClick={() => setUploadGrantModalOpen(true)}
+                  >
+                    <MdOutlineUpload className="w-5 h-5" />
+                    Upload Grant
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-[24px] text-[#000000] font-semibold">Recent Grants</h2>
+              </div>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                  <p className="text-red-700">{error}</p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-red-600 hover:text-red-800 underline"
+                  >
+                    {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                  </button>
+                </div>
+              )}
+              {loadingRecentGrants ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                  <span className="ml-3 text-[16px] text-[#4B5563]">Loading recent grants...</span>
+                </div>
+              ) : filteredRecentGrants.length ? (
+                <div className="flex overflow-x-auto pb-2 custom-scroll">
+                  {applyGrantFilters(filteredRecentGrants).map((grant) => (
                     <RecentGrantCard
                       key={grant._id}
                       grant={grant}
@@ -2764,342 +2712,407 @@ const Discover = () => {
                     />
                   ))}
                 </div>
-                <div className="mt-6">
-                  <Pagination
-                    currentPage={currentOtherGrantsPage}
-                    totalPages={getTotalPages(applyGrantFilters(filteredOtherGrants).length, itemsPerPage)}
-                    onPageChange={(page) => handlePageChange(page, setCurrentOtherGrantsPage)}
-                  />
+              ) : (
+                (!error && (
+                  <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Please fill the profile to get recent grants.</p>
+                ))
+              )}
+
+              <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other Grants</h2>
+              <div className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                  {/* Grant Category Selection */}
+                  <div>
+                    <label className="block text-[16px] font-medium text-[#111827] mb-2">
+                      Select Categories to Filter Grants
+                    </label>
+                    <IndustryMultiSelect
+                      selectedIndustries={selectedGrants}
+                      onIndustryChange={setSelectedGrants}
+                      industries={availableGrants}
+                    />
+                  </div>
+
+                  {/* Search Button */}
+                  <div className="flex justify-start md:justify-end">
+                    <button
+                      onClick={fetchOtherGrants}
+                      disabled={selectedGrants.length === 0 || loadingOtherGrants}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedGrants.length === 0 || loadingOtherGrants
+                        ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+                        : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
+                        }`}
+                    >
+                      {loadingOtherGrants ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Searching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <MdOutlineSearch className="w-5 h-5" />
+                          <span>Search Grants</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </>
-            ) : filteredOtherGrants.length === 0 && selectedGrants.length > 0 ? (
-              <div className="text-center py-8">
-                <p className="text-[16px] text-[#4B5563] mb-2">No grants found for the selected industries.</p>
-                <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search Grants" to discover relevant opportunities.</p>
-                <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find grants that match your expertise.</p>
-              </div>
-            )}
 
-            <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved Grants</h2>
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
-                <p className="text-red-700">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="mt-2 text-red-600 hover:text-red-800 underline"
-                >
-                  {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
-                </button>
-              </div>
-            )}
-
-            {!error && (
-              filteredSavedGrants.length > 0 ? (
+              {loadingOtherGrants ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+                  <span className="ml-3 text-[16px] text-[#4B5563]">Loading grants...</span>
+                </div>
+              ) : filteredOtherGrants.length > 0 ? (
                 <>
-                  <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-[#F8FAFC]">
-                          <tr className="text-[#374151] text-[14px] font-medium">
-                            <th className="px-4 py-3 text-left">Grant Title</th>
-                            <th className="px-4 py-3 text-left">Agency</th>
-                            <th className="px-4 py-3 text-left">Amount</th>
-                            <th className="px-4 py-3 text-left">Deadline</th>
-                            <th className="px-4 py-3 text-center">Status</th>
-                            <th className="px-4 py-3 text-center">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {getCurrentPageItems(applyGrantFilters(filteredSavedGrants), currentGrantTablePage, tableItemsPerPage).map((grant) => (
-                            <SavedGrantCard
-                              key={grant._id}
-                              grant={grant}
-                              isSaved={true}
-                            />
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-2 ">
+                    {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
+                      <RecentGrantCard
+                        key={grant._id}
+                        grant={grant}
+                        isSaved={!!savedGrants.find((s) => s._id === grant._id)}
+                        handleGenerateProposal={handleGenerateGrantProposal}
+                      />
+                    ))}
                   </div>
                   <div className="mt-6">
                     <Pagination
-                      currentPage={currentGrantTablePage}
-                      totalPages={getTotalPages(applyGrantFilters(filteredSavedGrants).length, tableItemsPerPage)}
-                      onPageChange={(page) => handlePageChange(page, setCurrentGrantTablePage)}
+                      currentPage={currentOtherGrantsPage}
+                      totalPages={getTotalPages(applyGrantFilters(filteredOtherGrants).length, itemsPerPage)}
+                      onPageChange={(page) => handlePageChange(page, setCurrentOtherGrantsPage)}
                     />
                   </div>
                 </>
+              ) : filteredOtherGrants.length === 0 && selectedGrants.length > 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-[16px] text-[#4B5563] mb-2">No grants found for the selected industries.</p>
+                  <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
+                </div>
               ) : (
-                <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some grants to view them!</p>
-              )
-            )}
+                <div className="text-center py-8">
+                  <p className="text-[16px] text-[#4B5563] mb-2">Select industries and click "Search Grants" to discover relevant opportunities.</p>
+                  <p className="text-[14px] text-[#6B7280]">Choose from the available industries to filter and find grants that match your expertise.</p>
+                </div>
+              )}
+
+              <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Saved Grants</h2>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center">
+                  <p className="text-red-700">{error}</p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-red-600 hover:text-red-800 underline"
+                  >
+                    {retryCount > 0 ? `Try again (${retryCount}/3)` : "Try again"}
+                  </button>
+                </div>
+              )}
+
+              {!error && (
+                filteredSavedGrants.length > 0 ? (
+                  <>
+                    <div className="w-full bg-white rounded-xl shadow-sm border overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead className="bg-[#F8FAFC]">
+                            <tr className="text-[#374151] text-[14px] font-medium">
+                              <th className="px-4 py-3 text-left">Grant Title</th>
+                              <th className="px-4 py-3 text-left">Agency</th>
+                              <th className="px-4 py-3 text-left">Amount</th>
+                              <th className="px-4 py-3 text-left">Deadline</th>
+                              <th className="px-4 py-3 text-center">Status</th>
+                              <th className="px-4 py-3 text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {getCurrentPageItems(applyGrantFilters(filteredSavedGrants), currentGrantTablePage, tableItemsPerPage).map((grant) => (
+                              <SavedGrantCard
+                                key={grant._id}
+                                grant={grant}
+                                isSaved={true}
+                              />
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <Pagination
+                        currentPage={currentGrantTablePage}
+                        totalPages={getTotalPages(applyGrantFilters(filteredSavedGrants).length, tableItemsPerPage)}
+                        onPageChange={(page) => handlePageChange(page, setCurrentGrantTablePage)}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[16px] text-[#4B5563]">Oops! Nothing here. Discover & save some grants to view them!</p>
+                )
+              )}
+            </div>
+          )}
+
+        </main>
+
+        <UploadRFPModal
+          isOpen={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+        />
+
+        <UploadGrantModal
+          isOpen={uploadGrantModalOpen}
+          onClose={() => setUploadGrantModalOpen(false)}
+        />
+
+        {/* Grant Proposal Modal */}
+        {showGrantProposalModal && selectedGrant && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Grant Proposal Form</h2>
+                  <button
+                    onClick={() => setShowGrantProposalModal(false)}
+                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                <p className="text-gray-600 mt-2">{selectedGrant.OPPORTUNITY_TITLE}</p>
+              </div>
+
+              <div className="p-6 space-y-8">
+                {/* Sample Data Note */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-blue-800 text-sm">
+                    <strong>Note:</strong> Please fill in all required fields marked with <span className="text-red-500">*</span>. You can use the "Clear Form" button to reset all fields.
+                  </p>
+                </div>
+
+                {/* Summary */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Summary <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.summary}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, summary: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    placeholder="Provide a comprehensive summary of your proposed project..."
+                  />
+                </div>
+
+                {/* Objectives */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Objectives <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.objectives}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, objectives: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    placeholder="Describe the main objectives of your proposed project..."
+                  />
+                </div>
+
+                {/* Activities */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Activities <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.activities}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, activities: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    placeholder="Describe the key activities and tasks of your proposed project..."
+                  />
+                </div>
+
+                {/* Beneficiaries */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Beneficiaries <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.beneficiaries}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, beneficiaries: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    placeholder="Describe the beneficiaries and target population of your proposed project..."
+                  />
+                </div>
+
+                {/* Geography */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Geography <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.geography}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, geography: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="Describe the geographic scope of your project..."
+                  />
+                </div>
+
+                {/* Start Date and Duration */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={grantProposalData.start_date}
+                      onChange={(e) => setGrantProposalData(prev => ({ ...prev, start_date: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Estimated Duration <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      value={grantProposalData.estimated_duration}
+                      onChange={(e) => setGrantProposalData(prev => ({ ...prev, estimated_duration: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="e.g., 24 months, 3 years..."
+                    />
+                  </div>
+                </div>
+
+                {/* Budget */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Budget <span className="text-gray-500 text-xs">(Optional)</span>
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Total Project Cost <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={grantProposalData.budget.total_project_cost}
+                        onChange={(e) => updateBudgetField('total_project_cost', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter total project cost..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Total Requested Amount <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={grantProposalData.budget.total_requested_amount}
+                        onChange={(e) => updateBudgetField('total_requested_amount', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter amount requesting from funder..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Cost Share Required
+                      </label>
+                      <textarea
+                        value={grantProposalData.budget.cost_share_required}
+                        onChange={(e) => updateBudgetField('cost_share_required', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={3}
+                        placeholder="Describe your cost share contribution and any partner contributions..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Budget Breakdown
+                      </label>
+                      <textarea
+                        value={grantProposalData.budget.budget_breakdown}
+                        onChange={(e) => updateBudgetField('budget_breakdown', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={3}
+                        placeholder="Provide detailed budget breakdown with amounts, reasons, and justifications..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Methods for Measuring Success */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
+                  </label>
+                  <textarea
+                    value={grantProposalData.methods_for_measuring_success}
+                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, methods_for_measuring_success: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    placeholder="Describe the methods and metrics you will use to measure the success of your project..."
+                  />
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowGrantProposalModal(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => setGrantProposalData({
+                    summary: "",
+                    objectives: "",
+                    activities: "",
+                    beneficiaries: "",
+                    geography: "",
+                    start_date: "",
+                    estimated_duration: "",
+                    budget: {
+                      total_project_cost: "",
+                      total_requested_amount: "",
+                      cost_share_required: "",
+                      budget_breakdown: ""
+                    },
+                    methods_for_measuring_success: ""
+                  })}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Clear Form
+                </button>
+                <button
+                  onClick={handleSubmitGrantProposal}
+                  disabled={isGeneratingProposal}
+                  className={`px-6 py-2 text-white rounded-md flex items-center gap-2 ${isGeneratingProposal
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                >
+                  {isGeneratingProposal && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  )}
+                  {isGeneratingProposal ? 'Generating...' : 'Continue'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-      </main>
-
-      <UploadRFPModal
-        isOpen={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-      />
-
-      <UploadGrantModal
-        isOpen={uploadGrantModalOpen}
-        onClose={() => setUploadGrantModalOpen(false)}
-      />
-
-      {/* Grant Proposal Modal */}
-      {showGrantProposalModal && selectedGrant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Grant Proposal Form</h2>
-                <button
-                  onClick={() => setShowGrantProposalModal(false)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-              <p className="text-gray-600 mt-2">{selectedGrant.OPPORTUNITY_TITLE}</p>
-            </div>
-
-            <div className="p-6 space-y-8">
-              {/* Sample Data Note */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-800 text-sm">
-                  <strong>Note:</strong> Please fill in all required fields marked with <span className="text-red-500">*</span>. You can use the "Clear Form" button to reset all fields.
-                </p>
-              </div>
-
-              {/* Summary */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Summary <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={grantProposalData.summary}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, summary: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Provide a comprehensive summary of your proposed project..."
-                />
-              </div>
-
-              {/* Objectives */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Objectives <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={grantProposalData.objectives}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, objectives: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Describe the main objectives of your proposed project..."
-                />
-              </div>
-
-              {/* Activities */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Activities <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={grantProposalData.activities}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, activities: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Describe the key activities and tasks of your proposed project..."
-                />
-              </div>
-
-              {/* Beneficiaries */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Beneficiaries <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={grantProposalData.beneficiaries}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, beneficiaries: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Describe the beneficiaries and target population of your proposed project..."
-                />
-              </div>
-
-              {/* Geography */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Geography <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={grantProposalData.geography}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, geography: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                  placeholder="Describe the geographic scope of your project..."
-                />
-              </div>
-
-              {/* Start Date and Duration */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={grantProposalData.start_date}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, start_date: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Duration <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.estimated_duration}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, estimated_duration: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={3}
-                    placeholder="e.g., 24 months, 3 years..."
-                  />
-                </div>
-              </div>
-
-              {/* Budget */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Budget <span className="text-gray-500 text-xs">(Optional)</span>
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Total Project Cost <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={grantProposalData.budget.total_project_cost}
-                      onChange={(e) => updateBudgetField('total_project_cost', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter total project cost..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Total Requested Amount <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={grantProposalData.budget.total_requested_amount}
-                      onChange={(e) => updateBudgetField('total_requested_amount', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter amount requesting from funder..."
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Cost Share Required
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.cost_share_required}
-                      onChange={(e) => updateBudgetField('cost_share_required', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder="Describe your cost share contribution and any partner contributions..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Budget Breakdown
-                    </label>
-                    <textarea
-                      value={grantProposalData.budget.budget_breakdown}
-                      onChange={(e) => updateBudgetField('budget_breakdown', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder="Provide detailed budget breakdown with amounts, reasons, and justifications..."
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Methods for Measuring Success */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
-                </label>
-                <textarea
-                  value={grantProposalData.methods_for_measuring_success}
-                  onChange={(e) => setGrantProposalData(prev => ({ ...prev, methods_for_measuring_success: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Describe the methods and metrics you will use to measure the success of your project..."
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                onClick={() => setShowGrantProposalModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setGrantProposalData({
-                  summary: "",
-                  objectives: "",
-                  activities: "",
-                  beneficiaries: "",
-                  geography: "",
-                  start_date: "",
-                  estimated_duration: "",
-                  budget: {
-                    total_project_cost: "",
-                    total_requested_amount: "",
-                    cost_share_required: "",
-                    budget_breakdown: ""
-                  },
-                  methods_for_measuring_success: ""
-                })}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                Clear Form
-              </button>
-              <button
-                onClick={handleSubmitGrantProposal}
-                disabled={isGeneratingProposal}
-                className={`px-6 py-2 text-white rounded-md flex items-center gap-2 ${isGeneratingProposal
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
-              >
-                {isGeneratingProposal && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                )}
-                {isGeneratingProposal ? 'Generating...' : 'Continue'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
+      </div>
+    </>
   );
 };
 

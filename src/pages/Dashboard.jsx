@@ -7,6 +7,7 @@ import { MdOutlineEdit, MdOutlineSearch, MdOutlineRotateLeft, MdOutlineDeleteFor
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
 import Swal from 'sweetalert2';
+import PaymentButton from '../components/PaymentButton';
 
 const localizer = momentLocalizer(moment);
 
@@ -1070,9 +1071,13 @@ const Dashboard = () => {
                                 Current plan: {subscriptionData ? subscriptionData.plan_name : 'Loading...'}
                             </p>
                             {subscriptionData && subscriptionData.plan_name !== "Enterprise" && (
-                                <button className="bg-[#8300AB] text-white px-4 py-2 rounded-lg hover:bg-[#8300AB] transition-colors">
+                                <PaymentButton
+                                    variant="primary"
+                                    size="sm"
+                                    className="bg-[#8300AB] hover:bg-[#6B0089]"
+                                >
                                     Upgrade
-                                </button>
+                                </PaymentButton>
                             )}
                         </div>
                     </div>

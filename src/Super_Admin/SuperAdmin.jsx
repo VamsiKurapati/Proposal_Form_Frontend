@@ -3725,7 +3725,9 @@ const SuperAdmin = () => {
                     <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
                         <div className="p-4 border-b border-[#4B5563]">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-medium text-[#000000]">LOGO</h2>
+                                <div className="w-[127px] h-[36px]">
+                                    <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
+                                </div>
                                 <button
                                     className="p-2 transition-colors"
                                     onClick={() => setShowMobileMenu(false)}
@@ -3815,10 +3817,8 @@ const SuperAdmin = () => {
                     <div className="p-4 h-screen flex flex-col justify-between">
                         {/* Top Section */}
                         <div>
-                            <div className="flex items-center justify-center lg:justify-start mb-4">
-                                <h2 className="text-lg font-medium text-white lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                                    LOGO
-                                </h2>
+                            <div className="hidden group-hover:block w-[127px] h-[36px] mb-4">
+                                <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
                             </div>
 
                             <nav className="space-y-2">

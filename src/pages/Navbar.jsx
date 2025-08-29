@@ -11,7 +11,9 @@ export default function Navbar() {
         <>
             {/* Navbar */}
             <nav className="fixed top-0 left-0 z-50 w-full flex items-center justify-between bg-white p-4 shadow-md px-8 md:px-16">
-                <div className="text-2xl font-bold text-[#2563EB] hover:cursor-pointer" onClick={() => navigate("/")}>LOGO</div>
+                <div className="w-[127px] h-[36px] hover:cursor-pointer" onClick={() => navigate("/")}>
+                    <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
+                </div>
 
                 <div className="hidden md:flex space-x-8">
                     <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
@@ -26,7 +28,7 @@ export default function Navbar() {
                         Login
                     </button>
                     <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition"
-                        onClick={() => navigate("/request-demo")}
+                        onClick={() => navigate("/contact")}
                     >
                         Request Demo
                     </button>

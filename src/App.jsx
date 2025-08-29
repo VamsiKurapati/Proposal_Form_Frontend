@@ -29,13 +29,11 @@ const SuperAdmin = lazy(() => import("./Super_Admin/SuperAdmin"));
 const ImageUpload = lazy(() => import("./Super_Admin/ImageUpload"));
 
 const SupportTicket = lazy(() => import("./pages/SupportTicket"));
+const StripePaymentPage = lazy(() => import("./pages/StripePaymentPage"));
+const PaymentDemo = lazy(() => import("./pages/PaymentDemo"));
 
 const App = () => {
   const { role } = useUser();
-
-  // useEffect(() => {
-  //   console.log("Role in App: ", role);
-  // }, [role]);
 
   return (
     <>
@@ -124,7 +122,19 @@ const App = () => {
             </ProtectedRoutes>
           } />
 
-          <Route path="*" element={<Home />} />
+          {/* <Route path="/payment" element={
+            <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
+              <StripePaymentPage />
+            </ProtectedRoutes>
+          } />
+
+          <Route path="/payment-demo" element={
+            <ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
+              <PaymentDemo />
+            </ProtectedRoutes> */}
+          {/* } /> */}
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </>
