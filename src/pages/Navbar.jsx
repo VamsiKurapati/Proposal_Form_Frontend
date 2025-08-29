@@ -26,7 +26,7 @@ export default function Navbar() {
                         Login
                     </button>
                     <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition"
-                        onClick={() => navigate("/request-demo")}
+                        onClick={() => navigate("/contact")}
                     >
                         Request Demo
                     </button>

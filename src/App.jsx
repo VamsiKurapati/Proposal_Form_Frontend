@@ -11,6 +11,8 @@ const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const SupportTicket = lazy(() => import("./pages/SupportTicket"));
+const Contact = lazy(() => import("./pages/Contact"));
+// const Subscription = lazy(() => import("./pages/Subscription"));
 
 const Discovery = lazy(() => import("./pages/Discover"));
 
@@ -119,8 +121,12 @@ const App = () => {
             </ProtectedRoutes>
           } />
 
+          {/* <Route path="/subscription" element={<Subscription />} /> */}
+
 
           <Route path="/support-ticket" element={<SupportTicket />} />
+
+          <Route path="/contact" element={<Contact />} />
 
 
           <Route path="*" element={<Home />} />

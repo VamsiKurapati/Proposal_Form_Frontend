@@ -13,11 +13,11 @@ const NavbarComponent = () => {
   const { role } = useUser();
 
   const navItems = [
+    { name: "Dashboard", path: "/dashboard" },
     { name: "Discover", path: "/discover" },
     { name: "Proposals", path: "/proposals" },
-    { name: "Dashboard", path: "/dashboard" },
     { name: "Profile", path: role === "company" ? "/company_profile_dashboard" : "/employee_profile_dashboard" },
-    { name: "Support Ticket", path: "/support-ticket" },
+    { name: "Support", path: "/support-ticket" },
   ];
 
   const handleProfileClick = () => {
@@ -43,7 +43,7 @@ const NavbarComponent = () => {
         </div>
         <span
           className="font-bold text-xl cursor-pointer"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/contact")}
         >
           LOGO
         </span>

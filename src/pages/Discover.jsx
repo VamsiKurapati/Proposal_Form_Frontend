@@ -18,6 +18,7 @@ import {
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useUser } from "../context/UserContext";
+import Subscription from "../components/Subscription";
 
 // Constants
 const API_BASE_URL = "http://localhost:5000/api/rfp";
@@ -2347,7 +2348,17 @@ const DiscoverRFPs = () => {
     return hasActiveRFPFilters() || hasActiveGrantFilters() || selectedIndustries.length > 0 || searchQuery.trim() !== "";
   };
 
+  const flag=null;
   return (
+    <>
+   {flag == null ? (
+  <div className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-[1px] z-50">
+    <div className="">
+      <Subscription/>
+
+    </div>
+  </div>
+) : null}
     <div className="min-h-screen bg-[#FFFFFF]">
       {/* Loading Overlay */}
       {isGeneratingProposal && (
@@ -3108,6 +3119,8 @@ const DiscoverRFPs = () => {
       )}
 
     </div>
+
+    </>
   );
 };
 

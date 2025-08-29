@@ -41,7 +41,7 @@ export default function Footer() {
                             <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
                                 <li>About</li>
                                 <li>Blog</li>
-                                <li>Contact</li>
+                                <li className="cursor-pointer hover:text-[#2563EB]" onClick={() => navigate("/contact")}>Contact</li>
                             </ul>
                         </div>
                     </div>
