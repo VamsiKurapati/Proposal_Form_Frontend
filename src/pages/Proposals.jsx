@@ -4,6 +4,7 @@ import { MdOutlineBookmark, MdOutlineBookmarkBorder, MdOutlineShare, MdOutlineCa
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
+import Swal from 'sweetalert2';
 
 // Constants
 const API_BASE_URL = "https://proposal-form-backend.vercel.app/api";
@@ -11,6 +12,9 @@ const API_ENDPOINTS = {
     GET_SAVED_AND_DRAFT_RFPS: `${API_BASE_URL}/rfp/getSavedAndDraftRFPs`,
     SAVE_RFP: `${API_BASE_URL}/rfp/saveRFP`,
     UNSAVE_RFP: `${API_BASE_URL}/rfp/unsaveRFP`,
+    GET_SAVED_AND_DRAFT_GRANTS: `${API_BASE_URL}/grant/getSavedAndDraftGrants`,
+    SAVE_GRANT: `${API_BASE_URL}/grant/saveGrant`,
+    UNSAVE_GRANT: `${API_BASE_URL}/grant/unsaveGrant`,
 };
 
 const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole, buttonText = "Generate", isCurrentEditor = true, isLoading = false }) => (
@@ -81,6 +85,106 @@ const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole
             </div>
         </div>
 
+    </div>
+);
+
+const GrantCard = ({ grant_info, onBookmark, onShare, onGenerate, userRole, buttonText = "Generate", isCurrentEditor = true, isLoading = false }) => (
+    <div className="bg-white rounded-xl border border-[#E5E7EB] p-5 flex flex-col justify-between relative">
+        <div>
+            <div className="flex items-start justify-between">
+                <h3 className="font-semibold text-[18px] mb-1 text-[#111827]">{grant_info.OPPORTUNITY_TITLE || "Untitled Grant"}</h3>
+                <div className="flex gap-2">
+                    <button
+                        title={grant_info.bookmarked ? (userRole === "Viewer" ? "Viewer cannot unsave" : "Unsave") : "Save"}
+                        onClick={grant_info.bookmarked && userRole === "Viewer" ? undefined : onBookmark}
+                        disabled={isLoading || (grant_info.bookmarked && userRole === "Viewer")}
+                        aria-label={grant_info.bookmarked ? (userRole === "Viewer" ? "Viewer cannot unsave" : "Unsave grant") : "Save grant"}
+                        className={`${grant_info.bookmarked && userRole === "Viewer" ? "cursor-not-allowed opacity-50" : isLoading ? "cursor-wait opacity-75" : "cursor-pointer"} text-[#111827]`}
+                    >
+                        {isLoading ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#111827]" aria-hidden="true"></div>
+                        ) : grant_info.bookmarked ? (
+                            <MdOutlineBookmark className="w-5 h-5" />
+                        ) : (
+                            <MdOutlineBookmarkBorder className="w-5 h-5" />
+                        )}
+                    </button>
+                    <button
+                        title="Share"
+                        onClick={onShare}
+                        aria-label="Share grant"
+                        className="text-[#111827]"
+                    >
+                        <MdOutlineShare className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+
+            <div className="mb-3">
+                <p className="text-[#4B5563] text-[14px] mb-1">
+                    <span className="font-medium">Agency:</span> {grant_info.AGENCY_NAME || "Not Provided"}
+                </p>
+                <p className="text-[#4B5563] text-[14px] mb-1">
+                    <span className="font-medium">Category:</span> {grant_info.CATEGORY_OF_FUNDING_ACTIVITY || "Not Provided"}
+                </p>
+                <p className="text-[#4B5563] text-[14px] mb-1">
+                    <span className="font-medium">Funding Type:</span> {grant_info.FUNDING_INSTRUMENT_TYPE || "Not Provided"}
+                </p>
+            </div>
+
+            <div className="flex items-center text-[14px] text-[#4B5563CC] mb-2">
+                <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563]" />
+                {grant_info.CLOSE_DATE ? `Close Date: ${grant_info.CLOSE_DATE}` :
+                    grant_info.ESTIMATED_APPLICATION_DUE_DATE ? `Due Date: ${grant_info.ESTIMATED_APPLICATION_DUE_DATE}` :
+                        "Deadline: Not Provided"}
+            </div>
+
+            <div className="flex items-center text-[14px] text-[#4B5563CC] mb-2">
+                <span className="text-[#059669] text-[12px] font-medium px-2 py-1 bg-[#D1FAE5] rounded-full">
+                    {grant_info.OPPORTUNITY_STATUS || "Unknown Status"}
+                </span>
+            </div>
+        </div>
+
+        <div className="flex justify-between items-center mt-2">
+            <div className="flex flex-col">
+                <span className="text-[#2563EB] text-[14px] font-semibold">
+                    {grant_info.AWARD_CEILING ? `Up to $${grant_info.AWARD_CEILING}` :
+                        grant_info.ESTIMATED_TOTAL_FUNDING ? `Total: $${grant_info.ESTIMATED_TOTAL_FUNDING}` :
+                            "Funding: Not Specified"}
+                </span>
+                {grant_info.EXPECTED_NUMBER_OF_AWARDS && (
+                    <span className="text-[#6B7280] text-[12px]">
+                        Expected Awards: {grant_info.EXPECTED_NUMBER_OF_AWARDS}
+                    </span>
+                )}
+            </div>
+            <div>
+                <button
+                    onClick={onGenerate}
+                    disabled={userRole === "Viewer" || (buttonText === "Continue" && !isCurrentEditor)}
+                    aria-label={`${buttonText.toLowerCase()} grant proposal`}
+                    className={`self-end px-5 py-1.5 rounded-lg text-[16px] font-medium ${userRole === "Viewer" || (buttonText === "Continue" && !isCurrentEditor)
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                        : 'bg-[#2563EB] text-white hover:bg-[#1d4ed8]'
+                        }`}
+                    title={
+                        userRole === "Viewer"
+                            ? "Viewer cannot generate/edit grant proposals"
+                            : buttonText === "Continue" && !isCurrentEditor
+                                ? "Only the current editor can continue this grant proposal"
+                                : `Click to ${buttonText.toLowerCase()}`
+                    }
+                >
+                    {buttonText}
+                </button>
+                {buttonText === "Continue" && !isCurrentEditor && (
+                    <div className="text-xs text-gray-500 mt-1 text-center">
+                        Current editor: {grant_info.currentEditor?.fullName || grant_info.currentEditor?.email || 'Unknown'}
+                    </div>
+                )}
+            </div>
+        </div>
     </div>
 );
 
@@ -175,12 +279,17 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 const Proposals = () => {
     const [savedProposals, setSavedProposals] = useState([]);
     const [draftProposals, setDraftProposals] = useState([]);
+    const [savedGrants, setSavedGrants] = useState([]);
+    const [draftGrants, setDraftGrants] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentSavedPage, setCurrentSavedPage] = useState(1);
     const [currentDraftPage, setCurrentDraftPage] = useState(1);
+    const [currentSavedGrantsPage, setCurrentSavedGrantsPage] = useState(1);
+    const [currentDraftGrantsPage, setCurrentDraftGrantsPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(4);
     const [fetchedProposals, setFetchedProposals] = useState(false);
-    const [savingStates, setSavingStates] = useState({}); // Track saving state for each proposal
+    const [fetchedGrants, setFetchedGrants] = useState(false);
+    const [savingStates, setSavingStates] = useState({}); // Track saving state for each proposal/grant
     const navigate = useNavigate();
 
     // Calculate items per page based on screen size
@@ -210,6 +319,18 @@ const Proposals = () => {
     const currentDraftProposals = draftProposals.slice(draftProposalsStartIndex, draftProposalsEndIndex);
     const totalDraftPages = Math.max(1, Math.ceil(draftProposals.length / itemsPerPage));
 
+    // Calculate pagination for saved grants
+    const savedGrantsStartIndex = (currentSavedGrantsPage - 1) * itemsPerPage;
+    const savedGrantsEndIndex = Math.min(savedGrantsStartIndex + itemsPerPage, savedGrants.length);
+    const currentSavedGrants = savedGrants.slice(savedGrantsStartIndex, savedGrantsEndIndex);
+    const totalSavedGrantsPages = Math.max(1, Math.ceil(savedGrants.length / itemsPerPage));
+
+    // Calculate pagination for draft grants
+    const draftGrantsStartIndex = (currentDraftGrantsPage - 1) * itemsPerPage;
+    const draftGrantsEndIndex = Math.min(draftGrantsStartIndex + itemsPerPage, draftGrants.length);
+    const currentDraftGrants = draftGrants.slice(draftGrantsStartIndex, draftGrantsEndIndex);
+    const totalDraftGrantsPages = Math.max(1, Math.ceil(draftGrants.length / itemsPerPage));
+
     // Validate that we're not showing more items than expected
     const validatePagination = () => {
         if (currentSavedProposals.length > itemsPerPage) {
@@ -217,6 +338,12 @@ const Proposals = () => {
         }
         if (currentDraftProposals.length > itemsPerPage) {
             console.warn('Draft proposals showing more items than expected:', currentDraftProposals.length, 'expected:', itemsPerPage);
+        }
+        if (currentSavedGrants.length > itemsPerPage) {
+            console.warn('Saved grants showing more items than expected:', currentSavedGrants.length, 'expected:', itemsPerPage);
+        }
+        if (currentDraftGrants.length > itemsPerPage) {
+            console.warn('Draft grants showing more items than expected:', currentDraftGrants.length, 'expected:', itemsPerPage);
         }
     };
 
@@ -233,28 +360,13 @@ const Proposals = () => {
         if (currentDraftPage > totalDraftPages && totalDraftPages > 0) {
             setCurrentDraftPage(totalDraftPages);
         }
-    }, [currentSavedPage, currentDraftPage, totalSavedPages, totalDraftPages]);
-
-    // Debug logging for pagination (only in development)
-    useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('Pagination Debug:', {
-                itemsPerPage,
-                currentSavedPage,
-                currentDraftPage,
-                savedProposalsLength: savedProposals.length,
-                draftProposalsLength: draftProposals.length,
-                currentSavedProposalsLength: currentSavedProposals.length,
-                currentDraftProposalsLength: currentDraftProposals.length,
-                totalSavedPages,
-                totalDraftPages,
-                savedProposalsStartIndex,
-                savedProposalsEndIndex,
-                draftProposalsStartIndex,
-                draftProposalsEndIndex
-            });
+        if (currentSavedGrantsPage > totalSavedGrantsPages && totalSavedGrantsPages > 0) {
+            setCurrentSavedGrantsPage(totalSavedGrantsPages);
         }
-    }, [itemsPerPage, currentSavedPage, currentDraftPage, savedProposals.length, draftProposals.length, currentSavedProposals.length, currentDraftProposals.length, totalSavedPages, totalDraftPages, savedProposalsStartIndex, savedProposalsEndIndex, draftProposalsStartIndex, draftProposalsEndIndex]);
+        if (currentDraftGrantsPage > totalDraftGrantsPages && totalDraftGrantsPages > 0) {
+            setCurrentDraftGrantsPage(totalDraftGrantsPages);
+        }
+    }, [currentSavedPage, currentDraftPage, currentSavedGrantsPage, currentDraftGrantsPage, totalSavedPages, totalDraftPages, totalSavedGrantsPages, totalDraftGrantsPages]);
 
     const { role } = useUser();
 
@@ -277,9 +389,6 @@ const Proposals = () => {
             }
             return null;
         } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-                console.error('Error parsing user from localStorage:', error);
-            }
             return null;
         }
     }, []); // Empty dependency array since localStorage doesn't change during component lifecycle
@@ -293,6 +402,8 @@ const Proposals = () => {
                 // Reset to first page when items per page changes
                 setCurrentSavedPage(1);
                 setCurrentDraftPage(1);
+                setCurrentSavedGrantsPage(1);
+                setCurrentDraftGrantsPage(1);
             }
         };
 
@@ -311,9 +422,6 @@ const Proposals = () => {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            if (process.env.NODE_ENV === 'development') {
-                console.log("res.data", res.data);
-            }
             setSavedProposals(res.data.savedRFPs || []);
             setDraftProposals(res.data.draftRFPs || []);
 
@@ -321,14 +429,7 @@ const Proposals = () => {
             setCurrentSavedPage(1);
             setCurrentDraftPage(1);
 
-            if (process.env.NODE_ENV === 'development') {
-                console.log("savedProposals", res.data.savedRFPs);
-                console.log("draftProposals", res.data.draftRFPs);
-            }
         } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-                console.error('Error fetching proposals:', error);
-            }
 
             // More specific error messages based on error type
             let errorMessage = "Error fetching proposals";
@@ -342,7 +443,12 @@ const Proposals = () => {
                 errorMessage = "No internet connection. Please check your network.";
             }
 
-            alert(errorMessage);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                confirmButtonColor: '#2563EB',
+            });
 
             // Reset to empty arrays on error
             setSavedProposals([]);
@@ -361,6 +467,13 @@ const Proposals = () => {
         }
     }, [fetchedProposals]);
 
+    useEffect(() => {
+        if (!fetchedGrants) {
+            fetchGrants();
+            setFetchedGrants(true);
+        }
+    }, [fetchedGrants]);
+
     const handleSave = async (rfp) => {
         const proposalId = rfp._id;
         setSavingStates(prev => ({ ...prev, [proposalId]: true }));
@@ -373,13 +486,14 @@ const Proposals = () => {
             });
             if (res.status === 201 || res.status === 200) {
                 setSavedProposals((prev) => [...prev, rfp]);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log("RFP data:", rfp);
-                }
             }
         } catch (err) {
-            console.error('Error saving RFP:', err);
-            alert('Failed to save RFP');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to save RFP',
+                confirmButtonColor: '#2563EB',
+            });
         } finally {
             setSavingStates(prev => ({ ...prev, [proposalId]: false }));
         }
@@ -389,23 +503,21 @@ const Proposals = () => {
         setSavingStates(prev => ({ ...prev, [rfpId]: true }));
 
         try {
-            if (process.env.NODE_ENV === 'development') {
-                console.log("sending request...");
-            }
             const res = await axios.post(API_ENDPOINTS.UNSAVE_RFP, { rfpId: rfpId }, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
             if (res.status === 200) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log("Handling Unsave...");
-                }
                 setSavedProposals((prev) => prev.filter((r) => r._id !== rfpId));
             }
         } catch (err) {
-            console.error('Error unsaving RFP:', err);
-            alert('Failed to unsave RFP');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to unsave RFP',
+                confirmButtonColor: '#2563EB',
+            });
         } finally {
             setSavingStates(prev => ({ ...prev, [rfpId]: false }));
         }
@@ -413,7 +525,19 @@ const Proposals = () => {
 
     const handleShare = (link) => {
         navigator.clipboard.writeText(link).then(() => {
-            alert("Link copied to clipboard!");
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: "Link copied to clipboard!",
+                confirmButtonColor: '#2563EB',
+            });
+        }).catch(() => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "Failed to copy link to clipboard.",
+                confirmButtonColor: '#2563EB',
+            });
         });
     };
 
@@ -438,6 +562,102 @@ const Proposals = () => {
     const handleDraftPageChange = (page) => {
         if (page >= 1 && page <= totalDraftPages) {
             setCurrentDraftPage(page);
+        }
+    };
+
+    // Grant-specific functions
+    const fetchGrants = async () => {
+        try {
+            const res = await axios.get(API_ENDPOINTS.GET_SAVED_AND_DRAFT_GRANTS, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            setSavedGrants(res.data.savedGrants || []);
+            setDraftGrants(res.data.draftGrants || []);
+
+            // Reset pagination to first page when new data is fetched
+            setCurrentSavedGrantsPage(1);
+            setCurrentDraftGrantsPage(1);
+        } catch (error) {
+            // Reset to empty arrays on error
+            setSavedGrants([]);
+            setDraftGrants([]);
+            setCurrentSavedGrantsPage(1);
+            setCurrentDraftGrantsPage(1);
+        }
+    };
+
+    const handleSaveGrant = async (grant) => {
+        const grantId = grant._id;
+        setSavingStates(prev => ({ ...prev, [grantId]: true }));
+
+        try {
+            const res = await axios.post(API_ENDPOINTS.SAVE_GRANT, { grantId: grant._id, grant: grant }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            if (res.status === 201 || res.status === 200) {
+                setSavedGrants((prev) => [...prev, grant]);
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to save Grant',
+                confirmButtonColor: '#2563EB',
+            });
+        } finally {
+            setSavingStates(prev => ({ ...prev, [grantId]: false }));
+        }
+    };
+
+    const handleUnsaveGrant = async (grantId) => {
+        setSavingStates(prev => ({ ...prev, [grantId]: true }));
+
+        try {
+            const res = await axios.post(API_ENDPOINTS.UNSAVE_GRANT, { grantId: grantId }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            if (res.status === 200) {
+                setSavedGrants((prev) => prev.filter((grant) => grant._id !== grantId));
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to unsave Grant',
+                confirmButtonColor: '#2563EB',
+            });
+        } finally {
+            setSavingStates(prev => ({ ...prev, [grantId]: false }));
+        }
+    };
+
+    const handleGenerateGrant = (grant) => {
+        navigate('/proposal_page', { state: { grant } });
+    };
+
+    const handleContinueGrant = (grant) => {
+        navigate('/editor', { state: { jsonData: grant.generatedProposal || null } });
+    };
+
+    const isGrantSaved = (grantId) => {
+        return savedGrants.some((grant) => grant.grantId === grantId);
+    };
+
+    const handleSavedGrantsPageChange = (page) => {
+        if (page >= 1 && page <= totalSavedGrantsPages) {
+            setCurrentSavedGrantsPage(page);
+        }
+    };
+
+    const handleDraftGrantsPageChange = (page) => {
+        if (page >= 1 && page <= totalDraftGrantsPages) {
+            setCurrentDraftGrantsPage(page);
         }
     };
 
@@ -516,16 +736,6 @@ const Proposals = () => {
                                         </div>
                                     )}
                                     {currentDraftProposals.map((proposal, idx) => {
-                                        // Debug logging only in development
-                                        if (process.env.NODE_ENV === 'development') {
-                                            console.log('Draft Proposal Debug:', {
-                                                proposalId: proposal._id,
-                                                currentEditor: proposal.currentEditor,
-                                                userEmail: userEmail,
-                                                isCurrentEditor: proposal.currentEditor?.email === userEmail,
-                                                fullProposal: proposal
-                                            });
-                                        }
                                         return (
                                             <ProposalCard
                                                 key={proposal._id}
@@ -554,6 +764,86 @@ const Proposals = () => {
                                 currentPage={currentDraftPage}
                                 totalPages={totalDraftPages}
                                 onPageChange={handleDraftPageChange}
+                            />
+                        )}
+
+                        <h2 className="text-[24px] font-semibold mb-2 mt-10">Saved Grants</h2>
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-sm text-gray-600">
+                                Showing {savedGrants.length > 0 ? savedGrantsStartIndex + 1 : 0} to {Math.min(savedGrantsEndIndex, savedGrants.length)} of {savedGrants.length} grants
+                            </span>
+                        </div>
+                        <div className={`grid ${getGridLayoutClass()} gap-5 mb-6`}>
+                            {currentSavedGrants.length > 0 ? (
+                                currentSavedGrants.map((grant, idx) => (
+                                    <GrantCard
+                                        key={grant._id}
+                                        grant_info={{
+                                            ...grant,
+                                            bookmarked: true
+                                        }}
+                                        onBookmark={() => handleUnsaveGrant(grant._id)}
+                                        onShare={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK || '#')}
+                                        onGenerate={() => handleGenerateGrant(grant)}
+                                        userRole={role}
+                                        buttonText="Generate"
+                                        isCurrentEditor={true}
+                                        isLoading={savingStates[grant._id] || false}
+                                    />
+                                ))
+                            ) : (
+                                <div className="col-span-full text-center text-[#4B5563] py-8">
+                                    No saved grants yet
+                                </div>
+                            )}
+                        </div>
+
+                        {totalSavedGrantsPages > 1 && (
+                            <Pagination
+                                currentPage={currentSavedGrantsPage}
+                                totalPages={totalSavedGrantsPages}
+                                onPageChange={handleSavedGrantsPageChange}
+                            />
+                        )}
+
+                        <h2 className="text-[24px] font-semibold mb-2 mt-10">Draft Grant Proposals</h2>
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-sm text-gray-600">
+                                Showing {draftGrants.length > 0 ? draftGrantsStartIndex + 1 : 0} to {Math.min(draftGrantsEndIndex, draftGrants.length)} of {draftGrants.length} grant proposals
+                            </span>
+                        </div>
+                        <div className={`grid ${getGridLayoutClass()} gap-5 mb-6`}>
+                            {currentDraftGrants.length > 0 ? (
+                                currentDraftGrants.map((grant, idx) => {
+                                    return (
+                                        <GrantCard
+                                            key={grant._id}
+                                            grant_info={{
+                                                ...grant,
+                                                bookmarked: false
+                                            }}
+                                            onBookmark={() => isGrantSaved(grant._id) ? handleUnsaveGrant(grant._id) : handleSaveGrant(grant)}
+                                            onShare={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK || '#')}
+                                            onGenerate={() => handleContinueGrant(grant)}
+                                            userRole={role}
+                                            buttonText="Continue"
+                                            isCurrentEditor={grant.currentEditor?.email === userEmail}
+                                            isLoading={savingStates[grant._id] || false}
+                                        />
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-full text-center text-[#4B5563] py-8">
+                                    No draft grant proposals yet
+                                </div>
+                            )}
+                        </div>
+
+                        {totalDraftGrantsPages > 1 && (
+                            <Pagination
+                                currentPage={currentDraftGrantsPage}
+                                totalPages={totalDraftGrantsPages}
+                                onPageChange={handleDraftGrantsPageChange}
                             />
                         )}
                     </>
