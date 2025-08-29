@@ -2348,10 +2348,11 @@ const DiscoverRFPs = () => {
     return hasActiveRFPFilters() || hasActiveGrantFilters() || selectedIndustries.length > 0 || searchQuery.trim() !== "";
   };
 
-  const flag=null;
+  const flag=JSON.parse(localStorage.getItem("subscription"));
+  
   return (
     <>
-   {flag == null ? (
+   {flag.plan_name == "None" ? (
   <div className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-[1px] z-50">
     <div className="">
       <Subscription/>

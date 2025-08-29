@@ -65,7 +65,9 @@ const LoginPage = () => {
         toast.success("Login successful");
         const token = res.data.token;
         const role = res.data.user.role;
+        const subscription= res.data.subscription;
         localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("subscription", JSON.stringify(subscription));
         localStorage.setItem("token", token);
         setRole(role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
         localStorage.setItem("userRole", role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
