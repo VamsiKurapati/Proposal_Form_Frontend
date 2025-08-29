@@ -94,8 +94,6 @@ const SuperAdmin = () => {
     // Ref for the resolved description textarea
     const supportResolvedDescriptionRef = useRef(null);
 
-    // const user = localStorage.getItem('user');
-
     // Ref for the admin message textarea
     const adminMessageRef = useRef('');
 
@@ -962,7 +960,7 @@ const SuperAdmin = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 {/* CARD 1 - Total Proposals */}
-                {usersStats["Total Proposals"] && (
+                
                     <div className="h-[242px] rounded-2xl bg-gradient-to-b from-[#413B99] to-[#6C63FF] p-6 flex justify-between items-center shadow-lg w-full">
                     {/* Left Content */}
                     <div>
@@ -981,7 +979,7 @@ const SuperAdmin = () => {
                         <img src={proposalimg} alt="Proposals" className="mt-[92px] w-[192px] h-[150px]" />
                     </div>
                     </div>
-                )}
+                
 
                 {/* CARD 2 - Remaining Data */}
                 <div className="h-[242px] rounded-2xl bg-gradient-to-b from-[#413B99] to-[#6C63FF] p-6 flex justify-between shadow-lg w-full">
@@ -3991,9 +3989,6 @@ const SuperAdmin = () => {
                                         </div>
                                         {showProfile && (
                                             <div className="absolute top-16 right-0 w-64 bg-[#F8F9FA] rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000">
-                                                Name: {user.fullname}
-                                                Email: {user.email}
-                                                Role: {user.role}
                                                 {/* <button className="w-full text-left rounded-lg p-2 flex items-center space-x-3 transition-colors text-[#4B5563]"
                                                     onClick={() => navigate('/change-password')}
                                                 >
@@ -4006,7 +4001,7 @@ const SuperAdmin = () => {
                                                     <MdOutlineLogout className="w-4 h-4" />
                                                     <span className="text-[16px] font-medium">Logout</span>
                                                 </button> */}
-
+                                                
                                             </div>
                                         )}
                                     </div>
