@@ -15,6 +15,10 @@ const statusStyles = {
     "Won": "bg-[#FEF9C3] text-[#CA8A04]",
     "Submitted": "bg-[#DCFCE7] text-[#15803D]",
     "Rejected": "bg-[#FEE2E2] text-[#DC2626]",
+    "Posted": "bg-[#DBEAFE] text-[#2563EB]",
+    "Forecasted": "bg-[#FEF3C7] text-[#F59E42]",
+    "Closed": "bg-[#FEE2E2] text-[#DC2626]",
+    "Archived": "bg-[#F3F4F6] text-[#6B7280]",
 };
 
 // Helper: bg color map for calendar
@@ -24,6 +28,10 @@ const bgColor = {
     'Won': 'bg-[#FEF9C3] bg-opacity-50',
     'Rejected': 'bg-[#FEE2E2] bg-opacity-50',
     'Deadline': 'bg-[#FEF3C7] bg-opacity-50',
+    'Posted': 'bg-[#DBEAFE] bg-opacity-50',
+    'Forecasted': 'bg-[#FEF3C7] bg-opacity-50',
+    'Closed': 'bg-[#FEE2E2] bg-opacity-50',
+    'Archived': 'bg-[#F3F4F6] bg-opacity-50',
 }
 
 // Helper: status color map for bg and text, dot
@@ -33,6 +41,10 @@ const statusBgMap = {
     'Won': 'bg-[#FEF9C3] text-[#CA8A04]',
     'Rejected': 'bg-[#FEE2E2] text-[#DC2626]',
     'Deadline': 'bg-[#FEF3C7] text-[#F59E42]',
+    'Posted': 'bg-[#DBEAFE] text-[#2563EB]',
+    'Forecasted': 'bg-[#FEF3C7] text-[#F59E42]',
+    'Closed': 'bg-[#FEE2E2] text-[#DC2626]',
+    'Archived': 'bg-[#F3F4F6] text-[#6B7280]',
 };
 
 const statusDotMap = {
@@ -41,6 +53,10 @@ const statusDotMap = {
     'Won': 'bg-[#CA8A04]',
     'Rejected': 'bg-[#DC2626]',
     'Deadline': 'bg-[#F59E42]',
+    'Posted': 'bg-[#2563EB]',
+    'Forecasted': 'bg-[#F59E42]',
+    'Closed': 'bg-[#DC2626]',
+    'Archived': 'bg-[#6B7280]',
 };
 
 function statusBadge(status) {
@@ -124,7 +140,7 @@ const Dashboard = () => {
     const [editForm, setEditForm] = useState({ deadline: "", submittedAt: "", status: "" });
 
     const [editGrantIdx, setEditGrantIdx] = useState(null);
-    const [editGrantForm, setEditGrantForm] = useState({ deadline: "", submittedAt: "", status: "" });
+    const [editGrantForm, setEditGrantForm] = useState({ deadline: "", status: "" });
 
     const handleEditClick = (idx, proposal) => {
         setEditIdx(idx);
@@ -199,9 +215,8 @@ const Dashboard = () => {
     const handleEditGrantClick = (idx, proposal) => {
         setEditGrantIdx(idx);
         setEditGrantForm({
-            deadline: proposal.deadline ? new Date(proposal.deadline).toISOString().split('T')[0] : "",
-            submittedAt: proposal.submittedAt ? new Date(proposal.submittedAt).toISOString().split('T')[0] : "",
-            status: proposal.status
+            deadline: proposal.CLOSE_DATE ? new Date(proposal.CLOSE_DATE).toISOString().split('T')[0] : "",
+            status: proposal.OPPORTUNITY_STATUS || proposal.status
         });
     };
 
@@ -223,7 +238,11 @@ const Dashboard = () => {
             if (res.status === 200) {
                 setGrantProposals(prev =>
                     prev.map(p =>
-                        p._id === proposalId ? { ...p, ...editGrantForm } : p
+                        p._id === proposalId ? {
+                            ...p,
+                            CLOSE_DATE: editGrantForm.deadline,
+                            OPPORTUNITY_STATUS: editGrantForm.status
+                        } : p
                     )
                 );
 
@@ -1074,30 +1093,6 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                {/* Proposal Type Breakdown */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-white rounded-lg shadow p-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">RFP Proposals</h3>
-                        <div className="text-2xl font-bold text-blue-600">{proposalsState.length}</div>
-                        <p className="text-sm text-gray-600">Active proposals</p>
-                        {subscriptionData && (
-                            <div className="mt-2 text-xs text-gray-500">
-                                {subscriptionData.currentRFPs} of {subscriptionData.maxRFPs} used
-                            </div>
-                        )}
-                    </div>
-                    <div className="bg-white rounded-lg shadow p-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">Grant Proposals</h3>
-                        <div className="text-2xl font-bold text-green-600">{grantProposals.length}</div>
-                        <p className="text-sm text-gray-600">Active proposals</p>
-                        {subscriptionData && (
-                            <div className="mt-2 text-xs text-gray-500">
-                                {subscriptionData.currentGrants} of {subscriptionData.maxGrants} used
-                            </div>
-                        )}
-                    </div>
-                </div>
-
                 {/* Search and Actions for RFP Proposals */}
                 <div className="flex flex-row items-center justify-between mb-4 gap-2">
                     <div className="flex relative w-full md:w-1/3 items-center gap-2">
@@ -1433,12 +1428,12 @@ const Dashboard = () => {
                         <thead>
                             <tr className="bg-[#F8FAFC]">
                                 {showGrantDeleteOptions && <th className="px-4 py-2"></th>}
-                                <th className="px-4 py-2 text-left font-medium">Grant Name</th>
-                                <th className="px-4 py-2 text-left font-medium">Organization</th>
+                                <th className="px-4 py-2 text-left font-medium">Opportunity Title</th>
+                                <th className="px-4 py-2 text-left font-medium">Agency Name</th>
                                 <th className="px-4 py-2 text-left font-medium">Current Editor</th>
-                                <th className="px-4 py-2 text-left font-medium">Deadline</th>
+                                <th className="px-4 py-2 text-left font-medium">Close Date</th>
                                 <th className="px-4 py-2 text-left font-medium">Status</th>
-                                <th className="px-4 py-2 text-left font-medium">Submission Date</th>
+                                <th className="px-4 py-2 text-left font-medium">Funding Amount</th>
                                 <th className="px-4 py-2 text-left font-medium">Action</th>
                             </tr>
                         </thead>
@@ -1460,16 +1455,16 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2 font-semibold">
                                                 <a
-                                                    href={`https://proposal-form-backend.vercel.app/api/dashboard/grant/${p.link}`}
+                                                    href={p.OPPORTUNITY_NUMBER_LINK || '#'}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-[#111827] hover:underline"
                                                 >
-                                                    {p.title}
+                                                    {p.OPPORTUNITY_TITLE || 'Not Provided'}
                                                 </a>
                                             </td>
 
-                                            <td className="px-4 py-2">{p.organization}</td>
+                                            <td className="px-4 py-2">{p.AGENCY_NAME || 'Not Provided'}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
                                                 <td className="px-4 py-2 relative">
@@ -1578,42 +1573,29 @@ const Dashboard = () => {
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    p.deadline ? new Date(p.deadline).toLocaleDateString('en-US', {
+                                                    p.CLOSE_DATE ? new Date(p.CLOSE_DATE).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'short',
                                                         day: 'numeric'
-                                                    }) : 'No deadline'
+                                                    }) : 'No close date'
                                                 )}
                                             </td>
 
                                             <td className="px-4 py-2">
                                                 {editGrantIdx === realIdx ? (
                                                     <select className="w-full border border-[#111827] rounded px-3 py-2 text-[#111827] text-[16px] bg-[#F3F4F6] focus:outline-none focus:ring-2 focus:ring-[#2563EB] min-w-[140px]" value={editGrantForm.status} onChange={e => handleEditGrantChange("status", e.target.value)}>
-                                                        <option value="In Progress">In Progress</option>
-                                                        <option value="Submitted">Submitted</option>
-                                                        <option value="Won">Won</option>
-                                                        <option value="Rejected">Rejected</option>
+                                                        <option value="Posted">Posted</option>
+                                                        <option value="Forecasted">Forecasted</option>
+                                                        <option value="Closed">Closed</option>
+                                                        <option value="Archived">Archived</option>
                                                     </select>
                                                 ) : (
-                                                    statusBadge(p.status)
+                                                    statusBadge(p.OPPORTUNITY_STATUS || p.status)
                                                 )}
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {editGrantIdx === realIdx ? (
-                                                    <input
-                                                        type="date"
-                                                        value={editGrantForm.submittedAt}
-                                                        onChange={e => handleEditGrantChange("submittedAt", e.target.value)}
-                                                        className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-                                                    />
-                                                ) : (
-                                                    p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'short',
-                                                        day: 'numeric'
-                                                    }) : 'Not submitted'
-                                                )}
+                                                {p.ESTIMATED_TOTAL_FUNDING || p.AWARD_CEILING || 'Not Provided'}
                                             </td>
 
                                             <td className="px-4 py-2">
@@ -1829,9 +1811,9 @@ const Dashboard = () => {
                     <table className="min-w-full text-sm ">
                         <thead>
                             <tr className="bg-[#F8FAFC]">
-                                <th className="px-4 py-2 text-left font-medium">Grant Name</th>
-                                <th className="px-4 py-2 text-left font-medium">Organization</th>
-                                <th className="px-4 py-2 text-left font-medium">Deadline</th>
+                                <th className="px-4 py-2 text-left font-medium">Opportunity Title</th>
+                                <th className="px-4 py-2 text-left font-medium">Agency Name</th>
+                                <th className="px-4 py-2 text-left font-medium">Close Date</th>
                                 <th className="px-4 py-2 text-left font-medium">Status</th>
                                 <th className="px-4 py-2 text-left font-medium">Restore in</th>
                                 <th className="px-4 py-2 text-left font-medium">Action</th>
@@ -1840,14 +1822,14 @@ const Dashboard = () => {
                         <tbody>
                             {paginatedDeletedGrantProposals.map((p, idx) => (
                                 <tr key={idx + (currentDeletedGrantPage - 1) * PAGE_SIZE} className="border-t">
-                                    <td className="px-4 py-2 font-semibold">{p.title}</td>
-                                    <td className="px-4 py-2">{p.organization}</td>
-                                    <td className="px-4 py-2">{new Date(p.deadline).toLocaleDateString('en-US', {
+                                    <td className="px-4 py-2 font-semibold">{p.OPPORTUNITY_TITLE || 'Not Provided'}</td>
+                                    <td className="px-4 py-2">{p.AGENCY_NAME || 'Not Provided'}</td>
+                                    <td className="px-4 py-2">{p.CLOSE_DATE ? new Date(p.CLOSE_DATE).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'short',
                                         day: 'numeric'
-                                    })}</td>
-                                    <td className="px-4 py-2">{statusBadge(p.status)}</td>
+                                    }) : 'No close date'}</td>
+                                    <td className="px-4 py-2">{statusBadge(p.OPPORTUNITY_STATUS || p.status)}</td>
                                     <td className="px-4 py-2">{p.restoreIn}</td>
                                     <td className="px-4 py-2">
                                         <div className="flex items-center gap-2">
