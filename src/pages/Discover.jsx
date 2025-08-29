@@ -554,6 +554,9 @@ const DiscoverRFPs = () => {
   const [uploadGrantModalOpen, setUploadGrantModalOpen] = useState(false);
   const [selectedIndustries, setSelectedIndustries] = useState([]);
   const [availableIndustries, setAvailableIndustries] = useState([]);
+
+  const [availableGrants, setAvailableGrants] = useState([]);
+  const [selectedGrants, setSelectedGrants] = useState([]);
   const [loadingOtherRFPs, setLoadingOtherRFPs] = useState(false);
   const [loadingRecommended, setLoadingRecommended] = useState(true);
   const [loadingSave, setLoadingSave] = useState({});
@@ -662,7 +665,7 @@ const DiscoverRFPs = () => {
     }
   };
 
-  // Set available industries statically
+  // Set available industries  and grants statically
   useEffect(() => {
     setAvailableIndustries([
       "Information Technology",
@@ -681,6 +684,33 @@ const DiscoverRFPs = () => {
       "Government",
       "Non-Profit",
       "Research & Development",
+    ]);
+
+    setAvailableGrants([
+      "Agriculture",
+      "Arts",
+      "Business and Commerce ",
+      "Community Development ",
+      "Consumer Protection",
+      "Disaster Prevention and Relief",
+      "Education",
+      "Employment, Labor and Training",
+      "Energy",
+      "Environment",
+      "Food and Nutrition",
+      "Health",
+      "Housing",
+      "Humanities",
+      "Income Security and Social Services",
+      "Information and Statistics",
+      "Infrastructure Investment and Jobs Act (IIJA)",
+      "Law, Justice and Legal Services",
+      "Natural Resources",
+      "Opportunity Zone Benefits",
+      "Other",
+      "Regional Development",
+      "Science and Technology and other Research and Development",
+      "Transportation",
     ]);
   }, []);
 
@@ -767,7 +797,7 @@ const DiscoverRFPs = () => {
   };
 
   const fetchOtherGrants = async () => {
-    if (selectedIndustries.length === 0) {
+    if (selectedGrants.length === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'No Industries Selected',
@@ -780,7 +810,7 @@ const DiscoverRFPs = () => {
     setLoadingOtherGrants(true);
     try {
       const res = await axios.post(`${API_BASE_URL}/getOtherGrants`, {
-        userEmail: localStorage.getItem("userEmail") || "user@example.com"
+        category: selectedGrants
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -2500,7 +2530,7 @@ const DiscoverRFPs = () => {
               </div>
             ) : filteredOtherRFPs.length > 0 ? (
               <>
-                <div className="flex overflow-x-auto pb-2 custom-scroll">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
                   {getCurrentPageItems(applyFilters(filteredOtherRFPs), currentOtherRFPsPage, itemsPerPage).map((rfp) => (
                     <RecentRFPCard
                       key={rfp._id}
@@ -2682,12 +2712,12 @@ const DiscoverRFPs = () => {
                 {/* Industry Selection */}
                 <div>
                   <label className="block text-[16px] font-medium text-[#111827] mb-2">
-                    Select Industries to Filter Grants
+                    Select Categories to Filter Grants
                   </label>
                   <IndustryMultiSelect
-                    selectedIndustries={selectedIndustries}
-                    onIndustryChange={setSelectedIndustries}
-                    industries={availableIndustries}
+                    selectedIndustries={selectedGrants}
+                    onIndustryChange={setSelectedGrants}
+                    industries={availableGrants}
                   />
                 </div>
 
@@ -2695,8 +2725,8 @@ const DiscoverRFPs = () => {
                 <div className="flex justify-start md:justify-end">
                   <button
                     onClick={fetchOtherGrants}
-                    disabled={selectedIndustries.length === 0 || loadingOtherGrants}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedIndustries.length === 0 || loadingOtherGrants
+                    disabled={selectedGrants.length === 0 || loadingOtherGrants}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-md text-[16px] font-medium transition-colors ${selectedGrants.length === 0 || loadingOtherGrants
                       ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
                       : "bg-[#2563EB] text-white hover:bg-[#1d4ed8] cursor-pointer"
                       }`}
@@ -2724,9 +2754,9 @@ const DiscoverRFPs = () => {
               </div>
             ) : filteredOtherGrants.length > 0 ? (
               <>
-                <div className="flex overflow-x-auto pb-2 custom-scroll">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
                   {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
-                    <GrantCard
+                    <RecentGrantCard
                       key={grant._id}
                       grant={grant}
                       isSaved={!!savedGrants.find((s) => s._id === grant._id)}
@@ -2742,7 +2772,7 @@ const DiscoverRFPs = () => {
                   />
                 </div>
               </>
-            ) : filteredOtherGrants.length === 0 && selectedIndustries.length > 0 ? (
+            ) : filteredOtherGrants.length === 0 && selectedGrants.length > 0 ? (
               <div className="text-center py-8">
                 <p className="text-[16px] text-[#4B5563] mb-2">No grants found for the selected industries.</p>
                 <p className="text-[14px] text-[#6B7280]">Try selecting different industries or check back later for new opportunities.</p>
