@@ -540,7 +540,7 @@ const SavedGrantCardPropTypes = {
 };
 
 // Main Component
-const DiscoverRFPs = () => {
+const Discover = () => {
   const [filters, setFilters] = useState({ category: [], deadline: [] });
   const [recommended, setRecommended] = useState([]);
   const [otherRFPs, setOtherRFPs] = useState([]);
@@ -2709,7 +2709,7 @@ const DiscoverRFPs = () => {
             <h2 className="text-[24px] text-[#000000] font-semibold mt-10 mb-4">Other Grants</h2>
             <div className="mb-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                {/* Industry Selection */}
+                {/* Grant Category Selection */}
                 <div>
                   <label className="block text-[16px] font-medium text-[#111827] mb-2">
                     Select Categories to Filter Grants
@@ -2754,7 +2754,7 @@ const DiscoverRFPs = () => {
               </div>
             ) : filteredOtherGrants.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-2 ">
                   {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
                     <RecentGrantCard
                       key={grant._id}
@@ -3103,4 +3103,4 @@ const DiscoverRFPs = () => {
   );
 };
 
-export default DiscoverRFPs;
+export default Discover;

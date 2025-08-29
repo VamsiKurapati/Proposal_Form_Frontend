@@ -55,8 +55,6 @@ const App = () => {
             <Discovery />
           </ProtectedRoutes>} />
 
-          {/* <Route path="/rfp_discovery" element={<RFPDiscovery />} /> */}
-
           <Route path="/proposals" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <Proposals />
           </ProtectedRoutes>} />
