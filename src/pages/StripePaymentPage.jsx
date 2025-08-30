@@ -9,68 +9,9 @@ import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../c
 import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 
 // Initialize Stripe
-const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY);
+const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY || 'pk_test_your_test_key_here');
 
 const baseUrl = "https://proposal-form-backend.vercel.app/api/stripe";
-
-const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
-
-const subscriptionPlansData = [
-    {
-        id: 'basic',
-        name: 'Basic Plan',
-        price: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
-        yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice,
-        features: [
-            `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations || 5} AI - RFP Proposal Generations`,
-            `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations || 5} AI - Grant Proposal Generations`,
-            "AI-Driven RFP Discovery",
-            "AI-Driven Grant Discovery",
-            "AI-Proposal Recommendation",
-            "Basic Compliance Check",
-            "Proposal Tracking Dashboard",
-            `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors || 3} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers || 4} Viewers, Unlimited Members`,
-            "Team Collaboration",
-            "Support",
-        ],
-        missingFeatures: [
-            "Advanced Compliance Check",
-        ],
-        popular: mostPopularPlan === "Basic"
-    },
-    {
-        id: 'professional',
-        name: 'Professional Plan',
-        price: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice,
-        yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice,
-        features: [
-            "Includes All Basic Features",
-            `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations || 20} AI - RFP Proposal Generations`,
-            `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations || 20} AI - Grant Proposal Generations`,
-            `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers || 10} Viewers, Unlimited Members`,
-            "Advanced Compliance Check",
-        ],
-        missingFeatures: [
-            "Dedicated Support",
-        ],
-        popular: mostPopularPlan === "Pro"
-    },
-    {
-        id: 'enterprise',
-        name: 'Enterprise Plan',
-        price: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
-        yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice,
-        features: [
-            "Includes All Basic & Pro Features",
-            `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations || 45} AI - RFP Proposal Generations`,
-            `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations || 45} AI - Grant Proposal Generations`,
-            "Unlimited Editors, Unlimited Viewers, Unlimited Members",
-            "Dedicated Support",
-        ],
-        missingFeatures: [],
-        popular: mostPopularPlan === "Enterprise"
-    }
-];
 
 const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     const stripe = useStripe();
@@ -79,9 +20,25 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     const [error, setError] = useState(null);
     const [clientSecret, setClientSecret] = useState('');
 
+    // Check if Stripe is properly loaded
+    if (!stripe || !elements) {
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-600">
+                    Payment system is not ready. Please refresh the page and try again.
+                </p>
+            </div>
+        );
+    }
+
     useEffect(() => {
         // Create payment intent on the server
         const createPaymentIntent = async () => {
+            if (!selectedPlan || !selectedPlan.id) {
+                setError('No plan selected. Please select a plan first.');
+                return;
+            }
+
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.post(
@@ -102,7 +59,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
             }
         };
 
-        if (selectedPlan) {
+        if (selectedPlan && selectedPlan.id) {
             createPaymentIntent();
         }
     }, [selectedPlan, billingCycle]);
@@ -110,7 +67,8 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!stripe || !elements || !clientSecret) {
+        if (!stripe || !elements || !clientSecret || !selectedPlan) {
+            setError('Payment system is not ready or no plan is selected.');
             return;
         }
 
@@ -211,10 +169,140 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
 
 const StripePaymentPage = () => {
     const navigate = useNavigate();
-    const [selectedPlan, setSelectedPlan] = useState(subscriptionPlansData[1]); // Default to Professional
+    const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
+
+    // Create subscription plans data with proper null checks
+    const subscriptionPlansData = React.useMemo(() => {
+        if (!subscriptionPlans || subscriptionPlans.length === 0) {
+            return [
+                {
+                    id: 'basic',
+                    name: 'Basic Plan',
+                    price: 29,
+                    yearlyPrice: 290,
+                    features: [
+                        'Up to 5 AI - RFP Proposal Generations',
+                        'Up to 5 AI - Grant Proposal Generations',
+                        'AI-Driven RFP Discovery',
+                        'AI-Driven Grant Discovery',
+                        'AI-Proposal Recommendation',
+                        'Basic Compliance Check',
+                        'Proposal Tracking Dashboard',
+                        '3 Editors, 4 Viewers, Unlimited Members',
+                        'Team Collaboration',
+                        'Support',
+                    ],
+                    missingFeatures: [
+                        'Advanced Compliance Check',
+                    ],
+                    popular: false
+                },
+                {
+                    id: 'professional',
+                    name: 'Professional Plan',
+                    price: 79,
+                    yearlyPrice: 790,
+                    features: [
+                        'Includes All Basic Features',
+                        'Up to 20 AI - RFP Proposal Generations',
+                        'Up to 20 AI - Grant Proposal Generations',
+                        '7 Editors, 10 Viewers, Unlimited Members',
+                        'Advanced Compliance Check',
+                    ],
+                    missingFeatures: [
+                        'Dedicated Support',
+                    ],
+                    popular: true
+                },
+                {
+                    id: 'enterprise',
+                    name: 'Enterprise Plan',
+                    price: 199,
+                    yearlyPrice: 1990,
+                    features: [
+                        'Includes All Basic & Pro Features',
+                        'Up to 45 AI - RFP Proposal Generations',
+                        'Up to 45 AI - Grant Proposal Generations',
+                        'Unlimited Editors, Unlimited Viewers, Unlimited Members',
+                        'Dedicated Support',
+                    ],
+                    missingFeatures: [],
+                    popular: false
+                }
+            ];
+        }
+
+        return [
+            {
+                id: 'basic',
+                name: 'Basic Plan',
+                price: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice || 29,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice || 290,
+                features: [
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations || 5} AI - RFP Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations || 5} AI - Grant Proposal Generations`,
+                    "AI-Driven RFP Discovery",
+                    "AI-Driven Grant Discovery",
+                    "AI-Proposal Recommendation",
+                    "Basic Compliance Check",
+                    "Proposal Tracking Dashboard",
+                    `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors || 3} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers || 4} Viewers, Unlimited Members`,
+                    "Team Collaboration",
+                    "Support",
+                ],
+                missingFeatures: [
+                    "Advanced Compliance Check",
+                ],
+                popular: mostPopularPlan === "Basic"
+            },
+            {
+                id: 'professional',
+                name: 'Professional Plan',
+                price: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice || 79,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice || 790,
+                features: [
+                    "Includes All Basic Features",
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations || 20} AI - RFP Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations || 20} AI - Grant Proposal Generations`,
+                    `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers || 10} Viewers, Unlimited Members`,
+                    "Advanced Compliance Check",
+                ],
+                missingFeatures: [
+                    "Dedicated Support",
+                ],
+                popular: mostPopularPlan === "Pro"
+            },
+            {
+                id: 'enterprise',
+                name: 'Enterprise Plan',
+                price: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice || 199,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice || 1990,
+                features: [
+                    "Includes All Basic & Pro Features",
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations || 45} AI - RFP Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations || 45} AI - Grant Proposal Generations`,
+                    "Unlimited Editors, Unlimited Viewers, Unlimited Members",
+                    "Dedicated Support",
+                ],
+                missingFeatures: [],
+                popular: mostPopularPlan === "Enterprise"
+            }
+        ];
+    }, [subscriptionPlans, mostPopularPlan]);
+
+    const [selectedPlan, setSelectedPlan] = useState(null);
     const [billingCycle, setBillingCycle] = useState('monthly');
     const [showCheckout, setShowCheckout] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Set default selected plan when data is available
+    useEffect(() => {
+        if (subscriptionPlansData.length > 0 && !selectedPlan) {
+            setSelectedPlan(subscriptionPlansData[1]); // Default to Professional
+            setIsLoading(false);
+        }
+    }, [subscriptionPlansData, selectedPlan]);
 
     const handlePlanSelect = (plan) => {
         setSelectedPlan(plan);
@@ -233,6 +321,20 @@ const StripePaymentPage = () => {
         console.error('Payment error:', error);
         // Error is handled in the CheckoutForm component
     };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6C63FF] mx-auto mb-4"></div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Plans...</h2>
+                    <p className="text-gray-600">
+                        Please wait while we load your subscription options.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     if (paymentSuccess) {
         return (
@@ -314,56 +416,65 @@ const StripePaymentPage = () => {
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8 mb-12">
-                    {subscriptionPlansData.map((plan) => (
-                        <div
-                            key={plan.id}
-                            className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF] relative' : 'border-gray-200'
-                                } ${selectedPlan.id === plan.id ? 'ring-2 ring-[#6C63FF] ring-opacity-50' : ''}`}
-                        >
-                            {plan.popular && (
-                                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                    <span className="bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white text-xs font-semibold px-4 py-1 rounded-full">
-                                        Most Popular
-                                    </span>
+                    {subscriptionPlansData && subscriptionPlansData.length > 0 ? (
+                        subscriptionPlansData.map((plan) => (
+                            <div
+                                key={plan.id}
+                                className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF] relative' : 'border-gray-200'
+                                    } ${selectedPlan?.id === plan.id ? 'ring-2 ring-[#6C63FF] ring-opacity-50' : ''}`}
+                            >
+                                {plan.popular && (
+                                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                        <span className="bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white text-xs font-semibold px-4 py-1 rounded-full">
+                                            Most Popular
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="p-8">
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                                    <div className="mb-6">
+                                        <span className="text-4xl font-bold text-gray-900">
+                                            ${billingCycle === 'yearly' ? plan.yearlyPrice : plan.price}
+                                        </span>
+                                        <span className="text-gray-600">
+                                            /{billingCycle === 'yearly' ? 'year' : 'month'}
+                                        </span>
+                                    </div>
+
+                                    <ul className="space-y-3 mb-8">
+                                        {plan.features.map((feature, index) => (
+                                            <li key={index} className="flex items-start">
+                                                <FaCheck className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                                                <span className="text-gray-700">{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <button
+                                        onClick={() => handlePlanSelect(plan)}
+                                        className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${plan.popular
+                                            ? 'bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white hover:from-[#5A52E8] hover:to-[#7A6CF0]'
+                                            : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        {selectedPlan?.id === plan.id ? 'Selected' : 'Choose Plan'}
+                                    </button>
                                 </div>
-                            )}
-
-                            <div className="p-8">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                                <div className="mb-6">
-                                    <span className="text-4xl font-bold text-gray-900">
-                                        ${billingCycle === 'yearly' ? plan.yearlyPrice : plan.price}
-                                    </span>
-                                    <span className="text-gray-600">
-                                        /{billingCycle === 'yearly' ? 'year' : 'month'}
-                                    </span>
-                                </div>
-
-                                <ul className="space-y-3 mb-8">
-                                    {plan.features.map((feature, index) => (
-                                        <li key={index} className="flex items-start">
-                                            <FaCheck className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                                            <span className="text-gray-700">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <button
-                                    onClick={() => handlePlanSelect(plan)}
-                                    className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${plan.popular
-                                        ? 'bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white hover:from-[#5A52E8] hover:to-[#7A6CF0]'
-                                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    {selectedPlan.id === plan.id ? 'Selected' : 'Choose Plan'}
-                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-3 text-center py-12">
+                            <div className="text-gray-500">
+                                <p>No subscription plans available at the moment.</p>
+                                <p>Please try again later or contact support.</p>
                             </div>
                         </div>
-                    ))}
+                    )}
                 </div>
 
                 {/* Checkout Section */}
-                {showCheckout && (
+                {showCheckout && selectedPlan && (
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-2xl font-bold text-gray-900">Complete Your Purchase</h2>
