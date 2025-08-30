@@ -18,6 +18,7 @@ import {
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useUser } from "../context/UserContext";
+import Subscription from "../components/Subscription";
 
 // Constants
 const API_BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";

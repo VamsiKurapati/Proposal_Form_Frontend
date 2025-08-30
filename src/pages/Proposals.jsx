@@ -12,9 +12,9 @@ const API_ENDPOINTS = {
     GET_SAVED_AND_DRAFT_RFPS: `${API_BASE_URL}/rfp/getSavedAndDraftRFPs`,
     SAVE_RFP: `${API_BASE_URL}/rfp/saveRFP`,
     UNSAVE_RFP: `${API_BASE_URL}/rfp/unsaveRFP`,
-    GET_SAVED_AND_DRAFT_GRANTS: `${API_BASE_URL}/grant/getSavedAndDraftGrants`,
-    SAVE_GRANT: `${API_BASE_URL}/grant/saveGrant`,
-    UNSAVE_GRANT: `${API_BASE_URL}/grant/unsaveGrant`,
+    GET_SAVED_AND_DRAFT_GRANTS: `${API_BASE_URL}/rfp/getSavedAndDraftGrants`,
+    SAVE_GRANT: `${API_BASE_URL}/rfp/saveGrant`,
+    UNSAVE_GRANT: `${API_BASE_URL}/rfp/unsaveGrant`,
 };
 
 const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole, buttonText = "Generate", isCurrentEditor = true, isLoading = false }) => (
