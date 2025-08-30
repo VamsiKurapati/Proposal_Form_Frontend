@@ -1,7 +1,7 @@
 // Stripe Configuration
 export const STRIPE_CONFIG = {
     // Replace with your actual Stripe publishable key
-    PUBLISHABLE_KEY: 'pk_test_your_publishable_key_here',
+    PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY,
 
     // API endpoints (these should match your backend)
     API_ENDPOINTS: {

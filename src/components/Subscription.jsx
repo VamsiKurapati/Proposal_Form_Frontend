@@ -230,7 +230,7 @@ export default function Subscription({ plan }) {
           </>
         ) : null}
 
-        <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto">
+        <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
           Get Started
         </button>
       </div>
