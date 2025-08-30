@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useNavigate } from 'react-router-dom';
-import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft } from 'react-icons/fa';
+import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft, FaCancel } from 'react-icons/fa';
 import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-icons/md';
 import axios from 'axios';
 import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../config/stripe';
@@ -186,7 +186,7 @@ const StripePaymentPage = () => {
                 id: 'basic',
                 name: 'Basic Plan',
                 price: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic").annualPrice,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic").yearlyPrice,
                 features: [
                     `Up to ${subscriptionPlans.find((p) => p.name === "Basic").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
                     `Up to ${subscriptionPlans.find((p) => p.name === "Basic").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
@@ -207,13 +207,13 @@ const StripePaymentPage = () => {
             {
                 id: 'professional',
                 name: 'Professional Plan',
-                price: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice,
+                price: subscriptionPlans.find((p) => p.name === "Pro").monthlyPrice,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro").yearlyPrice,
                 features: [
                     "Includes All Basic Features",
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
-                    `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers} Viewers, Unlimited Members`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+                    `${subscriptionPlans.find((p) => p.name === "Pro").maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Pro").maxViewers} Viewers, Unlimited Members`,
                     "Advanced Compliance Check",
                 ],
                 missingFeatures: [
@@ -224,12 +224,12 @@ const StripePaymentPage = () => {
             {
                 id: 'enterprise',
                 name: 'Enterprise Plan',
-                price: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice,
+                price: subscriptionPlans.find((p) => p.name === "Enterprise").monthlyPrice,
+                yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise").yearlyPrice,
                 features: [
                     "Includes All Basic & Pro Features",
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
+                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
                     "Unlimited Editors, Unlimited Viewers, Unlimited Members",
                     "Dedicated Support",
                 ],
@@ -392,6 +392,12 @@ const StripePaymentPage = () => {
                                         {plan.features.map((feature, index) => (
                                             <li key={index} className="flex items-start">
                                                 <FaCheck className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                                                <span className="text-gray-700">{feature}</span>
+                                            </li>
+                                        ))}
+                                        {plan.missingFeatures.map((feature, index) => (
+                                            <li key={index} className="flex items-start">
+                                                <FaCancel className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
                                                 <span className="text-gray-700">{feature}</span>
                                             </li>
                                         ))}
