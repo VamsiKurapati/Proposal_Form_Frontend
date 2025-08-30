@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useNavigate } from 'react-router-dom';
-import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft, FaCancel } from 'react-icons/fa';
+import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft, FaBan } from 'react-icons/fa';
 import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-icons/md';
 import axios from 'axios';
 import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../config/stripe';
@@ -397,7 +397,7 @@ const StripePaymentPage = () => {
                                         ))}
                                         {plan.missingFeatures.map((feature, index) => (
                                             <li key={index} className="flex items-start">
-                                                <FaCancel className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                                                <FaBan className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
                                                 <span className="text-gray-700">{feature}</span>
                                             </li>
                                         ))}
