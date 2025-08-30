@@ -17,7 +17,7 @@ const NavbarComponent = () => {
     { name: "Proposals", path: "/proposals" },
     { name: "Dashboard", path: "/dashboard" },
     { name: "Profile", path: role === "company" ? "/company_profile_dashboard" : "/employee_profile_dashboard" },
-    { name: "Support Ticket", path: "/support-ticket" },
+    { name: "Support", path: "/support-ticket" },
   ];
 
   const handleProfileClick = () => {

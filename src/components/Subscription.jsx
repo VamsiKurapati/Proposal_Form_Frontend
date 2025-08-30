@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaRegCheckCircle } from "react-icons/fa";
 
-const baseUrl = "https://proposal-form-backend.vercel.app/api";
+const baseUrl = "https://proposal-form-backend.vercel.app";
 
 export default function Subscription({ plan }) {
   const [plans, setPlans] = useState([]);
@@ -12,7 +12,7 @@ export default function Subscription({ plan }) {
 
   const subPlan = async () => {
     try {
-      const data = await axios.get(`${baseUrl}/subscription/getSubscriptionPlansData`, {
+      const data = await axios.get(`${baseUrl}/getSubscriptionPlansData`, {
         headers: {
           'Content-Type': 'application/json',
         },
