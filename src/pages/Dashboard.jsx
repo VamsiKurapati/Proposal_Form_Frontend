@@ -1035,7 +1035,7 @@ const Dashboard = () => {
                             <h1 className="text-[36px] text-[#000000] mb-4">Welcome <span className="font-semibold">{userName}</span>!</h1>
 
                             {/* Progress Bars */}
-                            <div className="grid grid-cols-1 xs:grid-cols-2 lg:max-w-[50%] gap-4 mb-4">
+                            <div className="grid grid-cols-1 xs:grid-cols-2 sm:max-w-[80%] md:max-w-[65%] lg:max-w-[50%] gap-4 mb-4">
                                 <div className="w-full">
                                     <label className="block text-[18px] text-[#000000] mb-2">Proposals Left</label>
                                     <div className="w-full bg-gray-200 rounded-full h-3">
