@@ -229,7 +229,7 @@ export default function Subscription({ plan }) {
 
   return (
     // <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 justify-center z-50">
-    <div className="flex flex-col lg:flex-row w-full max-w-5xl gap-4 justify-center items-start p-6  ">
+    <div className="flex flex-col lg:flex-row w-full h-full overflow-y-auto max-w-5xl gap-4 justify-center items-start p-6  ">
       {getPlanSection("Basic")}
       {getPlanSection("Pro")}
       {getPlanSection("Enterprise")}

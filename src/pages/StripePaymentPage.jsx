@@ -171,65 +171,14 @@ const StripePaymentPage = () => {
     const navigate = useNavigate();
     const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
 
+    console.log("Plans", subscriptionPlans);
+    console.log("Most Popular Plan", mostPopularPlan);
+
     // Create subscription plans data with proper null checks
     const subscriptionPlansData = React.useMemo(() => {
         if (!subscriptionPlans || subscriptionPlans.length === 0) {
-            return [
-                {
-                    id: 'basic',
-                    name: 'Basic Plan',
-                    price: 29,
-                    yearlyPrice: 290,
-                    features: [
-                        'Up to 5 AI - RFP Proposal Generations',
-                        'Up to 5 AI - Grant Proposal Generations',
-                        'AI-Driven RFP Discovery',
-                        'AI-Driven Grant Discovery',
-                        'AI-Proposal Recommendation',
-                        'Basic Compliance Check',
-                        'Proposal Tracking Dashboard',
-                        '3 Editors, 4 Viewers, Unlimited Members',
-                        'Team Collaboration',
-                        'Support',
-                    ],
-                    missingFeatures: [
-                        'Advanced Compliance Check',
-                    ],
-                    popular: false
-                },
-                {
-                    id: 'professional',
-                    name: 'Professional Plan',
-                    price: 79,
-                    yearlyPrice: 790,
-                    features: [
-                        'Includes All Basic Features',
-                        'Up to 20 AI - RFP Proposal Generations',
-                        'Up to 20 AI - Grant Proposal Generations',
-                        '7 Editors, 10 Viewers, Unlimited Members',
-                        'Advanced Compliance Check',
-                    ],
-                    missingFeatures: [
-                        'Dedicated Support',
-                    ],
-                    popular: true
-                },
-                {
-                    id: 'enterprise',
-                    name: 'Enterprise Plan',
-                    price: 199,
-                    yearlyPrice: 1990,
-                    features: [
-                        'Includes All Basic & Pro Features',
-                        'Up to 45 AI - RFP Proposal Generations',
-                        'Up to 45 AI - Grant Proposal Generations',
-                        'Unlimited Editors, Unlimited Viewers, Unlimited Members',
-                        'Dedicated Support',
-                    ],
-                    missingFeatures: [],
-                    popular: false
-                }
-            ];
+            console.log("No subscription plans available");
+            return [];
         }
 
         return [
@@ -407,9 +356,6 @@ const StripePaymentPage = () => {
                                     }`}
                             >
                                 Yearly
-                                <span className="ml-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                    Save 20%
-                                </span>
                             </button>
                         </div>
                     </div>
@@ -423,7 +369,7 @@ const StripePaymentPage = () => {
                                 className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF] relative' : 'border-gray-200'
                                     } ${selectedPlan?.id === plan.id ? 'ring-2 ring-[#6C63FF] ring-opacity-50' : ''}`}
                             >
-                                {plan.popular && (
+                                {(mostPopularPlan && mostPopularPlan === plan.name) && (
                                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                                         <span className="bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white text-xs font-semibold px-4 py-1 rounded-full">
                                             Most Popular

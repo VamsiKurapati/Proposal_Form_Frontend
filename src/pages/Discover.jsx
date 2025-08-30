@@ -2345,7 +2345,7 @@ const Discover = () => {
   return (
     <>
       {(flag && flag.plan_name == "None") ? (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-[1px] z-50">
+        <div className="fixed inset-0 flex justify-center items-center bg-black/20 backdrop-blur-sm z-50">
           <div className="">
             <Subscription />
 
