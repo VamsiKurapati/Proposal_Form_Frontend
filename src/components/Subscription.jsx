@@ -1,44 +1,32 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-const baseUrl = "https://proposal-form-backend.vercel.app";
+import { useSubscriptionPlans } from "../context/SubscriptionPlansContext";
 
 export default function Subscription({ plan }) {
   const navigate = useNavigate();
+  const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
   const [plans, setPlans] = useState([]);
+  const [popularPlan, setPopularPlan] = useState(null);
   const [isYearlyb, setIsYearlyb] = useState(false);
   const [isYearlyp, setIsYearlyp] = useState(false);
   const [isYearlye, setIsYearlye] = useState(false);
 
-  const subPlan = async () => {
-    try {
-      const data = await axios.get(`${baseUrl}/getSubscriptionPlansData`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      setPlans(data.data);
-    } catch (err) {
-      console.error("Failed to fetch plans:", err);
-    }
-  };
-
   useEffect(() => {
-    subPlan();
-  }, []);
+    setPlans(subscriptionPlans);
+    setPopularPlan(mostPopularPlan);
+  }, [subscriptionPlans, mostPopularPlan]);
 
   const getPlanSection = (planName) => {
-    const plan = plans.plans?.find((p) => p.name === planName);
+    const plan = plans?.find((p) => p.name === planName);
     if (!plan) return null;
 
     return (
       <div
-        className={`border rounded-2xl p-4 w-[340px] h-[500px] shadow-md relative transition-transform hover:scale-105 flex flex-col bg-white mt-[100px] ${plans.mostPopularPlan === planName ? "border-blue-500" : "border-gray-300"
+        className={`border rounded-2xl p-4 w-[340px] h-[500px] shadow-md relative transition-transform hover:scale-105 flex flex-col bg-white mt-[100px] ${popularPlan === planName ? "border-blue-500" : "border-gray-300"
           }`}
       >
-        {plans.mostPopularPlan === planName && (
+        {popularPlan === planName && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#2F3349] to-[#717AAF] text-white text-xs px-2 py-0.5 rounded-full">
             Most Popular
           </div>

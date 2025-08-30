@@ -6,60 +6,69 @@ import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft } from 'react-i
 import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-icons/md';
 import axios from 'axios';
 import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../config/stripe';
+import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 
 // Initialize Stripe
 const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY);
 
-const baseUrl = "https://proposal-form-backend.vercel.app/api";
+const baseUrl = "https://proposal-form-backend.vercel.app/api/stripe";
 
-const subscriptionPlans = [
+const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
+
+const subscriptionPlansData = [
     {
         id: 'basic',
         name: 'Basic Plan',
-        price: 29,
-        yearlyPrice: 290,
+        price: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
+        yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice,
         features: [
-            'Up to 10 RFP submissions per month',
-            'Basic compliance checking',
-            'Standard templates',
-            'Email support',
-            'Basic analytics'
+            `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations || 5} AI - RFP Proposal Generations`,
+            `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations || 5} AI - Grant Proposal Generations`,
+            "AI-Driven RFP Discovery",
+            "AI-Driven Grant Discovery",
+            "AI-Proposal Recommendation",
+            "Basic Compliance Check",
+            "Proposal Tracking Dashboard",
+            `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors || 3} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers || 4} Viewers, Unlimited Members`,
+            "Team Collaboration",
+            "Support",
         ],
-        popular: false
+        missingFeatures: [
+            "Advanced Compliance Check",
+        ],
+        popular: mostPopularPlan === "Basic"
     },
     {
         id: 'professional',
         name: 'Professional Plan',
-        price: 79,
-        yearlyPrice: 790,
+        price: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice,
+        yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice,
         features: [
-            'Up to 50 RFP submissions per month',
-            'Advanced compliance checking',
-            'Premium templates',
-            'Priority email support',
-            'Advanced analytics',
-            'Team collaboration (up to 5 users)',
-            'Custom branding'
+            "Includes All Basic Features",
+            `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations || 20} AI - RFP Proposal Generations`,
+            `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations || 20} AI - Grant Proposal Generations`,
+            `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers || 10} Viewers, Unlimited Members`,
+            "Advanced Compliance Check",
         ],
-        popular: true
+        missingFeatures: [
+            "Dedicated Support",
+        ],
+        popular: mostPopularPlan === "Pro"
     },
     {
         id: 'enterprise',
         name: 'Enterprise Plan',
-        price: 199,
-        yearlyPrice: 1990,
+        price: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
+        yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice,
         features: [
-            'Unlimited RFP submissions',
-            'Full compliance suite',
-            'Custom templates',
-            '24/7 phone support',
-            'Advanced analytics & reporting',
-            'Unlimited team members',
-            'Custom integrations',
-            'Dedicated account manager',
-            'SLA guarantees'
+            "Includes All Basic & Pro Features",
+            `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations || 45} AI - RFP Proposal Generations`,
+            `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations || 45} AI - Grant Proposal Generations`,
+            "Unlimited Editors, Unlimited Viewers, Unlimited Members",
+            "Dedicated Support",
         ],
-        popular: false
+        missingFeatures: [],
+        popular: mostPopularPlan === "Enterprise"
     }
 ];
 
@@ -202,7 +211,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
 
 const StripePaymentPage = () => {
     const navigate = useNavigate();
-    const [selectedPlan, setSelectedPlan] = useState(subscriptionPlans[1]); // Default to Professional
+    const [selectedPlan, setSelectedPlan] = useState(subscriptionPlansData[1]); // Default to Professional
     const [billingCycle, setBillingCycle] = useState('monthly');
     const [showCheckout, setShowCheckout] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -282,8 +291,8 @@ const StripePaymentPage = () => {
                             <button
                                 onClick={() => setBillingCycle('monthly')}
                                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${billingCycle === 'monthly'
-                                        ? 'bg-[#6C63FF] text-white shadow-md'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    ? 'bg-[#6C63FF] text-white shadow-md'
+                                    : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
                                 Monthly
@@ -291,8 +300,8 @@ const StripePaymentPage = () => {
                             <button
                                 onClick={() => setBillingCycle('yearly')}
                                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${billingCycle === 'yearly'
-                                        ? 'bg-[#6C63FF] text-white shadow-md'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    ? 'bg-[#6C63FF] text-white shadow-md'
+                                    : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
                                 Yearly
@@ -305,7 +314,7 @@ const StripePaymentPage = () => {
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8 mb-12">
-                    {subscriptionPlans.map((plan) => (
+                    {subscriptionPlansData.map((plan) => (
                         <div
                             key={plan.id}
                             className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF] relative' : 'border-gray-200'
@@ -342,8 +351,8 @@ const StripePaymentPage = () => {
                                 <button
                                     onClick={() => handlePlanSelect(plan)}
                                     className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${plan.popular
-                                            ? 'bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white hover:from-[#5A52E8] hover:to-[#7A6CF0]'
-                                            : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                                        ? 'bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white hover:from-[#5A52E8] hover:to-[#7A6CF0]'
+                                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                         }`}
                                 >
                                     {selectedPlan.id === plan.id ? 'Selected' : 'Choose Plan'}

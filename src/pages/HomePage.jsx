@@ -4,42 +4,15 @@ import { FaPlay } from "react-icons/fa";
 import { MdOutlineSearch, MdViewQuilt, MdOutlineSecurity, MdChat, MdOutlineAnalytics, MdOutlineCheckCircle, MdOutlineRocketLaunch, MdOutlineCalendarMonth, MdOutlineCancel } from "react-icons/md";
 import { BiTrophy } from "react-icons/bi";
 import { IoMdStats } from "react-icons/io";
-import axios from "axios";
-import Swal from "sweetalert2";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-
-const BASE_URL = "https://proposal-form-backend.vercel.app/getSubscriptionPlansData";
+import { useSubscriptionPlans } from "../context/SubscriptionPlansContext";
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
-  const [hasFetchedPlans, setHasFetchedPlans] = useState(false);
+  const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
   const [isMonthly, setIsMonthly] = useState([true, true, true]);
-
-  useEffect(() => {
-    const fetchPlans = async () => {
-      if (!hasFetchedPlans) {
-        try {
-          const response = await axios.get(`${BASE_URL}`);
-          setSubscriptionPlans(response.data.plans);
-          setHasFetchedPlans(true);
-        } catch (error) {
-          console.log(error);
-          Swal.fire({
-            title: "Error",
-            text: "Failed to fetch plans. Please try again later.",
-            icon: "error",
-          });
-          setSubscriptionPlans([]);
-          setHasFetchedPlans(true);
-        }
-      }
-    };
-
-    fetchPlans();
-  }, [hasFetchedPlans]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -119,17 +92,17 @@ export default function HomePage() {
     {
       name: "Basic",
       headerColor: "bg-teal-500",
-      monthlyPrice: subscriptionPlans[0]?.monthlyPrice || "$10",
-      annualPrice: subscriptionPlans[0]?.annualPrice || "$100",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice || "$10",
+      annualPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice || "$100",
       features: [
-        `Up to ${subscriptionPlans[0]?.max_rfp_proposal_generations || 5} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans[0]?.max_grant_proposal_generations || 5} AI - Grant Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations || 5} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations || 5} AI - Grant Proposal Generations`,
         "AI-Driven RFP Discovery",
         "AI-Driven Grant Discovery",
         "AI-Proposal Recommendation",
         "Basic Compliance Check",
         "Proposal Tracking Dashboard",
-        `${subscriptionPlans[0]?.maxEditors || 3} Editors, ${subscriptionPlans[0]?.maxViewers || 4} Viewers, Unlimited Members`,
+        `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors || 3} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers || 4} Viewers, Unlimited Members`,
         "Team Collaboration",
         "Support",
       ],
@@ -141,13 +114,13 @@ export default function HomePage() {
     {
       name: "Pro",
       headerColor: "bg-purple-500",
-      monthlyPrice: subscriptionPlans[1]?.monthlyPrice || "$25",
-      annualPrice: subscriptionPlans[1]?.annualPrice || "$250",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice || "$25",
+      annualPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice || "$250",
       features: [
         "Includes All Basic Features",
-        `Up to ${subscriptionPlans[1]?.max_rfp_proposal_generations || 20} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans[1]?.max_grant_proposal_generations || 20} AI - Grant Proposal Generations`,
-        `${subscriptionPlans[1]?.maxEditors || 7} Editors, ${subscriptionPlans[1]?.maxViewers || 10} Viewers, Unlimited Members`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations || 20} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations || 20} AI - Grant Proposal Generations`,
+        `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers || 10} Viewers, Unlimited Members`,
         "Advanced Compliance Check",
       ],
       missingFeatures: [
@@ -158,13 +131,13 @@ export default function HomePage() {
     {
       name: "Enterprise",
       headerColor: "bg-gray-700",
-      monthlyPrice: subscriptionPlans[2]?.monthlyPrice || "$50",
-      annualPrice: subscriptionPlans[2]?.annualPrice || "$500",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice || "$50",
+      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice || "$500",
       features: [
         "Includes All Basic & Pro Features",
-        `Up to ${subscriptionPlans[2]?.max_rfp_proposal_generations || 45} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans[2]?.max_grant_proposal_generations || 45} AI - Grant Proposal Generations`,
-        "Unlimited Editors, Unlimited Viewers, Unlimited Members",
+        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations || 45} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations || 45} AI - Grant Proposal Generations`,
+        `${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxViewers || 10} Viewers, Unlimited Members`,
         "Dedicated Support",
       ],
       missingFeatures: [],
