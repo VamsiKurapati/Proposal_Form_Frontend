@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaRegCheckCircle } from "react-icons/fa";
 
-const baseUrl = "http://localhost:5000";
+const baseUrl = "https://proposal-form-backend.vercel.app/api";
 
-export default function Subscription({plan}) {
+export default function Subscription({ plan }) {
   const [plans, setPlans] = useState([]);
   const [isYearlyb, setIsYearlyb] = useState(false);
   const [isYearlyp, setIsYearlyp] = useState(false);
@@ -12,9 +12,9 @@ export default function Subscription({plan}) {
 
   const subPlan = async () => {
     try {
-      const data = await axios.get(`${baseUrl}/getSubscriptionPlansData`, {
+      const data = await axios.get(`${baseUrl}/subscription/getSubscriptionPlansData`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
         },
       });
       setPlans(data.data);
@@ -33,9 +33,8 @@ export default function Subscription({plan}) {
 
     return (
       <div
-        className={`border rounded-2xl p-4 w-[340px] h-[500px] shadow-md relative transition-transform hover:scale-105 flex flex-col bg-white mt-[100px] ${
-          plans.mostPopularPlan === planName ? "border-blue-500" : "border-gray-300"
-        }`}
+        className={`border rounded-2xl p-4 w-[340px] h-[500px] shadow-md relative transition-transform hover:scale-105 flex flex-col bg-white mt-[100px] ${plans.mostPopularPlan === planName ? "border-blue-500" : "border-gray-300"
+          }`}
       >
         {plans.mostPopularPlan === planName && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#2F3349] to-[#717AAF] text-white text-xs px-2 py-0.5 rounded-full">
@@ -45,27 +44,22 @@ export default function Subscription({plan}) {
 
         {planName === "Basic" ? (
           <>
-            
-
             <div className="flex items-center mb-4 relative bg-gray-200 rounded-full w-[120px] p-1 ml-[50%] -translate-x-1/2">
               <div
-                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${
-                  isYearlyb ? "translate-x-[58px]" : "translate-x-0"
-                }`}
+                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${isYearlyb ? "translate-x-[58px]" : "translate-x-0"
+                  }`}
               ></div>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  !isYearlyb ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${!isYearlyb ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlyb(false)}
                 style={{ userSelect: "none" }}
               >
                 Monthly
               </span>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  isYearlyb ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${isYearlyb ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlyb(true)}
                 style={{ userSelect: "none" }}
               >
@@ -124,34 +118,31 @@ export default function Subscription({plan}) {
           </>
         ) : planName === "Pro" ? (
           <>
-           
+
 
             <div className="flex items-center mb-4 relative bg-gray-200 rounded-full w-[120px] p-1 ml-[50%] -translate-x-1/2">
               <div
-                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${
-                  isYearlyp ? "translate-x-[58px]" : "translate-x-0"
-                }`}
+                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${isYearlyp ? "translate-x-[58px]" : "translate-x-0"
+                  }`}
               ></div>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  !isYearlyp ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${!isYearlyp ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlyp(false)}
                 style={{ userSelect: "none" }}
               >
                 Monthly
               </span>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  isYearlyp ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${isYearlyp ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlyp(true)}
                 style={{ userSelect: "none" }}
               >
                 Yearly
               </span>
             </div>
-            
+
             <p className="text-xl font-bold mb-4 text-center">
               ${isYearlyp ? plan.yearlyPrice : plan.monthlyPrice}
               <span className="text-xs font-normal">/{isYearlyp ? "year" : "month"}</span>
@@ -183,27 +174,24 @@ export default function Subscription({plan}) {
           </>
         ) : planName === "Enterprise" ? (
           <>
-            
+
 
             <div className="flex items-center mb-4 relative bg-gray-200 rounded-full w-[120px] p-1 ml-[50%] -translate-x-1/2">
               <div
-                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${
-                  isYearlye ? "translate-x-[58px]" : "translate-x-0"
-                }`}
+                className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${isYearlye ? "translate-x-[58px]" : "translate-x-0"
+                  }`}
               ></div>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  !isYearlye ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${!isYearlye ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlye(false)}
                 style={{ userSelect: "none" }}
               >
                 Monthly
               </span>
               <span
-                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${
-                  isYearlye ? "text-white" : "text-[#6C63FF]"
-                }`}
+                className={`relative z-10 flex-1 text-center py-0.5 text-xs font-medium cursor-pointer transition-colors ${isYearlye ? "text-white" : "text-[#6C63FF]"
+                  }`}
                 onClick={() => setIsYearlye(true)}
                 style={{ userSelect: "none" }}
               >
@@ -255,9 +243,9 @@ export default function Subscription({plan}) {
       {getPlanSection("Basic")}
       {getPlanSection("Pro")}
       {getPlanSection("Enterprise")}
-      
+
     </div>
-  // </div>
+    // </div>
 
   );
 }
