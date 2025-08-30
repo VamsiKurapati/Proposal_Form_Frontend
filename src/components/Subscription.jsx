@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaRegCheckCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const baseUrl = "https://proposal-form-backend.vercel.app";
 
 export default function Subscription({ plan }) {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [isYearlyb, setIsYearlyb] = useState(false);
   const [isYearlyp, setIsYearlyp] = useState(false);
