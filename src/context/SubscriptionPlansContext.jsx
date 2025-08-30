@@ -17,7 +17,7 @@ export const SubscriptionPlansProvider = ({ children }) => {
                         'Content-Type': 'application/json',
                     }
                 });
-                console.log(res.data);
+                // console.log(res.data);
                 setSubscriptionPlans(res.data.plans);
                 setMostPopularPlan(res.data.mostPopularPlan);
             } catch (error) {
