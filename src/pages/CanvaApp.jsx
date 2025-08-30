@@ -336,6 +336,9 @@ const CanvaApp = () => {
       try {
         // Use the JSON data from the navigation state if it exists, otherwise use the project from localStorage
         const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
+        const proposalId = location.state.proposalId || localStorage.getItem('proposalId');
+
+        localStorage.setItem('proposalId', proposalId);
 
         // After using jsonData for 1st time, delete it from the navigation state for security reasons to prevent users from manipulating the JSON data and also to avoid resetting the project when the user refreshes the page
         if (location.state.jsonData) {
@@ -938,6 +941,30 @@ const CanvaApp = () => {
     }
   };
 
+  const handleContinue = async () => {
+    try {
+      const proposalId = localStorage.getItem('proposalId');
+      const jsonData = JSON.parse(localStorage.getItem('jsonData'));
+      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
+        proposalId,
+        jsonData
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      console.log(res.data);
+      navigate('/basic-compliance-check', {
+        state: {
+          data: res.data
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Failed to continue');
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <NavbarComponent />
@@ -1032,7 +1059,7 @@ const CanvaApp = () => {
                 />
               </div>
               <div className="absolute top-2 right-12 z-10">
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => window.location.href = '/dashboard'}>
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()}>
                   Continue
                 </button>
               </div>

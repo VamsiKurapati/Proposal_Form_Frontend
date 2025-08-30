@@ -33,11 +33,12 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
+        console.log(res.data);
         setIsGeneratingProposal(false);
         //Navigate to editor with the generated proposal
         navigate('/editor', {
           state: {
-            jsonData: res.data
+            jsonData: res.data.processedProposal, proposalId: res.data.proposalId
           }
         });
       }
