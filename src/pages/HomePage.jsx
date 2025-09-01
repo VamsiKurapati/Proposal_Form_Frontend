@@ -305,7 +305,7 @@ export default function HomePage() {
               {/* Price */}
               <div className="text-center mb-6">
                 <p className="text-[28px] font-bold text-[#000000]">
-                  ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
+                  {isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
                   <span className="text-[20px] text-[#6B7280] font-regular">/month</span>
                 </p>
               </div>

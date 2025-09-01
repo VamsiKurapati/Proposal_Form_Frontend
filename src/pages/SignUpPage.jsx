@@ -68,9 +68,9 @@ const SignupForm = () => {
       {step === 0 && (
         <div className="space-y-4 text-center">
           <div className="flex items-center justify-between">
-            <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+            <img src="/Logo.png" alt="Logo" className="w-[180px] h-[72px]" />
           </div>
-          <h2 className="text-[32px] font-semibold text-[#2563EB] mb-4">Welcome to (AI RFP)</h2>
+          <h2 className="text-[32px] font-semibold text-[#2563EB] mb-4">Welcome to (RFP2Grant)</h2>
           <h3 className="text-[32px] font-medium text-[#111827]">Join as</h3>
           <div className="flex flex-col gap-4">
             <button
@@ -103,7 +103,7 @@ const SignupForm = () => {
 
           <div className="w-full md:w-1/2 max-w-lg">
             <div className="flex items-center justify-between">
-              <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+              <img src="/Logo.png" alt="Logo" className="w-[180px] h-[72px]" />
             </div>
             <h2 className="text-[32px] font-semibold text-[#2563EB] mb-1">Sign up</h2>
             <p className="font-normal text-[16px] text-[#6B7280] mb-6">

@@ -192,8 +192,13 @@ const SupportTicket = () => {
 
         try {
             const res = await axios.post(
-                "${baseUrl}/tickets",
-                formData
+                `${baseUrl}/tickets`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
             );
 
             if (res.status === 200) {

@@ -71,7 +71,7 @@ const LoginPage = () => {
         localStorage.setItem("subscription", JSON.stringify(subscription));
         setRole(role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
         localStorage.setItem("userRole", role === "SuperAdmin" ? "SuperAdmin" : role === "company" ? "company" : res.data.user.accessLevel || "Viewer");
-        role === "SuperAdmin" ? navigate("/admin") : role === "company" ? navigate("/company_profile_dashboard") : navigate("/employee_profile_dashboard");
+        role === "SuperAdmin" ? navigate("/admin") : navigate("/dashboard");
       } else {
         toast.error(res.data.message);
       }
@@ -93,9 +93,8 @@ const LoginPage = () => {
       {/* Right Form */}
       <div className="w-full md:w-1/2 max-w-lg">
         <div className="flex items-center justify-between">
-          <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+          <img src="/Logo.png" alt="Logo" className="w-[180px] h-[72px]" />
         </div>
-        <h2 className="text-[32px] font-semibold text-[#2563EB] mb-1">Log In</h2>
         <p className="font-normal text-[16px] text-[#6B7280] mb-6">
           Welcome back! Login to continue
         </p>
