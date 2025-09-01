@@ -73,12 +73,14 @@ const SupportTicket = () => {
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
 
+    const baseUrl = "https://proposal-form-backend.vercel.app/api/support";
+
     const fetchConversationMessages = async (ticketId) => {
         setLoadingMessages(true);
         try {
             const [userRes, adminRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/userMessages`),
-                axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/adminMessages`)
+                axios.get(`${baseUrl}/tickets/${ticketId}/userMessages`),
+                axios.get(`${baseUrl}/tickets/${ticketId}/adminMessages`)
             ]);
 
             const userMsgs = (userRes.data.userMessages || []).map(msg => ({
@@ -122,7 +124,7 @@ const SupportTicket = () => {
             try {
                 setLoading(true);
                 const { data } = await axios.get(
-                    `http://localhost:5000/api/support/tickets?userId=${userId}`
+                    `${baseUrl}/tickets?userId=${userId}`
                 );
 
                 if (data?.tickets?.length) {
@@ -190,7 +192,7 @@ const SupportTicket = () => {
 
         try {
             const res = await axios.post(
-                "http://localhost:5000/api/support/tickets",
+                "${baseUrl}/tickets",
                 formData
             );
 
@@ -205,7 +207,7 @@ const SupportTicket = () => {
 
                 // Fetch updated tickets
                 const updatedTickets = await axios.get(
-                    `http://localhost:5000/api/support/tickets?userId=${userId}`
+                    `${baseUrl}/tickets?userId=${userId}`
                 );
 
                 if (updatedTickets.data?.tickets) {
@@ -414,11 +416,11 @@ const SupportTicket = () => {
                                                         e.preventDefault();
                                                         try {
                                                             await axios.put(
-                                                                `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id
+                                                                `${baseUrl}/tickets/${ticket._id || ticket.id
                                                                 }/withdrawn`
                                                             );
                                                             const updatedTickets = await axios.get(
-                                                                `http://localhost:5000/api/support/tickets?userId=${userId}`
+                                                                `${baseUrl}/tickets?userId=${userId}`
                                                             );
                                                             setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
@@ -502,17 +504,17 @@ const SupportTicket = () => {
                                                             <div className="flex flex-col items-center z-10">
                                                                 <div
                                                                     className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${getStepStatusDynamic(currentStatus, step, steps) === "done" ||
-                                                                            getStepStatusDynamic(currentStatus, step, steps) === "current"
-                                                                            ? "bg-blue-500 border-blue-500 text-white"
-                                                                            : "bg-gray-200 border-gray-300 text-gray-500"
+                                                                        getStepStatusDynamic(currentStatus, step, steps) === "current"
+                                                                        ? "bg-blue-500 border-blue-500 text-white"
+                                                                        : "bg-gray-200 border-gray-300 text-gray-500"
                                                                         }`}
                                                                 >
                                                                     ✓
                                                                 </div>
                                                                 <span
                                                                     className={`mt-2 text-sm font-medium ${getStepStatusDynamic(currentStatus, step, steps) === "current"
-                                                                            ? "text-blue-500"
-                                                                            : "text-gray-500"
+                                                                        ? "text-blue-500"
+                                                                        : "text-gray-500"
                                                                         }`}
                                                                 >
                                                                     {step}
@@ -523,9 +525,9 @@ const SupportTicket = () => {
                                                                 <div className="absolute top-4 left-8 w-full h-1">
                                                                     <div
                                                                         className={`h-1 ${getStepStatusDynamic(currentStatus, steps[index + 1], steps) !==
-                                                                                "pending"
-                                                                                ? "bg-blue-500"
-                                                                                : "bg-gray-300"
+                                                                            "pending"
+                                                                            ? "bg-blue-500"
+                                                                            : "bg-gray-300"
                                                                             }`}
                                                                     ></div>
                                                                 </div>
@@ -584,8 +586,8 @@ const SupportTicket = () => {
                                                                         >
                                                                             <div
                                                                                 className={`px-3 py-2 rounded-lg max-w-[80%] ${msg.sender === "user"
-                                                                                        ? "bg-blue-100 text-blue-800"
-                                                                                        : "bg-green-100 text-green-800"
+                                                                                    ? "bg-blue-100 text-blue-800"
+                                                                                    : "bg-green-100 text-green-800"
                                                                                     }`}
                                                                             >
                                                                                 <span className="font-semibold">
@@ -622,7 +624,7 @@ const SupportTicket = () => {
                                                             setSendingMessage(true);
                                                             try {
                                                                 await axios.post(
-                                                                    `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id}/userMessages`,
+                                                                    `${baseUrl}/tickets/${ticket._id || ticket.id}/userMessages`,
                                                                     { message: newMessage }   // ✅ changed text → message
                                                                 );
                                                                 // Refetch messages
@@ -685,11 +687,11 @@ const SupportTicket = () => {
                                                         e.preventDefault();
                                                         try {
                                                             await axios.put(
-                                                                `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id
+                                                                `${baseUrl}/tickets/${ticket._id || ticket.id
                                                                 }/reopen`
                                                             );
                                                             const updatedTickets = await axios.get(
-                                                                `http://localhost:5000/api/support/tickets?userId=${userId}`
+                                                                `${baseUrl}/tickets?userId=${userId}`
                                                             );
                                                             setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
