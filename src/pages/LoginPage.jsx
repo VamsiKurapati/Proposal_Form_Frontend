@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ToastContainer from "./ToastContainer";
 import { useUser } from "../context/UserContext";
+import Navbar from "./Navbar";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -85,6 +86,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 bg-white">
       <ToastContainer />
+      <Navbar />
       {/* Left Image */}
       <div className="w-full md:w-1/2 flex justify-center mb-10 md:mb-0">
         <img src="/Login.png" alt="Login Illustration" className="w-2/3 max-w-sm" />

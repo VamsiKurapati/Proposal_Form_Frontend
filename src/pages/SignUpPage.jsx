@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import Navbar from "./Navbar";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ const SignupForm = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 bg-white">
+      <Navbar />
       {/* STEP 0 - JOIN AS */}
       {step === 0 && (
         <div className="space-y-4 text-center">
