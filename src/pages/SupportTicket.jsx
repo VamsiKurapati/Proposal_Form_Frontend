@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { FaChevronDown, FaChevronUp, FaTrash } from "react-icons/fa";
+
 import { TbTrashX } from "react-icons/tb";
+
+
 import NavbarComponent from "./NavbarComponent";
 import axios from "axios";
 
@@ -47,8 +50,6 @@ const subCategoriesMap = {
     Others: ["General Inquiry", "Request Documentation", "Training Request"],
 };
 
-const BASE_URL = "https://proposal-form-backend.vercel.app";
-
 const statusSteps = ["Created", "In Progress", "Completed"];
 
 const SupportTicket = () => {
@@ -71,114 +72,13 @@ const SupportTicket = () => {
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
-
-    // Helper function to update a specific ticket locally
-    const updateTicketLocally = (ticketId, updates) => {
-        setTickets(prevTickets =>
-            prevTickets.map(ticket =>
-                ticket._id === ticketId || ticket.id === ticketId
-                    ? { ...ticket, ...updates }
-                    : ticket
-            )
-        );
-    };
-
-    // Helper function to add a new ticket locally
-    const addTicketLocally = (newTicket) => {
-        setTickets(prevTickets => [newTicket, ...prevTickets]);
-    };
-
-    // Helper function to remove a ticket locally
-    const removeTicketLocally = (ticketId) => {
-        setTickets(prevTickets =>
-            prevTickets.filter(ticket =>
-                ticket._id !== ticketId && ticket.id !== ticketId
-            )
-        );
-    };
-
-    // Helper function to update conversation messages locally
-    const addMessageLocally = (ticketId, message) => {
-        if (showConversationPopup === ticketId) {
-            setConversationMessages(prev => [...prev, message]);
-        }
-    };
-
-    // Function to check for admin responses and update tickets locally
-    const checkForAdminUpdates = async () => {
-        if (!userId) return;
-
-        setRefreshing(true);
-        try {
-            const { data } = await axios.get(
-                `${BASE_URL}/api/support/tickets?userId=${userId}`
-            );
-
-            if (data?.tickets) {
-                // Check if there are any updates
-                const hasUpdates = data.tickets.some(newTicket => {
-                    const oldTicket = tickets.find(t =>
-                        t._id === newTicket._id || t.id === newTicket.id
-                    );
-                    return !oldTicket ||
-                        oldTicket.status !== newTicket.status ||
-                        oldTicket.Resolved_Description !== newTicket.Resolved_Description;
-                });
-
-                if (hasUpdates) {
-                    // Update tickets that have changed
-                    setTickets(prevTickets => {
-                        const updatedTickets = prevTickets.map(prevTicket => {
-                            const newTicket = data.tickets.find(t =>
-                                t._id === prevTicket._id || t.id === prevTicket.id
-                            );
-                            return newTicket || prevTicket;
-                        });
-                        return updatedTickets;
-                    });
-
-                    // Show success message
-                    setSuccessMsg("Tickets updated successfully!");
-                    setTimeout(() => setSuccessMsg(""), 3000);
-                } else {
-                    setSuccessMsg("No updates found");
-                    setTimeout(() => setSuccessMsg(""), 2000);
-                }
-            }
-        } catch (error) {
-            console.error("Error checking for admin updates:", error);
-            setErrorMsg("Failed to check for updates");
-            setTimeout(() => setErrorMsg(""), 3000);
-        } finally {
-            setRefreshing(false);
-        }
-    };
-
-    // Function to handle admin message updates
-    const handleAdminMessageUpdate = (ticketId, adminMessage) => {
-        // Update conversation if the popup is open for this ticket
-        if (showConversationPopup === ticketId) {
-            const newMsg = {
-                text: adminMessage.message,
-                createdAt: adminMessage.createdAt,
-                sender: "admin"
-            };
-            addMessageLocally(ticketId, newMsg);
-        }
-
-        // Update ticket status if it changed
-        if (adminMessage.status) {
-            updateTicketLocally(ticketId, { status: adminMessage.status });
-        }
-    };
 
     const fetchConversationMessages = async (ticketId) => {
         setLoadingMessages(true);
         try {
             const [userRes, adminRes] = await Promise.all([
-                axios.get(`${BASE_URL}/api/support/tickets/${ticketId}/userMessages`),
-                axios.get(`${BASE_URL}/api/support/tickets/${ticketId}/adminMessages`)
+                axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/userMessages`),
+                axios.get(`http://localhost:5000/api/support/tickets/${ticketId}/adminMessages`)
             ]);
 
             const userMsgs = (userRes.data.userMessages || []).map(msg => ({
@@ -222,7 +122,7 @@ const SupportTicket = () => {
             try {
                 setLoading(true);
                 const { data } = await axios.get(
-                    `${BASE_URL}/api/support/tickets?userId=${userId}`
+                    `http://localhost:5000/api/support/tickets?userId=${userId}`
                 );
 
                 if (data?.tickets?.length) {
@@ -242,15 +142,6 @@ const SupportTicket = () => {
         };
 
         fetchTickets();
-    }, [userId]);
-
-    // Periodically check for admin updates
-    useEffect(() => {
-        if (!userId) return;
-
-        const interval = setInterval(checkForAdminUpdates, 30000); // Check every 30 seconds
-
-        return () => clearInterval(interval);
     }, [userId]);
 
     // Pre-open dropdowns for "Created" and "In Progress"
@@ -299,24 +190,11 @@ const SupportTicket = () => {
 
         try {
             const res = await axios.post(
-                `${BASE_URL}/api/support/tickets`,
+                "http://localhost:5000/api/support/tickets",
                 formData
             );
 
             if (res.status === 200) {
-                // Add the new ticket locally immediately
-                const newTicket = res.data.ticket || res.data;
-                if (newTicket) {
-                    addTicketLocally(newTicket);
-
-                    // Open dropdown for the new ticket
-                    setOpenTickets(prev => ({
-                        ...prev,
-                        [newTicket._id || newTicket.id]: true
-                    }));
-                }
-
-                // Clear form
                 setCategory("");
                 setSubCategory("");
                 setDescription("");
@@ -325,8 +203,27 @@ const SupportTicket = () => {
                 const fileInput = document.getElementById("fileUpload");
                 if (fileInput) fileInput.value = "";
 
-                setSuccessMsg("Support ticket submitted successfully!");
-                setTimeout(() => setSuccessMsg(""), 3000);
+                // Fetch updated tickets
+                const updatedTickets = await axios.get(
+                    `http://localhost:5000/api/support/tickets?userId=${userId}`
+                );
+
+                if (updatedTickets.data?.tickets) {
+                    setTickets(updatedTickets.data.tickets); // ensure new array reference
+                    // Open dropdowns for newly added ticket(s)
+                    const newOpen = {};
+                    updatedTickets.data.tickets.forEach((ticket) => {
+                        if (
+                            ticket.status === "Created" ||
+                            ticket.status === "In Progress" ||
+                            ticket.status === "Re-Opened"
+                        ) {
+                            newOpen[ticket._id] = true;
+                        }
+                    });
+                    setOpenTickets(newOpen);
+                }
+
             } else {
                 setErrorMsg(res.data.message || "Failed to submit ticket.");
             }
@@ -334,6 +231,12 @@ const SupportTicket = () => {
             setErrorMsg(err.response?.data?.message || "An error occurred.");
         }
         setSubmitting(false);
+        setSuccessMsg("Support ticket submitted successfully!");
+        setTimeout(() => setSuccessMsg(""), 3000);
+        setCategory("");
+        setSubCategory("");
+        setDescription("");
+        setAttachments(null);
     };
 
     const getStepStatusDynamic = (currentStatus, step, steps) => {
@@ -480,45 +383,12 @@ const SupportTicket = () => {
 
                 {/* Ticket List */}
                 <div className="p-6 bg-grey min-h-screen">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 className="text-xl text-blue-600 font-semibold mb-1">
-                                Track Support Ticket
-                            </h2>
-                            <p className="text-gray-500">
-                                Track the status of your support ticket
-                            </p>
-                        </div>
-                        <button
-                            onClick={checkForAdminUpdates}
-                            disabled={refreshing}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                            title="Check for updates"
-                        >
-                            {refreshing ? (
-                                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            ) : (
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            )}
-                            {refreshing ? "Checking..." : "Refresh"}
-                        </button>
-                    </div>
-
-                    {/* Success and Error Messages */}
-                    {successMsg && (
-                        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                            {successMsg}
-                        </div>
-                    )}
-                    {errorMsg && (
-                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                            {errorMsg}
-                        </div>
-                    )}
+                    <h2 className="text-xl text-blue-600 font-semibold mb-1">
+                        Track Support Ticket
+                    </h2>
+                    <p className="text-gray-500 mb-6">
+                        Track the status of your support ticket
+                    </p>
 
                     {tickets.map((ticket) => {
                         return (
@@ -544,19 +414,17 @@ const SupportTicket = () => {
                                                         e.preventDefault();
                                                         try {
                                                             await axios.put(
-                                                                `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id
+                                                                `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id
                                                                 }/withdrawn`
                                                             );
-
-                                                            // Update ticket locally immediately
-                                                            updateTicketLocally(ticket._id || ticket.id, {
-                                                                status: "Withdrawn"
-                                                            });
-
+                                                            const updatedTickets = await axios.get(
+                                                                `http://localhost:5000/api/support/tickets?userId=${userId}`
+                                                            );
+                                                            setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
                                                             alert(
                                                                 err.response?.data?.message ||
-                                                                "Failed to withdraw ticket."
+                                                                "Failed to reopen ticket."
                                                             );
                                                         }
                                                     }}
@@ -634,17 +502,17 @@ const SupportTicket = () => {
                                                             <div className="flex flex-col items-center z-10">
                                                                 <div
                                                                     className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${getStepStatusDynamic(currentStatus, step, steps) === "done" ||
-                                                                        getStepStatusDynamic(currentStatus, step, steps) === "current"
-                                                                        ? "bg-blue-500 border-blue-500 text-white"
-                                                                        : "bg-gray-200 border-gray-300 text-gray-500"
+                                                                            getStepStatusDynamic(currentStatus, step, steps) === "current"
+                                                                            ? "bg-blue-500 border-blue-500 text-white"
+                                                                            : "bg-gray-200 border-gray-300 text-gray-500"
                                                                         }`}
                                                                 >
                                                                     ✓
                                                                 </div>
                                                                 <span
                                                                     className={`mt-2 text-sm font-medium ${getStepStatusDynamic(currentStatus, step, steps) === "current"
-                                                                        ? "text-blue-500"
-                                                                        : "text-gray-500"
+                                                                            ? "text-blue-500"
+                                                                            : "text-gray-500"
                                                                         }`}
                                                                 >
                                                                     {step}
@@ -655,9 +523,9 @@ const SupportTicket = () => {
                                                                 <div className="absolute top-4 left-8 w-full h-1">
                                                                     <div
                                                                         className={`h-1 ${getStepStatusDynamic(currentStatus, steps[index + 1], steps) !==
-                                                                            "pending"
-                                                                            ? "bg-blue-500"
-                                                                            : "bg-gray-300"
+                                                                                "pending"
+                                                                                ? "bg-blue-500"
+                                                                                : "bg-gray-300"
                                                                             }`}
                                                                     ></div>
                                                                 </div>
@@ -716,8 +584,8 @@ const SupportTicket = () => {
                                                                         >
                                                                             <div
                                                                                 className={`px-3 py-2 rounded-lg max-w-[80%] ${msg.sender === "user"
-                                                                                    ? "bg-blue-100 text-blue-800"
-                                                                                    : "bg-green-100 text-green-800"
+                                                                                        ? "bg-blue-100 text-blue-800"
+                                                                                        : "bg-green-100 text-green-800"
                                                                                     }`}
                                                                             >
                                                                                 <span className="font-semibold">
@@ -753,21 +621,12 @@ const SupportTicket = () => {
                                                             if (!newMessage.trim()) return;
                                                             setSendingMessage(true);
                                                             try {
-                                                                const response = await axios.post(
-                                                                    `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id}/userMessages`,
-                                                                    { message: newMessage }
+                                                                await axios.post(
+                                                                    `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id}/userMessages`,
+                                                                    { message: newMessage }   // ✅ changed text → message
                                                                 );
-
-                                                                // Add message locally immediately
-                                                                if (response.data.userMessage) {
-                                                                    const newMsg = {
-                                                                        text: response.data.userMessage.message,
-                                                                        createdAt: response.data.userMessage.createdAt,
-                                                                        sender: "user"
-                                                                    };
-                                                                    addMessageLocally(ticket._id || ticket.id, newMsg);
-                                                                }
-
+                                                                // Refetch messages
+                                                                await fetchConversationMessages(ticket._id || ticket.id);
                                                                 setNewMessage("");
                                                             } catch (err) {
                                                                 alert(
@@ -826,22 +685,13 @@ const SupportTicket = () => {
                                                         e.preventDefault();
                                                         try {
                                                             await axios.put(
-                                                                `${BASE_URL}/api/support/tickets/${ticket._id || ticket.id
+                                                                `http://localhost:5000/api/support/tickets/${ticket._id || ticket.id
                                                                 }/reopen`
                                                             );
-
-                                                            // Update ticket locally immediately
-                                                            updateTicketLocally(ticket._id || ticket.id, {
-                                                                status: "Re-Opened",
-                                                                isOpen: true
-                                                            });
-
-                                                            // Open the dropdown for the reopened ticket
-                                                            setOpenTickets(prev => ({
-                                                                ...prev,
-                                                                [ticket._id || ticket.id]: true
-                                                            }));
-
+                                                            const updatedTickets = await axios.get(
+                                                                `http://localhost:5000/api/support/tickets?userId=${userId}`
+                                                            );
+                                                            setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
                                                             alert(
                                                                 err.response?.data?.message ||
