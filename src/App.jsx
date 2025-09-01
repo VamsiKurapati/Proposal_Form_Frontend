@@ -6,6 +6,7 @@ import { useUser } from './context/UserContext';
 const ProtectedRoutes = lazy(() => import('./pages/ProtectedRoutes'));
 
 const Home = lazy(() => import("./pages/HomePage"));
+const Contact = lazy(() => import("./pages/Contact"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
@@ -40,6 +41,8 @@ const App = () => {
       <Suspense fallback={<></>}>
         <Routes>
           <Route path="/" element={role === null ? <Home /> : role === "SuperAdmin" ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />} />
+
+          <Route path="/contact" element={<Contact />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />

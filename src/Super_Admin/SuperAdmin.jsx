@@ -135,7 +135,7 @@ const SuperAdmin = () => {
 
     const [loading, setLoading] = useState(false);
 
-    const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
+    const baseUrl = "https://proposal-form-backend.vercel.app/api";
     // const baseUrl = "http://localhost:5000/api";
 
 
