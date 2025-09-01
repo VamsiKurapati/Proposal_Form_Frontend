@@ -4,7 +4,6 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import Navbar from "./Navbar";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -65,11 +64,12 @@ const SignupForm = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 bg-white">
-      <Navbar />
       {/* STEP 0 - JOIN AS */}
       {step === 0 && (
         <div className="space-y-4 text-center">
-          <h1 className="text-[36px] text-[#000000] font-bold italic mb-2">LOGO</h1>
+          <div className="flex items-center justify-between">
+            <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+          </div>
           <h2 className="text-[32px] font-semibold text-[#2563EB] mb-4">Welcome to (AI RFP)</h2>
           <h3 className="text-[32px] font-medium text-[#111827]">Join as</h3>
           <div className="flex flex-col gap-4">
@@ -102,7 +102,9 @@ const SignupForm = () => {
           </div>
 
           <div className="w-full md:w-1/2 max-w-lg">
-            <h1 className="text-[36px] text-[#000000] font-bold italic mb-2">LOGO</h1>
+            <div className="flex items-center justify-between">
+              <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+            </div>
             <h2 className="text-[32px] font-semibold text-[#2563EB] mb-1">Sign up</h2>
             <p className="font-normal text-[16px] text-[#6B7280] mb-6">
               Enter your work details to create your account

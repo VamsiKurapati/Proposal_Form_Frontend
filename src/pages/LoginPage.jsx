@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ToastContainer from "./ToastContainer";
 import { useUser } from "../context/UserContext";
-import Navbar from "./Navbar";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -86,7 +85,6 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 bg-white">
       <ToastContainer />
-      <Navbar />
       {/* Left Image */}
       <div className="w-full md:w-1/2 flex justify-center mb-10 md:mb-0">
         <img src="/Login.png" alt="Login Illustration" className="w-2/3 max-w-sm" />
@@ -94,7 +92,9 @@ const LoginPage = () => {
 
       {/* Right Form */}
       <div className="w-full md:w-1/2 max-w-lg">
-        <h1 className="text-[36px] text-[#000000] font-bold italic mb-2">LOGO</h1>
+        <div className="flex items-center justify-between">
+          <img src="/Logo.png" alt="Logo" className="w-[127px] h-[36px]" />
+        </div>
         <h2 className="text-[32px] font-semibold text-[#2563EB] mb-1">Log In</h2>
         <p className="font-normal text-[16px] text-[#6B7280] mb-6">
           Welcome back! Login to continue
