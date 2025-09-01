@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { useState } from 'react';
 import axios from 'axios';
-import contact from '../assets/contact.png';
+import contact from '../assets/Contact.png';
 import { FaPlay } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
