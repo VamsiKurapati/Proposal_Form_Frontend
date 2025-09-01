@@ -9,7 +9,7 @@ import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../c
 import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 
 // Initialize Stripe
-const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY || 'pk_test_your_test_key_here');
+const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY);
 
 const baseUrl = "https://proposal-form-backend.vercel.app/api/stripe";
 
@@ -44,9 +44,8 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                 const response = await axios.post(
                     `${baseUrl}${STRIPE_CONFIG.API_ENDPOINTS.CREATE_PAYMENT_INTENT}`,
                     {
-                        planId: selectedPlan.id,
+                        planId: selectedPlan._id,
                         billingCycle: billingCycle,
-                        amount: billingCycle === 'yearly' ? selectedPlan.yearlyPrice : selectedPlan.price
                     },
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -59,7 +58,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
             }
         };
 
-        if (selectedPlan && selectedPlan.id) {
+        if (selectedPlan && selectedPlan._id) {
             createPaymentIntent();
         }
     }, [selectedPlan, billingCycle]);
@@ -94,7 +93,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                 await axios.post(
                     `${baseUrl}${STRIPE_CONFIG.API_ENDPOINTS.ACTIVATE_SUBSCRIPTION}`,
                     {
-                        planId: selectedPlan.id,
+                        planId: selectedPlan._id,
                         billingCycle: billingCycle,
                         paymentIntentId: paymentIntent.id
                     },
@@ -151,7 +150,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                         <MdOutlinePayments className="w-5 h-5 mr-2" />
                         {billingCycle === 'yearly'
                             ? `Pay $${selectedPlan.yearlyPrice} yearly`
-                            : `Pay $${selectedPlan.price} monthly`
+                            : `Pay $${selectedPlan.monthlyPrice} monthly`
                         }
                     </>
                 )}
@@ -171,13 +170,13 @@ const StripePaymentPage = () => {
     const navigate = useNavigate();
     const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
 
-    console.log("Plans", subscriptionPlans);
-    console.log("Most Popular Plan", mostPopularPlan);
+    console.log("Plans from context:", subscriptionPlans);
+    console.log("Most Popular Plan from context:", mostPopularPlan);
 
     // Create subscription plans data with proper null checks
     const subscriptionPlansData = React.useMemo(() => {
         if (!subscriptionPlans || subscriptionPlans.length === 0) {
-            console.log("No subscription plans available");
+            console.log("No subscription plans available from context");
             return [];
         }
 
@@ -185,7 +184,7 @@ const StripePaymentPage = () => {
             {
                 id: 'basic',
                 name: 'Basic Plan',
-                price: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
+                monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
                 yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic").yearlyPrice,
                 features: [
                     `Up to ${subscriptionPlans.find((p) => p.name === "Basic").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
@@ -207,7 +206,7 @@ const StripePaymentPage = () => {
             {
                 id: 'professional',
                 name: 'Professional Plan',
-                price: subscriptionPlans.find((p) => p.name === "Pro").monthlyPrice,
+                monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro").monthlyPrice,
                 yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro").yearlyPrice,
                 features: [
                     "Includes All Basic Features",
@@ -224,7 +223,7 @@ const StripePaymentPage = () => {
             {
                 id: 'enterprise',
                 name: 'Enterprise Plan',
-                price: subscriptionPlans.find((p) => p.name === "Enterprise").monthlyPrice,
+                monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise").monthlyPrice,
                 yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise").yearlyPrice,
                 features: [
                     "Includes All Basic & Pro Features",
@@ -366,10 +365,10 @@ const StripePaymentPage = () => {
                         subscriptionPlansData.map((plan) => (
                             <div
                                 key={plan.id}
-                                className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF] relative' : 'border-gray-200'
+                                className={`bg-white rounded-2xl shadow-lg relative border-2 transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-[#6C63FF]' : 'border-[#E5E7EB]'
                                     } ${selectedPlan?.id === plan.id ? 'ring-2 ring-[#6C63FF] ring-opacity-50' : ''}`}
                             >
-                                {(mostPopularPlan && mostPopularPlan === plan.name) && (
+                                {plan.popular && (
                                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                                         <span className="bg-gradient-to-r from-[#6C63FF] to-[#8B7CF6] text-white text-xs font-semibold px-4 py-1 rounded-full">
                                             Most Popular
@@ -381,7 +380,7 @@ const StripePaymentPage = () => {
                                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                                     <div className="mb-6">
                                         <span className="text-4xl font-bold text-gray-900">
-                                            ${billingCycle === 'yearly' ? plan.yearlyPrice : plan.price}
+                                            ${billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice}
                                         </span>
                                         <span className="text-gray-600">
                                             /{billingCycle === 'yearly' ? 'year' : 'month'}
@@ -454,14 +453,14 @@ const StripePaymentPage = () => {
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Amount:</span>
                                         <span className="font-bold text-lg">
-                                            ${billingCycle === 'yearly' ? selectedPlan.yearlyPrice : selectedPlan.price}
+                                            ${billingCycle === 'yearly' ? selectedPlan.yearlyPrice : selectedPlan.monthlyPrice}
                                         </span>
                                     </div>
                                     {billingCycle === 'yearly' && (
                                         <div className="flex justify-between text-green-600">
                                             <span>Yearly Savings:</span>
                                             <span className="font-medium">
-                                                ${Math.round((selectedPlan.price * 12 - selectedPlan.yearlyPrice) / 12)}/month
+                                                ${Math.round((selectedPlan.monthlyPrice * 12 - selectedPlan.yearlyPrice) / 12)}/month
                                             </span>
                                         </div>
                                     )}

@@ -12,20 +12,9 @@ export const STRIPE_CONFIG = {
         UPDATE_PAYMENT_METHOD: '/update-payment-method'
     },
 
-    // Subscription plan IDs (these should match your Stripe product IDs)
-    PLAN_IDS: {
-        BASIC: 'price_basic_monthly',
-        BASIC_YEARLY: 'price_basic_yearly',
-        PROFESSIONAL: 'price_professional_monthly',
-        PROFESSIONAL_YEARLY: 'price_professional_yearly',
-        ENTERPRISE: 'price_enterprise_monthly',
-        ENTERPRISE_YEARLY: 'price_enterprise_yearly'
-    },
-
     // Payment method types
     PAYMENT_METHODS: {
-        CARD: 'card',
-        BANK_ACCOUNT: 'bank_account'
+        CARD: 'card'
     },
 
     // Billing cycles
