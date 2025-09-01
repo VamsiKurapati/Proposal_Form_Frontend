@@ -2366,8 +2366,23 @@ const Discover = () => {
               <p className="text-gray-600 text-sm leading-relaxed">
                 Please wait while we generate your proposal. This process may take a few moments as we analyze your data and generate a proposal.
               </p>
+              <br />
+              <p className="text-[#EF4444] text-sm leading-relaxed">
+                Note: Do not refresh the page while the proposal is generating.
+              </p>
             </div>
           </div>
+        )}
+
+        {error && !isGeneratingProposal && (
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to generate proposal. Please try again.',
+            confirmButtonColor: '#2563EB'
+          }).then(() => {
+            setError(null);
+          })
         )}
 
         <NavbarComponent />
