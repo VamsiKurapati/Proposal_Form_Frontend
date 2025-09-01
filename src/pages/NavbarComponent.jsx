@@ -13,9 +13,9 @@ const NavbarComponent = () => {
   const { role } = useUser();
 
   const navItems = [
+    { name: "Dashboard", path: "/dashboard" },
     { name: "Discover", path: "/discover" },
     { name: "Proposals", path: "/proposals" },
-    { name: "Dashboard", path: "/dashboard" },
     { name: "Profile", path: role === "company" ? "/company_profile_dashboard" : "/employee_profile_dashboard" },
     { name: "Support", path: "/support-ticket" },
   ];

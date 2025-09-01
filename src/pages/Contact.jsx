@@ -57,7 +57,7 @@ export default function Contact() {
       <div className="flex flex-col items-center bg-[#EFF6FF] border-b mt-16">
         <div className="flex flex-col items-start w-full max-w-4xl  pt-11">
           <p className="text-[30px] font-semibold text-[#2563EB]">Contact Us</p>
-          <p className="text-[#4B5563]">Contact us for request demo</p>
+          <p className="text-[#4B5563]">Contact Us To Request A Demo</p>
         </div>
 
         {/* Main Form Section */}
