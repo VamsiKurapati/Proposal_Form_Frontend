@@ -1530,7 +1530,10 @@ const Discover = () => {
     <div className="bg-[#F8FAFC] rounded-xl p-4 shadow w-[355px] mr-4 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <img src={rfp.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />
+          {rfp.logo && <img src={rfp.logo} alt="Logo" className="w-12 h-12 rounded-full object-cover" />}
+          {!rfp.logo && <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center">
+            <span className="text-white font-bold text-lg">R</span>
+          </div>}
           <span className="text-[10px] text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded-full">
             {rfp.match}% Match
           </span>
