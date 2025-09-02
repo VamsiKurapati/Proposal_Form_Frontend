@@ -23,46 +23,6 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     // Get Stripe configuration status
     const stripeConfig = getStripeConfigStatus();
 
-    // Check if Stripe is properly loaded
-    if (!stripe || !elements) {
-        let errorMessage = "Payment system is not ready. Please refresh the page and try again.";
-
-        if (stripeConfig.isDefaultKey) {
-            errorMessage = "Stripe is not configured. Please contact support or check your environment variables.";
-        } else if (!stripeConfig.isValid) {
-            errorMessage = "Invalid Stripe configuration. Please check your publishable key.";
-        }
-
-        return (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                        <FaBan className="h-5 w-5 text-red-400" />
-                    </div>
-                    <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800">
-                            Payment System Error
-                        </h3>
-                        <div className="mt-2 text-sm text-red-700">
-                            <p>{errorMessage}</p>
-                            {stripeConfig.isDefaultKey && (
-                                <div className="mt-2">
-                                    <p className="font-medium">To fix this issue:</p>
-                                    <ol className="list-decimal list-inside mt-1 space-y-1">
-                                        <li>Get your Stripe publishable key from <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener noreferrer" className="underline">Stripe Dashboard</a></li>
-                                        <li>Create a .env file in your project root</li>
-                                        <li>Add: VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here</li>
-                                        <li>Restart your development server</li>
-                                    </ol>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     useEffect(() => {
         // Create payment intent on the server
         const createPaymentIntent = async () => {
@@ -176,6 +136,46 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     };
 
     const cardElementOptions = CARD_ELEMENT_OPTIONS;
+
+    // Check if Stripe is properly loaded - moved after all hooks
+    if (!stripe || !elements) {
+        let errorMessage = "Payment system is not ready. Please refresh the page and try again.";
+
+        if (stripeConfig.isDefaultKey) {
+            errorMessage = "Stripe is not configured. Please contact support or check your environment variables.";
+        } else if (!stripeConfig.isValid) {
+            errorMessage = "Invalid Stripe configuration. Please check your publishable key.";
+        }
+
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                        <FaBan className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">
+                            Payment System Error
+                        </h3>
+                        <div className="mt-2 text-sm text-red-700">
+                            <p>{errorMessage}</p>
+                            {stripeConfig.isDefaultKey && (
+                                <div className="mt-2">
+                                    <p className="font-medium">To fix this issue:</p>
+                                    <ol className="list-decimal list-inside mt-1 space-y-1">
+                                        <li>Get your Stripe publishable key from <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener noreferrer" className="underline">Stripe Dashboard</a></li>
+                                        <li>Create a .env file in your project root</li>
+                                        <li>Add: VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here</li>
+                                        <li>Restart your development server</li>
+                                    </ol>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
