@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import Swal from 'sweetalert2';
+import GrantProposalForm from '../components/GrantProposalForm';
 
 // Constants
 const API_BASE_URL = "https://proposal-form-backend.vercel.app/api";
@@ -290,6 +291,12 @@ const Proposals = () => {
     const [fetchedProposals, setFetchedProposals] = useState(false);
     const [fetchedGrants, setFetchedGrants] = useState(false);
     const [savingStates, setSavingStates] = useState({}); // Track saving state for each proposal/grant
+
+    // Grant proposal form state
+    const [showGrantProposalModal, setShowGrantProposalModal] = useState(false);
+    const [selectedGrant, setSelectedGrant] = useState(null);
+    const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
+
     const navigate = useNavigate();
 
     // Calculate items per page based on screen size
@@ -638,11 +645,150 @@ const Proposals = () => {
     };
 
     const handleGenerateGrant = (grant) => {
-        navigate('/proposal_page', { state: { grant } });
+        setSelectedGrant(grant);
+        setShowGrantProposalModal(true);
     };
 
     const handleContinueGrant = (grant) => {
         navigate('/editor', { state: { jsonData: grant.generatedProposal || null } });
+    };
+
+    const handleSubmitGrantProposal = async (proposalData) => {
+        setIsGeneratingProposal(true);
+
+        try {
+            // Validate required fields
+            const requiredFields = [
+                'summary',
+                'objectives',
+                'activities',
+                'beneficiaries',
+                'geography',
+                'start_date',
+                'estimated_duration',
+                'total_project_cost',
+                'total_requested_amount',
+                'cost_share_required',
+                'budget_breakdown',
+                'methods_for_measuring_success'
+            ];
+
+            const missingFields = requiredFields.filter(field => {
+                if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries' || field === 'methods_for_measuring_success') {
+                    return !proposalData[field] || proposalData[field].trim() === '';
+                }
+
+                if (field === 'total_project_cost' || field === 'total_requested_amount' || field === 'cost_share_required' || field === 'budget_breakdown') {
+                    return !proposalData.budget[field] || proposalData.budget[field].toString().trim() === '';
+                }
+
+                return !proposalData[field] || proposalData[field].toString().trim() === '';
+            });
+
+            if (missingFields.length > 0) {
+                setIsGeneratingProposal(false);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Required Fields Missing',
+                    text: `Please fill in the following required fields: ${missingFields.join(', ')}`,
+                    confirmButtonColor: '#2563EB'
+                });
+                return;
+            }
+
+            // Validate budget fields
+            const totalProjectCost = parseFloat(proposalData.budget.total_project_cost);
+            const totalRequestedAmount = parseFloat(proposalData.budget.total_requested_amount);
+
+            if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
+                setIsGeneratingProposal(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Budget',
+                    text: 'Total project cost must be a positive number.',
+                    confirmButtonColor: '#2563EB'
+                });
+                return;
+            }
+
+            if (isNaN(totalRequestedAmount) || totalRequestedAmount <= 0) {
+                setIsGeneratingProposal(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Budget',
+                    text: 'Total requested amount must be a positive number.',
+                    confirmButtonColor: '#2563EB'
+                });
+                return;
+            }
+
+            // Check if total requested amount exceeds grant award ceiling
+            if (selectedGrant.AWARD_CEILING && selectedGrant.AWARD_CEILING !== "Not Provided") {
+                const awardCeiling = parseFloat(selectedGrant.AWARD_CEILING.replace(/[^0-9.]/g, ''));
+                if (!isNaN(awardCeiling) && totalRequestedAmount > awardCeiling) {
+                    setIsGeneratingProposal(false);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Budget Exceeds Limit',
+                        text: `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
+                        confirmButtonColor: '#2563EB'
+                    });
+                    return;
+                }
+            }
+
+            if (totalRequestedAmount > totalProjectCost) {
+                setIsGeneratingProposal(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Budget',
+                    text: 'Total requested amount cannot exceed total project cost.',
+                    confirmButtonColor: '#2563EB'
+                });
+                return;
+            }
+
+            // Submit the grant proposal data
+            const res = await axios.post(`${API_BASE_URL}/rfp/sendGrantDataForProposalGeneration`, {
+                formData: proposalData,
+                grant: selectedGrant
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            if (res.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Grant proposal generated successfully!',
+                    confirmButtonColor: '#2563EB'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to generate grant proposal. Please try again.',
+                    confirmButtonColor: '#2563EB'
+                });
+            }
+
+            // Close the modal
+            setShowGrantProposalModal(false);
+            setSelectedGrant(null);
+
+        } catch (error) {
+            console.error("Error generating grant proposal:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.response?.data?.message || 'An error occurred while generating the grant proposal.',
+                confirmButtonColor: '#2563EB'
+            });
+        } finally {
+            setIsGeneratingProposal(false);
+        }
     };
 
     const isGrantSaved = (grantId) => {
@@ -849,6 +995,15 @@ const Proposals = () => {
                     </>
                 )}
             </div>
+
+            {/* Grant Proposal Form Modal */}
+            <GrantProposalForm
+                selectedGrant={selectedGrant}
+                isOpen={showGrantProposalModal}
+                onClose={() => setShowGrantProposalModal(false)}
+                onSubmit={handleSubmitGrantProposal}
+                isGenerating={isGeneratingProposal}
+            />
         </>
     );
 };

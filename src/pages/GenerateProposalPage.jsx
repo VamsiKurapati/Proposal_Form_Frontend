@@ -6,6 +6,7 @@ import { useProfile } from '../context/ProfileContext';
 import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
 import axios from 'axios';
+import swal from 'sweetalert';
 
 const GenerateProposalPage = () => {
   const location = useLocation();
@@ -33,19 +34,23 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
-        console.log(res.data);
+        //console.log(res.data);
         setIsGeneratingProposal(false);
-        //Navigate to editor with the generated proposal
-        navigate('/editor', {
-          state: {
-            jsonData: res.data.processedProposal, proposalId: res.data.proposalId
-          }
-        });
+        swal("Success", "Proposal generated successfully. Redirecting to editor.", "success");
+        setTimeout(() => {
+          navigate('/editor', {
+            state: {
+              jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+            }
+          });
+        }, 1000);
+      } else {
+        swal("Error", "Failed to generate proposal. Please try again.", "error");
       }
     } catch (error) {
       console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
-      //Don't navigate to editor if there is an error
+      swal("Error", "Failed to generate proposal. Please try again.", "error");
       return;
     }
   };
