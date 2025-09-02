@@ -11,7 +11,7 @@ import { useSubscriptionPlans } from "../context/SubscriptionPlansContext";
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
+  const { subscriptionPlans } = useSubscriptionPlans();
   const [isMonthly, setIsMonthly] = useState([true, true, true]);
 
   useEffect(() => {
@@ -131,8 +131,8 @@ export default function HomePage() {
     {
       name: "Enterprise",
       headerColor: "bg-gray-700",
-      monthlyPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.monthlyPrice || "N/A"}`,
-      annualPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.yearlyPrice || "N/A"}`,
+      monthlyPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.monthlyPrice}` : "N/A"}`,
+      annualPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.yearlyPrice}` : "N/A"}`,
       features: [
         "Includes All Basic & Pro Features",
         `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.maxRFPProposalGenerations} AI - RFP Proposal Generations` : "Custom RFP Proposal Generations"}`,
@@ -304,6 +304,7 @@ export default function HomePage() {
 
               {/* Price */}
               {(plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A") ? (
+                console.log(plan.monthlyPrice, plan.annualPrice),
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
@@ -313,6 +314,7 @@ export default function HomePage() {
                   </div>
                 </>
               ) : (
+                console.log(plan.monthlyPrice, plan.annualPrice),
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
