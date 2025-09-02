@@ -92,17 +92,17 @@ export default function HomePage() {
     {
       name: "Basic",
       headerColor: "bg-teal-500",
-      monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice || "$10",
-      annualPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice || "$100",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice,
       features: [
-        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations || 5} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations || 5} AI - Grant Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
         "AI-Driven RFP Discovery",
         "AI-Driven Grant Discovery",
         "AI-Proposal Recommendation",
         "Basic Compliance Check",
         "Proposal Tracking Dashboard",
-        `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors || 3} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers || 4} Viewers, Unlimited Members`,
+        `${subscriptionPlans.find((p) => p.name === "Basic")?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Basic")?.maxViewers} Viewers, Unlimited Members`,
         "Team Collaboration",
         "Support",
       ],
@@ -114,13 +114,13 @@ export default function HomePage() {
     {
       name: "Pro",
       headerColor: "bg-purple-500",
-      monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice || "$25",
-      annualPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice || "$250",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice,
       features: [
         "Includes All Basic Features",
-        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations || 20} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations || 20} AI - Grant Proposal Generations`,
-        `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers || 10} Viewers, Unlimited Members`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+        `${subscriptionPlans.find((p) => p.name === "Pro")?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Pro")?.maxViewers} Viewers, Unlimited Members`,
         "Advanced Compliance Check",
       ],
       missingFeatures: [
@@ -131,13 +131,13 @@ export default function HomePage() {
     {
       name: "Enterprise",
       headerColor: "bg-gray-700",
-      monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice || "$50",
-      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice || "$500",
+      monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice,
       features: [
         "Includes All Basic & Pro Features",
-        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations || 45} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations || 45} AI - Grant Proposal Generations`,
-        `${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxEditors || 7} Editors, ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxViewers || 10} Viewers, Unlimited Members`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
+        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+        `${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxViewers} Viewers, Unlimited Members`,
         "Dedicated Support",
       ],
       missingFeatures: [],
@@ -305,7 +305,7 @@ export default function HomePage() {
               {/* Price */}
               <div className="text-center mb-6">
                 <p className="text-[28px] font-bold text-[#000000]">
-                  {isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
+                  ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
                   <span className="text-[20px] text-[#6B7280] font-regular">/month</span>
                 </p>
               </div>
