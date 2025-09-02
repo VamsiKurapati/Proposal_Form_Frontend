@@ -131,13 +131,13 @@ export default function HomePage() {
     {
       name: "Enterprise",
       headerColor: "bg-gray-700",
-      monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
-      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.yearlyPrice,
+      monthlyPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.monthlyPrice || "N/A"}`,
+      annualPrice: `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.yearlyPrice || "N/A"}`,
       features: [
         "Includes All Basic & Pro Features",
-        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-        `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
-        `${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxViewers} Viewers, Unlimited Members`,
+        `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.maxRFPProposalGenerations} AI - RFP Proposal Generations` : "Custom RFP Proposal Generations"}`,
+        `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.maxGrantProposalGenerations} AI - Grant Proposal Generations` : "Custom Grant Proposal Generations"}`,
+        `${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact) ? `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Enterprise" && !p.isContact)?.maxViewers} Viewers, Unlimited Members` : "Custom Editors, Custom Viewers, Unlimited Members"}`,
         "Dedicated Support",
       ],
       missingFeatures: [],
@@ -303,12 +303,16 @@ export default function HomePage() {
               </div>
 
               {/* Price */}
-              <div className="text-center mb-6">
-                <p className="text-[28px] font-bold text-[#000000]">
-                  ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
-                  <span className="text-[20px] text-[#6B7280] font-regular">{isMonthly[idx] ? "/month" : "/year"}</span>
-                </p>
-              </div>
+              {plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A" && (
+                <>
+                  <div className="text-center mb-6">
+                    <p className="text-[28px] font-bold text-[#000000]">
+                      ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
+                      <span className="text-[20px] text-[#6B7280] font-regular">{isMonthly[idx] ? "/month" : "/year"}</span>
+                    </p>
+                  </div>
+                </>
+              )}
 
               {/* Features List */}
               <ul className="space-y-3 mb-6">
@@ -360,7 +364,7 @@ export default function HomePage() {
                   ? "bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
                   : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
-                onClick={() => navigate("/sign_up")}
+                onClick={() => (plan.name === "Enterprise" && !plan.isContact) ? navigate("/contact") : navigate("/sign_up")}
               >
                 {plan.button}
               </button>
