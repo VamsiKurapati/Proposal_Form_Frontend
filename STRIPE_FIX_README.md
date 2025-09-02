@@ -25,21 +25,25 @@ I've implemented the following fixes:
 
 ## How to Fix the Issue
 
-### Option 1: Set up Environment Variable (Recommended)
-1. Create a `.env` file in your project root
+### Step 1: Get Your Stripe Key
+1. Go to [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
+2. Copy your **publishable key** (starts with `pk_test_` for test mode)
+3. Keep this key handy for the next step
+
+### Step 2: Set up Environment Variable
+1. Create a `.env` file in your project root (same level as package.json)
 2. Add your Stripe publishable key:
    ```
    VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_key_here
    ```
-3. Restart your development server
+3. Replace `pk_test_your_actual_key_here` with your actual key from Step 1
+4. Save the file
+5. Restart your development server (`npm run dev` or `yarn dev`)
 
-### Option 2: Get Your Stripe Key
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
-2. Copy your publishable key (starts with `pk_test_` for test mode)
-3. Follow Option 1 above
-
-### Option 3: Use Test Key (Temporary)
-The system now has a fallback test key, but you should replace it with your actual key for proper functionality.
+### Step 3: Verify the Fix
+- The yellow warning banner should disappear
+- You should see a blue "Test Mode" indicator (if using test keys)
+- The payment form should load properly
 
 ## Test Cards for Development
 - **Visa**: `4242424242424242`
