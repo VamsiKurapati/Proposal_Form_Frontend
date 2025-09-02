@@ -303,7 +303,7 @@ export default function HomePage() {
               </div>
 
               {/* Price */}
-              {plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A" && (
+              {(plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A") ? (
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
@@ -312,9 +312,7 @@ export default function HomePage() {
                     </p>
                   </div>
                 </>
-              )}
-
-              {(plan.name === "Enterprise" && plan.isContact) && (
+              ) : (
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
