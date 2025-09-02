@@ -6,6 +6,7 @@ import axios from 'axios';
 import contact from '../assets/Contact.png';
 import { FaPlay } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 
 
@@ -36,12 +37,21 @@ export default function Contact() {
     axios.post(`${API_URL}/contact`, formData)
       .then((response) => {
         setMessage("Your request has been sent successfully!");
-        alert("Your request has been sent successfully!");
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Your request has been sent successfully!',
+        });
         setFormData({ name: "", company: "", email: "" });
         navigate("/");
       })
       .catch((error) => {
         setMessage("Failed to send request. Please try again.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to send request. Please try again.',
+        });
         console.error(error);
       })
       .finally(() => setLoading(false));
@@ -54,18 +64,18 @@ export default function Contact() {
       <Navbar />
 
       {/* Blue Heading Section */}
-      <div className="flex flex-col items-center bg-[#EFF6FF] border-b mt-16">
-        <div className="flex flex-col items-start w-full max-w-4xl  pt-11">
+      <div className="flex flex-col items-start bg-[#EFF6FF] border-b mt-16 p-4 px-8 md:px-16">
+        <div className="flex flex-col items-start w-full max-w-4xl pt-11 mb-8">
           <p className="text-[30px] font-semibold text-[#2563EB]">Contact Us</p>
-          <p className="text-[#4B5563]">Contact Us To Request A Demo</p>
+          <p className="text-[#4B5563]">Feel free to request a demo or to know about our custom pricing</p>
         </div>
 
         {/* Main Form Section */}
         <div className="flex items-center justify-center min-h-[70vh] w-full">
-          <div className="flex flex-col lg:flex-row w-full  bg-white p-8 rounded shadow">
+          <div className="flex flex-col-reverse md:flex-row w-full bg-white rounded-lg shadow p-4 md:p-8">
 
             {/* Left Side: Form */}
-            <div className="w-full lg:w-1/2 pl-16">
+            <div className="w-full md:w-1/2">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block font-medium text-gray-700 mb-1">Name</label>
@@ -121,11 +131,11 @@ export default function Contact() {
             </div>
 
             {/* Right Side: Illustration */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center mt-8 lg:mt-0">
+            <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
               <img
                 src={contact}
                 alt="Contact Illustration"
-                className="w-64"
+                className="w-64 md:w-full h-[300px] md:h-full"
               />
             </div>
 
@@ -136,15 +146,6 @@ export default function Contact() {
       <section className="bg-[#1E293B] text-center py-12 px-8 md:px-16">
         <h3 className="text-[36px] text-[#FFFFFF] font-semi-bold mb-2">Ready to get started</h3>
         <p className="text-[#FFFFFF] text-[16px] font-medium mb-4">Join thousands of satisfied customers and transform your business today.</p>
-        {/* <div className="flex flex-col sm:flex-row mx-auto justify-center gap-4">
-          <button className="mx-auto bg-[#2563EB] text-white px-6 py-2 rounded-lg text-[16px] text-[#FFFFFF] font-regular">
-            Get Started
-          </button>
-          <button className="mx-auto bg-[#FFFFFF] border border-1 border-[#00000033] px-6 py-2 rounded-lg flex items-center gap-2 text-[16px] text-[#000000] font-regular">
-            <FaPlay className="text-[#000000]" />
-            Watch Demo
-          </button>
-        </div> */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <button className="w-[140px] sm:w-auto bg-[#2563EB] hover:bg-[#1d4ed8] transition text-white px-6 py-2 rounded-lg text-[16px] font-medium shadow"
             onClick={() => navigate("/")}
