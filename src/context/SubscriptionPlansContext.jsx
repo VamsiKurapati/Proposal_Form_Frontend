@@ -17,11 +17,20 @@ export const SubscriptionPlansProvider = ({ children }) => {
                         'Content-Type': 'application/json',
                     }
                 });
-                // console.log(res.data);
-                setSubscriptionPlans(res.data.plans);
-                setMostPopularPlan(res.data.mostPopularPlan);
+
+                // Validate the response data structure
+                if (res.data && res.data.plans && Array.isArray(res.data.plans)) {
+                    setSubscriptionPlans(res.data.plans);
+                    setMostPopularPlan(res.data.mostPopularPlan || null);
+                } else {
+                    console.error('Invalid subscription plans data structure:', res.data);
+                    setSubscriptionPlans([]);
+                    setMostPopularPlan(null);
+                }
             } catch (error) {
-                console.error(error);
+                console.error('Error fetching subscription plans:', error);
+                setSubscriptionPlans([]);
+                setMostPopularPlan(null);
             }
         };
         fetchSubscriptionPlans();

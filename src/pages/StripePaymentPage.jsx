@@ -34,13 +34,18 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     useEffect(() => {
         // Create payment intent on the server
         const createPaymentIntent = async () => {
-            if (!selectedPlan || !selectedPlan.id) {
+            if (!selectedPlan || !selectedPlan._id) {
                 setError('No plan selected. Please select a plan first.');
                 return;
             }
 
             try {
                 const token = localStorage.getItem('token');
+                if (!token) {
+                    setError('Authentication required. Please log in again.');
+                    return;
+                }
+
                 const response = await axios.post(
                     `${baseUrl}${STRIPE_CONFIG.API_ENDPOINTS.CREATE_PAYMENT_INTENT}`,
                     {
@@ -51,10 +56,21 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                         headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-                setClientSecret(response.data.clientSecret);
+
+                if (response.data && response.data.clientSecret) {
+                    setClientSecret(response.data.clientSecret);
+                } else {
+                    setError('Invalid response from payment server. Please try again.');
+                }
             } catch (err) {
                 console.error('Error creating payment intent:', err);
-                setError('Failed to initialize payment. Please try again.');
+                if (err.response && err.response.status === 401) {
+                    setError('Authentication expired. Please log in again.');
+                } else if (err.response && err.response.data && err.response.data.message) {
+                    setError(err.response.data.message);
+                } else {
+                    setError('Failed to initialize payment. Please try again.');
+                }
             }
         };
 
@@ -90,7 +106,13 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
             // Handle successful payment
             try {
                 const token = localStorage.getItem('token');
-                await axios.post(
+                if (!token) {
+                    setError('Authentication required. Please log in again.');
+                    setLoading(false);
+                    return;
+                }
+
+                const response = await axios.post(
                     `${baseUrl}${STRIPE_CONFIG.API_ENDPOINTS.ACTIVATE_SUBSCRIPTION}`,
                     {
                         planId: selectedPlan._id,
@@ -101,10 +123,21 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                         headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-                onSuccess(paymentIntent);
+
+                if (response.status === 200 || response.status === 201) {
+                    onSuccess(paymentIntent);
+                } else {
+                    setError('Payment successful but subscription activation failed. Please contact support.');
+                }
             } catch (err) {
                 console.error('Error activating subscription:', err);
-                setError('Payment successful but subscription activation failed. Please contact support.');
+                if (err.response && err.response.status === 401) {
+                    setError('Authentication expired. Please log in again.');
+                } else if (err.response && err.response.data && err.response.data.message) {
+                    setError(`Payment successful but subscription activation failed: ${err.response.data.message}`);
+                } else {
+                    setError('Payment successful but subscription activation failed. Please contact support.');
+                }
             }
             setLoading(false);
         }
@@ -180,21 +213,42 @@ const StripePaymentPage = () => {
             return [];
         }
 
+        // Helper function to safely get plan data
+        const getPlanData = (planName) => {
+            const plan = subscriptionPlans.find((p) => p.name === planName);
+            if (!plan) {
+                console.warn(`Plan ${planName} not found in subscription plans`);
+                return null;
+            }
+            return plan;
+        };
+
+        const basicPlan = getPlanData("Basic");
+        const proPlan = getPlanData("Pro");
+        const enterprisePlan = getPlanData("Enterprise");
+
+        // Return empty array if any required plan is missing
+        if (!basicPlan || !proPlan || !enterprisePlan) {
+            console.error("One or more required subscription plans are missing");
+            return [];
+        }
+
         return [
             {
                 id: 'basic',
                 name: 'Basic Plan',
-                monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Basic").yearlyPrice,
+                _id: basicPlan._id,
+                monthlyPrice: basicPlan.monthlyPrice || 0,
+                yearlyPrice: basicPlan.yearlyPrice || 0,
                 features: [
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Basic").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Basic").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+                    `Up to ${basicPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${basicPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
                     "AI-Driven RFP Discovery",
                     "AI-Driven Grant Discovery",
                     "AI-Proposal Recommendation",
                     "Basic Compliance Check",
                     "Proposal Tracking Dashboard",
-                    `${subscriptionPlans.find((p) => p.name === "Basic").maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Basic").maxViewers} Viewers, Unlimited Members`,
+                    `${basicPlan.maxEditors || 0} Editors, ${basicPlan.maxViewers || 0} Viewers, Unlimited Members`,
                     "Team Collaboration",
                     "Support",
                 ],
@@ -206,13 +260,14 @@ const StripePaymentPage = () => {
             {
                 id: 'professional',
                 name: 'Professional Plan',
-                monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro").monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Pro").yearlyPrice,
+                _id: proPlan._id,
+                monthlyPrice: proPlan.monthlyPrice || 0,
+                yearlyPrice: proPlan.yearlyPrice || 0,
                 features: [
                     "Includes All Basic Features",
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Pro").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
-                    `${subscriptionPlans.find((p) => p.name === "Pro").maxEditors} Editors, ${subscriptionPlans.find((p) => p.name === "Pro").maxViewers} Viewers, Unlimited Members`,
+                    `Up to ${proPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${proPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    `${proPlan.maxEditors || 0} Editors, ${proPlan.maxViewers || 0} Viewers, Unlimited Members`,
                     "Advanced Compliance Check",
                 ],
                 missingFeatures: [
@@ -223,12 +278,13 @@ const StripePaymentPage = () => {
             {
                 id: 'enterprise',
                 name: 'Enterprise Plan',
-                monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise").monthlyPrice,
-                yearlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise").yearlyPrice,
+                _id: enterprisePlan._id,
+                monthlyPrice: enterprisePlan.monthlyPrice || 0,
+                yearlyPrice: enterprisePlan.yearlyPrice || 0,
                 features: [
                     "Includes All Basic & Pro Features",
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise").maxRFPProposalGenerations} AI - RFP Proposal Generations`,
-                    `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise").maxGrantProposalGenerations} AI - Grant Proposal Generations`,
+                    `Up to ${enterprisePlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${enterprisePlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
                     "Unlimited Editors, Unlimited Viewers, Unlimited Members",
                     "Dedicated Support",
                 ],
