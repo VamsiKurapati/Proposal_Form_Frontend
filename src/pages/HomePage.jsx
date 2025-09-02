@@ -141,7 +141,7 @@ export default function HomePage() {
         "Dedicated Support",
       ],
       missingFeatures: [],
-      button: `${subscriptionPlans.find((p) => p.name === "Enterprise" && p.isContact) ? "Contact Us" : "Get Started"}`,
+      button: `${subscriptionPlans.find((p) => p.name === "Enterprise" && p.isContact) ? "Get In Touch" : "Get Started"}`,
     },
   ];
 
@@ -304,7 +304,6 @@ export default function HomePage() {
 
               {/* Price */}
               {(plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A") ? (
-                console.log(plan.monthlyPrice, plan.annualPrice),
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
@@ -314,7 +313,6 @@ export default function HomePage() {
                   </div>
                 </>
               ) : (
-                console.log(plan.monthlyPrice, plan.annualPrice),
                 <>
                   <div className="text-center mb-6">
                     <p className="text-[28px] font-bold text-[#000000]">
@@ -347,26 +345,30 @@ export default function HomePage() {
               </ul>
 
               {/* Billing Toggle */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <button
-                  className={`text-sm font-medium transition-colors ${isMonthly[idx]
-                    ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
-                    : "text-[#2563EB]"
-                    }`}
-                  onClick={() => handleBillingToggle(idx, true)}
-                >
-                  Monthly
-                </button>
-                <button
-                  className={`text-sm font-medium transition-colors ${!isMonthly[idx]
-                    ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
-                    : "text-[#2563EB]"
-                    }`}
-                  onClick={() => handleBillingToggle(idx, false)}
-                >
-                  Yearly
-                </button>
-              </div>
+              {plan.monthlyPrice !== "N/A" && plan.annualPrice !== "N/A" && (
+                <>
+                  <div className="flex items-center justify-center gap-2 mb-6">
+                    <button
+                      className={`text-sm font-medium transition-colors ${isMonthly[idx]
+                        ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
+                        : "text-[#2563EB]"
+                        }`}
+                      onClick={() => handleBillingToggle(idx, true)}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      className={`text-sm font-medium transition-colors ${!isMonthly[idx]
+                        ? "bg-[#2563EB] text-white px-4 py-2 rounded-lg"
+                        : "text-[#2563EB]"
+                        }`}
+                      onClick={() => handleBillingToggle(idx, false)}
+                    >
+                      Yearly
+                    </button>
+                  </div>
+                </>
+              )}
 
               {/* Get Started Button */}
               <button
