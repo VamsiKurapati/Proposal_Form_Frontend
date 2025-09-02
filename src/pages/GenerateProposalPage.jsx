@@ -6,7 +6,7 @@ import { useProfile } from '../context/ProfileContext';
 import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
 import axios from 'axios';
-import swal from 'sweetalert';
+import Swal from 'sweetalert2';
 
 const GenerateProposalPage = () => {
   const location = useLocation();
@@ -36,7 +36,11 @@ const GenerateProposalPage = () => {
       if (res.status === 200) {
         //console.log(res.data);
         setIsGeneratingProposal(false);
-        swal("Success", "Proposal generated successfully. Redirecting to editor.", "success");
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Proposal generated successfully. Redirecting to editor.',
+        });
         setTimeout(() => {
           navigate('/editor', {
             state: {
@@ -45,12 +49,20 @@ const GenerateProposalPage = () => {
           });
         }, 1000);
       } else {
-        swal("Error", "Failed to generate proposal. Please try again.", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to generate proposal. Please try again.',
+        });
       }
     } catch (error) {
       console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
-      swal("Error", "Failed to generate proposal. Please try again.", "error");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to generate proposal. Please try again.',
+      });
       return;
     }
   };
