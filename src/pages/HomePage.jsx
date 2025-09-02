@@ -93,7 +93,7 @@ export default function HomePage() {
       name: "Basic",
       headerColor: "bg-teal-500",
       monthlyPrice: subscriptionPlans.find((p) => p.name === "Basic")?.monthlyPrice,
-      annualPrice: subscriptionPlans.find((p) => p.name === "Basic")?.annualPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Basic")?.yearlyPrice,
       features: [
         `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
         `Up to ${subscriptionPlans.find((p) => p.name === "Basic")?.maxGrantProposalGenerations} AI - Grant Proposal Generations`,
@@ -115,7 +115,7 @@ export default function HomePage() {
       name: "Pro",
       headerColor: "bg-purple-500",
       monthlyPrice: subscriptionPlans.find((p) => p.name === "Pro")?.monthlyPrice,
-      annualPrice: subscriptionPlans.find((p) => p.name === "Pro")?.annualPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Pro")?.yearlyPrice,
       features: [
         "Includes All Basic Features",
         `Up to ${subscriptionPlans.find((p) => p.name === "Pro")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
@@ -132,7 +132,7 @@ export default function HomePage() {
       name: "Enterprise",
       headerColor: "bg-gray-700",
       monthlyPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.monthlyPrice,
-      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.annualPrice,
+      annualPrice: subscriptionPlans.find((p) => p.name === "Enterprise")?.yearlyPrice,
       features: [
         "Includes All Basic & Pro Features",
         `Up to ${subscriptionPlans.find((p) => p.name === "Enterprise")?.maxRFPProposalGenerations} AI - RFP Proposal Generations`,
@@ -306,7 +306,7 @@ export default function HomePage() {
               <div className="text-center mb-6">
                 <p className="text-[28px] font-bold text-[#000000]">
                   ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
-                  <span className="text-[20px] text-[#6B7280] font-regular">/month</span>
+                  <span className="text-[20px] text-[#6B7280] font-regular">{isMonthly[idx] ? "/month" : "/year"}</span>
                 </p>
               </div>
 
