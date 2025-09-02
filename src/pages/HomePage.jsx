@@ -141,7 +141,7 @@ export default function HomePage() {
         "Dedicated Support",
       ],
       missingFeatures: [],
-      button: "Get Started",
+      button: `${subscriptionPlans.find((p) => p.name === "Enterprise" && p.isContact) ? "Contact Us" : "Get Started"}`,
     },
   ];
 
@@ -309,6 +309,16 @@ export default function HomePage() {
                     <p className="text-[28px] font-bold text-[#000000]">
                       ${isMonthly[idx] ? plan.monthlyPrice : plan.annualPrice}
                       <span className="text-[20px] text-[#6B7280] font-regular">{isMonthly[idx] ? "/month" : "/year"}</span>
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {(plan.name === "Enterprise" && plan.isContact) && (
+                <>
+                  <div className="text-center mb-6">
+                    <p className="text-[28px] font-bold text-[#000000]">
+                      <span className="text-[#2563EB]">Custom</span> Pricing
                     </p>
                   </div>
                 </>
