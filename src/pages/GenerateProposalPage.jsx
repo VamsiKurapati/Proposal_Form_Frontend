@@ -24,7 +24,7 @@ const GenerateProposalPage = () => {
     setIsGeneratingProposal(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/rfp/sendDataForProposalGeneration`, {
+      const res = await axios.post(`http://51.21.225.240/api/rfp/sendDataForProposalGeneration`, {
         proposal,
       }, {
         headers: {
