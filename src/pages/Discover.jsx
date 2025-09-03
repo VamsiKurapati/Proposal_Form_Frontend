@@ -2745,7 +2745,7 @@ const Discover = () => {
                 </div>
               ) : filteredOtherGrants.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-2 ">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
                     {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
                       <RecentGrantCard
                         key={grant._id}
