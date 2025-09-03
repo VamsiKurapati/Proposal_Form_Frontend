@@ -2808,7 +2808,7 @@ const Discover = () => {
                             {getCurrentPageItems(applyGrantFilters(filteredSavedGrants), currentGrantTablePage, tableItemsPerPage).map((grant) => (
                               <SavedGrantCard
                                 key={grant._id}
-                                grant={grant}
+                                grant={grant.grant_data}
                                 isSaved={true}
                               />
                             ))}
