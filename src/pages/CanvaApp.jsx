@@ -945,7 +945,7 @@ const CanvaApp = () => {
   const handleContinue = async () => {
     try {
       const proposalId = localStorage.getItem('proposalId');
-      const jsonData = JSON.parse(localStorage.getItem('jsonData'));
+      const jsonData = JSON.parse(localStorage.getItem('canva-project'));
       const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
         proposalId,
         jsonData

@@ -43,6 +43,18 @@ export const CARD_ELEMENT_OPTIONS = {
         },
     },
     hidePostalCode: true,
+    // Enable real-time validation
+    options: {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                    color: '#aab7c4',
+                },
+            },
+        },
+    }
 };
 
 // Error messages for common Stripe errors
@@ -58,7 +70,9 @@ export const STRIPE_ERROR_MESSAGES = {
     'invalid_number': 'Your card number is invalid.',
     'processing_error': 'An error occurred while processing your card. Please try again.',
     'rate_limit': 'Too many requests made to the API too quickly.',
-    'authentication_required': 'Your card requires authentication. Please try again.',
+    'authentication_required': 'Your card requires additional authentication. Please complete the verification process.',
+    'setup_intent_authentication_required': 'Your card requires additional authentication. Please complete the verification process.',
+    'payment_intent_authentication_required': 'Your card requires additional authentication. Please complete the verification process.',
 };
 
 // Helper function to get user-friendly error message
@@ -72,6 +86,30 @@ export const getStripeErrorMessage = (error) => {
     }
 
     return 'An unexpected error occurred. Please try again.';
+};
+
+// Enhanced error handling for different payment scenarios
+export const handleStripeError = (error) => {
+    switch (error.code) {
+        case 'card_declined':
+            return 'Your card was declined. Please try a different card.';
+        case 'expired_card':
+            return 'Your card has expired. Please use a different card.';
+        case 'incorrect_cvc':
+            return 'Your card\'s security code is incorrect.';
+        case 'insufficient_funds':
+            return 'Your card has insufficient funds.';
+        case 'authentication_required':
+        case 'setup_intent_authentication_required':
+        case 'payment_intent_authentication_required':
+            return 'Your card requires additional authentication. Please complete the verification process.';
+        case 'processing_error':
+            return 'An error occurred while processing your card. Please try again.';
+        case 'rate_limit':
+            return 'Too many requests. Please wait a moment and try again.';
+        default:
+            return error.message || 'An unexpected error occurred. Please try again.';
+    }
 };
 
 // Helper function to format currency

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft, FaBan } from 'react-icons/fa';
 import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-icons/md';
 import axios from 'axios';
-import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage, getStripeConfigStatus } from '../config/stripe';
+import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage, getStripeConfigStatus, handleStripeError } from '../config/stripe';
 import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 
 // Initialize Stripe
@@ -82,17 +82,29 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
         setLoading(true);
         setError(null);
 
+        // Get the card element
+        const cardElement = elements.getElement(CardElement);
+
+        // Validate card element
+        if (!cardElement) {
+            setError('Card information is required. Please enter your card details.');
+            setLoading(false);
+            return;
+        }
+
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
-                card: elements.getElement(CardElement),
+                card: cardElement,
                 billing_details: {
-                    // Add billing details here if needed
+                    // Billing details will be handled by the backend using logged-in user info
                 },
             },
+            // Enable 3D Secure authentication
+            setup_future_usage: 'off_session',
         });
 
         if (stripeError) {
-            setError(getStripeErrorMessage(stripeError));
+            setError(handleStripeError(stripeError));
             setLoading(false);
         } else if (paymentIntent.status === 'succeeded') {
             // Handle successful payment
@@ -132,6 +144,58 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                 }
             }
             setLoading(false);
+        } else if (paymentIntent.status === 'requires_action') {
+            // Handle 3D Secure authentication
+            try {
+                const { error: confirmError } = await stripe.confirmCardPayment(clientSecret);
+
+                if (confirmError) {
+                    setError(handleStripeError(confirmError));
+                    setLoading(false);
+                } else {
+                    // Payment succeeded after 3D Secure authentication
+                    try {
+                        const token = localStorage.getItem('token');
+                        if (!token) {
+                            setError('Authentication required. Please log in again.');
+                            setLoading(false);
+                            return;
+                        }
+
+                        const response = await axios.post(
+                            `${baseUrl}${STRIPE_CONFIG.API_ENDPOINTS.ACTIVATE_SUBSCRIPTION}`,
+                            {
+                                planId: selectedPlan._id,
+                                billingCycle: billingCycle,
+                                paymentIntentId: paymentIntent.id
+                            },
+                            {
+                                headers: { Authorization: `Bearer ${token}` }
+                            }
+                        );
+
+                        if (response.status === 200 || response.status === 201) {
+                            onSuccess(paymentIntent);
+                        } else {
+                            setError('Payment successful but subscription activation failed. Please contact support.');
+                        }
+                    } catch (err) {
+                        console.error('Error activating subscription after 3D Secure:', err);
+                        if (err.response && err.response.status === 401) {
+                            setError('Authentication expired. Please log in again.');
+                        } else if (err.response && err.response.data && err.response.data.message) {
+                            setError(`Payment successful but subscription activation failed: ${err.response.data.message}`);
+                        } else {
+                            setError('Payment successful but subscription activation failed. Please contact support.');
+                        }
+                    }
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('Error during 3D Secure authentication:', err);
+                setError('Authentication failed. Please try again.');
+                setLoading(false);
+            }
         }
     };
 
@@ -176,9 +240,21 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Card Details
                         </label>
-                        <div className="border border-gray-300 rounded-md p-3 bg-gray-50">
-                            <CardElement options={cardElementOptions} />
+                        <div className="border border-gray-300 rounded-md p-3 bg-gray-50 focus-within:border-[#6C63FF] focus-within:ring-1 focus-within:ring-[#6C63FF] transition-colors">
+                            <CardElement
+                                options={cardElementOptions}
+                                onChange={(event) => {
+                                    if (event.error) {
+                                        setError(handleStripeError(event.error));
+                                    } else {
+                                        setError(null);
+                                    }
+                                }}
+                            />
                         </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Your card information is secure and encrypted
+                        </p>
                     </div>
                 </div>
             </div>
@@ -197,7 +273,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                 {loading ? (
                     <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Processing...</span>
+                        <span>Processing Payment...</span>
                     </div>
                 ) : (
                     <>
