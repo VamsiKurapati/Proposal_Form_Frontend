@@ -165,7 +165,7 @@ export default function Subscription({ plan }) {
         ) : planName === "Enterprise" ? (
           <>
 
-
+          
             <div className="flex items-center mb-4 relative bg-gray-200 rounded-full w-[120px] p-1 ml-[50%] -translate-x-1/2">
               <div
                 className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${isYearlye ? "translate-x-[58px]" : "translate-x-0"

@@ -2061,14 +2061,21 @@ const SuperAdmin = () => {
                                 {editingPlans[plan._id] ? (
                                     <>
                                         Up to
-
+                                    
                                         <input type="number" value={editingPlans[plan._id].editValue.maxRFPProposalGenerations} onChange={(e) => setEditingPlans((prev) => ({ ...prev, [plan._id]: { ...prev[plan._id], editValue: { ...prev[plan._id].editValue, maxRFPProposalGenerations: e.target.value } } }))} className="w-1/2 border rounded-lg px-2 py-1" />
                                         AI - RFP Proposal Generations
                                     </>
                                 ) : (
                                     <span>
-                                        Up to {editingPlans[plan._id]?.editValue?.maxRFPProposalGenerations ? editingPlans[plan._id].editValue.maxRFPProposalGenerations : plan.maxRFPProposalGenerations} AI - RFP Proposal Generations
-                                    </span>
+                                        {isContact
+                                            ? "Custom AI-RFP Proposal Generations"
+                                            : `Up to ${
+                                                editingPlans[plan._id]?.editValue?.maxRFPProposalGenerations
+                                                    ? editingPlans[plan._id].editValue.maxRFPProposalGenerations
+                                                    : plan.maxRFPProposalGenerations
+                                                } AI - RFP Proposal Generations`
+                                            }
+                                        </span>
                                 )}
 
                             </li>
@@ -2100,10 +2107,16 @@ const SuperAdmin = () => {
                                     </>
                                 ) : (
                                     <span>
-                                        Up to{" "}
-                                        {editingPlans[plan._id]?.editValue?.maxGrantProposalGenerations ? editingPlans[plan._id].editValue.maxGrantProposalGenerations :
-                                            plan.maxGrantProposalGenerations}{" "}
-                                        AI - Grant Proposal Generations
+                                        
+                                        {isContact
+                                            ? "Custom AI-Grant Proposal Generations"
+                                            : `Up to ${
+                                                editingPlans[plan._id]?.editValue?.maxGrantProposalGenerations
+                                                    ? editingPlans[plan._id].editValue.maxGrantProposalGenerations
+                                                    : plan.maxGrantProposalGenerations
+                                                } AI - Grant Proposal Generations`
+                                            }
+                                       
                                     </span>
                                 )}
 
@@ -2112,7 +2125,11 @@ const SuperAdmin = () => {
                                 <span className="text-green-500 p-1">
                                     <FaRegCheckCircle className="w-4 h-4" />
                                 </span>
-                                Unlimited Editors, Unlimited Viewers, Unlimited Members
+                                {isContact
+                                            ? "Custom Editors, Custom Viewers, Custom Members"
+                                            : "Unlimited Editors, Unlimited Viewers, Unlimited Members"
+                                            }
+                                
 
                             </li>
                             <li className="flex items-center text-gray-700">
@@ -2236,8 +2253,11 @@ const SuperAdmin = () => {
                 {getPlanSection("Enterprise")}
             </div>
 
-
+            {
+               isContact  && (
             <ShowCustomDetails/>
+                )
+            }
 
         </div>
     );
@@ -3504,7 +3524,7 @@ const SuperAdmin = () => {
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px;">
                         <img src="/vite.svg" alt="Company Logo" style="width: 60px; height: 60px; margin-right: 20px;">
                         <div>
-                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP App</h1>
+                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP2GRANTS</h1>
                             <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 16px;">Professional Proposal Management</p>
                         </div>
                     </div>
@@ -3728,7 +3748,7 @@ const SuperAdmin = () => {
                         <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
                             <img src="/vite.svg" alt="Company Logo" className="w-12 h-12 mr-4" />
                             <div>
-                                <h4 className="text-xl font-bold text-[#2563eb]">RFP App</h4>
+                                <h4 className="text-xl font-bold text-[#2563eb]">RFP2GRANTS</h4>
                                 <p className="text-sm text-[#6b7280]">Professional Proposal Management</p>
                             </div>
                         </div>

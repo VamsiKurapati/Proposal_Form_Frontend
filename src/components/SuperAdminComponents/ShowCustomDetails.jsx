@@ -21,6 +21,7 @@ const ShowCustomDetails = () => {
   const [transaction_id, setTransaction_id] = useState(null);
 
 
+
   const handleCustomDelete=(id)=>{
     axios.delete(`${baseUrl}/admin/deleteCustomPlan/${id}`, {
       headers: {
@@ -173,7 +174,7 @@ const ShowCustomDetails = () => {
   
     setLoading(true);
     axios
-      .post(`${baseUrl}/admin/updateSubscriptionPlanCustom`, payload, {
+      .post(`${baseUrl}/admin/createCustomPlan`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -316,66 +317,63 @@ const ShowCustomDetails = () => {
                     </td>
                   </tr>
                   {openDetails === plan._id && (
-                    <tr>
-                      <td colSpan={4} className="bg-gray-50 p-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                          <p>
-                            <strong>Price:</strong> ${plan.price}
-                          </p>
-                          <p>
-                            <strong>Max Editors:</strong> {plan.maxEditors}
-                          </p>
-                          <p>
-                            <strong>Max Viewers:</strong> {plan.maxViewers}
-                          </p>
-                          <p>
-                            <strong>Max RFP:</strong>{" "}
-                            {plan.maxRFPProposalGenerations}
-                          </p>
-                          <p>
-                            <strong>Max Grant:</strong>{" "}
-                            {plan.maxGrantProposalGenerations}
-                          </p>
-                            <p>
-                            <strong>Transaction ID:</strong>
-                          <input
-                            type="text"
-                            name="transaction_id"
-                            value={plan.transaction_id}
-                            onChange={(e) => setTransaction_id(e.target.value)}
-                            className="w-full border rounded-lg px-3 py-2"
-                            />
-                            </p>
-                        </div>
+                      <tr>
+                        <td colSpan={4} className="bg-gray-50 p-6">
+                          <div className="grid grid-cols-2 gap-6 text-sm text-gray-800">
+                            <div className="space-y-2">
+                              <p><strong>Price:</strong> ${plan.price}</p>
+                              <p><strong>Max Editors:</strong> {plan.maxEditors}</p>
+                              <p><strong>Max Viewers:</strong> {plan.maxViewers}</p>
+                            </div>
 
-                      <button onClick={() => handleCustomDelete(plan._id)} className="bg-red-500 text-white p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-red-800">
-                        Delete
-                      </button>
+                            <div className="space-y-2">
+                              <p><strong>Max RFP:</strong> {plan.maxRFPProposalGenerations}</p>
+                              <p><strong>Max Grant:</strong> {plan.maxGrantProposalGenerations}</p>
+                              <div>
+                                <strong>Transaction ID:</strong>
+                                <input
+                                  type="text"
+                                  name="transaction_id"
+                                  value={plan.transaction_id}
+                                  onChange={(e) => setTransaction_id(e.target.value)}
+                                  className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                  placeholder="Enter Transaction ID"
+                                />
+                              </div>
+                            </div>
+                          </div>
 
-                      <button
-                        onClick={() =>
-                            handleCustomSubmitfinal(
-                            plan._id,
-                            plan.email,
-                            plan.price,
-                            plan.planType,
-                            plan.maxEditors,
-                            plan.maxViewers,
-                            plan.maxRFPProposalGenerations,
-                            plan.maxGrantProposalGenerations,
-                            plan.transaction_id,
-                            plan.companyName 
-                            )
-                        }
-                        className="bg-blue-500 text-white p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-800"
-                        >
-                        Submit customised plan
-                        </button>
+                          <div className="flex items-center gap-4 mt-6">
+                            <button
+                              onClick={() => handleCustomDelete(plan._id)}
+                              className="flex-1 bg-red-500 text-white py-2 rounded-lg transition-colors hover:bg-red-700 shadow-sm"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleCustomSubmitfinal(
+                                  plan._id,
+                                  plan.email,
+                                  plan.price,
+                                  plan.planType,
+                                  plan.maxEditors,
+                                  plan.maxViewers,
+                                  plan.maxRFPProposalGenerations,
+                                  plan.maxGrantProposalGenerations,
+                                  plan.transaction_id,
+                                  plan.companyName
+                                )
+                              }
+                              className="flex-1 bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white py-2 rounded-lg transition-colors hover:bg-gradient-to-b hover:from-[#3F73BD] hover:to-[#6C63FF] shadow-sm"
+                            >
+                              Submit Customised Plan
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
 
-                      </td>
-                      
-                    </tr>
-                  )}
                 </React.Fragment>
               ))
             ) : (
@@ -478,7 +476,7 @@ const ShowCustomDetails = () => {
 
               <button
                 onClick={handleCustomSubmit}
-                className="w-full mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                className="w-full mt-4 px-4 py-2 bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white rounded-lg hover:bg-gradient-to-b hover:from-[#3F73BD] hover:to-[#6C63FF]"
               >
                 Submit Request
               </button>
