@@ -1,7 +1,7 @@
 // Stripe Configuration
 export const STRIPE_CONFIG = {
     // Replace with your actual Stripe publishable key
-    PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY,
+    PUBLISHABLE_KEY: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
 
     // API endpoints (these should match your backend)
     API_ENDPOINTS: {
@@ -80,6 +80,27 @@ export const formatCurrency = (amount, currency = 'USD') => {
         style: 'currency',
         currency: currency,
     }).format(amount / 100); // Stripe amounts are in cents
+};
+
+// Helper function to validate Stripe publishable key
+export const validateStripeKey = (key) => {
+    if (!key) return false;
+    // Check if it's a valid Stripe publishable key format
+    return /^pk_(test_|live_)[a-zA-Z0-9]{24,}$/.test(key);
+};
+
+// Helper function to get Stripe configuration status
+export const getStripeConfigStatus = () => {
+    const key = STRIPE_CONFIG.PUBLISHABLE_KEY;
+    const isValid = validateStripeKey(key);
+
+    return {
+        hasKey: !!key,
+        isValid: isValid,
+        isTestKey: key && key.startsWith('pk_test_'),
+        isLiveKey: key && key.startsWith('pk_live_'),
+        isDefaultKey: key === 'pk_test_51N8example_key_here'
+    };
 };
 
 // Helper function to validate card number (basic Luhn algorithm)

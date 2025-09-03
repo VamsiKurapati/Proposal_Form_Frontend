@@ -17,7 +17,7 @@ export const ProfileProvider = ({ children }) => {
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
         // Only fetch if we haven't initialized yet or if we don't have data or if role is null
-        if (role === null || !role.includes("company", "Editor", "Viewer") || (hasInitialized && companyData)) {
+        if (role === null || !role.includes("company", "employee") || (hasInitialized && companyData)) {
             return;
         }
 

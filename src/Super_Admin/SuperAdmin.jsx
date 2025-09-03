@@ -2641,6 +2641,20 @@ const SuperAdmin = () => {
                 {/* Filters and Search */}
                 <div className="pb-4 mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="relative w-[540px]">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <MdOutlineSearch className="h-4 w-4 text-[#4B5563]" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={notificationSearchTerm}
+                                onChange={(e) => {
+                                    setNotificationSearchTerm(e.target.value);
+                                }}
+                                className="block w-full pl-10 pr-3 py-2 border border-[#4B5563] rounded-lg leading-5 bg-white placeholder-[#4B5563] focus:outline-none focus:placeholder-[#4B5563] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 "
+                            />
+                        </div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="relative notification-filter-modal">
                                 <button className="flex items-center justify-center space-x-2 px-3 py-2 text-sm text-[#111827] bg-white border border-[#4B5563] rounded-lg hover:bg-[#4B5563] hover:text-white w-full sm:w-auto"
@@ -2809,20 +2823,6 @@ const SuperAdmin = () => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-                        <div className="relative w-[540px]">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MdOutlineSearch className="h-4 w-4 text-[#4B5563]" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search"
-                                value={notificationSearchTerm}
-                                onChange={(e) => {
-                                    setNotificationSearchTerm(e.target.value);
-                                }}
-                                className="block w-full pl-10 pr-3 py-2 border border-[#4B5563] rounded-lg leading-5 bg-white placeholder-[#4B5563] focus:outline-none focus:placeholder-[#4B5563] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 "
-                            />
                         </div>
                     </div>
                 </div>
@@ -4060,7 +4060,9 @@ const SuperAdmin = () => {
                                 <div className="flex items-center">
                                     <div className="w-full h-8 rounded-lg flex items-center justify-center mr-3">
 
-                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab=='plan-management' ? 'Plan Management' : 'Support'}</span>
+
+                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : 'Notifications'}</span>
+
                                     </div>
                                 </div>
                             </div>

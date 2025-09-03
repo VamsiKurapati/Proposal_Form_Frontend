@@ -18,6 +18,7 @@ import {
 } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useUser } from "../context/UserContext";
+import GrantProposalForm from "../components/GrantProposalForm";
 import Subscription from "../components/Subscription";
 
 // Constants
@@ -585,22 +586,7 @@ const Discover = () => {
   const [showGrantProposalModal, setShowGrantProposalModal] = useState(false);
   const [selectedGrant, setSelectedGrant] = useState(null);
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
-  const [grantProposalData, setGrantProposalData] = useState({
-    summary: "",
-    objectives: "",
-    activities: "",
-    beneficiaries: "",
-    geography: "",
-    start_date: "",
-    estimated_duration: "",
-    budget: {
-      total_project_cost: "",
-      total_requested_amount: "",
-      cost_share_required: "",
-      budget_breakdown: ""
-    },
-    methods_for_measuring_success: ""
-  });
+
 
   // Pagination state variables
   const [itemsPerPage] = useState(6); // 6 items per page for cards
@@ -1353,17 +1339,9 @@ const Discover = () => {
 
 
 
-  const updateBudgetField = (field, value) => {
-    setGrantProposalData(prev => ({
-      ...prev,
-      budget: {
-        ...prev.budget,
-        [field]: value
-      }
-    }));
-  };
 
-  const handleSubmitGrantProposal = async () => {
+
+  const handleSubmitGrantProposal = async (proposalData) => {
     // Set loading state to true
     setIsGeneratingProposal(true);
 
@@ -1386,14 +1364,14 @@ const Discover = () => {
 
       const missingFields = requiredFields.filter(field => {
         if (field === 'summary' || field === 'geography' || field === 'estimated_duration' || field === 'objectives' || field === 'activities' || field === 'beneficiaries' || field === 'methods_for_measuring_success') {
-          return !grantProposalData[field] || grantProposalData[field].trim() === '';
+          return !proposalData[field] || proposalData[field].trim() === '';
         }
 
         if (field === 'total_project_cost' || field === 'total_requested_amount' || field === 'cost_share_required' || field === 'budget_breakdown') {
-          return !grantProposalData.budget[field] || grantProposalData.budget[field].toString().trim() === '';
+          return !proposalData.budget[field] || proposalData.budget[field].toString().trim() === '';
         }
 
-        return !grantProposalData[field] || grantProposalData[field].toString().trim() === '';
+        return !proposalData[field] || proposalData[field].toString().trim() === '';
       });
 
       if (missingFields.length > 0) {
@@ -1408,8 +1386,8 @@ const Discover = () => {
       }
 
       // Validate budget fields
-      const totalProjectCost = parseFloat(grantProposalData.budget.total_project_cost);
-      const totalRequestedAmount = parseFloat(grantProposalData.budget.total_requested_amount);
+      const totalProjectCost = parseFloat(proposalData.budget.total_project_cost);
+      const totalRequestedAmount = parseFloat(proposalData.budget.total_requested_amount);
 
       if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
         setIsGeneratingProposal(false);
@@ -1461,7 +1439,7 @@ const Discover = () => {
 
       // Here you can handle the submission of the grant proposal data
       const res = await axios.post(`${API_BASE_URL}/sendGrantDataForProposalGeneration`, {
-        formData: grantProposalData,
+        formData: proposalData,
         grant: selectedGrant
       }, {
         headers: {
@@ -1489,27 +1467,9 @@ const Discover = () => {
       setShowGrantProposalModal(false);
       setSelectedGrant(null);
 
-      // Reset form data
-      setGrantProposalData({
-        summary: "",
-        objectives: "",
-        activities: "",
-        beneficiaries: "",
-        geography: "",
-        start_date: "",
-        estimated_duration: "",
-        budget: {
-          total_project_cost: "",
-          total_requested_amount: "",
-          cost_share_required: "",
-          budget_breakdown: ""
-        },
-        methods_for_measuring_success: ""
-      });
-
       // You can add navigation or other logic here
-      // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: grantProposalData } });
-      console.log("Grant Proposal Data:", grantProposalData);
+      // navigate("/grant_proposal_page", { state: { grant: selectedGrant, proposalData: proposalData } });
+      console.log("Grant Proposal Data:", proposalData);
       console.log("Selected Grant:", selectedGrant);
 
     } catch (error) {
@@ -2785,7 +2745,7 @@ const Discover = () => {
                 </div>
               ) : filteredOtherGrants.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-2 ">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2 ">
                     {getCurrentPageItems(applyGrantFilters(filteredOtherGrants), currentOtherGrantsPage, itemsPerPage).map((grant) => (
                       <RecentGrantCard
                         key={grant._id}
@@ -2848,7 +2808,7 @@ const Discover = () => {
                             {getCurrentPageItems(applyGrantFilters(filteredSavedGrants), currentGrantTablePage, tableItemsPerPage).map((grant) => (
                               <SavedGrantCard
                                 key={grant._id}
-                                grant={grant}
+                                grant={grant.grant_data}
                                 isSaved={true}
                               />
                             ))}
@@ -2884,251 +2844,13 @@ const Discover = () => {
         />
 
         {/* Grant Proposal Modal */}
-        {showGrantProposalModal && selectedGrant && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">Grant Proposal Form</h2>
-                  <button
-                    onClick={() => setShowGrantProposalModal(false)}
-                    className="text-gray-400 hover:text-gray-600 text-2xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-gray-600 mt-2">{selectedGrant.OPPORTUNITY_TITLE}</p>
-              </div>
-
-              <div className="p-6 space-y-8">
-                {/* Sample Data Note */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 text-sm">
-                    <strong>Note:</strong> Please fill in all required fields marked with <span className="text-red-500">*</span>. You can use the "Clear Form" button to reset all fields.
-                  </p>
-                </div>
-
-                {/* Summary */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Summary <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.summary}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, summary: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                    placeholder="Provide a comprehensive summary of your proposed project..."
-                  />
-                </div>
-
-                {/* Objectives */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Objectives <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.objectives}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, objectives: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                    placeholder="Describe the main objectives of your proposed project..."
-                  />
-                </div>
-
-                {/* Activities */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Activities <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.activities}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, activities: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                    placeholder="Describe the key activities and tasks of your proposed project..."
-                  />
-                </div>
-
-                {/* Beneficiaries */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Beneficiaries <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.beneficiaries}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, beneficiaries: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                    placeholder="Describe the beneficiaries and target population of your proposed project..."
-                  />
-                </div>
-
-                {/* Geography */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Geography <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.geography}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, geography: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={3}
-                    placeholder="Describe the geographic scope of your project..."
-                  />
-                </div>
-
-                {/* Start Date and Duration */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Start Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={grantProposalData.start_date}
-                      onChange={(e) => setGrantProposalData(prev => ({ ...prev, start_date: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Estimated Duration <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={grantProposalData.estimated_duration}
-                      onChange={(e) => setGrantProposalData(prev => ({ ...prev, estimated_duration: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder="e.g., 24 months, 3 years..."
-                    />
-                  </div>
-                </div>
-
-                {/* Budget */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Budget <span className="text-gray-500 text-xs">(Optional)</span>
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Total Project Cost <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={grantProposalData.budget.total_project_cost}
-                        onChange={(e) => updateBudgetField('total_project_cost', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter total project cost..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Total Requested Amount <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={grantProposalData.budget.total_requested_amount}
-                        onChange={(e) => updateBudgetField('total_requested_amount', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter amount requesting from funder..."
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Cost Share Required
-                      </label>
-                      <textarea
-                        value={grantProposalData.budget.cost_share_required}
-                        onChange={(e) => updateBudgetField('cost_share_required', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                        placeholder="Describe your cost share contribution and any partner contributions..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Budget Breakdown
-                      </label>
-                      <textarea
-                        value={grantProposalData.budget.budget_breakdown}
-                        onChange={(e) => updateBudgetField('budget_breakdown', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                        placeholder="Provide detailed budget breakdown with amounts, reasons, and justifications..."
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Methods for Measuring Success */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
-                  </label>
-                  <textarea
-                    value={grantProposalData.methods_for_measuring_success}
-                    onChange={(e) => setGrantProposalData(prev => ({ ...prev, methods_for_measuring_success: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                    placeholder="Describe the methods and metrics you will use to measure the success of your project..."
-                  />
-                </div>
-              </div>
-
-              <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
-                <button
-                  onClick={() => setShowGrantProposalModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => setGrantProposalData({
-                    summary: "",
-                    objectives: "",
-                    activities: "",
-                    beneficiaries: "",
-                    geography: "",
-                    start_date: "",
-                    estimated_duration: "",
-                    budget: {
-                      total_project_cost: "",
-                      total_requested_amount: "",
-                      cost_share_required: "",
-                      budget_breakdown: ""
-                    },
-                    methods_for_measuring_success: ""
-                  })}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                >
-                  Clear Form
-                </button>
-                <button
-                  onClick={handleSubmitGrantProposal}
-                  disabled={isGeneratingProposal}
-                  className={`px-6 py-2 text-white rounded-md flex items-center gap-2 ${isGeneratingProposal
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                >
-                  {isGeneratingProposal && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                  )}
-                  {isGeneratingProposal ? 'Generating...' : 'Continue'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <GrantProposalForm
+          selectedGrant={selectedGrant}
+          isOpen={showGrantProposalModal}
+          onClose={() => setShowGrantProposalModal(false)}
+          onSubmit={handleSubmitGrantProposal}
+          isGenerating={isGeneratingProposal}
+        />
 
       </div>
     </>

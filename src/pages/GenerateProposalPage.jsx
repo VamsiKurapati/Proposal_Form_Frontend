@@ -6,6 +6,7 @@ import { useProfile } from '../context/ProfileContext';
 import { useUser } from '../context/UserContext';
 import { AddTeamMemberModal, AddCaseStudyModal } from './CompanyProfileDashboard';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const GenerateProposalPage = () => {
   const location = useLocation();
@@ -23,7 +24,7 @@ const GenerateProposalPage = () => {
     setIsGeneratingProposal(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/rfp/sendDataForProposalGeneration`, {
+      const res = await axios.post(`https://rfp-backend.lockerwise.com/api/rfp/sendDataForProposalGeneration`, {
         proposal,
       }, {
         headers: {
@@ -33,19 +34,35 @@ const GenerateProposalPage = () => {
       });
 
       if (res.status === 200) {
-        console.log(res.data);
+        //console.log(res.data);
         setIsGeneratingProposal(false);
-        //Navigate to editor with the generated proposal
-        navigate('/editor', {
-          state: {
-            jsonData: res.data.processedProposal, proposalId: res.data.proposalId
-          }
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Proposal generated successfully. Redirecting to editor.',
+        });
+        setTimeout(() => {
+          navigate('/editor', {
+            state: {
+              jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+            }
+          });
+        }, 1000);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to generate proposal. Please try again.',
         });
       }
     } catch (error) {
       console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
-      //Don't navigate to editor if there is an error
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to generate proposal. Please try again.',
+      });
       return;
     }
   };

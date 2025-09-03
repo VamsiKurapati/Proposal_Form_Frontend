@@ -43,7 +43,7 @@ const NavbarComponent = () => {
         </div>
         <div
           className="w-[127px] h-[36px] cursor-pointer"
-          onClick={() => navigate("/")}
+          onClick={() => role === null ? navigate("/") : role === "SuperAdmin" ? navigate("/admin") : navigate("/dashboard")}
         >
           <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
         </div>

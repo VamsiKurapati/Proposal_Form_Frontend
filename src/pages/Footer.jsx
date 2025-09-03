@@ -14,7 +14,7 @@ export default function Footer() {
                         <img src={"./Logo.png"} alt="logo" className="w-[127px] h-[36px] mb-4" />
                         <p className="text-[16px] text-[#1E293B] font-regular mb-4">Transforming RFP management with AI-powered solutions</p>
                     </div>
-                    <div className="flex flex-col xs:flex-row justify-center items-start text-left gap-8 sm:gap-24 mx-auto">
+                    <div className="flex flex-row justify-center items-start text-left gap-8 sm:gap-24 mx-auto">
                         <div className="flex flex-col items-start text-left">
                             <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Company</h4>
                             <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
@@ -26,20 +26,20 @@ export default function Footer() {
                         <div className="flex flex-col items-start text-left">
                             <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Connect</h4>
                             <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
-                                <li>
-                                    <span className="text-[16px] text-[#1E293B] font-regular">
+                                <li className="flex items-center">
+                                    <span className="text-[16px] text-[#1E293B] font-regular -mr-2">
                                         <LuLinkedin className="w-6 h-6 text-[#1E293B] mr-4 inline-block" />
                                     </span>
                                     <a href="/">Linkedin</a>
                                 </li>
-                                <li>
-                                    <span className="text-[16px] text-[#1E293B] font-regular">
+                                <li className="flex items-center">
+                                    <span className="text-[16px] text-[#1E293B] font-regular -mr-2">
                                         <LuTwitter className="w-6 h-6 text-[#1E293B] mr-4 inline-block" />
                                     </span>
                                     <a href="/">Twitter</a>
                                 </li>
-                                <li>
-                                    <span className="text-[16px] text-[#1E293B] font-regular">
+                                <li className="flex items-center">
+                                    <span className="text-[16px] text-[#1E293B] font-regular -mr-2">
                                         <LuInstagram className="w-6 h-6 text-[#1E293B] mr-4 inline-block" />
                                     </span>
                                     <a href="/">Instagram</a>

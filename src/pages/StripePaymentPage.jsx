@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaCreditCard, FaShieldAlt, FaLock, FaArrowLeft, FaBan } from 'react-icons/fa';
 import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-icons/md';
 import axios from 'axios';
-import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage } from '../config/stripe';
+import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage, getStripeConfigStatus } from '../config/stripe';
 import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 
 // Initialize Stripe
@@ -20,16 +20,8 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     const [error, setError] = useState(null);
     const [clientSecret, setClientSecret] = useState('');
 
-    // Check if Stripe is properly loaded
-    if (!stripe || !elements) {
-        return (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-sm text-red-600">
-                    Payment system is not ready. Please refresh the page and try again.
-                </p>
-            </div>
-        );
-    }
+    // Get Stripe configuration status
+    const stripeConfig = getStripeConfigStatus();
 
     useEffect(() => {
         // Create payment intent on the server
@@ -145,6 +137,35 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
 
     const cardElementOptions = CARD_ELEMENT_OPTIONS;
 
+    // Check if Stripe is properly loaded - moved after all hooks
+    if (!stripe || !elements) {
+        let errorMessage = "Payment system is not ready. Please refresh the page and try again.";
+
+        if (stripeConfig.isDefaultKey) {
+            errorMessage = "Stripe is not configured. Please contact support or check your environment variables.";
+        } else if (!stripeConfig.isValid) {
+            errorMessage = "Invalid Stripe configuration. Please check your publishable key.";
+        }
+
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                        <FaBan className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">
+                            Payment System Error
+                        </h3>
+                        <div className="mt-2 text-sm text-red-700">
+                            <p>{errorMessage}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -203,8 +224,8 @@ const StripePaymentPage = () => {
     const navigate = useNavigate();
     const { subscriptionPlans, mostPopularPlan } = useSubscriptionPlans();
 
-    console.log("Plans from context:", subscriptionPlans);
-    console.log("Most Popular Plan from context:", mostPopularPlan);
+    // Get Stripe configuration status
+    const stripeConfig = getStripeConfigStatus();
 
     // Create subscription plans data with proper null checks
     const subscriptionPlansData = React.useMemo(() => {
@@ -381,6 +402,8 @@ const StripePaymentPage = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
                         Choose Your Plan
