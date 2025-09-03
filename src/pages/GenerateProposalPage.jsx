@@ -24,7 +24,7 @@ const GenerateProposalPage = () => {
     setIsGeneratingProposal(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`http://51.21.225.240/api/rfp/sendDataForProposalGeneration`, {
+      const res = await axios.post(`https://rfp-backend.lockerwise.com/api/rfp/sendDataForProposalGeneration`, {
         proposal,
       }, {
         headers: {
