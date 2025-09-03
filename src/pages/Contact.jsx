@@ -20,6 +20,7 @@ export default function Contact() {
     name: "",
     company: "",
     email: "",
+    description: "",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -37,12 +38,15 @@ export default function Contact() {
     axios.post(`${API_URL}/contact`, formData)
       .then((response) => {
         setMessage("Your request has been sent successfully!");
+
         Swal.fire({
           icon: 'success',
           title: 'Success',
           text: 'Your request has been sent successfully!',
         });
-        setFormData({ name: "", company: "", email: "" });
+
+        setFormData({ name: "", company: "", email: "", description: "" });
+
         navigate("/");
       })
       .catch((error) => {
@@ -110,6 +114,18 @@ export default function Contact() {
                     name="email"
                     placeholder="Enter your email"
                     value={formData.email}
+                    onChange={handleChange}
+                    className="w-full border-b border-gray-300 focus:border-blue-500 outline-none pb-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    name="message"
+                    placeholder="Enter description of your request"
+                    value={formData.description}
                     onChange={handleChange}
                     className="w-full border-b border-gray-300 focus:border-blue-500 outline-none pb-2"
                     required
