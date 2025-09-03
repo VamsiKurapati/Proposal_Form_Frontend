@@ -553,6 +553,7 @@ const Proposals = () => {
     };
 
     const handleContinue = (proposal) => {
+        localStorage.setItem('proposalId', proposal._id);
         navigate('/editor', { state: { jsonData: proposal.generatedProposal || null } });
     };
 
