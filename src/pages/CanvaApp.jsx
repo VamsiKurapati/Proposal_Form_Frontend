@@ -970,7 +970,7 @@ const CanvaApp = () => {
 
       //Continue to basic if subscription is basic and advanced if subscription is pro or enterprise and show a banner to upgrade to advanced if subscription is basic
       const subscription = JSON.parse(localStorage.getItem('subscription'));
-      if (subscription.plan_name === 'Basic' || subscription.plan_name === 'None') {
+      if (subscription.plan_name === 'Basic') {
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
           proposalId,
           jsonData,
@@ -991,7 +991,7 @@ const CanvaApp = () => {
             text: 'Failed to continue',
           });
         }
-      } else if (subscription.plan_name === 'Pro' || subscription.plan_name === 'Enterprise' || subscription.plan_name === 'None') {
+      } else if (subscription.plan_name === 'Pro' || subscription.plan_name === 'Enterprise') {
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
           proposalId,
           jsonData,

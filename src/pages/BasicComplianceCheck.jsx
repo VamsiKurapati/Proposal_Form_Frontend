@@ -15,17 +15,15 @@ const BasicComplianceCheck = () => {
         if (data) {
             setData(data);
             setComplianceData(data);
+            //Delete the location.state.data
+            delete location.state.data;
         } else {
             setData(null);
             // Fallback data structure for testing
             setComplianceData({
-                missing_sections: ["Executive Summary", "Scope of Work / Deliverables"],
-                format_issues: {
-                    "Budget & Cost Breakdown": [
-                        "Doesn't start with a capital letter at section: Budget & Cost Breakdown"
-                    ]
-                },
-                empty_sections: ["Executive Summary", "Scope of Work / Deliverables"]
+                missing_sections: [],
+                format_issues: {},
+                empty_sections: []
             });
         }
     }, []);
@@ -181,59 +179,6 @@ const BasicComplianceCheck = () => {
                             </ul>
                         </div>
                     </div>
-
-                    {/* Detailed Section Analysis */}
-                    {allSections.length > 0 && (
-                        <div className="mb-10">
-                            <h3 className="text-[18px] font-semibold text-[#111827] mb-4">Detailed Section Analysis</h3>
-                            <div className="grid grid-cols-1 gap-4">
-                                {allSections.map((section, idx) => {
-                                    const status = getSectionStatus(section);
-                                    const issues = getIssuesForSection(section);
-
-                                    const getStatusColor = (status) => {
-                                        switch (status) {
-                                            case "completed": return "bg-[#F0FDF4] border-[#BBF7D0]";
-                                            case "missing": return "bg-[#FEF2F2] border-[#FECACA]";
-                                            case "empty": return "bg-[#FEF2F2] border-[#FECACA]";
-                                            case "format_issues": return "bg-[#FEFCE8] border-[#FEF0C7]";
-                                            default: return "bg-[#F8F9FA] border-[#E5E7EB]";
-                                        }
-                                    };
-
-                                    const getStatusIcon = (status) => {
-                                        switch (status) {
-                                            case "completed": return <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />;
-                                            case "missing": return <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />;
-                                            case "empty": return <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />;
-                                            case "format_issues": return <MdOutlineError className="text-[20px] text-[#EAB308]" />;
-                                            default: return <MdOutlineError className="text-[20px] text-[#6B7280]" />;
-                                        }
-                                    };
-
-                                    return (
-                                        <div key={idx} className={`border-2 rounded-lg p-4 ${getStatusColor(status)}`}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <h4 className="text-[16px] font-semibold text-[#111827]">{section}</h4>
-                                                {getStatusIcon(status)}
-                                            </div>
-                                            {issues.length > 0 ? (
-                                                <ul className="space-y-1">
-                                                    {issues.map((issue, issueIdx) => (
-                                                        <li key={issueIdx} className="text-[14px] text-[#6B7280] ml-6">
-                                                            • {issue}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-[14px] text-[#16A34A] ml-6">✓ Section is compliant</p>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {/* Advanced Compliance Check Section */}

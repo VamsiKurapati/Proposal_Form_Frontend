@@ -18,7 +18,7 @@ const AdvancedComplianceCheck = () => {
             setBasicComplianceCheck({
                 missing_sections: incoming?.compliance_dataBasicCompliance?.missing_sections || [],
                 empty_sections: incoming?.compliance_dataBasicCompliance?.empty_sections || [],
-                format_issues: incoming?.compliance_dataBasicCompliance?.format_issues || {},
+                format_issues: incoming?.compliance_dataBasicCompliance?.format_issues || [],
             });
             setAdvancedComplianceCheck({
                 rfp_title: incoming?.dataAdvancedCompliance?.rfp_title || "",
@@ -27,6 +27,8 @@ const AdvancedComplianceCheck = () => {
                 missing_information: incoming?.dataAdvancedCompliance?.missing_information || [],
                 status: incoming?.dataAdvancedCompliance?.status || "",
             });
+            //Delete the location.state.data
+            delete location.state.data;
         } else {
             setData(null);
             setBasicComplianceCheck({
