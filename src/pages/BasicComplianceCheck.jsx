@@ -161,20 +161,20 @@ const BasicComplianceCheck = () => {
                         </div>
 
                         {/* Empty Sections */}
-                        <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
+                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
                             <h2 className="text-[16px] font-semibold text-[#14532D]">Empty Sections</h2>
                             <p className="text-[#14532D] text-[14px] mb-4">Sections that need content</p>
                             <ul className="space-y-3">
                                 {complianceData && complianceData.empty_sections && complianceData.empty_sections.length > 0 ? (
                                     complianceData.empty_sections.map((section, idx) => (
                                         <li key={idx} className="flex items-center justify-start gap-2">
-                                            <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                            <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                             <span className="text-[#111827] text-[16px]">{section}</span>
                                         </li>
                                     ))
                                 ) : (
                                     <li className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                         <span className="text-[#111827] text-[16px]">No empty sections</span>
                                     </li>
                                 )}
@@ -195,7 +195,7 @@ const BasicComplianceCheck = () => {
                                         switch (status) {
                                             case "completed": return "bg-[#F0FDF4] border-[#BBF7D0]";
                                             case "missing": return "bg-[#FEF2F2] border-[#FECACA]";
-                                            case "empty": return "bg-[#FEFCE8] border-[#FEF0C7]";
+                                            case "empty": return "bg-[#FEF2F2] border-[#FECACA]";
                                             case "format_issues": return "bg-[#FEFCE8] border-[#FEF0C7]";
                                             default: return "bg-[#F8F9FA] border-[#E5E7EB]";
                                         }
@@ -205,7 +205,7 @@ const BasicComplianceCheck = () => {
                                         switch (status) {
                                             case "completed": return <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />;
                                             case "missing": return <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />;
-                                            case "empty": return <MdOutlineError className="text-[20px] text-[#EAB308]" />;
+                                            case "empty": return <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />;
                                             case "format_issues": return <MdOutlineError className="text-[20px] text-[#EAB308]" />;
                                             default: return <MdOutlineError className="text-[20px] text-[#6B7280]" />;
                                         }
@@ -252,7 +252,7 @@ const BasicComplianceCheck = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                                 <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6 h-32 md:h-40" />
                                 <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6 h-32 md:h-40" />
-                                <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6 h-32 md:h-40" />
+                                <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6 h-32 md:h-40" />
                             </div>
                             <div className="bg-[#F8F9FA] border-2 border-[#E5E7EB] rounded-lg p-6 mb-10 h-24" />
                         </div>

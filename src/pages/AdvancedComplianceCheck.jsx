@@ -50,6 +50,10 @@ const AdvancedComplianceCheck = () => {
             <div className="w-full mx-auto p-8 mt-16">
                 {/* Compliance Check Title */}
                 <h1 className="text-[24px] font-semibold mb-4">Compliance Check</h1>
+
+                {/* RFP Title */}
+                <h1 className="text-[24px] font-semibold mb-4">{advancedComplianceCheck && advancedComplianceCheck.rfp_title}</h1>
+
                 {/* Basic Compliance Check */}
                 <div className="flex flex-col gap-4">
                     <span className="text-black text-[20px] font-semibold mt-4 mb-4">
@@ -76,20 +80,41 @@ const AdvancedComplianceCheck = () => {
                                 )}
                             </ul>
                         </div>
+
+                        {/* Format Issues */}
+                        <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6">
+                            <h2 className="text-[16px] font-semibold text-[#713F12]">Format Issues</h2>
+                            <p className="text-[#713F12] text-[14px] mb-4">Sections with formatting problems</p>
+                            <ul className="space-y-3">
+                                {basicComplianceCheck && basicComplianceCheck.format_issues && basicComplianceCheck.format_issues.map((issue, idx) => (
+                                    <li key={idx} className="flex items-center justify-start gap-2">
+                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                        <span className="text-[#111827] text-[16px]">{issue}</span>
+                                    </li>
+                                ))}
+                                {basicComplianceCheck && basicComplianceCheck.format_issues && basicComplianceCheck.format_issues.length === 0 && (
+                                    <li className="flex items-center justify-start gap-2">
+                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                        <span className="text-[#111827] text-[16px]">No format issues found</span>
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+
                         {/* Empty Sections */}
-                        <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
+                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
                             <h2 className="text-[16px] font-semibold text-[#14532D]">Empty Sections</h2>
                             <p className="text-[#14532D] text-[14px] mb-4">These sections are present but empty</p>
                             <ul className="space-y-3">
                                 {basicComplianceCheck && basicComplianceCheck.empty_sections && basicComplianceCheck.empty_sections.map((section, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                         <span className="text-[#111827] text-[16px]">{section}</span>
                                     </li>
                                 ))}
                                 {basicComplianceCheck && basicComplianceCheck.empty_sections && basicComplianceCheck.empty_sections.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                         <span className="text-[#111827] text-[16px]">No empty sections found</span>
                                     </li>
                                 )}
@@ -137,32 +162,32 @@ const AdvancedComplianceCheck = () => {
                             <ul className="space-y-3">
                                 {advancedComplianceCheck && advancedComplianceCheck.present_information && advancedComplianceCheck.present_information.map((item, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
-                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                        <BsFillCheckCircleFill className="text-[20px] text-[#EAB308]" />
                                         <span className="text-[#111827] text-[16px]">{item}</span>
                                     </li>
                                 ))}
                                 {advancedComplianceCheck && advancedComplianceCheck.present_information && advancedComplianceCheck.present_information.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
-                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
+                                        <BsFillCheckCircleFill className="text-[20px] text-[#EAB308]" />
                                         <span className="text-[#111827] text-[16px]">No present information found</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
                         {/* Missing Information */}
-                        <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
+                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
                             <h2 className="text-[16px] font-semibold text-[#14532D]">Missing Information</h2>
                             <p className="text-[#14532D] text-[14px] mb-4">Requested but not found</p>
                             <ul className="space-y-3">
                                 {advancedComplianceCheck && advancedComplianceCheck.missing_information && advancedComplianceCheck.missing_information.map((item, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                         <span className="text-[#111827] text-[16px]">{item}</span>
                                     </li>
                                 ))}
                                 {advancedComplianceCheck && advancedComplianceCheck.missing_information && advancedComplianceCheck.missing_information.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
-                                        <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
+                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
                                         <span className="text-[#111827] text-[16px]">No missing information</span>
                                     </li>
                                 )}
