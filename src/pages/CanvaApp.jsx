@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
+import axios from 'axios';
 import { MdOutlineArrowBack } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
@@ -17,6 +18,8 @@ import FloatingToolbar from '../components/Toolbar/FloatingToolbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { exportToJSON, exportToPDF, exportToOptimizedSVG, importFromJSON, importFromJSONData } from '../utils/export';
 import { getTemplateSets } from '../utils/loadTemplates';
+import { compressData, shouldCompress } from '../utils/compression';
+import Swal from 'sweetalert2';
 
 import PropertiesPanel from '../components/PropertiesPanel.jsx';
 import HistoryPanel from '../components/HistoryPanel.jsx';
@@ -944,24 +947,67 @@ const CanvaApp = () => {
   const handleContinue = async () => {
     try {
       const proposalId = localStorage.getItem('proposalId');
-      const jsonData = JSON.parse(localStorage.getItem('jsonData'));
-      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
-        proposalId,
-        jsonData
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      console.log(res.data);
-      navigate('/basic-compliance-check', {
-        state: {
-          data: res.data
-        }
-      });
+      const fullProjectData = JSON.parse(localStorage.getItem('canva-project'));
+
+      // Check if we should compress the data
+      if (shouldCompress(fullProjectData)) {
+        console.log('Data is large, compressing before sending...');
+
+        // Compress the entire project data
+        const compressionResult = compressData(fullProjectData);
+        console.log(`Compression: ${compressionResult.originalSize} bytes → ${compressionResult.compressedSize} bytes (${compressionResult.compressionRatio}% reduction)`);
+
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
+          proposalId,
+          jsonData: compressionResult.compressed,
+          isCompressed: true
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log(res.data);
+        navigate('/advanced-compliance-check', {
+          state: {
+            data: res.data
+          }
+        });
+      } else {
+        // Data is small enough, send without compression
+        console.log('Data is small, sending without compression...');
+
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
+          proposalId,
+          jsonData: fullProjectData,
+          isCompressed: false
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log(res.data);
+        navigate('/advanced-compliance-check', {
+          state: {
+            data: res.data
+          }
+        });
+      }
     } catch (error) {
       console.error(error);
-      alert('Failed to continue');
+      if (error.response?.status === 413) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'The proposal data is too large even after compression. Please reduce the content and try again.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to continue',
+        });
+      }
     }
   };
 
@@ -1002,7 +1048,11 @@ const CanvaApp = () => {
             onProjectsClick={() => panelState.showProjectsPanel ? panelState.setShowProjectsPanel(false) : panelState.openProjectsPanel()}
             onPropertiesClick={() => panelState.showPropertiesPanel ? panelState.setShowPropertiesPanel(false) : panelState.openPropertiesPanel()}
             onBackgroundClick={setBackgroundWithHistory}
-            onLayoutTemplateClick={() => alert('Layout templates coming soon!')}
+            onLayoutTemplateClick={() => Swal.fire({
+              icon: 'info',
+              title: 'Info',
+              text: 'Layout templates coming soon!',
+            })}
             onResetBackgroundClick={() => setBackgroundWithHistory('color', '#ffffff')}
             showDesignPanel={panelState.showDesignPanel}
             showElementsPanel={panelState.showElementsPanel}
