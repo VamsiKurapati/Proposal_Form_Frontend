@@ -5,6 +5,7 @@ import { MdOutlineError, MdOutlineLock } from "react-icons/md";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { compressData, shouldCompress } from '../utils/compression';
 
 const BasicComplianceCheck = () => {
     const location = useLocation();
@@ -51,8 +52,22 @@ const BasicComplianceCheck = () => {
         loadingDiv.innerHTML = 'Preparing PDF export...';
         document.body.appendChild(loadingDiv);
         try {
+            let jsonData = null;
+            let isCompressed = false;
+            if (shouldCompress(project)) {
+                const compressedResult = compressData(project);
+                jsonData = compressedResult.compressed;
+                isCompressed = true;
+            } else {
+                jsonData = project;
+            }
             const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
-                project: project
+                project: jsonData,
+                isCompressed
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
             }, {
                 responseType: 'blob' // Important: tell axios to expect binary data
             });

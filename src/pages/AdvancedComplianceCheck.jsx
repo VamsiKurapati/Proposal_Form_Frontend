@@ -5,6 +5,7 @@ import { MdOutlineDoneAll, MdOutlineError } from "react-icons/md";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { compressData, shouldCompress } from '../utils/compression';
 
 const AdvancedComplianceCheck = () => {
     const location = useLocation();
@@ -12,6 +13,7 @@ const AdvancedComplianceCheck = () => {
     const [data, setData] = useState(null);
     const [basicComplianceCheck, setBasicComplianceCheck] = useState(null);
     const [advancedComplianceCheck, setAdvancedComplianceCheck] = useState(null);
+
 
     useEffect(() => {
         const incoming = location.state && location.state.data;
@@ -69,8 +71,18 @@ const AdvancedComplianceCheck = () => {
         loadingDiv.innerHTML = 'Preparing PDF export...';
         document.body.appendChild(loadingDiv);
         try {
+            let jsonData = null;
+            let isCompressed = false;
+            if (shouldCompress(project)) {
+                const compressedResult = compressData(project);
+                jsonData = compressedResult.compressed;
+                isCompressed = true;
+            } else {
+                jsonData = project;
+            }
             const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
-                project: project
+                project: jsonData,
+                isCompressed
             }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
