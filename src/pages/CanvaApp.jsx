@@ -957,7 +957,7 @@ const CanvaApp = () => {
         const compressionResult = compressData(fullProjectData);
         console.log(`Compression: ${compressionResult.originalSize} bytes → ${compressionResult.compressedSize} bytes (${compressionResult.compressionRatio}% reduction)`);
 
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
           proposalId,
           jsonData: compressionResult.compressed,
           isCompressed: true
@@ -968,7 +968,7 @@ const CanvaApp = () => {
           }
         });
         console.log(res.data);
-        navigate('/basic-compliance-check', {
+        navigate('/advanced-compliance-check', {
           state: {
             data: res.data
           }
@@ -977,7 +977,7 @@ const CanvaApp = () => {
         // Data is small enough, send without compression
         console.log('Data is small, sending without compression...');
 
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
           proposalId,
           jsonData: fullProjectData,
           isCompressed: false
@@ -987,7 +987,7 @@ const CanvaApp = () => {
           }
         });
         console.log(res.data);
-        navigate('/basic-compliance-check', {
+        navigate('/advanced-compliance-check', {
           state: {
             data: res.data
           }
