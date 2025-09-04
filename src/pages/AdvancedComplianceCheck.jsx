@@ -3,10 +3,12 @@ import NavbarComponent from "./NavbarComponent";
 import { IoIosArrowBack, IoMdCloseCircle } from "react-icons/io";
 import { MdOutlineDoneAll, MdOutlineError } from "react-icons/md";
 import { BsFillCheckCircleFill } from "react-icons/bs";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AdvancedComplianceCheck = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [basicComplianceCheck, setBasicComplianceCheck] = useState(null);
     const [advancedComplianceCheck, setAdvancedComplianceCheck] = useState(null);
@@ -45,6 +47,65 @@ const AdvancedComplianceCheck = () => {
             });
         }
     }, []);
+
+    const handleGeneratePDF = async () => {
+        const project = JSON.parse(localStorage.getItem('canva-project'));
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+        `;
+        loadingDiv.innerHTML = 'Preparing PDF export...';
+        document.body.appendChild(loadingDiv);
+        try {
+            const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
+                project: project
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+            }, {
+                responseType: 'blob' // Important: tell axios to expect binary data
+            });
+
+            const pdfBlob = new Blob([res.data], { type: "application/pdf" });
+            const blobUrl = URL.createObjectURL(pdfBlob);
+
+            // Download automatically
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = `proposal-${new Date()
+                .toISOString()
+                .slice(0, 19)
+                .replace(/:/g, "-")}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            // Optional: open in new tab
+            window.open(blobUrl, "_blank");
+
+            // Cleanup
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        } catch (err) {
+            console.error("PDF export error:", err);
+            alert("Failed to generate PDF. Please try again.");
+        } finally {
+            // Remove loading indicator
+            document.body.removeChild(loadingDiv);
+        }
+    };
 
     return (
         <div className="min-h-screen overflow-y-auto">
@@ -204,11 +265,15 @@ const AdvancedComplianceCheck = () => {
                     </div>
                     {/* Navigation Buttons */}
                     <div className="flex flex-col md:flex-row items-center justify-between mt-8 gap-4">
-                        <button className="border border-[#4B5563] text-[#4B5563] px-6 py-2 rounded transition text-[16px] flex items-center gap-2">
+                        <button className="border border-[#4B5563] text-[#4B5563] px-6 py-2 rounded transition text-[16px] flex items-center gap-2"
+                            onClick={() => navigate('/editor')}>
                             <IoIosArrowBack className="text-[20px] text-[#4B5563]" />
                             Back to Editor
                         </button>
-                        <button className="bg-[#2563EB] text-white px-8 py-2 rounded transition text-[16px]">Fix Issues</button>
+                        <button className="bg-[#2563EB] text-white px-8 py-2 rounded transition text-[16px]"
+                            onClick={() => handleGeneratePDF()}>
+                            Generate PDF
+                        </button>
                     </div>
                 </div>
             </div>
