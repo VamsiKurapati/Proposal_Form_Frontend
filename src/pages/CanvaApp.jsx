@@ -1043,7 +1043,14 @@ const CanvaApp = () => {
         proposalId,
         jsonData,
         isCompressed
-      });
+      },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
       if (res.status === 200) {
         setAutoSaveIndicator(false);
       } else {
