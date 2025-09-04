@@ -18,7 +18,7 @@ const AdvancedComplianceCheck = () => {
             setBasicComplianceCheck({
                 missing_sections: incoming?.compliance_dataBasicCompliance?.missing_sections || [],
                 empty_sections: incoming?.compliance_dataBasicCompliance?.empty_sections || [],
-                format_issues: incoming?.compliance_dataBasicCompliance?.format_issues || [],
+                format_issues: incoming?.compliance_dataBasicCompliance?.format_issues || {},
             });
             setAdvancedComplianceCheck({
                 rfp_title: incoming?.dataAdvancedCompliance?.rfp_title || "",
@@ -88,13 +88,19 @@ const AdvancedComplianceCheck = () => {
                             <h2 className="text-[16px] font-semibold text-[#713F12]">Format Issues</h2>
                             <p className="text-[#713F12] text-[14px] mb-4">Sections with formatting problems</p>
                             <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck.format_issues && basicComplianceCheck.format_issues.map((issue, idx) => (
-                                    <li key={idx} className="flex items-center justify-start gap-2">
-                                        <MdOutlineError className="text-[20px] text-[#EAB308]" />
-                                        <span className="text-[#111827] text-[16px]">{issue}</span>
-                                    </li>
-                                ))}
-                                {basicComplianceCheck && basicComplianceCheck.format_issues && basicComplianceCheck.format_issues.length === 0 && (
+                                {basicComplianceCheck && basicComplianceCheck.format_issues && Object.keys(basicComplianceCheck.format_issues).length > 0 ? (
+                                    Object.entries(basicComplianceCheck.format_issues).map(([section, issues], idx) => (
+                                        <li key={idx} className="flex items-start justify-start gap-2">
+                                            <MdOutlineError className="text-[20px] text-[#EAB308] mt-1 flex-shrink-0" />
+                                            <div className="flex flex-col">
+                                                <span className="text-[#111827] text-[16px] font-medium">{section}</span>
+                                                {issues.map((issue, issueIdx) => (
+                                                    <span key={issueIdx} className="text-[#713F12] text-[14px] ml-2">• {issue}</span>
+                                                ))}
+                                            </div>
+                                        </li>
+                                    ))
+                                ) : (
                                     <li className="flex items-center justify-start gap-2">
                                         <MdOutlineError className="text-[20px] text-[#EAB308]" />
                                         <span className="text-[#111827] text-[16px]">No format issues found</span>

@@ -28,66 +28,6 @@ const BasicComplianceCheck = () => {
         }
     }, []);
 
-    // Helper function to get unique sections from all categories
-    const getAllSections = () => {
-        if (!complianceData) return [];
-
-        const sections = new Set();
-
-        // Add missing sections
-        if (complianceData.missing_sections) {
-            complianceData.missing_sections.forEach(section => sections.add(section));
-        }
-
-        // Add sections with format issues
-        if (complianceData.format_issues) {
-            Object.keys(complianceData.format_issues).forEach(section => sections.add(section));
-        }
-
-        // Add empty sections
-        if (complianceData.empty_sections) {
-            complianceData.empty_sections.forEach(section => sections.add(section));
-        }
-
-        return Array.from(sections);
-    };
-
-    // Helper function to get issues for a specific section
-    const getIssuesForSection = (sectionName) => {
-        if (!complianceData) return [];
-
-        const issues = [];
-
-        // Check if section is missing
-        if (complianceData.missing_sections && complianceData.missing_sections.includes(sectionName)) {
-            issues.push("Section is missing from the document");
-        }
-
-        // Check if section has format issues
-        if (complianceData.format_issues && complianceData.format_issues[sectionName]) {
-            issues.push(...complianceData.format_issues[sectionName]);
-        }
-
-        // Check if section is empty
-        if (complianceData.empty_sections && complianceData.empty_sections.includes(sectionName)) {
-            issues.push("Section exists but is empty");
-        }
-
-        return issues;
-    };
-
-    // Helper function to get section status
-    const getSectionStatus = (sectionName) => {
-        const issues = getIssuesForSection(sectionName);
-
-        if (issues.length === 0) return "completed";
-        if (issues.some(issue => issue.includes("missing"))) return "missing";
-        if (issues.some(issue => issue.includes("empty"))) return "empty";
-        return "format_issues";
-    };
-
-    const allSections = getAllSections();
-
     return (
         <div className="min-h-screen overflow-y-auto">
             <NavbarComponent />
