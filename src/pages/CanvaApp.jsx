@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import axios from 'axios';
-import { MdOutlineArrowBack } from 'react-icons/md';
+import { MdOutlineArrowBack, MdOutlineRefresh, MdOutlineCheck } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
@@ -36,6 +36,7 @@ const CanvaApp = () => {
   const [isGridView, setIsGridView] = React.useState(false);
   const [sets, setSets] = React.useState({});
   const [svgPreviews, setSvgPreviews] = React.useState({});
+  const [autoSaveIndicator, setAutoSaveIndicator] = React.useState(false);
 
   const panelState = usePanelState();
 
@@ -949,48 +950,61 @@ const CanvaApp = () => {
       const proposalId = localStorage.getItem('proposalId');
       const fullProjectData = JSON.parse(localStorage.getItem('canva-project'));
 
-      // Check if we should compress the data
+      if (!proposalId || !fullProjectData) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Proposal ID or Proposal Data not found',
+        });
+      }
+
+      let jsonData = null;
+      let isCompressed = false;
+
       if (shouldCompress(fullProjectData)) {
-        console.log('Data is large, compressing before sending...');
-
-        // Compress the entire project data
-        const compressionResult = compressData(fullProjectData);
-        console.log(`Compression: ${compressionResult.originalSize} bytes → ${compressionResult.compressedSize} bytes (${compressionResult.compressionRatio}% reduction)`);
-
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
-          proposalId,
-          jsonData: compressionResult.compressed,
-          isCompressed: true
-        }, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        console.log(res.data);
-        navigate('/advanced-compliance-check', {
-          state: {
-            data: res.data
-          }
-        });
+        jsonData = compressData(fullProjectData);
+        isCompressed = true;
       } else {
-        // Data is small enough, send without compression
-        console.log('Data is small, sending without compression...');
+        jsonData = fullProjectData;
+      }
 
+      //Continue to basic if subscription is basic and advanced if subscription is pro or enterprise and show a banner to upgrade to advanced if subscription is basic
+      const subscription = localStorage.getItem('subscription');
+      if (subscription.plan_name === 'Basic') {
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
+          proposalId,
+          jsonData,
+          isCompressed
+        });
+        if (res.status === 200) {
+          navigate('/basic-compliance-check', { state: { data: res.data } });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to continue',
+          });
+        }
+      } else if (subscription.plan_name === 'Pro' || subscription.plan_name === 'Enterprise') {
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
           proposalId,
-          jsonData: fullProjectData,
-          isCompressed: false
-        }, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+          jsonData,
+          isCompressed
         });
-        console.log(res.data);
-        navigate('/advanced-compliance-check', {
-          state: {
-            data: res.data
-          }
+        if (res.status === 200) {
+          navigate('/advanced-compliance-check', { state: { data: res.data } });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to continue',
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'You are not authorized to continue',
         });
       }
     } catch (error) {
@@ -1010,6 +1024,51 @@ const CanvaApp = () => {
       }
     }
   };
+
+  const autoSave = async () => {
+    const proposalId = localStorage.getItem('proposalId');
+    const project = JSON.parse(localStorage.getItem('canva-project'));
+    //Compress the project
+    let jsonData = null;
+    let isCompressed = false;
+    if (shouldCompress(project)) {
+      jsonData = compressData(project);
+      isCompressed = true;
+    } else {
+      jsonData = project;
+    }
+    if (proposalId && project) {
+      setAutoSaveIndicator(true);
+      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/autoSave`, {
+        proposalId,
+        jsonData,
+        isCompressed
+      });
+      if (res.status === 200) {
+        setAutoSaveIndicator(false);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to auto save',
+        });
+        setAutoSaveIndicator(false);
+      }
+    }
+  };
+
+  //Use effect to auto save the project to localStorage and store to DB every 1 minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      autoSave();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [project, autoSave]);
+
+  //Use effect to save the project to localStorage when there is any change in the project
+  useEffect(() => {
+    localStorage.setItem('canva-project', JSON.stringify(project));
+  }, [project]);
 
   return (
     <div className="h-full flex flex-col">
@@ -1077,7 +1136,7 @@ const CanvaApp = () => {
           {!isGridView && (
             //Add a back button to go back to the previous page
             <>
-              <div className="absolute top-2 left-4 z-10">
+              <div className="absolute top-2 left-4 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
                   <MdOutlineArrowBack className="w-4 h-4" />
                 </button>
@@ -1108,7 +1167,21 @@ const CanvaApp = () => {
                   setProject={setProject}
                 />
               </div>
-              <div className="absolute top-2 right-12 z-10">
+
+              {/* Show Auto Save Div here, when autoSave is initiated show the circle spinning indicator for request time and stop after response is received */}
+              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2">
+                  Auto Save
+                  {autoSaveIndicator && (
+                    <MdOutlineRefresh className="w-4 h-4 animate-spin" />
+                  )}
+                  {!autoSaveIndicator && (
+                    <MdOutlineCheck className="w-4 h-4 text-[#16A34A]" />
+                  )}
+                </div>
+              </div>
+
+              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()}>
                   Continue
                 </button>
