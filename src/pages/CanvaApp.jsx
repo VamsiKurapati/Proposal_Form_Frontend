@@ -1176,7 +1176,7 @@ const CanvaApp = () => {
               </div>
 
               {/* Show Auto Save Div here, when autoSave is initiated show the circle spinning indicator for request time and stop after response is received */}
-              <div className="absolute top-2 right-16 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2">
                   Auto Save
                   {autoSaveIndicator && (
@@ -1188,7 +1188,7 @@ const CanvaApp = () => {
                 </div>
               </div>
 
-              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute top-6 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()}>
                   Continue
                 </button>
