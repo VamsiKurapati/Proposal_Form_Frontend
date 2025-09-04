@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import axios from 'axios';
-import { MdOutlineArrowBack, MdOutlineRefresh, MdOutlineCheck } from 'react-icons/md';
+import { MdOutlineArrowBack, MdOutlineRefresh } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
@@ -1144,7 +1144,7 @@ const CanvaApp = () => {
             //Add a back button to go back to the previous page
             <>
               <div className="absolute top-2 left-4 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)}>
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)} title="Back">
                   <MdOutlineArrowBack className="w-4 h-4" />
                 </button>
               </div>
@@ -1176,20 +1176,19 @@ const CanvaApp = () => {
               </div>
 
               {/* Show Auto Save Div here, when autoSave is initiated show the circle spinning indicator for request time and stop after response is received */}
-              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
-                <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2">
-                  Auto Save
+              <div className="absolute top-2 right-16 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Auto Save">
                   {autoSaveIndicator && (
                     <MdOutlineRefresh className="w-4 h-4 animate-spin" />
                   )}
                   {!autoSaveIndicator && (
-                    <MdOutlineCheck className="w-4 h-4 text-[#16A34A]" />
+                    <MdOutlineRefresh className="w-4 h-4" />
                   )}
                 </div>
               </div>
 
-              <div className="absolute top-8 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()}>
+              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()} title="Continue">
                   Continue
                 </button>
               </div>
