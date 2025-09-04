@@ -962,7 +962,8 @@ const CanvaApp = () => {
       let isCompressed = false;
 
       if (shouldCompress(fullProjectData)) {
-        jsonData = compressData(fullProjectData);
+        const compressedResult = compressData(fullProjectData);
+        jsonData = compressedResult.jsonData;
         isCompressed = true;
       } else {
         jsonData = fullProjectData;
@@ -1044,7 +1045,8 @@ const CanvaApp = () => {
     let jsonData = null;
     let isCompressed = false;
     if (shouldCompress(project)) {
-      jsonData = compressData(project);
+      const compressedResult = compressData(project);
+      jsonData = compressedResult.jsonData;
       isCompressed = true;
     } else {
       jsonData = project;
