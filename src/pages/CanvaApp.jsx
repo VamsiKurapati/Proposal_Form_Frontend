@@ -969,7 +969,7 @@ const CanvaApp = () => {
       }
 
       //Continue to basic if subscription is basic and advanced if subscription is pro or enterprise and show a banner to upgrade to advanced if subscription is basic
-      const subscription = localStorage.getItem('subscription');
+      const subscription = JSON.parse(localStorage.getItem('subscription'));
       if (subscription.plan_name === 'Basic' || subscription.plan_name === 'None') {
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
           proposalId,
