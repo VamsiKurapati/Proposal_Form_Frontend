@@ -1188,7 +1188,7 @@ const CanvaApp = () => {
                 </div>
               </div>
 
-              <div className="absolute top-6 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute top-8 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()}>
                   Continue
                 </button>
