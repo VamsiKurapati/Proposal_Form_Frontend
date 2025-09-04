@@ -208,6 +208,11 @@ const BasicComplianceCheck = () => {
                         <p className="text-md text-[#2563EB] text-center max-w-md">
                             Get detailed compliance insights, critical issue detection, and AI-powered suggestions by upgrading your plan.
                         </p>
+
+                        <button className="bg-[#2563EB] text-white px-8 py-2 rounded transition text-[16px]"
+                            onClick={() => navigate('/payment')}>
+                            Upgrade
+                        </button>
                     </div>
                 </div>
 

@@ -1053,25 +1053,35 @@ const CanvaApp = () => {
     }
     if (proposalId && project) {
       setAutoSaveIndicator(true);
-      const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/autoSave`, {
-        proposalId,
-        jsonData,
-        isCompressed
-      },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+      try {
+        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/autoSave`, {
+          proposalId,
+          jsonData,
+          isCompressed
+        },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
           }
+        );
+        if (res.status === 200) {
+          setAutoSaveIndicator(false);
+        } else {
+          setAutoSaveIndicator(false);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to auto save',
+          });
         }
-      );
-      if (res.status === 200) {
-        setAutoSaveIndicator(false);
-      } else {
+      } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'Failed to auto save',
         });
+      } finally {
         setAutoSaveIndicator(false);
       }
     }
@@ -1191,10 +1201,9 @@ const CanvaApp = () => {
               {/* Show Auto Save Div here, when autoSave is initiated show the circle spinning indicator for request time and stop after response is received */}
               <div className="absolute top-2 right-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Auto Save">
-                  {autoSaveIndicator && (
+                  {autoSaveIndicator ? (
                     <MdOutlineRefresh className="w-4 h-4 animate-spin" />
-                  )}
-                  {!autoSaveIndicator && (
+                  ) : (
                     <MdOutlineRefresh className="w-4 h-4" />
                   )}
                 </div>
