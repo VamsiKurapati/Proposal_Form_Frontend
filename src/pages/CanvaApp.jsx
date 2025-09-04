@@ -975,7 +975,13 @@ const CanvaApp = () => {
           proposalId,
           jsonData,
           isCompressed
-        });
+        },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
         if (res.status === 200) {
           navigate('/basic-compliance-check', { state: { data: res.data } });
         } else {
@@ -990,7 +996,13 @@ const CanvaApp = () => {
           proposalId,
           jsonData,
           isCompressed
-        });
+        },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
         if (res.status === 200) {
           navigate('/advanced-compliance-check', { state: { data: res.data } });
         } else {
@@ -1046,7 +1058,6 @@ const CanvaApp = () => {
       },
         {
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         }
@@ -1176,7 +1187,7 @@ const CanvaApp = () => {
               </div>
 
               {/* Show Auto Save Div here, when autoSave is initiated show the circle spinning indicator for request time and stop after response is received */}
-              <div className="absolute top-2 right-16 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute top-2 right-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Auto Save">
                   {autoSaveIndicator && (
                     <MdOutlineRefresh className="w-4 h-4 animate-spin" />
@@ -1185,10 +1196,8 @@ const CanvaApp = () => {
                     <MdOutlineRefresh className="w-4 h-4" />
                   )}
                 </div>
-              </div>
 
-              <div className="absolute top-2 right-12 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()} title="Continue">
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()} title="Continue" style={{ marginLeft: '8px' }}>
                   Continue
                 </button>
               </div>
