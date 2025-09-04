@@ -9,57 +9,38 @@ const AdvancedComplianceCheck = () => {
     const location = useLocation();
     const [data, setData] = useState(null);
     const [basicComplianceCheck, setBasicComplianceCheck] = useState(null);
-    const [complianceScore, setComplianceScore] = useState(0);
-    const [issuesIdentified, setIssuesIdentified] = useState(0);
     const [advancedComplianceCheck, setAdvancedComplianceCheck] = useState(null);
-    const [aiSuggestions, setAiSuggestions] = useState(null);
 
     useEffect(() => {
-        const data = location.state && location.state.data;
-        if (data) {
-            setData(data);
-            setBasicComplianceCheck(data.basicComplianceCheck);
-            setAdvancedComplianceCheck(data.advancedComplianceCheck);
-            setAiSuggestions(data.aiSuggestions);
+        const incoming = location.state && location.state.data;
+        if (incoming) {
+            setData(incoming);
+            setBasicComplianceCheck({
+                missing_sections: incoming?.compliance_dataBasicCompliance?.missing_sections || [],
+                empty_sections: incoming?.compliance_dataBasicCompliance?.empty_sections || [],
+                format_issues: incoming?.compliance_dataBasicCompliance?.format_issues || {},
+            });
+            setAdvancedComplianceCheck({
+                rfp_title: incoming?.dataAdvancedCompliance?.rfp_title || "",
+                requested_information: incoming?.dataAdvancedCompliance?.requested_information || [],
+                present_information: incoming?.dataAdvancedCompliance?.present_information || [],
+                missing_information: incoming?.dataAdvancedCompliance?.missing_information || [],
+                status: incoming?.dataAdvancedCompliance?.status || "",
+            });
         } else {
             setData(null);
-            setBasicComplianceCheck([{
-                title: "Critical Issues Found",
-                description: "Please address these issues before submission",
-                issues: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Missing Sections",
-                description: "Please address these issues before submission",
-                sections: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Completed Sections",
-                description: "Recheck before submission if needed",
-                sections: ["Complete section", "Partnership Overview", "Financial Summary"],
-            }]);
-            setComplianceScore(0);
-            setIssuesIdentified(0);
-            setAdvancedComplianceCheck([{
-                title: "Critical Issues Found",
-                description: "Please address these issues before submission",
-                issues: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Missing Sections",
-                description: "Please address these issues before submission",
-                sections: ["Missing executive summary", "Font format issues", "Incomplete cover letter"],
-            },
-            {
-                title: "Completed Sections",
-                description: "Recheck before submission if needed",
-                sections: ["Complete section", "Partnership Overview", "Financial Summary"],
-            }]);
-            setAiSuggestions([{
-                title: "AI Suggestions",
-                description: "Please address these issues before submission",
-                suggestions: ["Complete executive summary section with project overview.", "Add detailed budget breakdown.", "Change the font & font style of the headlines.", "Do some kind of changes as suggested by AI."],
-            }]);
+            setBasicComplianceCheck({
+                missing_sections: [],
+                empty_sections: [],
+                format_issues: {},
+            });
+            setAdvancedComplianceCheck({
+                rfp_title: "",
+                requested_information: [],
+                present_information: [],
+                missing_information: [],
+                status: "",
+            });
         }
     }, []);
 
@@ -75,38 +56,19 @@ const AdvancedComplianceCheck = () => {
                         Basic Compliance Check
                     </span>
                     {/* Compliance Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        {/* Critical Issues */}
-                        <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#7F1D1D]">{basicComplianceCheck && basicComplianceCheck[0].title}</h2>
-                            <p className="text-[#B91C1C] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[0].description}</p>
-                            <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck[0].issues && basicComplianceCheck[0].issues.map((issue, idx) => (
-                                    <li key={idx} className="flex items-center justify-start gap-2">
-                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">{issue}</span>
-                                    </li>
-                                ))}
-                                {basicComplianceCheck && basicComplianceCheck[0].issues && basicComplianceCheck[0].issues.length === 0 && (
-                                    <li className="flex items-center justify-start gap-2">
-                                        <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">No critical issues found</span>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                         {/* Missing Sections */}
                         <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#713F12]">{basicComplianceCheck && basicComplianceCheck[1].title}</h2>
-                            <p className="text-[#713F12] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[1].description}</p>
+                            <h2 className="text-[16px] font-semibold text-[#713F12]">Missing Sections</h2>
+                            <p className="text-[#713F12] text-[14px] mb-4">Please address these items before submission</p>
                             <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck[1].sections && basicComplianceCheck[1].sections.map((section, idx) => (
+                                {basicComplianceCheck && basicComplianceCheck.missing_sections && basicComplianceCheck.missing_sections.map((section, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
                                         <MdOutlineError className="text-[20px] text-[#EAB308]" />
                                         <span className="text-[#111827] text-[16px]">{section}</span>
                                     </li>
                                 ))}
-                                {basicComplianceCheck && basicComplianceCheck[1].sections && basicComplianceCheck[1].sections.length === 0 && (
+                                {basicComplianceCheck && basicComplianceCheck.missing_sections && basicComplianceCheck.missing_sections.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
                                         <MdOutlineError className="text-[20px] text-[#EAB308]" />
                                         <span className="text-[#111827] text-[16px]">No missing sections found</span>
@@ -114,21 +76,21 @@ const AdvancedComplianceCheck = () => {
                                 )}
                             </ul>
                         </div>
-                        {/* Completed Sections */}
+                        {/* Empty Sections */}
                         <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#14532D]">{basicComplianceCheck && basicComplianceCheck[2].title}</h2>
-                            <p className="text-[#14532D] text-[14px] mb-4">{basicComplianceCheck && basicComplianceCheck[2].description}</p>
+                            <h2 className="text-[16px] font-semibold text-[#14532D]">Empty Sections</h2>
+                            <p className="text-[#14532D] text-[14px] mb-4">These sections are present but empty</p>
                             <ul className="space-y-3">
-                                {basicComplianceCheck && basicComplianceCheck[2].sections && basicComplianceCheck[2].sections.map((section, idx) => (
+                                {basicComplianceCheck && basicComplianceCheck.empty_sections && basicComplianceCheck.empty_sections.map((section, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
                                         <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
                                         <span className="text-[#111827] text-[16px]">{section}</span>
                                     </li>
                                 ))}
-                                {basicComplianceCheck && basicComplianceCheck[2].sections && basicComplianceCheck[2].sections.length === 0 && (
+                                {basicComplianceCheck && basicComplianceCheck.empty_sections && basicComplianceCheck.empty_sections.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
                                         <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
-                                        <span className="text-[#111827] text-[16px]">No completed sections found</span>
+                                        <span className="text-[#111827] text-[16px]">No empty sections found</span>
                                     </li>
                                 )}
                             </ul>
@@ -143,95 +105,69 @@ const AdvancedComplianceCheck = () => {
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-[#F8F9FA] border-2 border-[#E5E7EB] rounded-lg p-4 flex flex-col items-start">
-                            <span className="text-[#6B7280] text-[18px]">Overall Compliance Score</span>
-                            <span className="text-[#2563EB] text-[36px] font-semibold">{complianceScore}%</span>
-                        </div>
-                        <div className="bg-[#F8F9FA] border-2 border-[#E5E7EB] rounded-lg p-4 flex flex-col items-start">
-                            <span className="text-[#6B7280] text-[18px]">Issues Identified</span>
-                            <span className="text-[#2563EB] text-[36px] font-semibold">{issuesIdentified}</span>
-                        </div>
-                        <div className="bg-[#F8F9FA] border-2 border-[#E5E7EB] rounded-lg p-4 flex flex-col items-start">
-                            <span className="text-[#6B7280] text-[18px]">Suggestions</span>
-                            <span className="text-[#2563EB] text-[36px] font-semibold">{aiSuggestions && aiSuggestions.length}</span>
+                            <span className="text-[#6B7280] text-[18px]">Overall Compliance Status</span>
+                            <span className="text-[#2563EB] text-[28px] font-semibold">{advancedComplianceCheck && advancedComplianceCheck.status}</span>
                         </div>
                     </div>
                     {/* Compliance Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        {/* Critical Issues */}
+                        {/* Requested Information */}
                         <div className="bg-[#FEF2F2] border-2 border-[#FECACA] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#7F1D1D]">{advancedComplianceCheck && advancedComplianceCheck[0].title}</h2>
-                            <p className="text-[#B91C1C] text-[14px] mb-4">{advancedComplianceCheck && advancedComplianceCheck[0].description}</p>
+                            <h2 className="text-[16px] font-semibold text-[#7F1D1D]">Requested Information</h2>
+                            <p className="text-[#B91C1C] text-[14px] mb-4">As specified in the RFP</p>
                             <ul className="space-y-3">
-                                {advancedComplianceCheck && advancedComplianceCheck[0].issues && advancedComplianceCheck[0].issues.map((issue, idx) => (
+                                {advancedComplianceCheck && advancedComplianceCheck.requested_information && advancedComplianceCheck.requested_information.map((item, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
                                         <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">{issue}</span>
+                                        <span className="text-[#111827] text-[16px]">{item}</span>
                                     </li>
                                 ))}
-                                {advancedComplianceCheck && advancedComplianceCheck[0].issues && advancedComplianceCheck[0].issues.length === 0 && (
+                                {advancedComplianceCheck && advancedComplianceCheck.requested_information && advancedComplianceCheck.requested_information.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
                                         <IoMdCloseCircle className="text-[20px] text-[#EF4444]" />
-                                        <span className="text-[#111827] text-[16px]">No critical issues found</span>
+                                        <span className="text-[#111827] text-[16px]">No items specified</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
-                        {/* Missing Sections */}
+                        {/* Present Information */}
                         <div className="bg-[#FEFCE8] border-2 border-[#FEF0C7] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#713F12]">{advancedComplianceCheck && advancedComplianceCheck[1].title}</h2>
-                            <p className="text-[#713F12] text-[14px] mb-4">{advancedComplianceCheck && advancedComplianceCheck[1].description}</p>
+                            <h2 className="text-[16px] font-semibold text-[#713F12]">Present Information</h2>
+                            <p className="text-[#713F12] text-[14px] mb-4">Information detected in the proposal</p>
                             <ul className="space-y-3">
-                                {advancedComplianceCheck && advancedComplianceCheck[1].sections && advancedComplianceCheck[1].sections.map((section, idx) => (
+                                {advancedComplianceCheck && advancedComplianceCheck.present_information && advancedComplianceCheck.present_information.map((item, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
                                         <MdOutlineError className="text-[20px] text-[#EAB308]" />
-                                        <span className="text-[#111827] text-[16px]">{section}</span>
+                                        <span className="text-[#111827] text-[16px]">{item}</span>
                                     </li>
                                 ))}
-                                {advancedComplianceCheck && advancedComplianceCheck[1].sections && advancedComplianceCheck[1].sections.length === 0 && (
+                                {advancedComplianceCheck && advancedComplianceCheck.present_information && advancedComplianceCheck.present_information.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
                                         <MdOutlineError className="text-[20px] text-[#EAB308]" />
-                                        <span className="text-[#111827] text-[16px]">No missing sections found</span>
+                                        <span className="text-[#111827] text-[16px]">No present information found</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
-                        {/* Completed Sections */}
+                        {/* Missing Information */}
                         <div className="bg-[#F0FDF4] border-2 border-[#BBF7D0] rounded-lg p-6">
-                            <h2 className="text-[16px] font-semibold text-[#14532D]">{advancedComplianceCheck && advancedComplianceCheck[2].title}</h2>
-                            <p className="text-[#14532D] text-[14px] mb-4">{advancedComplianceCheck && advancedComplianceCheck[2].description}</p>
+                            <h2 className="text-[16px] font-semibold text-[#14532D]">Missing Information</h2>
+                            <p className="text-[#14532D] text-[14px] mb-4">Requested but not found</p>
                             <ul className="space-y-3">
-                                {advancedComplianceCheck && advancedComplianceCheck[2].sections && advancedComplianceCheck[2].sections.map((section, idx) => (
+                                {advancedComplianceCheck && advancedComplianceCheck.missing_information && advancedComplianceCheck.missing_information.map((item, idx) => (
                                     <li key={idx} className="flex items-center justify-start gap-2">
                                         <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
-                                        <span className="text-[#111827] text-[16px]">{section}</span>
+                                        <span className="text-[#111827] text-[16px]">{item}</span>
                                     </li>
                                 ))}
-                                {advancedComplianceCheck && advancedComplianceCheck[2].sections && advancedComplianceCheck[2].sections.length === 0 && (
+                                {advancedComplianceCheck && advancedComplianceCheck.missing_information && advancedComplianceCheck.missing_information.length === 0 && (
                                     <li className="flex items-center justify-start gap-2">
                                         <BsFillCheckCircleFill className="text-[20px] text-[#16A34A]" />
-                                        <span className="text-[#111827] text-[16px]">No completed sections found</span>
+                                        <span className="text-[#111827] text-[16px]">No missing information</span>
                                     </li>
                                 )}
                             </ul>
                         </div>
-                    </div>
-                    {/* AI Suggestions */}
-                    <div className="bg-[#F8F9FA] border-2 border-[#E5E7EB] rounded-lg p-6 mb-10">
-                        <h2 className="text-[20px] font-semibold text-[#2563EB] mb-4">AI Suggestions</h2>
-                        <ul className="space-y-3">
-                            {aiSuggestions && aiSuggestions.map((suggestion, idx) => (
-                                <li key={idx} className="flex items-center justify-start gap-2">
-                                    <MdOutlineDoneAll className="text-[20px] text-[#2563EB]" />
-                                    <span className="text-[#111827] text-[16px]">{suggestion.title}</span>
-                                </li>
-                            ))}
-                            {aiSuggestions && aiSuggestions.length === 0 && (
-                                <li className="flex items-center justify-start gap-2">
-                                    <MdOutlineDoneAll className="text-[20px] text-[#2563EB]" />
-                                    <span className="text-[#111827] text-[16px]">No AI suggestions found</span>
-                                </li>
-                            )}
-                        </ul>
                     </div>
                     {/* Navigation Buttons */}
                     <div className="flex flex-col md:flex-row items-center justify-between mt-8 gap-4">
