@@ -136,8 +136,8 @@ const SuperAdmin = () => {
 
     const [loading, setLoading] = useState(false);
 
-    // const baseUrl = "https://proposal-form-backend.vercel.app/api";
-    const baseUrl = "http://localhost:5000/api";
+    const baseUrl = "https://proposal-form-backend.vercel.app/api";
+    // const baseUrl = "http://localhost:5000/api";
 
 
 
@@ -1482,11 +1482,11 @@ const SuperAdmin = () => {
             console.log("data.data.plans", data.data.plans);
             for (let i = 0; i < data.data.plans.length; i++) {
                 if (data.data.plans[i].name === "Enterprise") {
-                  setIsContact(data.data.plans[i].isContact);
-                  console.log("Enterprise isContact:", data.data.plans[i].isContact);
-                  break;
+                    setIsContact(data.data.plans[i].isContact);
+                    console.log("Enterprise isContact:", data.data.plans[i].isContact);
+                    break;
                 }
-              }
+            }
         } catch (err) {
             console.error("Failed to fetch plans:", err);
         }
@@ -1497,7 +1497,7 @@ const SuperAdmin = () => {
     }, []);
     useEffect(() => {
         console.log("Updated isContact:", isContact);
-      }, [isContact]);
+    }, [isContact]);
 
 
     const startEdit = (plan) => {
@@ -1577,9 +1577,9 @@ const SuperAdmin = () => {
 
 
 
-    
-      
-         
+
+
+
     const getPlanSection = (planName) => {
         const plan = plans.plans?.find((p) => p.name === planName);
         if (!plan) return null;
@@ -1974,27 +1974,25 @@ const SuperAdmin = () => {
                 ) : planName === "Enterprise" ? (
                     <>
 
-                    {/*IsContact Toggle Button */}
-                    <div className="flex justify-end">
-                        <div className="flex items-center gap-2">
-                            <span className="text-gray-700">Is Contact</span>
-                            <button
-                            onClick={updateContacts}
-                            className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-                                isContact ? "bg-green-500" : "bg-gray-300"
-                            }`}
-                            >
-                            <div
-                                className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                isContact ? "translate-x-6" : "translate-x-0"
-                                }`}
-                            ></div>
-                            </button>
-                        </div>
+                        {/*IsContact Toggle Button */}
+                        <div className="flex justify-end">
+                            <div className="flex items-center gap-2">
+                                <span className="text-gray-700">Is Contact</span>
+                                <button
+                                    onClick={updateContacts}
+                                    className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${isContact ? "bg-green-500" : "bg-gray-300"
+                                        }`}
+                                >
+                                    <div
+                                        className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isContact ? "translate-x-6" : "translate-x-0"
+                                            }`}
+                                    ></div>
+                                </button>
+                            </div>
                         </div>
 
-                        
-                        {!editingPlans[plan._id]  ? (
+
+                        {!editingPlans[plan._id] ? (
                             <p className="text-2xl font-bold mb-4">
                                 ${isYearlye ? plan.yearlyPrice : plan.monthlyPrice}
                                 <span className="text-sm font-normal">/{isYearlye ? "year" : "month"}</span>
@@ -2045,7 +2043,7 @@ const SuperAdmin = () => {
                             </span>
                         </div>
 
-                        
+
                         <h2 className="text-lg font-semibold mb-2">{plan.name}</h2>
                         <ul className="space-y-2 mb-6">
                             <li className="flex items-center text-[#6C63FF] text-lg font-semibold">
@@ -2122,7 +2120,7 @@ const SuperAdmin = () => {
                                 Dedicated Support
                             </li>
 
-                            
+
                         </ul>
                     </>
                 ) : null}
@@ -2157,8 +2155,8 @@ const SuperAdmin = () => {
 
             </div>
         );
-        
-        
+
+
 
     };
     const updateContacts = async () => {
@@ -2237,7 +2235,7 @@ const SuperAdmin = () => {
             </div>
 
 
-            <ShowCustomDetails/>
+            <ShowCustomDetails />
 
         </div>
     );
@@ -3791,124 +3789,120 @@ const SuperAdmin = () => {
 
             {/* Mobile Menu Overlay - Only visible on small screens */}
             {showMobileMenu && (
-  <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-    <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col">
-      
-      {/* Header Section */}
-      <div className="p-4 border-b border-[#4B5563] flex items-center justify-between">
-        <div className="w-[127px] h-[36px]">
-          <img src="/Logo.png" alt="logo" className="w-full h-full" />
-        </div>
-        <button
-          className="p-2 transition-colors"
-          onClick={() => setShowMobileMenu(false)}
-        >
-          <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
-        </button>
-      </div>
+                <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                    <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col">
 
-      {/* Navigation Section */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <nav className="space-y-2">
-          {/* User Management */}
-          <button
-            className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
-              activeTab === "user-management"
-                ? "bg-[#2563eb] text-white"
-                : "text-[#4B5563]"
-            }`}
-            onClick={() => {
-              setActiveTab("user-management");
-              closeAllInvoiceRows();
-              setShowMobileMenu(false);
-            }}
-          >
-            <MdOutlineManageAccounts className="w-4 h-4" />
-            <span className="text-[16px] font-medium">User Management</span>
-          </button>
+                        {/* Header Section */}
+                        <div className="p-4 border-b border-[#4B5563] flex items-center justify-between">
+                            <div className="w-[127px] h-[36px]">
+                                <img src="/Logo.png" alt="logo" className="w-full h-full" />
+                            </div>
+                            <button
+                                className="p-2 transition-colors"
+                                onClick={() => setShowMobileMenu(false)}
+                            >
+                                <MdOutlineMenu className="w-6 h-6 text-[#4B5563]" />
+                            </button>
+                        </div>
 
-          {/* Payments */}
-          <button
-            className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
-              activeTab === "payments"
-                ? "bg-[#2563eb] text-white"
-                : "text-[#4B5563]"
-            }`}
-            onClick={() => {
-              setActiveTab("payments");
-              closeAllInvoiceRows();
-              setShowMobileMenu(false);
-            }}
-          >
-            <MdOutlinePayments className="w-4 h-4" />
-            <span className="text-[16px] font-medium">Payments</span>
-          </button>
+                        {/* Navigation Section */}
+                        <div className="flex-1 overflow-y-auto p-4">
+                            <nav className="space-y-2">
+                                {/* User Management */}
+                                <button
+                                    className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "user-management"
+                                            ? "bg-[#2563eb] text-white"
+                                            : "text-[#4B5563]"
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab("user-management");
+                                        closeAllInvoiceRows();
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlineManageAccounts className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">User Management</span>
+                                </button>
 
-          {/* Plan Management */}
-          <button
-            className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
-              activeTab === "plan-management"
-                ? "bg-[#2563eb] text-white"
-                : "text-[#4B5563]"
-            }`}
-            onClick={() => {
-              setActiveTab("plan-management");
-              closeAllInvoiceRows();
-              setShowMobileMenu(false);
-            }}
-          >
-            <LuCrown className="w-4 h-4" />
-            <span className="text-[16px] font-medium">Plan Management</span>
-          </button>
+                                {/* Payments */}
+                                <button
+                                    className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "payments"
+                                            ? "bg-[#2563eb] text-white"
+                                            : "text-[#4B5563]"
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab("payments");
+                                        closeAllInvoiceRows();
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlinePayments className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Payments</span>
+                                </button>
 
-          {/* Support */}
-          <button
-            className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
-              activeTab === "support"
-                ? "bg-[#2563eb] text-white"
-                : "text-[#4B5563]"
-            }`}
-            onClick={() => {
-              setActiveTab("support");
-              closeAllInvoiceRows();
-              setShowMobileMenu(false);
-            }}
-          >
-            <MdOutlineHeadsetMic className="w-4 h-4" />
-            <span className="text-[16px] font-medium">Support</span>
-          </button>
+                                {/* Plan Management */}
+                                <button
+                                    className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "plan-management"
+                                            ? "bg-[#2563eb] text-white"
+                                            : "text-[#4B5563]"
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab("plan-management");
+                                        closeAllInvoiceRows();
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <LuCrown className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Plan Management</span>
+                                </button>
 
-          {/* Website */}
-          <button
-            className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
-            onClick={() => window.open("/", "_blank")}
-          >
-            <MdLanguage className="w-5 h-5 flex-shrink-0" />
-            <span className="text-[16px] font-medium">Website</span>
-          </button>
+                                {/* Support */}
+                                <button
+                                    className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "support"
+                                            ? "bg-[#2563eb] text-white"
+                                            : "text-[#4B5563]"
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab("support");
+                                        closeAllInvoiceRows();
+                                        setShowMobileMenu(false);
+                                    }}
+                                >
+                                    <MdOutlineHeadsetMic className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Support</span>
+                                </button>
 
-          {/* Change Password */}
-          <button
-            onClick={() => navigate("/change-password")}
-            className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
-          >
-            <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
-            <span className="text-[16px] font-medium">Change Password</span>
-          </button>
+                                {/* Website */}
+                                <button
+                                    className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
+                                    onClick={() => window.open("/", "_blank")}
+                                >
+                                    <MdLanguage className="w-5 h-5 flex-shrink-0" />
+                                    <span className="text-[16px] font-medium">Website</span>
+                                </button>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
-          >
-            <MdOutlineLogout className="w-5 h-5 flex-shrink-0" />
-            <span className="text-[16px] font-medium">Logout</span>
-          </button>
-        </nav>
-      </div>
-    </div>
-  </div>
-)}
+                                {/* Change Password */}
+                                <button
+                                    onClick={() => navigate("/change-password")}
+                                    className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
+                                >
+                                    <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
+                                    <span className="text-[16px] font-medium">Change Password</span>
+                                </button>
+
+                                {/* Logout */}
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
+                                >
+                                    <MdOutlineLogout className="w-5 h-5 flex-shrink-0" />
+                                    <span className="text-[16px] font-medium">Logout</span>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            )}
 
 
 
