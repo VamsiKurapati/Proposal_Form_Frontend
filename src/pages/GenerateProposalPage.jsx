@@ -209,8 +209,8 @@ const GenerateProposalPage = () => {
                   <div key={idx} className="flex items-center gap-2 bg-white rounded-lg px-2 py-1">
                     <MdOutlineAssignment className="w-6 h-6 text-[#2563EB] shrink-0" />
                     <div className='w-full flex flex-col truncate'>
-                      <div className="text-[20px] font-medium text-[#111827]">{p.title}</div>
-                      <div className="text-[16px] text-[#9CA3AF]">{p.company}</div>
+                      <div className="text-[20px] font-medium text-[#111827]">{p.title || p.OPPORTUNITY_TITLE}</div>
+                      <div className="text-[16px] text-[#9CA3AF]">{p.company || p.CLIENT_NAME}</div>
                     </div>
                   </div>
                 ))}
