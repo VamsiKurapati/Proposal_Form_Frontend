@@ -132,6 +132,7 @@ const SuperAdmin = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPageTransactions, setCurrentPageTransactions] = useState(1);
     const [currentPageSupport, setCurrentPageSupport] = useState(1);
+    const [currentPageEnterpriseSupport, setCurrentPageEnterpriseSupport] = useState(1);
     const [currentPageNotifications, setCurrentPageNotifications] = useState(1);
 
     const [loading, setLoading] = useState(false);
@@ -677,6 +678,7 @@ const SuperAdmin = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [filteredSupport, setFilteredSupport] = useState([]);
+    const [filteredEnterpriseSupport, setFilteredEnterpriseSupport] = useState([]);
     const [filteredNotifications, setFilteredNotifications] = useState([]);
 
     useEffect(async () => {
@@ -735,6 +737,7 @@ const SuperAdmin = () => {
             const supportTicketsStats = response.data.TicketStats;
             setSupportTicketsStats(supportTicketsStats);
             setFilteredSupport(supportTicketsData);
+            setFilteredEnterpriseSupport((supportTicketsData || []).filter(t => (t.plan_name || '').toLowerCase() === 'enterprise'));
         } catch (error) {
             //console.log("error", error);
         } finally {
@@ -793,16 +796,16 @@ const SuperAdmin = () => {
     useEffect(() => {
         //console.log("supportSearchTerm", supportSearchTerm);
         //console.log("support", supportTicketsData);
-        if (supportSearchTerm) {
-            const term = supportSearchTerm.toLowerCase();
-            setFilteredSupport((supportTicketsData || []).filter(ticket =>
-                (ticket.type && ticket.type.toLowerCase().includes(term)) ||
-                (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
-                (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term))
-            ));
-        } else {
-            setFilteredSupport(supportTicketsData);
-        }
+        const term = (supportSearchTerm || '').toLowerCase();
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(t => (t.plan_name || '').toLowerCase() === 'enterprise');
+        const filterFn = (ticket) =>
+            (ticket.type && ticket.type.toLowerCase().includes(term)) ||
+            (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
+            (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term));
+
+        setFilteredSupport(term ? baseAll.filter(filterFn) : baseAll);
+        setFilteredEnterpriseSupport(term ? baseEnterprise.filter(filterFn) : baseEnterprise);
     }, [supportSearchTerm]);
 
     useEffect(() => {
@@ -886,22 +889,31 @@ const SuperAdmin = () => {
     }, [paymentsData, transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
-        const base = supportTicketsData || [];
-        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
-        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority.toLowerCase() === supportPriorityFilter.toLowerCase()));
-        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.category.toLowerCase() === supportTypeFilter.toLowerCase()));
-        setFilteredSupport(byType);
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(t => (t.plan_name || '').toLowerCase() === 'enterprise');
+
+        const filterPipeline = (base) => {
+            const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
+            const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
+            const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.category || '').toLowerCase() === supportTypeFilter.toLowerCase());
+            return byType;
+        };
+
+        setFilteredSupport(filterPipeline(baseAll));
+        setFilteredEnterpriseSupport(filterPipeline(baseEnterprise));
     }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
     // Removed duplicate notifications filter effect; combined above
 
     useEffect(() => {
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(support => (support.plan_name || '').toLowerCase() === 'enterprise');
         if (completedTickets) {
-            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Completed'));
-            //console.log("resolved", filteredSupport);
+            setFilteredSupport(baseAll.filter(support => support.status === 'Completed'));
+            setFilteredEnterpriseSupport(baseEnterprise.filter(support => support.status === 'Completed'));
         } else {
-            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Completed'));
-            //console.log("not resolved", filteredSupport);
+            setFilteredSupport(baseAll.filter(support => support.status !== 'Completed'));
+            setFilteredEnterpriseSupport(baseEnterprise.filter(support => support.status !== 'Completed'));
         }
     }, [completedTickets, supportTicketsData]);
 
@@ -920,6 +932,7 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when support search terms change
         setCurrentPageSupport(1);
+        setCurrentPageEnterpriseSupport(1);
         closeAllInvoiceRows();
     }, [supportSearchTerm]);
 
@@ -944,6 +957,7 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when support filters change
         setCurrentPageSupport(1);
+        setCurrentPageEnterpriseSupport(1);
         closeAllInvoiceRows();
     }, [supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
@@ -1977,7 +1991,7 @@ const SuperAdmin = () => {
                     {/*IsContact Toggle Button */}
                     <div className="flex justify-end">
                         <div className="flex items-center gap-2">
-                            <span className="text-gray-700">Is Contact</span>
+                            <span className="text-gray-700">Contact Us</span>
                             <button
                             onClick={updateContacts}
                             className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
@@ -2278,6 +2292,15 @@ const SuperAdmin = () => {
                         Active Tickets
                     </button>
                     <button
+                        onClick={() => { setSupportTab('Enterprise'); setCompletedTickets(false) }}
+                        className={`py-2 px-1 border-b-2 font-medium text-[16px] transition-colors ${supportTab === 'Enterprise'
+                            ? 'border-[#6C63FF] text-[#6C63FF]'
+                            : 'border-transparent text-[#4B5563]'
+                            }`}
+                    >
+                        Enterprise Tickets
+                    </button>
+                    <button
                         onClick={() => { setSupportTab('resolved'); setCompletedTickets(true) }}
                         className={`py-2 px-1 border-b-2 font-medium text-[16px] transition-colors ${supportTab === 'resolved'
                             ? 'border-[#6C63FF] text-[#6C63FF]'
@@ -2518,103 +2541,204 @@ const SuperAdmin = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
-                <table className="w-full rounded-2xl">
-                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
-                        <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Category
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Sub Category
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
-                                Description
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Date
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Priority
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Status
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                        {(() => {
-                            const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
-                            return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
-                                <React.Fragment key={index}>
+            {supportTab === 'Enterprise' ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
+                    <table className="w-full rounded-2xl">
+                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Sub Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                    Description
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Date
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Priority
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            {(() => {
+                                const paginatedEnterprise = paginateData(filteredEnterpriseSupport, currentPageEnterpriseSupport, rowsPerPage);
+                                return paginatedEnterprise.length > 0 ? paginatedEnterprise.map((ticket, index) => (
+                                    <React.Fragment key={index}>
+                                        <tr>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                                {ticket.category}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                                {ticket.subCategory}
+                                            </td>
+                                            <td className="p-4 text-[16px] text-[#4B5563]">
+                                                <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                    <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-[#6C63FF] whitespace-nowrap">
+                                                {formatDate(ticket.createdAt)}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                    {ticket.priority}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                    {ticket.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => openSupportModal(ticket)}
+                                                    title="View Details"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                    </React.Fragment>
+                                )) : (
                                     <tr>
-                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                            {ticket.category}
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                            {ticket.subCategory}
-                                        </td>
-                                        <td className="p-4 text-[16px] text-[#4B5563]">
-                                            <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
-                                                <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-[#6C63FF] whitespace-nowrap">
-                                            {formatDate(ticket.createdAt)}
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                                {ticket.priority}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => openSupportModal(ticket)}
-                                                title="View Details"
-                                            >
-                                                <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
-                                            </button>
+                                        <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                            No tickets found
                                         </td>
                                     </tr>
+                                );
+                            })()}
+                        </tbody>
+                    </table>
+                    {filteredEnterpriseSupport.length > 0 && (
+                        <PaginationComponent
+                            currentPage={currentPageEnterpriseSupport}
+                            totalPages={getTotalPages(filteredEnterpriseSupport, rowsPerPage)}
+                            onPageChange={(page) => {
+                                setCurrentPageEnterpriseSupport(page);
+                                closeAllInvoiceRows();
+                            }}
+                            totalItems={filteredEnterpriseSupport.length}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(newRowsPerPage) => {
+                                setRowsPerPage(newRowsPerPage);
+                                setCurrentPageEnterpriseSupport(1);
+                                closeAllInvoiceRows();
+                            }}
+                        />
+                    )}
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
+                    <table className="w-full rounded-2xl">
+                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Sub Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                    Description
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Date
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Priority
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            {(() => {
+                                const nonEnterprise = (filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise');
+                                const paginatedSupport = paginateData(nonEnterprise, currentPageSupport, rowsPerPage);
+                                return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
+                                    <React.Fragment key={index}>
+                                        <tr>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                                {ticket.category}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                                {ticket.subCategory}
+                                            </td>
+                                            <td className="p-4 text-[16px] text-[#4B5563]">
+                                                <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                    <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-[#6C63FF] whitespace-nowrap">
+                                                {formatDate(ticket.createdAt)}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                    {ticket.priority}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                    {ticket.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => openSupportModal(ticket)}
+                                                    title="View Details"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
+                                                </button>
+                                            </td>
+                                        </tr>
 
-                                </React.Fragment>
-                            )) : (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
-                                        No tickets found
-                                    </td>
-                                </tr>
-                            );
-                        })()}
-                    </tbody>
-                </table>
-                {filteredSupport.length > 0 && (
-                    <PaginationComponent
-                        currentPage={currentPageSupport}
-                        totalPages={getTotalPages(filteredSupport, rowsPerPage)}
-                        onPageChange={(page) => {
-                            setCurrentPageSupport(page);
-                            closeAllInvoiceRows();
-                        }}
-                        totalItems={filteredSupport.length}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={(newRowsPerPage) => {
-                            setRowsPerPage(newRowsPerPage);
-                            setCurrentPageSupport(1); // Reset to first page when changing rows per page
-                            closeAllInvoiceRows();
-                        }}
-                    />
-                )}
-            </div>
+                                    </React.Fragment>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                            No tickets found
+                                        </td>
+                                    </tr>
+                                );
+                            })()}
+                        </tbody>
+                    </table>
+                    {(() => { const nonEnterprise = (filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise'); return nonEnterprise.length > 0; })() && (
+                        <PaginationComponent
+                            currentPage={currentPageSupport}
+                            totalPages={getTotalPages((filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise'), rowsPerPage)}
+                            onPageChange={(page) => {
+                                setCurrentPageSupport(page);
+                                closeAllInvoiceRows();
+                            }}
+                            totalItems={(filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise').length}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(newRowsPerPage) => {
+                                setRowsPerPage(newRowsPerPage);
+                                setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                                closeAllInvoiceRows();
+                            }}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 
@@ -2640,6 +2764,9 @@ const SuperAdmin = () => {
         }
         return "just now";
     }
+
+
+
     const renderNotifications = () => {
         const getNotificationIcon = (icon) => {
             switch (icon) {
@@ -3208,6 +3335,12 @@ const SuperAdmin = () => {
                                                         <p className='text-[#6B7280]'>Priority</p>
                                                         <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
                                                             {selectedSupport.priority}
+                                                        </span>
+                                                    </div>
+                                                    <div className='flex flex-col gap-2'>
+                                                        <p className='text-[#6B7280]'>Plan Name</p>
+                                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.plan_name)}`}>
+                                                            {selectedSupport.plan_name}
                                                         </span>
                                                     </div>
                                                 </div>

@@ -73,7 +73,7 @@ const SupportTicket = () => {
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
 
-    const baseUrl = "https://proposal-form-backend.vercel.app/api/support";
+    const baseUrl = "http://localhost:5000/api/support";
 
     const fetchConversationMessages = async (ticketId) => {
         setLoadingMessages(true);
@@ -183,11 +183,15 @@ const SupportTicket = () => {
         setSuccessMsg("");
         setErrorMsg("");
 
+        const subsplanName = JSON.parse(localStorage.getItem("subscription"));
+
         const formData = new FormData();
         formData.append("userId", userId);
         formData.append("category", category);
         formData.append("subCategory", subCategory);
         formData.append("description", description);
+        formData.append("plan_name", subsplanName.plan_name);
+        console.log("subsplanName", subsplanName.plan_name);
         if (attachments) formData.append("attachments", attachments);
 
         try {

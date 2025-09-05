@@ -105,6 +105,9 @@ export default function Subscription({ plan }) {
                 Support
               </li>
             </ul>
+            <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+          Get Started
+        </button>
           </>
         ) : planName === "Pro" ? (
           <>
@@ -161,6 +164,9 @@ export default function Subscription({ plan }) {
                 Advance Compliance Check
               </li>
             </ul>
+            <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+          Get Started
+        </button>
           </>
         ) : planName === "Enterprise" ? (
           <>
@@ -225,12 +231,20 @@ export default function Subscription({ plan }) {
                 Dedicated Support
               </li>
             </ul>
+
+            {plan.isContact ? (
+              <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/support-ticket")}>
+                Get in Touch
+              </button>
+            ) : (
+              <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+                Get Started
+              </button>
+            )}
           </>
         ) : null}
 
-        <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
-          Get Started
-        </button>
+       
       </div>
     );
   };
