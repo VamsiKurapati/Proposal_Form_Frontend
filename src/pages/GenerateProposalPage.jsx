@@ -36,18 +36,32 @@ const GenerateProposalPage = () => {
       if (res.status === 200) {
         //console.log(res.data);
         setIsGeneratingProposal(false);
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Proposal generated successfully. Redirecting to editor.',
-        });
-        setTimeout(() => {
-          navigate('/editor', {
-            state: {
-              jsonData: res.data.processedProposal, proposalId: res.data.proposalId
-            }
+        if (res.data.message === "Proposal Generation completed successfully.") {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Proposal generated successfully. Redirecting to editor.',
           });
-        }, 1000);
+          setTimeout(() => {
+            navigate('/editor', {
+              state: {
+                jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+              }
+            });
+          }, 1000);
+        } else if (res.data.message === "Proposal Generation is already in progress. Please wait for it to complete.") {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Proposal Generation is already in progress. Please wait for it to complete.',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to generate proposal. Please try again.',
+          });
+        }
       } else {
         Swal.fire({
           icon: 'error',

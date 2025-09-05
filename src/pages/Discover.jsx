@@ -609,6 +609,9 @@ const Discover = () => {
     deadlineRange: []
   });
 
+  //Generating State
+  const [isGeneratingGrantProposal, setIsGeneratingGrantProposal] = useState(false);
+
   // Pagination functions
   const getCurrentPageItems = (items, currentPage, itemsPerPage) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -1342,8 +1345,8 @@ const Discover = () => {
 
 
   const handleSubmitGrantProposal = async (proposalData) => {
-    // Set loading state to true
-    setIsGeneratingProposal(true);
+    // Set generating state to true
+    setIsGeneratingGrantProposal(true);
 
     try {
       // Validate required fields
@@ -1375,7 +1378,8 @@ const Discover = () => {
       });
 
       if (missingFields.length > 0) {
-        setIsGeneratingProposal(false);
+        // Set generating state to false
+        setIsGeneratingGrantProposal(false);
         Swal.fire({
           icon: 'warning',
           title: 'Required Fields Missing',
@@ -1390,7 +1394,7 @@ const Discover = () => {
       const totalRequestedAmount = parseFloat(proposalData.budget.total_requested_amount);
 
       if (isNaN(totalProjectCost) || totalProjectCost <= 0) {
-        setIsGeneratingProposal(false);
+        setIsGeneratingGrantProposal(false);
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
@@ -1401,7 +1405,7 @@ const Discover = () => {
       }
 
       if (isNaN(totalRequestedAmount) || totalRequestedAmount <= 0) {
-        setIsGeneratingProposal(false);
+        setIsGeneratingGrantProposal(false);
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
@@ -1415,7 +1419,7 @@ const Discover = () => {
       if (selectedGrant.AWARD_CEILING && selectedGrant.AWARD_CEILING !== "Not Provided") {
         const awardCeiling = parseFloat(selectedGrant.AWARD_CEILING.replace(/[^0-9.]/g, ''));
         if (!isNaN(awardCeiling) && totalRequestedAmount > awardCeiling) {
-          setIsGeneratingProposal(false);
+          setIsGeneratingGrantProposal(false);
           Swal.fire({
             icon: 'error',
             title: 'Budget Exceeds Limit',
@@ -1427,7 +1431,7 @@ const Discover = () => {
       }
 
       if (totalRequestedAmount > totalProjectCost) {
-        setIsGeneratingProposal(false);
+        setIsGeneratingGrantProposal(false);
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
@@ -1448,12 +1452,35 @@ const Discover = () => {
       });
 
       if (res.status === 200) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Grant proposal generated successfully!',
-          confirmButtonColor: '#2563EB'
-        });
+        if (res.data.message === "Grant Proposal Generation completed successfully.") {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Grant proposal generated successfully!',
+            confirmButtonColor: '#2563EB'
+          });
+          setTimeout(() => {
+            navigate('/editor', {
+              state: {
+                jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+              }
+            });
+          }, 1000);
+        } else if (res.data.message === "Grant Proposal Generation is already in progress. Please wait for it to complete.") {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Grant Proposal Generation is already in progress. Please wait for it to complete.',
+            confirmButtonColor: '#2563EB'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to generate grant proposal. Please try again.',
+            confirmButtonColor: '#2563EB'
+          });
+        }
       } else {
         Swal.fire({
           icon: 'error',
@@ -1482,7 +1509,7 @@ const Discover = () => {
       });
     } finally {
       // Always set loading to false
-      setIsGeneratingProposal(false);
+      setIsGeneratingGrantProposal(false);
     }
   };
 

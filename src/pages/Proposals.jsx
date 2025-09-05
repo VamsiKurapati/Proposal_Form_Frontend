@@ -760,12 +760,35 @@ const Proposals = () => {
             });
 
             if (res.status === 200) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Grant proposal generated successfully!',
-                    confirmButtonColor: '#2563EB'
-                });
+                if (res.data.message === "Grant Proposal Generation completed successfully.") {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Grant proposal generated successfully!',
+                        confirmButtonColor: '#2563EB'
+                    });
+                    setTimeout(() => {
+                        navigate('/editor', {
+                            state: {
+                                jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+                            }
+                        });
+                    }, 1000);
+                } else if (res.data.message === "Grant Proposal Generation is already in progress. Please wait for it to complete.") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Grant Proposal Generation is already in progress. Please wait for it to complete.',
+                        confirmButtonColor: '#2563EB'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to generate grant proposal. Please try again.',
+                        confirmButtonColor: '#2563EB'
+                    });
+                }
             } else {
                 Swal.fire({
                     icon: 'error',
