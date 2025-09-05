@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 
 
 
-const API_URL = "https://proposal-form-backend.vercel.app";
+const API_URL = "http://localhost:5000";
 export default function Contact() {
   const navigate = useNavigate();
 
@@ -118,13 +118,13 @@ export default function Contact() {
                 <div>
                   <label className="block font-medium text-gray-700 mb-1">Description</label>
                   <textarea
-                    name="message"
-                    placeholder="Enter description of your request"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full border-b border-gray-300 focus:border-blue-500 outline-none pb-2"
-                    required
-                  />
+                      name="description"
+                      placeholder="Enter description of your request"
+                      value={formData.description}
+                      onChange={handleChange}
+                      className="w-full border-b border-gray-300 focus:border-blue-500 outline-none pb-2"
+                      required
+                    />
                 </div>
 
                 <button

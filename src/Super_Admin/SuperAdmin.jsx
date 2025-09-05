@@ -32,8 +32,9 @@ import {
     MdLanguage,
     MdOutlinePhone,
     MdOutlineSubscriptions,
+    MdOutlinePermContactCalendar
 } from 'react-icons/md';
-import { IoLogoLinkedin } from "react-icons/io";
+import { IoLogoLinkedin } from "react-icons/io";    
 import { LuCrown } from "react-icons/lu";
 import { FaRegCheckCircle } from "react-icons/fa";
 
@@ -2276,6 +2277,200 @@ const SuperAdmin = () => {
         </div>
     );
 
+    const [contactRequestSearchTerm, setContactRequestSearchTerm] = useState('');
+    const [contactRequestData, setContactRequestData] = useState([]);
+    const [filteredContactRequest, setFilteredContactRequest] = useState([]);
+    const [currentPageContact, setCurrentPageContact] = useState(1);
+    const [contactDetailsModalOpen, setContactDetailsModalOpen] = useState(false);
+    const [selectedContactRequest, setSelectedContactRequest] = useState(null);
+
+    const contactRequestDatafetch = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/admin/getContactData`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            setContactRequestData(response.data || []);
+            setFilteredContactRequest(response.data || []);
+        } catch (e) {
+            // ignore
+        }
+    };
+
+    useEffect(() => {
+        contactRequestDatafetch();
+    }, []);
+
+    useEffect(() => {
+        const term = (contactRequestSearchTerm || '').toLowerCase();
+        const base = contactRequestData || [];
+        const filtered = term
+            ? base.filter(r =>
+                (r.name || '').toLowerCase().includes(term) ||
+                (r.company || '').toLowerCase().includes(term) ||
+                (r.email || '').toLowerCase().includes(term) ||
+                (r.status || '').toLowerCase().includes(term)
+              )
+            : base;
+        setFilteredContactRequest(filtered);
+    }, [contactRequestSearchTerm, contactRequestData]);
+
+    const renderContactRequest = () => (
+        <div className='h-full'>
+            {/* Search Bar */}
+            <div className="mb-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="relative">
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, company, email, or status"
+                                value={contactRequestSearchTerm}
+                                onChange={(e) => {
+                                    setContactRequestSearchTerm(e.target.value);
+                                    setCurrentPageContact(1);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-[530px] text-[#374151] placeholder-[#9CA3AF] bg-white"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Contact Requests Table */}
+            <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
+                <table className="w-full rounded-2xl">
+                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                        <tr>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Name</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Company</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Email</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Description</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Status</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {(() => {
+                            const statusWeight = (s) => {
+                                const t = (s || '').toLowerCase();
+                                if (t === 'open') return 0;
+                                if (t === 'connected') return 2;
+                                return 1;
+                            };
+                            const sorted = [...(filteredContactRequest || [])].sort((a, b) => statusWeight(a?.status) - statusWeight(b?.status));
+                            const paginated = paginateData(sorted, currentPageContact, rowsPerPage);
+                            return paginated.length > 0 ? paginated.map((row, idx) => (
+                                <tr key={idx} className="hover:bg-[#F8FAFC] transition-colors">
+                                    <td className="p-4 text-[16px] text-[#4B5563]">{row.name || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#4B5563]">{row.company || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#6C63FF]">{row.email || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#4B5563]"><div className="max-w-[240px] line-clamp-2 truncate">{row.description || '—'}</div></td>
+                                    <td className="p-4 whitespace-nowrap">
+                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor((row.status || 'Pending'))}`}>
+                                            {row.status || 'Pending'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-[16px] text-[#4B5563] whitespace-nowrap">
+                                        <button
+                                            className="text-[#2563EB] px-4 py-2 rounded-md"
+                                            onClick={() => {
+                                                const selected = (contactRequestData || []).find(r => r._id === row._id);
+                                                setSelectedContactRequest(selected || row);
+                                                setContactDetailsModalOpen(true);
+                                            }}
+                                        >
+                                            <MdOutlineVisibility className="w-5 h-5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan={5} className="p-4 text-center text-gray-500">No contact requests found</td>
+                                </tr>
+                            );
+                        })()}
+                    </tbody>
+                </table>
+                {filteredContactRequest.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageContact}
+                        totalPages={getTotalPages(filteredContactRequest, rowsPerPage)}
+                        onPageChange={(page) => { setCurrentPageContact(page); closeAllInvoiceRows(); }}
+                        totalItems={filteredContactRequest.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => { setRowsPerPage(newRowsPerPage); setCurrentPageContact(1); closeAllInvoiceRows(); }}
+                    />
+                )}
+            </div>
+
+            {contactDetailsModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" onClick={(e) => { if (e.target === e.currentTarget) setContactDetailsModalOpen(false); }}>
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900">Contact Request</h3>
+                            <button onClick={() => setContactDetailsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
+                                <MdOutlineClose className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="text-sm text-gray-700 space-y-1 mb-4">
+                            <p><strong>Name:</strong> {selectedContactRequest?.name || '—'}</p>
+                            <p><strong>Company:</strong> {selectedContactRequest?.company || '—'}</p>
+                            <p><strong>Email:</strong> {selectedContactRequest?.email || '—'}</p>
+                            <p><strong>Status:</strong> {selectedContactRequest?.status || 'Pending'}</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                onClick={async () => {
+                                    try {
+                                        const id = selectedContactRequest?._id;
+                                        await axios.delete(`${baseUrl}/admin/deleteContactData/${id}`, {
+                                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                                        });
+                                        setContactRequestData(prev => (prev || []).filter(r => r._id !== id));
+                                        setFilteredContactRequest(prev => (prev || []).filter(r => r._id !== id));
+                                        setContactDetailsModalOpen(false);
+                                        toast.success('Contact request deleted');
+                                    } catch (e) {
+                                        toast.error('Failed to delete');
+                                    }
+                                }}
+                            >
+                                Delete
+                            </button>
+                            {selectedContactRequest?.status !== 'Connected' && (
+                            <button
+                                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                onClick={async () => {
+                                    try {
+                                        const id = selectedContactRequest?._id;
+                                        await axios.put(`${baseUrl}/admin/updateContactData/${id}`, { status: 'Connected' }, {
+                                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                                        });
+                                        setContactRequestData(prev => (prev || []).map(r => r._id === id ? { ...r, status: 'Connected' } : r));
+                                        setFilteredContactRequest(prev => (prev || []).map(r => r._id === id ? { ...r, status: 'Connected' } : r));
+                                        setSelectedContactRequest(prev => prev ? { ...prev, status: 'Connected' } : prev);
+                                        setContactDetailsModalOpen(false);
+                                        toast.success('Marked as Connected');
+                                    } catch (e) {
+                                        toast.error('Failed to update');
+                                    }
+                                }}
+                            >
+                                Mark as Connected
+                            </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
 
     const renderSupport = () => (
         <div className='h-full'>
@@ -4014,6 +4209,18 @@ const SuperAdmin = () => {
             <span className="text-[16px] font-medium">Plan Management</span>
           </button>
 
+          {/* Contact Request */}
+          <button
+            className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
+              activeTab === "contact-request"
+                ? "bg-[#2563eb] text-white"
+                : "text-[#4B5563]"
+            }`}
+          >
+            <MdOutlinePermContactCalendar className="w-4 h-4" />
+            <span className="text-[16px] font-medium">Contact Request</span>
+          </button>
+
           {/* Support */}
           <button
             className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${
@@ -4030,6 +4237,7 @@ const SuperAdmin = () => {
             <MdOutlineHeadsetMic className="w-4 h-4" />
             <span className="text-[16px] font-medium">Support</span>
           </button>
+
 
           {/* Website */}
           <button
@@ -4142,6 +4350,20 @@ const SuperAdmin = () => {
                                 </button>
 
                                 <button
+                                    className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'enterprise-support' ? 'bg-[#6C63FF] text-white' : 'text-white'
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab('contact-request');
+                                        closeAllInvoiceRows();
+                                    }}
+                                >
+                                    <MdOutlinePermContactCalendar className="w-5 h-5 flex-shrink-0" />
+                                    <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                                        Contact Request
+                                    </span>
+                                </button>
+
+                                <button
                                     className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'support' ? 'bg-[#6C63FF] text-white' : 'text-white'
                                         }`}
                                     onClick={() => {
@@ -4214,7 +4436,7 @@ const SuperAdmin = () => {
                                     <div className="w-full h-8 rounded-lg flex items-center justify-center mr-3">
 
 
-                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : 'Notifications'}</span>
+                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : activeTab === 'notifications' ? 'Notifications' : 'Contact Request'}</span>
 
                                     </div>
                                 </div>
@@ -4267,6 +4489,7 @@ const SuperAdmin = () => {
                             {activeTab === 'support' && renderSupport()}
                             {activeTab === 'plan-management' && renderPlanManagement()}
                             {activeTab === 'notifications' && renderNotifications()}
+                            {activeTab === 'contact-request' && renderContactRequest()}
                         </div>
                     </div>
                 </div>
