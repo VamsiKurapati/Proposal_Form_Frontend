@@ -105,6 +105,9 @@ export default function Subscription({ plan }) {
                 Support
               </li>
             </ul>
+            <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+          Get Started
+        </button>
           </>
         ) : planName === "Pro" ? (
           <>
@@ -161,11 +164,16 @@ export default function Subscription({ plan }) {
                 Advance Compliance Check
               </li>
             </ul>
+            <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+          Get Started
+        </button>
           </>
         ) : planName === "Enterprise" ? (
           <>
 
-
+            {!plan.isContact && (
+              
+            <div>
             <div className="flex items-center mb-4 relative bg-gray-200 rounded-full w-[120px] p-1 ml-[50%] -translate-x-1/2">
               <div
                 className={`absolute top-1 left-1 w-[55px] h-[22px] rounded-full bg-[#6C63FF] transition-transform duration-300 ${isYearlye ? "translate-x-[58px]" : "translate-x-0"
@@ -194,6 +202,10 @@ export default function Subscription({ plan }) {
               <span className="text-xs font-normal">/{isYearlye ? "year" : "month"}</span>
             </p>
 
+            </div>
+
+            )}
+
             <p className="text-[24px] font-semibold mb-2">{plan.name}</p>
             <ul className="space-y-1 mb-4 text-sm">
               <li className="flex items-center text-[#6C63FF] text-sm font-semibold">
@@ -202,27 +214,37 @@ export default function Subscription({ plan }) {
               </li>
               <li className="flex items-center text-gray-700">
                 <span className="text-green-500 p-1"><FaRegCheckCircle className="w-3.5 h-3.5" /></span>
-                <span>Up to {plan.maxRFPProposalGenerations} AI - RFP Proposal Generations</span>
+                {plan.isContact ? "Custom AI-RFP Proposal Generations" :
+                <span>Up to {plan.maxRFPProposalGenerations} AI - RFP Proposal Generations</span>}
               </li>
               <li className="flex items-center text-gray-700">
                 <span className="text-green-500 p-1"><FaRegCheckCircle className="w-3.5 h-3.5" /></span>
-                <span>Up to {plan.maxGrantProposalGenerations} AI - Grant Proposal Generations</span>
+                {plan.isContact ? "Custom AI-Grant Proposal Generations" :
+                <span>Up to {plan.maxGrantProposalGenerations} AI - Grant Proposal Generations</span>}
               </li>
               <li className="flex items-center text-gray-700">
                 <span className="text-green-500 p-1"><FaRegCheckCircle className="w-3.5 h-3.5" /></span>
-                Unlimited Editors, Unlimited Viewers, Unlimited Members
+                {plan.isContact ? "Custom Editors, Custom Viewers, Custom Members" : "Unlimited Editors, Unlimited Viewers, Unlimited Members"}
               </li>
               <li className="flex items-center text-gray-700">
                 <span className="text-green-500 p-1"><FaRegCheckCircle className="w-3.5 h-3.5" /></span>
                 Dedicated Support
               </li>
             </ul>
+
+            {plan.isContact ? (
+              <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/support-ticket")}>
+                Get in Touch
+              </button>
+            ) : (
+              <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
+                Get Started
+              </button>
+            )}
           </>
         ) : null}
 
-        <button className="w-full py-1.5 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white text-sm font-medium shadow mt-auto" onClick={() => navigate("/payment")}>
-          Get Started
-        </button>
+       
       </div>
     );
   };

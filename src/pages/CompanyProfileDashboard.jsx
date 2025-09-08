@@ -1,11 +1,13 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineCheck } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineCheck, MdOutlinePayments } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
 
 // Short desc, job title, highest edu, skills
+
+const baseUrl = "https://proposal-form-backend.vercel.app/api";
 
 // Unified Badge Styles
 const badgeStyles = {
@@ -42,6 +44,7 @@ const sidebarItems = [
   { name: "Documents", icon: <MdOutlineFolder className="w-6 h-6" /> },
   { name: "Case Studies", icon: <MdOutlineAssignment className="w-6 h-6" /> },
   { name: "Certificates", icon: <MdOutlineVerifiedUser className="w-6 h-6" /> },
+  { name: "Payment", icon: <MdOutlinePayments className="w-6 h-6" /> },
 ];
 
 // Mobile Dropdown Component
@@ -281,7 +284,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
     try {
       let skillsArray = formData.skills.split(',').map(skill => skill.trim());
       formData.skills = skillsArray;
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addEmployee', formData,
+      const response = await axios.post(`${baseUrl}/profile/addEmployee`, formData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -461,7 +464,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
       formDataToSend.append('company', formData.company);
       formDataToSend.append('file', formData.file);
 
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addCaseStudy', formDataToSend,
+      const response = await axios.post(`${baseUrl}/profile/addCaseStudy`, formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -594,7 +597,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addLicenseAndCertification', formData,
+      const response = await axios.post(`${baseUrl}/profile/addLicenseAndCertification`, formData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -725,7 +728,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
       formDataToSend.append('type', formData.file.type === 'application/pdf' ? 'PDF' : 'TXT');
       formDataToSend.append('document', formData.file);
 
-      const response = await axios.post('https://proposal-form-backend.vercel.app/api/profile/addDocument', formDataToSend,
+      const response = await axios.post(`${baseUrl}/profile/addDocument`, formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -869,6 +872,11 @@ const CompanyProfileDashboard = () => {
   const [showAddDocumentModal, setShowAddDocumentModal] = useState(false);
   const [filteredProposals, setFilteredProposals] = useState([]);
 
+  // Payments tab state
+  const [payments, setPayments] = useState([]);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   // Remove useEffect for fetching company data
   // useEffect(() => { ... }, []);
 
@@ -913,7 +921,7 @@ const CompanyProfileDashboard = () => {
 
       // Download the actual document from the backend as binary
       const response = await axios.get(
-        `https://proposal-form-backend.vercel.app/api/profile/getDocument/${docItem.fileId}`,
+        `${baseUrl}/profile/getDocument/${docItem.fileId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -984,6 +992,98 @@ const CompanyProfileDashboard = () => {
     setShowAddDocumentModal(true);
   };
 
+  React.useEffect(() => {
+    const userId = JSON.parse(localStorage.getItem("user"))?._id;
+    console.log("userId", userId);
+    const loadPayments = async () => {
+      if (activeTab !== "Payment") return;
+      try {
+        const res = await axios.get(`${baseUrl}/profile/getPaymentById/${userId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const allPayments = res.data;
+        const normalized = Array.isArray(allPayments) ? allPayments : [allPayments];
+        setPayments(normalized);
+      } catch (e) {
+        setPayments([]);
+      }
+    };
+    loadPayments();
+  }, [activeTab]);
+
+  const printPaymentInvoice = (data) => {
+    try {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Invoice - ${data.transaction_id}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+            .invoice-header { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+            .logo { width: 60px; height: 60px; margin-right: 20px; }
+            .company-name { color: #2563eb; margin: 0; font-size: 28px; font-weight: bold; }
+            .company-tagline { color: #6b7280; margin: 5px 0 0 0; font-size: 16px; }
+            .invoice-title { color: #111827; margin: 30px 0 20px 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+            .invoice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0; }
+            .section-title { color: #374151; margin: 0 0 15px 0; font-size: 18px; }
+            .detail-row { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #111827; }
+            .value { margin-left: 10px; color: #6b7280; }
+            .footer { border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; }
+            .footer-content { display: flex; justify-content: space-between; align-items: center; }
+            .total-amount { font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 5px; }
+            .thank-you { color: #6b7280; font-size: 14px; }
+            @media print { body { padding: 0; } .no-print { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-header">
+            <img src="/vite.svg" alt="Company Logo" class="logo">
+            <div>
+              <h1 class="company-name">RFP2GRANTS</h1>
+              <p class="company-tagline">Professional Proposal Management</p>
+            </div>
+          </div>
+          <h2 class="invoice-title">Payment Invoice - ${data.transaction_id}</h2>
+          <div class="invoice-grid">
+            <div>
+              <h3 class="section-title">Invoice Details</h3>
+              <div class="detail-row"><span class="label">Transaction ID:</span><span class="value">${data.transaction_id || 'N/A'}</span></div>
+              <div class="detail-row"><span class="label">Amount:</span><span class="value">$${data.price}</span></div>
+              <div class="detail-row"><span class="label">Payment Method:</span><span class="value">${data.payment_method || 'N/A'}</span></div>
+              <div class="detail-row"><span class="label">Plan Name:</span><span class="value">${data.planName || '—'}</span></div>
+            </div>
+            <div>
+              <h3 class="section-title">Additional Information</h3>
+              <div class="detail-row"><span class="label">Status:</span><span class="value">${data.status}</span></div>
+              <div class="detail-row"><span class="label">User ID:</span><span class="value">${data.user_id || 'N/A'}</span></div>
+              <div class="detail-row"><span class="label">Paid At:</span><span class="value">${data.paid_at || data.createdAt || 'N/A'}</span></div>
+            </div>
+          </div>
+          <div class="footer">
+            <div class="footer-content">
+              <div style="color: #6b7280; font-size: 14px;">Invoice generated on ${new Date().toLocaleDateString()}</div>
+              <div style="text-align: right;">
+                <div class="total-amount">Total Amount: $${data.price}</div>
+                <div class="thank-you">Thank you for your business!</div>
+              </div>
+            </div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-top: 30px; padding: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Print Invoice</button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 10px;">Close</button>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } catch (e) {
+      alert('Failed to open invoice for printing.');
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -1028,7 +1128,7 @@ const CompanyProfileDashboard = () => {
 
     try {
       const response = await axios.post(
-        'https://proposal-form-backend.vercel.app/api/profile/uploadLogo',
+        `${baseUrl}/profile/uploadLogo`,
         formData,
         {
           headers: {
@@ -1037,7 +1137,7 @@ const CompanyProfileDashboard = () => {
           },
         }
       );
-      setLogoUrl("https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl);
+      setLogoUrl(`${baseUrl}/profile/getProfileImage/file/${response.data.logoUrl}`);
       // //console.log(logoUrl);
       setEditMode(false);
       setSelectedFile(null);
@@ -1636,6 +1736,81 @@ const CompanyProfileDashboard = () => {
                   <div className="col-span-full text-center text-[#9CA3AF] py-8 text-[16px]">No certifications yet... Add your first certification!</div>
                 )}
               </div>
+            </div>
+          )}
+          {activeTab === "Payment" && (
+            <div className="bg-white rounded-xl p-2">
+              <h2 className="text-[24px] font-semibold mb-4">Payments</h2>
+
+              <div className="bg-white border border-[#E5E7EB] overflow-x-auto rounded-2xl">
+                <table className="w-full rounded-2xl">
+                  <thead className="bg-[#F8F8FF] border-b border-[#0000001A]">
+                    <tr>
+                      <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Transaction ID</th>
+                      <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Company Name</th>
+                      <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Amount</th>
+                      <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Plan</th>
+                      <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.length > 0 ? (
+                      payments.map((payment, index) => (
+                        <tr key={payment._id || index} className="hover:bg-[#F8FAFC] transition-colors">
+                          <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">{payment.transaction_id || payment._id}</td>
+                          <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">{companyData.companyName || '—'}</td>
+                          <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#6C63FF]">${payment.price}</td>
+                          <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">{payment.planName || '—'}</td>
+                          <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                            <div className="flex items-center gap-2">
+                              {/* <button
+                                className="px-3 py-1 bg-[#2563EB] text-white rounded-lg"
+                                onClick={() => { setSelectedPayment(payment); setShowPaymentModal(true); }}
+                              >
+                                View
+                              </button> */}
+                              <button
+                                className="px-3 py-1 border border-[#4B5563] text-[#111827] rounded-lg hover:bg-[#F8FAFC]"
+                                onClick={() => printPaymentInvoice(payment)}
+                              >
+                                <span className="inline-flex items-center gap-1"><MdOutlineDownload className="w-4 h-4" /> Invoice</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">No payments loaded yet. Fetch by Payment ID.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {showPaymentModal && selectedPayment && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowPaymentModal(false)}>
+                  <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Payment Details</h3>
+                      <button onClick={() => setShowPaymentModal(false)} className="text-gray-500 hover:text-gray-700"><MdOutlineClose className="w-6 h-6" /></button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-[14px] text-[#111827]">
+                      <div><strong>Transaction ID:</strong> <div className="text-[#4B5563]">{selectedPayment.transaction_id || selectedPayment._id}</div></div>
+                      <div><strong>Company Name:</strong> <div className="text-[#4B5563]">{companyData.companyName || '—'}</div></div>
+                      <div><strong>Plan:</strong> <div className="text-[#4B5563]">{selectedPayment.planName || '—'}</div></div>
+                      <div><strong>Amount:</strong> <div className="text-[#4B5563]">${selectedPayment.price}</div></div>
+                      <div><strong>Status:</strong> <div className="text-[#4B5563]">{selectedPayment.status}</div></div>
+                      <div><strong>Payment Method:</strong> <div className="text-[#4B5563]">{selectedPayment.payment_method || 'N/A'}</div></div>
+                      <div><strong>Paid At:</strong> <div className="text-[#4B5563]">{selectedPayment.paid_at || selectedPayment.createdAt || 'N/A'}</div></div>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-6">
+                      <button className="px-4 py-2 border border-[#4B5563] rounded-lg text-[#111827] hover:bg-[#F8FAFC]" onClick={() => setShowPaymentModal(false)}>Close</button>
+                      <button className="px-4 py-2 bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white rounded-lg" onClick={() => printPaymentInvoice(selectedPayment)}>Download Invoice</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
