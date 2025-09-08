@@ -1466,18 +1466,32 @@ const Discover = () => {
               }
             });
           }, 1000);
-        } else if (res.data.message === "Grant Proposal Generation is already in progress. Please wait for it to complete.") {
+        } else if (res.data.message === "Grant Proposal Generation is in Progress. Please visit again after some time.") {
           Swal.fire({
             icon: 'warning',
             title: 'Warning',
-            text: 'Grant Proposal Generation is already in progress. Please wait for it to complete.',
+            text: 'Your grant proposal is being generated. Please visit again after some time.',
+            confirmButtonColor: '#2563EB'
+          });
+        } else if (res.data.message === "Grant Proposal Generation is still in progress. Please wait for it to complete.") {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Your grant proposal is still being generated. Please visit again after some time.',
+            confirmButtonColor: '#2563EB'
+          });
+        } else if (res.data.message === "A proposal with the same Grant ID already exists in draft. Please edit the draft proposal instead of generating a new one.") {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'A proposal with the same Grant ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
             confirmButtonColor: '#2563EB'
           });
         } else {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Failed to generate grant proposal. Please try again.',
+            text: 'Failed to generate grant proposal. Please try again after some time.',
             confirmButtonColor: '#2563EB'
           });
         }
@@ -1485,7 +1499,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to generate grant proposal. Please try again.',
+          text: 'Failed to generate grant proposal. Please try again after some time.',
           confirmButtonColor: '#2563EB'
         });
       }
@@ -1504,7 +1518,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to generate grant proposal. Please try again.',
+        text: 'Failed to generate grant proposal. Please try again after some time.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
