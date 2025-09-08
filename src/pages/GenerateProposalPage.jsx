@@ -51,33 +51,33 @@ const GenerateProposalPage = () => {
           }, 1500);
         } else if (res.data.message === "Proposal Generation is in Progress. Please visit again after some time.") {
           Swal.fire({
-            icon: 'warning',
-            title: 'Warning',
+            icon: 'info',
+            title: 'In Progress',
             text: 'Your proposal is being generated. Please visit again after some time.',
           });
         } else if (res.data.message === "Proposal Generation is still in progress. Please wait for it to complete.") {
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
+            icon: 'info',
+            title: 'In Progress',
             text: 'Your proposal is still being generated. Please visit again after some time.',
           });
         } else if (res.data.message === "A proposal with the same RFP ID already exists in draft. Please edit the draft proposal instead of generating a new one.") {
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
+            icon: 'warning',
+            title: 'Duplicate Proposal',
             text: 'A proposal with the same RFP ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
           });
         } else {
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
+            icon: 'warning',
+            title: 'Failed',
             text: 'Failed to generate proposal. Please try again after some time.',
           });
         }
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: 'warning',
+          title: 'Failed',
           text: 'Failed to generate proposal. Please try again after some time.',
         });
       }
@@ -85,8 +85,8 @@ const GenerateProposalPage = () => {
       console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
+        icon: 'warning',
+        title: 'Failed',
         text: 'Failed to generate proposal. Please try again after some time.',
       });
       return;
