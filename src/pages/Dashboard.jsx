@@ -969,7 +969,7 @@ const Dashboard = () => {
 
         return (
             <div
-                className={`relative h-full w-full min-h-[56px] min-w-[56px] p-1 sm:min-h-[80px] sm:min-w-[80px] sm:p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}
+                className={`z-100 relative h-full w-full min-h-[56px] min-w-[56px] p-1 sm:min-h-[80px] sm:min-w-[80px] sm:p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}
                 style={{ fontSize: '12px' }}
             >
                 <div className="absolute top-1 left-2 text-[18px] text-[#9CA3AF] font-medium">{moment(value).date()}</div>
@@ -996,7 +996,7 @@ const Dashboard = () => {
                         {isDropdownOpen && (
                             <div className="absolute z-10 left-2 bottom-8 bg-[#F3F4F6] border rounded shadow-lg p-2 w-40 sm:w-56">
                                 {sortedEvents.map((ev, i) => (
-                                    <div key={i} className="mb-2 last:mb-0">
+                                    <div key={i} className="flex justify-between items-center mb-2 last:mb-0">
                                         <span className="font-medium text-[12px] sm:text-base">{ev.title}</span>
                                         <span className={`ml-2 px-2 py-[2px] rounded-full text-[10px] sm:text-xs font-medium ${statusBgMap[ev.status]}`}>
                                             <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]} mr-1`}></span>
