@@ -986,15 +986,15 @@ const Dashboard = () => {
                         {/* Show "+X more" if more events */}
                         {sortedEvents.length > 1 && (
                             <div
-                                className="absolute bottom-1 left-2 text-[10px] sm:text-[11px] text-[#2563EB] cursor-pointer underline font-medium"
+                                className="absolute bottom-1 left-2 text-[10px] sm:text-[11px] text-[#2563EB] cursor-pointer font-medium"
                                 onClick={() => setOpenDropdownDate(isDropdownOpen ? null : dateKey)}
                             >
-                                +{sortedEvents.length - 1} more
+                                {isDropdownOpen ? 'Hide' : `+${sortedEvents.length - 1} more`}
                             </div>
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-1000 left-2 bottom-8 bg-[#F3F4F6] border rounded shadow-lg p-2 w-40 sm:w-full h-full overflow-y-auto">
+                            <div className="absolute z-1000 bottom-4 p-2 w-40 sm:w-full h-full overflow-y-auto">
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="flex flex-col justify-between items-center mb-2 last:mb-0">
                                         <span className="font-medium text-[12px] sm:text-base">{ev.title}</span>
