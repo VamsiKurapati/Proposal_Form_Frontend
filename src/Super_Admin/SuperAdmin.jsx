@@ -1349,6 +1349,112 @@ const SuperAdmin = () => {
                             {transactionFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-50 border border-[#E5E7EB]">
                                     {/* Filter content same as before */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionStatusFilter" id="all" value="all"
+                                            checked={transactionStatusFilter === 'all'}
+                                            onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="all" className="cursor-pointer leading-none">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="success" value="Success"
+                                                checked={transactionStatusFilter === 'Success'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="success" className="cursor-pointer leading-none">Success</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="failed" value="Failed"
+                                                checked={transactionStatusFilter === 'Failed'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="failed" className="cursor-pointer leading-none">Failed</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="refunded" value="Refunded"
+                                                checked={transactionStatusFilter === 'Refunded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="refunded" className="cursor-pointer leading-none">Refunded</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pendingRefund" value="Pending Refund"
+                                                checked={transactionStatusFilter === 'Pending Refund'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="pendingRefund" className="cursor-pointer leading-none">Pending Refund</label>
+                                        </div>
+                                    </div>
+                                    {/* Date */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="today" value="Today"
+                                                checked={transactionDateFilter === 'Today'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="today" className="cursor-pointer leading-none">Today</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last24hours" value="Last 24 Hours"
+                                                checked={transactionDateFilter === 'Last 24 Hours'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last24hours" className="cursor-pointer leading-none">Last 24 Hours</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last7days" value="Last 7 Days"
+                                                checked={transactionDateFilter === 'Last 7 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last7days" className="cursor-pointer leading-none">Last 7 Days</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last14days" value="Last 14 Days"
+                                                checked={transactionDateFilter === 'Last 14 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last14days" className="cursor-pointer leading-none">Last 14 Days</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last30days" value="Last 30 Days"
+                                                checked={transactionDateFilter === 'Last 30 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last30days" className="cursor-pointer leading-none">Last 30 Days</label>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
