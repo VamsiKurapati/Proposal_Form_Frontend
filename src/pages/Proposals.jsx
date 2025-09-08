@@ -770,7 +770,7 @@ const Proposals = () => {
                     setTimeout(() => {
                         navigate('/editor', {
                             state: {
-                                jsonData: res.data.processedProposal, proposalId: res.data.proposalId
+                                jsonData: res.data.proposal, proposalId: res.data.proposalId
                             }
                         });
                     }, 1000);
