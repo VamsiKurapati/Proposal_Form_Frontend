@@ -32,6 +32,7 @@ import {
     MdLanguage,
     MdOutlinePhone,
     MdOutlineSubscriptions,
+    MdOutlinePermContactCalendar
 } from 'react-icons/md';
 import { IoLogoLinkedin } from "react-icons/io";
 import { LuCrown } from "react-icons/lu";
@@ -132,12 +133,13 @@ const SuperAdmin = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPageTransactions, setCurrentPageTransactions] = useState(1);
     const [currentPageSupport, setCurrentPageSupport] = useState(1);
+    const [currentPageEnterpriseSupport, setCurrentPageEnterpriseSupport] = useState(1);
     const [currentPageNotifications, setCurrentPageNotifications] = useState(1);
 
     const [loading, setLoading] = useState(false);
 
-    const baseUrl = "https://proposal-form-backend.vercel.app/api";
-    // const baseUrl = "http://localhost:5000/api";
+    // const baseUrl = "https://proposal-form-backend.vercel.app/api";
+    const baseUrl = "http://localhost:5000/api";
 
 
 
@@ -656,6 +658,8 @@ const SuperAdmin = () => {
                 return 'bg-[#4B5563] text-[#111827]';
             case 'Cancelled':
                 return 'bg-[#F3F4F6] text-[#6B7280]';
+            case 'Connected':
+                return 'bg-[#DCFCE7] text-[#15803D]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -677,6 +681,7 @@ const SuperAdmin = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [filteredSupport, setFilteredSupport] = useState([]);
+    const [filteredEnterpriseSupport, setFilteredEnterpriseSupport] = useState([]);
     const [filteredNotifications, setFilteredNotifications] = useState([]);
 
     useEffect(async () => {
@@ -735,6 +740,7 @@ const SuperAdmin = () => {
             const supportTicketsStats = response.data.TicketStats;
             setSupportTicketsStats(supportTicketsStats);
             setFilteredSupport(supportTicketsData);
+            setFilteredEnterpriseSupport((supportTicketsData || []).filter(t => (t.plan_name || '').toLowerCase() === 'enterprise'));
         } catch (error) {
             //console.log("error", error);
         } finally {
@@ -793,16 +799,16 @@ const SuperAdmin = () => {
     useEffect(() => {
         //console.log("supportSearchTerm", supportSearchTerm);
         //console.log("support", supportTicketsData);
-        if (supportSearchTerm) {
-            const term = supportSearchTerm.toLowerCase();
-            setFilteredSupport((supportTicketsData || []).filter(ticket =>
-                (ticket.type && ticket.type.toLowerCase().includes(term)) ||
-                (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
-                (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term))
-            ));
-        } else {
-            setFilteredSupport(supportTicketsData);
-        }
+        const term = (supportSearchTerm || '').toLowerCase();
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(t => (t.plan_name || '').toLowerCase() === 'enterprise');
+        const filterFn = (ticket) =>
+            (ticket.type && ticket.type.toLowerCase().includes(term)) ||
+            (ticket.subject && ticket.subject.toLowerCase().includes(term)) ||
+            (ticket.ticket_id && ticket.ticket_id.toLowerCase().includes(term));
+
+        setFilteredSupport(term ? baseAll.filter(filterFn) : baseAll);
+        setFilteredEnterpriseSupport(term ? baseEnterprise.filter(filterFn) : baseEnterprise);
     }, [supportSearchTerm]);
 
     useEffect(() => {
@@ -886,22 +892,31 @@ const SuperAdmin = () => {
     }, [paymentsData, transactionStatusFilter, transactionDateFilter]);
 
     useEffect(() => {
-        const base = supportTicketsData || [];
-        const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
-        const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority.toLowerCase() === supportPriorityFilter.toLowerCase()));
-        const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.category.toLowerCase() === supportTypeFilter.toLowerCase()));
-        setFilteredSupport(byType);
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(t => (t.plan_name || '').toLowerCase() === 'enterprise');
+
+        const filterPipeline = (base) => {
+            const byStatus = supportStatusFilter === 'all' ? base : base.filter(t => (t.status === supportStatusFilter));
+            const byPriority = supportPriorityFilter === 'all' ? byStatus : byStatus.filter(t => (t.priority || '').toLowerCase() === supportPriorityFilter.toLowerCase());
+            const byType = supportTypeFilter === 'all' ? byPriority : byPriority.filter(t => (t.category || '').toLowerCase() === supportTypeFilter.toLowerCase());
+            return byType;
+        };
+
+        setFilteredSupport(filterPipeline(baseAll));
+        setFilteredEnterpriseSupport(filterPipeline(baseEnterprise));
     }, [supportTicketsData, supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
     // Removed duplicate notifications filter effect; combined above
 
     useEffect(() => {
+        const baseAll = supportTicketsData || [];
+        const baseEnterprise = baseAll.filter(support => (support.plan_name || '').toLowerCase() === 'enterprise');
         if (completedTickets) {
-            setFilteredSupport(supportTicketsData.filter(support => support.status === 'Completed'));
-            //console.log("resolved", filteredSupport);
+            setFilteredSupport(baseAll.filter(support => support.status === 'Completed'));
+            setFilteredEnterpriseSupport(baseEnterprise.filter(support => support.status === 'Completed'));
         } else {
-            setFilteredSupport(supportTicketsData.filter(support => support.status !== 'Completed'));
-            //console.log("not resolved", filteredSupport);
+            setFilteredSupport(baseAll.filter(support => support.status !== 'Completed'));
+            setFilteredEnterpriseSupport(baseEnterprise.filter(support => support.status !== 'Completed'));
         }
     }, [completedTickets, supportTicketsData]);
 
@@ -920,6 +935,7 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when support search terms change
         setCurrentPageSupport(1);
+        setCurrentPageEnterpriseSupport(1);
         closeAllInvoiceRows();
     }, [supportSearchTerm]);
 
@@ -944,6 +960,7 @@ const SuperAdmin = () => {
     useEffect(() => {
         // Reset pagination when support filters change
         setCurrentPageSupport(1);
+        setCurrentPageEnterpriseSupport(1);
         closeAllInvoiceRows();
     }, [supportStatusFilter, supportPriorityFilter, supportTypeFilter]);
 
@@ -1332,6 +1349,112 @@ const SuperAdmin = () => {
                             {transactionFilterModal && (
                                 <div className="absolute top-10 left-0 w-64 bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-50 border border-[#E5E7EB]">
                                     {/* Filter content same as before */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[14px] font-medium text-[#111827]">Filters</span>
+                                        <button
+                                            className="text-[12px] text-[#2563EB] hover:underline"
+                                            onClick={() => { handleTransactionStatusChangeFilter('all'); handleTransactionDateChangeFilter('all'); }}
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+                                    {/* All */}
+                                    <div className="flex items-center space-x-2">
+                                        <input type="radio" name="transactionStatusFilter" id="all" value="all"
+                                            checked={transactionStatusFilter === 'all'}
+                                            onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                        />
+                                        <label htmlFor="all" className="cursor-pointer leading-none">All</label>
+                                    </div>
+                                    {/* Status */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Status :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="success" value="Success"
+                                                checked={transactionStatusFilter === 'Success'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="success" className="cursor-pointer leading-none">Success</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="failed" value="Failed"
+                                                checked={transactionStatusFilter === 'Failed'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="failed" className="cursor-pointer leading-none">Failed</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="refunded" value="Refunded"
+                                                checked={transactionStatusFilter === 'Refunded'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="refunded" className="cursor-pointer leading-none">Refunded</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionStatusFilter" id="pendingRefund" value="Pending Refund"
+                                                checked={transactionStatusFilter === 'Pending Refund'}
+                                                onClick={(e) => { if (transactionStatusFilter === e.target.value) handleTransactionStatusChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionStatusChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="pendingRefund" className="cursor-pointer leading-none">Pending Refund</label>
+                                        </div>
+                                    </div>
+                                    {/* Date */}
+                                    <span className="text-[16px] font-medium text-[#4B5563]">Date :</span>
+                                    <div className="ml-4">
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="today" value="Today"
+                                                checked={transactionDateFilter === 'Today'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="today" className="cursor-pointer leading-none">Today</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last24hours" value="Last 24 Hours"
+                                                checked={transactionDateFilter === 'Last 24 Hours'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last24hours" className="cursor-pointer leading-none">Last 24 Hours</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last7days" value="Last 7 Days"
+                                                checked={transactionDateFilter === 'Last 7 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last7days" className="cursor-pointer leading-none">Last 7 Days</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last14days" value="Last 14 Days"
+                                                checked={transactionDateFilter === 'Last 14 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last14days" className="cursor-pointer leading-none">Last 14 Days</label>
+                                        </div>
+                                        <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded cursor-pointer mb-2">
+                                            <input type="radio" name="transactionDateFilter" id="last30days" value="Last 30 Days"
+                                                checked={transactionDateFilter === 'Last 30 Days'}
+                                                onClick={(e) => { if (transactionDateFilter === e.target.value) handleTransactionDateChangeFilter('all'); }}
+                                                onChange={(e) => handleTransactionDateChangeFilter(e.target.value)}
+                                                className="mt-1"
+                                            />
+                                            <label htmlFor="last30days" className="cursor-pointer leading-none">Last 30 Days</label>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -1977,7 +2100,7 @@ const SuperAdmin = () => {
                         {/*IsContact Toggle Button */}
                         <div className="flex justify-end">
                             <div className="flex items-center gap-2">
-                                <span className="text-gray-700">Is Contact</span>
+                                <span className="text-gray-700">Contact Us</span>
                                 <button
                                     onClick={updateContacts}
                                     className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${isContact ? "bg-green-500" : "bg-gray-300"
@@ -2065,7 +2188,13 @@ const SuperAdmin = () => {
                                     </>
                                 ) : (
                                     <span>
-                                        Up to {editingPlans[plan._id]?.editValue?.maxRFPProposalGenerations ? editingPlans[plan._id].editValue.maxRFPProposalGenerations : plan.maxRFPProposalGenerations} AI - RFP Proposal Generations
+                                        {isContact
+                                            ? "Custom AI-RFP Proposal Generations"
+                                            : `Up to ${editingPlans[plan._id]?.editValue?.maxRFPProposalGenerations
+                                                ? editingPlans[plan._id].editValue.maxRFPProposalGenerations
+                                                : plan.maxRFPProposalGenerations
+                                            } AI - RFP Proposal Generations`
+                                        }
                                     </span>
                                 )}
 
@@ -2098,10 +2227,15 @@ const SuperAdmin = () => {
                                     </>
                                 ) : (
                                     <span>
-                                        Up to{" "}
-                                        {editingPlans[plan._id]?.editValue?.maxGrantProposalGenerations ? editingPlans[plan._id].editValue.maxGrantProposalGenerations :
-                                            plan.maxGrantProposalGenerations}{" "}
-                                        AI - Grant Proposal Generations
+
+                                        {isContact
+                                            ? "Custom AI-Grant Proposal Generations"
+                                            : `Up to ${editingPlans[plan._id]?.editValue?.maxGrantProposalGenerations
+                                                ? editingPlans[plan._id].editValue.maxGrantProposalGenerations
+                                                : plan.maxGrantProposalGenerations
+                                            } AI - Grant Proposal Generations`
+                                        }
+
                                     </span>
                                 )}
 
@@ -2110,7 +2244,11 @@ const SuperAdmin = () => {
                                 <span className="text-green-500 p-1">
                                     <FaRegCheckCircle className="w-4 h-4" />
                                 </span>
-                                Unlimited Editors, Unlimited Viewers, Unlimited Members
+                                {isContact
+                                    ? "Custom Editors, Custom Viewers, Custom Members"
+                                    : "Unlimited Editors, Unlimited Viewers, Unlimited Members"
+                                }
+
 
                             </li>
                             <li className="flex items-center text-gray-700">
@@ -2234,9 +2372,206 @@ const SuperAdmin = () => {
                 {getPlanSection("Enterprise")}
             </div>
 
+            {
+                isContact && (
+                    <ShowCustomDetails />
+                )
+            }
 
-            <ShowCustomDetails />
+        </div>
+    );
 
+    const [contactRequestSearchTerm, setContactRequestSearchTerm] = useState('');
+    const [contactRequestData, setContactRequestData] = useState([]);
+    const [filteredContactRequest, setFilteredContactRequest] = useState([]);
+    const [currentPageContact, setCurrentPageContact] = useState(1);
+    const [contactDetailsModalOpen, setContactDetailsModalOpen] = useState(false);
+    const [selectedContactRequest, setSelectedContactRequest] = useState(null);
+
+    const contactRequestDatafetch = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/admin/getContactData`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            setContactRequestData(response.data || []);
+            setFilteredContactRequest(response.data || []);
+        } catch (e) {
+            // ignore
+        }
+    };
+
+    useEffect(() => {
+        contactRequestDatafetch();
+    }, []);
+
+    useEffect(() => {
+        const term = (contactRequestSearchTerm || '').toLowerCase();
+        const base = contactRequestData || [];
+        const filtered = term
+            ? base.filter(r =>
+                (r.name || '').toLowerCase().includes(term) ||
+                (r.company || '').toLowerCase().includes(term) ||
+                (r.email || '').toLowerCase().includes(term) ||
+                (r.status || '').toLowerCase().includes(term)
+            )
+            : base;
+        setFilteredContactRequest(filtered);
+    }, [contactRequestSearchTerm, contactRequestData]);
+
+    const renderContactRequest = () => (
+        <div className='h-full'>
+            {/* Search Bar */}
+            <div className="mb-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="relative">
+                            <MdOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] w-5 h-5" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, company, email, or status"
+                                value={contactRequestSearchTerm}
+                                onChange={(e) => {
+                                    setContactRequestSearchTerm(e.target.value);
+                                    setCurrentPageContact(1);
+                                    closeAllInvoiceRows();
+                                }}
+                                className="pl-10 pr-4 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-transparent w-[530px] text-[#374151] placeholder-[#9CA3AF] bg-white"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Contact Requests Table */}
+            <div className="bg-white border border-[#E5E7EB] mb-6 overflow-x-auto rounded-2xl">
+                <table className="w-full rounded-2xl">
+                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                        <tr>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Name</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Company</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Email</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Description</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Status</th>
+                            <th className="p-4 text-left text-[16px] font-medium text-[#4B5563]">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {(() => {
+                            const statusWeight = (s) => {
+                                const t = (s || '').toLowerCase();
+                                if (t === 'open') return 0;
+                                if (t === 'connected') return 2;
+                                return 1;
+                            };
+                            const sorted = [...(filteredContactRequest || [])].sort((a, b) => statusWeight(a?.status) - statusWeight(b?.status));
+                            const paginated = paginateData(sorted, currentPageContact, rowsPerPage);
+                            return paginated.length > 0 ? paginated.map((row, idx) => (
+                                <tr key={idx} className="hover:bg-[#F8FAFC] transition-colors">
+                                    <td className="p-4 text-[16px] text-[#4B5563]">{row.name || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#4B5563]">{row.company || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#6C63FF]">{row.email || '—'}</td>
+                                    <td className="p-4 text-[16px] text-[#4B5563]"><div className="max-w-[240px] line-clamp-2 truncate">{row.description || '—'}</div></td>
+                                    <td className="p-4 whitespace-nowrap">
+                                        <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor((row.status || 'Pending'))}`}>
+                                            {row.status || 'Pending'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-[16px] text-[#4B5563] whitespace-nowrap">
+                                        <button
+                                            className="text-[#2563EB] px-4 py-2 rounded-md"
+                                            onClick={() => {
+                                                const selected = (contactRequestData || []).find(r => r._id === row._id);
+                                                setSelectedContactRequest(selected || row);
+                                                setContactDetailsModalOpen(true);
+                                            }}
+                                        >
+                                            <MdOutlineVisibility className="w-5 h-5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan={5} className="p-4 text-center text-gray-500">No contact requests found</td>
+                                </tr>
+                            );
+                        })()}
+                    </tbody>
+                </table>
+                {filteredContactRequest.length > 0 && (
+                    <PaginationComponent
+                        currentPage={currentPageContact}
+                        totalPages={getTotalPages(filteredContactRequest, rowsPerPage)}
+                        onPageChange={(page) => { setCurrentPageContact(page); closeAllInvoiceRows(); }}
+                        totalItems={filteredContactRequest.length}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(newRowsPerPage) => { setRowsPerPage(newRowsPerPage); setCurrentPageContact(1); closeAllInvoiceRows(); }}
+                    />
+                )}
+            </div>
+
+            {contactDetailsModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" onClick={(e) => { if (e.target === e.currentTarget) setContactDetailsModalOpen(false); }}>
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900">Contact Request</h3>
+                            <button onClick={() => setContactDetailsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
+                                <MdOutlineClose className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="text-sm text-gray-700 space-y-1 mb-4">
+                            <p><strong>Name:</strong> {selectedContactRequest?.name || '—'}</p>
+                            <p><strong>Company:</strong> {selectedContactRequest?.company || '—'}</p>
+                            <p><strong>Email:</strong> {selectedContactRequest?.email || '—'}</p>
+                            <p><strong>Status:</strong> {selectedContactRequest?.status || 'Pending'}</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                onClick={async () => {
+                                    try {
+                                        const id = selectedContactRequest?._id;
+                                        await axios.delete(`${baseUrl}/admin/deleteContactData/${id}`, {
+                                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                                        });
+                                        setContactRequestData(prev => (prev || []).filter(r => r._id !== id));
+                                        setFilteredContactRequest(prev => (prev || []).filter(r => r._id !== id));
+                                        setContactDetailsModalOpen(false);
+                                        toast.success('Contact request deleted');
+                                    } catch (e) {
+                                        toast.error('Failed to delete');
+                                    }
+                                }}
+                            >
+                                Delete
+                            </button>
+                            {selectedContactRequest?.status !== 'Connected' && (
+                                <button
+                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                    onClick={async () => {
+                                        try {
+                                            const id = selectedContactRequest?._id;
+                                            await axios.put(`${baseUrl}/admin/updateContactData/${id}`, { status: 'Connected' }, {
+                                                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                                            });
+                                            setContactRequestData(prev => (prev || []).map(r => r._id === id ? { ...r, status: 'Connected' } : r));
+                                            setFilteredContactRequest(prev => (prev || []).map(r => r._id === id ? { ...r, status: 'Connected' } : r));
+                                            setSelectedContactRequest(prev => prev ? { ...prev, status: 'Connected' } : prev);
+                                            setContactDetailsModalOpen(false);
+                                            toast.success('Marked as Connected');
+                                        } catch (e) {
+                                            toast.error('Failed to update');
+                                        }
+                                    }}
+                                >
+                                    Mark as Connected
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 
@@ -2254,6 +2589,15 @@ const SuperAdmin = () => {
                             }`}
                     >
                         Active Tickets
+                    </button>
+                    <button
+                        onClick={() => { setSupportTab('Enterprise'); setCompletedTickets(false) }}
+                        className={`py-2 px-1 border-b-2 font-medium text-[16px] transition-colors ${supportTab === 'Enterprise'
+                            ? 'border-[#6C63FF] text-[#6C63FF]'
+                            : 'border-transparent text-[#4B5563]'
+                            }`}
+                    >
+                        Enterprise Tickets
                     </button>
                     <button
                         onClick={() => { setSupportTab('resolved'); setCompletedTickets(true) }}
@@ -2496,103 +2840,204 @@ const SuperAdmin = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
-                <table className="w-full rounded-2xl">
-                    <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
-                        <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Category
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Sub Category
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
-                                Description
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Date
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Priority
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
-                                Status
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                        {(() => {
-                            const paginatedSupport = paginateData(filteredSupport, currentPageSupport, rowsPerPage);
-                            return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
-                                <React.Fragment key={index}>
+            {supportTab === 'Enterprise' ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
+                    <table className="w-full rounded-2xl">
+                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Sub Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                    Description
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Date
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Priority
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            {(() => {
+                                const paginatedEnterprise = paginateData(filteredEnterpriseSupport, currentPageEnterpriseSupport, rowsPerPage);
+                                return paginatedEnterprise.length > 0 ? paginatedEnterprise.map((ticket, index) => (
+                                    <React.Fragment key={index}>
+                                        <tr>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                                {ticket.category}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                                {ticket.subCategory}
+                                            </td>
+                                            <td className="p-4 text-[16px] text-[#4B5563]">
+                                                <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                    <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-[#6C63FF] whitespace-nowrap">
+                                                {formatDate(ticket.createdAt)}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                    {ticket.priority}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                    {ticket.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => openSupportModal(ticket)}
+                                                    title="View Details"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                    </React.Fragment>
+                                )) : (
                                     <tr>
-                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
-                                            {ticket.category}
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
-                                            {ticket.subCategory}
-                                        </td>
-                                        <td className="p-4 text-[16px] text-[#4B5563]">
-                                            <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
-                                                <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-[#6C63FF] whitespace-nowrap">
-                                            {formatDate(ticket.createdAt)}
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
-                                                {ticket.priority}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 whitespace-nowrap text-[16px] font-medium">
-                                            <button
-                                                className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
-                                                onClick={() => openSupportModal(ticket)}
-                                                title="View Details"
-                                            >
-                                                <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
-                                            </button>
+                                        <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                            No tickets found
                                         </td>
                                     </tr>
+                                );
+                            })()}
+                        </tbody>
+                    </table>
+                    {filteredEnterpriseSupport.length > 0 && (
+                        <PaginationComponent
+                            currentPage={currentPageEnterpriseSupport}
+                            totalPages={getTotalPages(filteredEnterpriseSupport, rowsPerPage)}
+                            onPageChange={(page) => {
+                                setCurrentPageEnterpriseSupport(page);
+                                closeAllInvoiceRows();
+                            }}
+                            totalItems={filteredEnterpriseSupport.length}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(newRowsPerPage) => {
+                                setRowsPerPage(newRowsPerPage);
+                                setCurrentPageEnterpriseSupport(1);
+                                closeAllInvoiceRows();
+                            }}
+                        />
+                    )}
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-x-auto">
+                    <table className="w-full rounded-2xl">
+                        <thead className="bg-[#F8FAFC] border-b border-[#0000001A]">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Sub Category
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/3">
+                                    Description
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Date
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Priority
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/6">
+                                    Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider w-1/12">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            {(() => {
+                                const nonEnterprise = (filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise');
+                                const paginatedSupport = paginateData(nonEnterprise, currentPageSupport, rowsPerPage);
+                                return paginatedSupport.length > 0 ? paginatedSupport.map((ticket, index) => (
+                                    <React.Fragment key={index}>
+                                        <tr>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563]">
+                                                {ticket.category}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] text-[#4B5563]">
+                                                {ticket.subCategory}
+                                            </td>
+                                            <td className="p-4 text-[16px] text-[#4B5563]">
+                                                <div className="max-w-[200px] line-clamp-2 truncate text-ellipsis">
+                                                    <span className="text-ellipsis overflow-hidden">{ticket.description}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-[#6C63FF] whitespace-nowrap">
+                                                {formatDate(ticket.createdAt)}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                                                    {ticket.priority}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-[12px] font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                                                    {ticket.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap text-[16px] font-medium">
+                                                <button
+                                                    className="p-2 rounded-lg transition-colors flex items-center justify-center hover:bg-blue-50"
+                                                    onClick={() => openSupportModal(ticket)}
+                                                    title="View Details"
+                                                >
+                                                    <MdOutlineVisibility className="w-5 h-5 text-[#6C63FF]" />
+                                                </button>
+                                            </td>
+                                        </tr>
 
-                                </React.Fragment>
-                            )) : (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
-                                        No tickets found
-                                    </td>
-                                </tr>
-                            );
-                        })()}
-                    </tbody>
-                </table>
-                {filteredSupport.length > 0 && (
-                    <PaginationComponent
-                        currentPage={currentPageSupport}
-                        totalPages={getTotalPages(filteredSupport, rowsPerPage)}
-                        onPageChange={(page) => {
-                            setCurrentPageSupport(page);
-                            closeAllInvoiceRows();
-                        }}
-                        totalItems={filteredSupport.length}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={(newRowsPerPage) => {
-                            setRowsPerPage(newRowsPerPage);
-                            setCurrentPageSupport(1); // Reset to first page when changing rows per page
-                            closeAllInvoiceRows();
-                        }}
-                    />
-                )}
-            </div>
+                                    </React.Fragment>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-[16px] font-medium text-[#4B5563] text-center">
+                                            No tickets found
+                                        </td>
+                                    </tr>
+                                );
+                            })()}
+                        </tbody>
+                    </table>
+                    {(() => { const nonEnterprise = (filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise'); return nonEnterprise.length > 0; })() && (
+                        <PaginationComponent
+                            currentPage={currentPageSupport}
+                            totalPages={getTotalPages((filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise'), rowsPerPage)}
+                            onPageChange={(page) => {
+                                setCurrentPageSupport(page);
+                                closeAllInvoiceRows();
+                            }}
+                            totalItems={(filteredSupport || []).filter(t => (t.plan_name || '').toLowerCase() !== 'enterprise').length}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(newRowsPerPage) => {
+                                setRowsPerPage(newRowsPerPage);
+                                setCurrentPageSupport(1); // Reset to first page when changing rows per page
+                                closeAllInvoiceRows();
+                            }}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 
@@ -2618,6 +3063,9 @@ const SuperAdmin = () => {
         }
         return "just now";
     }
+
+
+
     const renderNotifications = () => {
         const getNotificationIcon = (icon) => {
             switch (icon) {
@@ -2933,9 +3381,16 @@ const SuperAdmin = () => {
                                             <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
                                         </div>
                                         <div className='flex flex-row gap-2'>
+                                            {console.log("selectedUser", selectedUser)}
                                             <p className="text-gray-900 font-bold text-2xl mb-1">{selectedUser.companyName}</p>
                                             <span className={`h-fit px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
                                                 {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
+                                            </span>
+                                        </div>
+                                        <div className='flex flex-row gap-2'>
+                                            <p className="text-gray-900 font-bold text-sm mb-1">Subscription Type</p>
+                                            <span className={`h-fit px-2 py-1 text-xs rounded-full`}>
+                                                {selectedUser.plan_name === null ? 'None' : selectedUser.plan_name}
                                             </span>
                                         </div>
 
@@ -3186,6 +3641,12 @@ const SuperAdmin = () => {
                                                         <p className='text-[#6B7280]'>Priority</p>
                                                         <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getPriorityColor(selectedSupport.priority)}`}>
                                                             {selectedSupport.priority}
+                                                        </span>
+                                                    </div>
+                                                    <div className='flex flex-col gap-2'>
+                                                        <p className='text-[#6B7280]'>Plan Name</p>
+                                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(selectedSupport.plan_name)}`}>
+                                                            {selectedSupport.plan_name}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -3502,7 +3963,7 @@ const SuperAdmin = () => {
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 20px;">
                         <img src="/vite.svg" alt="Company Logo" style="width: 60px; height: 60px; margin-right: 20px;">
                         <div>
-                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP App</h1>
+                            <h1 style="color: #2563eb; margin: 0; font-size: 28px; font-weight: bold;">RFP2GRANTS</h1>
                             <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 16px;">Professional Proposal Management</p>
                         </div>
                     </div>
@@ -3520,12 +3981,13 @@ const SuperAdmin = () => {
                                     <span style="margin-left: 10px; color: #6b7280;">${data.transaction_id}</span>
                                 </div>
                                 <div style="margin-bottom: 15px;">
-                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
-                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
+                                
+                                    <span style="font-weight: bold; color: #111827;">Subscription Type:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.planName || 'N/A'}</span>
                                 </div>
                                 <div style="margin-bottom: 15px;">
-                                    <span style="font-weight: bold; color: #111827;">Payment Method:</span>
-                                    <span style="margin-left: 10px; color: #6b7280;">${data.payment_method || 'N/A'}</span>
+                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
                                 </div>
                             </div>
                             <div>
@@ -3636,9 +4098,10 @@ const SuperAdmin = () => {
                                 <span class="value">$${data.price}</span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Payment Method:</span>
-                                <span class="value">${data.payment_method || 'N/A'}</span>
+                                <span class="label">Subscription Type:</span>
+                                <span class="value">${data.planName || 'N/A'}</span>
                             </div>
+                            
                         </div>
                         <div>
                             <h3 class="section-title">Additional Information</h3>
@@ -3698,10 +4161,13 @@ const SuperAdmin = () => {
         };
 
         const getInvoiceData = () => {
+            console.log("data", data);
             return [
                 { label: 'Transaction ID', value: data.transaction_id },
                 { label: 'Amount', value: `$${data.price}` },
-                { label: 'Payment Method', value: data.payment_method || 'N/A' },
+
+
+                { label: 'Subscription Type', value: data.planName || 'None' },
                 { label: 'Status', value: data.status },
                 { label: 'User ID', value: data.user_id },
                 { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
@@ -3726,7 +4192,7 @@ const SuperAdmin = () => {
                         <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
                             <img src="/vite.svg" alt="Company Logo" className="w-12 h-12 mr-4" />
                             <div>
-                                <h4 className="text-xl font-bold text-[#2563eb]">RFP App</h4>
+                                <h4 className="text-xl font-bold text-[#2563eb]">RFP2GRANTS</h4>
                                 <p className="text-sm text-[#6b7280]">Professional Proposal Management</p>
                             </div>
                         </div>
@@ -3856,6 +4322,17 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium">Plan Management</span>
                                 </button>
 
+                                {/* Contact Request */}
+                                <button
+                                    className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "contact-request"
+                                            ? "bg-[#2563eb] text-white"
+                                            : "text-[#4B5563]"
+                                        }`}
+                                >
+                                    <MdOutlinePermContactCalendar className="w-4 h-4" />
+                                    <span className="text-[16px] font-medium">Contact Request</span>
+                                </button>
+
                                 {/* Support */}
                                 <button
                                     className={`w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors ${activeTab === "support"
@@ -3872,10 +4349,11 @@ const SuperAdmin = () => {
                                     <span className="text-[16px] font-medium">Support</span>
                                 </button>
 
+
                                 {/* Website */}
                                 <button
                                     className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
-                                    onClick={() => window.open("/", "_blank")}
+                                    onClick={() => window.open("https://rfp2grants.ai/", "_blank")}
                                 >
                                     <MdLanguage className="w-5 h-5 flex-shrink-0" />
                                     <span className="text-[16px] font-medium">Website</span>
@@ -3983,6 +4461,20 @@ const SuperAdmin = () => {
                                 </button>
 
                                 <button
+                                    className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'enterprise-support' ? 'bg-[#6C63FF] text-white' : 'text-white'
+                                        }`}
+                                    onClick={() => {
+                                        setActiveTab('contact-request');
+                                        closeAllInvoiceRows();
+                                    }}
+                                >
+                                    <MdOutlinePermContactCalendar className="w-5 h-5 flex-shrink-0" />
+                                    <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                                        Contact Request
+                                    </span>
+                                </button>
+
+                                <button
                                     className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'support' ? 'bg-[#6C63FF] text-white' : 'text-white'
                                         }`}
                                     onClick={() => {
@@ -4007,7 +4499,8 @@ const SuperAdmin = () => {
 
                                     <MdLanguage className="w-5 h-5 flex-shrink-0" />
                                     <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                                        Website
+                                        <a href="https://rfp2grants.ai/" target="_blank" rel="noopener noreferrer">Website</a>
+
                                     </span>
                                 </button>
                                 <button
@@ -4055,7 +4548,7 @@ const SuperAdmin = () => {
                                     <div className="w-full h-8 rounded-lg flex items-center justify-center mr-3">
 
 
-                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : 'Notifications'}</span>
+                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : activeTab === 'notifications' ? 'Notifications' : 'Contact Request'}</span>
 
                                     </div>
                                 </div>
@@ -4108,6 +4601,7 @@ const SuperAdmin = () => {
                             {activeTab === 'support' && renderSupport()}
                             {activeTab === 'plan-management' && renderPlanManagement()}
                             {activeTab === 'notifications' && renderNotifications()}
+                            {activeTab === 'contact-request' && renderContactRequest()}
                         </div>
                     </div>
                 </div>
