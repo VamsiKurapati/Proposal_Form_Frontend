@@ -273,18 +273,52 @@ export const exportToPDF = async (project) => {
   }
 
   try {
-    const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
-      project: jsonData,
-      isCompressed
-    }, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    const res = await axios.post(
+      'https://proposal-form-backend.vercel.app/api/proposals/generatePDF',
+      {
+        project: jsonData,
+        isCompressed
       },
-    }, {
-      responseType: 'blob' // Important: tell axios to expect binary data
-    });
+      {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Accept': 'application/pdf,application/octet-stream,text/plain,application/json'
+        },
+        // Expect binary; we'll still handle base64 string fallback below
+        responseType: 'arraybuffer'
+      }
+    );
 
-    const pdfBlob = new Blob([res.data], { type: "application/pdf" });
+    const contentType = (res.headers && (res.headers['content-type'] || res.headers['Content-Type'])) || '';
+
+    let pdfBlob;
+    if (contentType.includes('application/pdf')) {
+      // Server returned raw PDF bytes
+      pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+    } else {
+      // Fallback: server returned base64 (as text) inside the ArrayBuffer
+      let base64Payload = '';
+      try {
+        const decodedText = new TextDecoder('utf-8').decode(res.data);
+        // Could be plain base64 or data URL
+        base64Payload = decodedText.replace(/^data:application\/pdf;base64,/, '').trim();
+      } catch (e) {
+        // As a last resort, try to interpret as already-correct bytes
+        pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+      }
+
+      if (!pdfBlob) {
+        // Convert base64 string to Uint8Array
+        const byteCharacters = atob(base64Payload);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        pdfBlob = new Blob([byteArray], { type: 'application/pdf' });
+      }
+    }
+
     const blobUrl = URL.createObjectURL(pdfBlob);
 
     // Download automatically
