@@ -2,6 +2,7 @@
 import { optimizeSVG, getOptimizationStats } from './svg.js';
 import cloudImageService from './cloudImageService.js';
 import axios from 'axios';
+import { shouldCompress, compressData } from './compression.js';
 
 export function exportToJSON(project) {
   // Process images for export (handle cloud URLs)
@@ -261,9 +262,24 @@ export const exportToPDF = async (project) => {
   loadingDiv.innerHTML = 'Processing images and preparing PDF export...';
   document.body.appendChild(loadingDiv);
 
+  let jsonData = null;
+  let isCompressed = false;
+  if (shouldCompress(project)) {
+    const compressedResult = compressData(project);
+    jsonData = compressedResult.compressed;
+    isCompressed = true;
+  } else {
+    jsonData = project;
+  }
+
   try {
     const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
-      project: project
+      project: jsonData,
+      isCompressed
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
     }, {
       responseType: 'blob' // Important: tell axios to expect binary data
     });

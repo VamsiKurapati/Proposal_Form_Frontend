@@ -40,7 +40,7 @@ const GenerateProposalPage = () => {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'Proposal generated successfully. Redirecting to editor.',
+            text: res.data.message || 'Proposal generated successfully. Redirecting to editor.',
           });
           setTimeout(() => {
             navigate('/editor', {
@@ -53,32 +53,32 @@ const GenerateProposalPage = () => {
           Swal.fire({
             icon: 'info',
             title: 'In Progress',
-            text: 'Your proposal is being generated. Please visit again after some time.',
+            text: res.data.message || 'Your proposal is being generated. Please visit again after some time.',
           });
         } else if (res.data.message === "Proposal Generation is still in progress. Please wait for it to complete.") {
           Swal.fire({
             icon: 'info',
             title: 'In Progress',
-            text: 'Your proposal is still being generated. Please visit again after some time.',
+            text: res.data.message || 'Your proposal is still being generated. Please visit again after some time.',
           });
         } else if (res.data.message === "A proposal with the same RFP ID already exists in draft. Please edit the draft proposal instead of generating a new one.") {
           Swal.fire({
             icon: 'warning',
             title: 'Duplicate Proposal',
-            text: 'A proposal with the same RFP ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
+            text: res.data.message || 'A proposal with the same RFP ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
           });
         } else {
           Swal.fire({
             icon: 'warning',
             title: 'Failed',
-            text: 'Failed to generate proposal. Please try again after some time.',
+            text: res.data.message || 'Failed to generate proposal. Please try again after some time.',
           });
         }
       } else {
         Swal.fire({
           icon: 'warning',
           title: 'Failed',
-          text: 'Failed to generate proposal. Please try again after some time.',
+          text: res.data.message || 'Failed to generate proposal. Please try again after some time.',
         });
       }
     } catch (error) {
@@ -87,7 +87,7 @@ const GenerateProposalPage = () => {
       Swal.fire({
         icon: 'warning',
         title: 'Failed',
-        text: 'Failed to generate proposal. Please try again after some time.',
+        text: error.response?.data?.message || 'Failed to generate proposal. Please try again after some time.',
       });
       return;
     }

@@ -860,7 +860,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Save Failed',
-        text: 'Failed to save grant. Please try again.',
+        text: err.response?.data?.message || 'Failed to save grant. Please try again.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
@@ -910,7 +910,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Unsave Failed',
-        text: 'Failed to unsave grant. Please try again.',
+        text: err.response?.data?.message || 'Failed to unsave grant. Please try again.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
@@ -1231,7 +1231,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Save Failed',
-        text: 'Failed to save RFP. Please try again.',
+        text: err.response?.data?.message || 'Failed to save RFP. Please try again.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
@@ -1279,7 +1279,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Unsave Failed',
-        text: 'Failed to unsave RFP. Please try again.',
+        text: err.response?.data?.message || 'Failed to unsave RFP. Please try again.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
@@ -1302,7 +1302,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'error',
         title: 'Copy Failed',
-        text: 'Failed to copy link to clipboard',
+        text: err.response?.data?.message || 'Failed to copy link to clipboard',
         confirmButtonColor: '#2563EB'
       });
     });
@@ -1398,7 +1398,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
-          text: 'Total project cost must be a positive number.',
+          text: err.response?.data?.message || 'Total project cost must be a positive number.',
           confirmButtonColor: '#2563EB'
         });
         return;
@@ -1409,7 +1409,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
-          text: 'Total requested amount must be a positive number.',
+          text: err.response?.data?.message || 'Total requested amount must be a positive number.',
           confirmButtonColor: '#2563EB'
         });
         return;
@@ -1423,7 +1423,7 @@ const Discover = () => {
           Swal.fire({
             icon: 'error',
             title: 'Budget Exceeds Limit',
-            text: `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
+            text: err.response?.data?.message || `Total requested amount (${totalRequestedAmount}) cannot exceed the grant award ceiling (${awardCeiling}).`,
             confirmButtonColor: '#2563EB'
           });
           return;
@@ -1435,7 +1435,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'error',
           title: 'Invalid Budget',
-          text: 'Total requested amount cannot exceed total project cost.',
+          text: err.response?.data?.message || 'Total requested amount cannot exceed total project cost.',
           confirmButtonColor: '#2563EB'
         });
         return;
@@ -1456,7 +1456,7 @@ const Discover = () => {
           Swal.fire({
             icon: 'success',
             title: 'Success!',
-            text: 'Grant proposal generated successfully!',
+            text: res.data.message || 'Grant proposal generated successfully!',
             confirmButtonColor: '#2563EB'
           });
           setTimeout(() => {
@@ -1470,28 +1470,28 @@ const Discover = () => {
           Swal.fire({
             icon: 'info',
             title: 'In Progress',
-            text: 'Your grant proposal is being generated. Please visit again after some time.',
+            text: res.data.message || 'Your grant proposal is being generated. Please visit again after some time.',
             confirmButtonColor: '#2563EB'
           });
         } else if (res.data.message === "Grant Proposal Generation is still in progress. Please wait for it to complete.") {
           Swal.fire({
             icon: 'info',
             title: 'In Progress',
-            text: 'Your grant proposal is still being generated. Please visit again after some time.',
+            text: res.data.message || 'Your grant proposal is still being generated. Please visit again after some time.',
             confirmButtonColor: '#2563EB'
           });
         } else if (res.data.message === "A proposal with the same Grant ID already exists in draft. Please edit the draft proposal instead of generating a new one.") {
           Swal.fire({
             icon: 'warning',
             title: 'Duplicate Proposal',
-            text: 'A proposal with the same Grant ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
+            text: res.data.message || 'A proposal with the same Grant ID already exists in draft. Please edit the draft proposal instead of generating a new one.',
             confirmButtonColor: '#2563EB'
           });
         } else {
           Swal.fire({
             icon: 'warning',
             title: 'Failed',
-            text: 'Failed to generate grant proposal. Please try again after some time.',
+            text: res.data.message || 'Failed to generate grant proposal. Please try again after some time.',
             confirmButtonColor: '#2563EB'
           });
         }
@@ -1499,7 +1499,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'warning',
           title: 'Failed',
-          text: 'Failed to generate grant proposal. Please try again after some time.',
+          text: res.data.message || 'Failed to generate grant proposal. Please try again after some time.',
           confirmButtonColor: '#2563EB'
         });
       }
@@ -1518,7 +1518,7 @@ const Discover = () => {
       Swal.fire({
         icon: 'warning',
         title: 'Failed',
-        text: 'Failed to generate grant proposal. Please try again after some time.',
+        text: error.response?.data?.message || 'Failed to generate grant proposal. Please try again after some time.',
         confirmButtonColor: '#2563EB'
       });
     } finally {
@@ -1944,7 +1944,7 @@ const Discover = () => {
           Swal.fire({
             icon: 'error',
             title: 'Invalid File Type',
-            text: 'Please upload only PDF or TXT files.',
+            text: err.response?.data?.message || 'Please upload only PDF or TXT files.',
             confirmButtonColor: '#2563EB'
           });
           e.target.value = '';
@@ -1959,7 +1959,7 @@ const Discover = () => {
         Swal.fire({
           icon: 'warning',
           title: 'No File Selected',
-          text: 'Please upload a file.',
+          text: err.response?.data?.message || 'Please upload a file.',
           confirmButtonColor: '#2563EB'
         });
         return;
