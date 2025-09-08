@@ -658,6 +658,8 @@ const SuperAdmin = () => {
                 return 'bg-[#4B5563] text-[#111827]';
             case 'Cancelled':
                 return 'bg-[#F3F4F6] text-[#6B7280]';
+            case 'Connected':
+                return 'bg-[#DCFCE7] text-[#15803D]';
             default:
                 return 'bg-[#FEF9C3] text-[#CA8A04]';
         }
@@ -3277,9 +3279,16 @@ const SuperAdmin = () => {
                                             <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
                                         </div>
                                         <div className='flex flex-row gap-2'>
+                                            {console.log("selectedUser", selectedUser)}
                                             <p className="text-gray-900 font-bold text-2xl mb-1">{selectedUser.companyName}</p>
                                             <span className={`h-fit px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
                                                 {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
+                                            </span>
+                                        </div>
+                                        <div className='flex flex-row gap-2'>
+                                            <p className="text-gray-900 font-bold text-sm mb-1">Subscription Type</p>
+                                            <span className={`h-fit px-2 py-1 text-xs rounded-full`}>
+                                                {selectedUser.plan_name===null ? 'None' : selectedUser.plan_name}
                                             </span>
                                         </div>
 
@@ -3870,12 +3879,13 @@ const SuperAdmin = () => {
                                     <span style="margin-left: 10px; color: #6b7280;">${data.transaction_id}</span>
                                 </div>
                                 <div style="margin-bottom: 15px;">
-                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
-                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
+                                
+                                    <span style="font-weight: bold; color: #111827;">Subscription Type:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">${data.planName || 'N/A'}</span>
                                 </div>
                                 <div style="margin-bottom: 15px;">
-                                    <span style="font-weight: bold; color: #111827;">Payment Method:</span>
-                                    <span style="margin-left: 10px; color: #6b7280;">${data.payment_method || 'N/A'}</span>
+                                    <span style="font-weight: bold; color: #111827;">Amount:</span>
+                                    <span style="margin-left: 10px; color: #6b7280;">$${data.price}</span>
                                 </div>
                             </div>
                             <div>
@@ -3986,9 +3996,10 @@ const SuperAdmin = () => {
                                 <span class="value">$${data.price}</span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Payment Method:</span>
-                                <span class="value">${data.payment_method || 'N/A'}</span>
+                                <span class="label">Subscription Type:</span>
+                                <span class="value">${data.planName || 'N/A'}</span>
                             </div>
+                            
                         </div>
                         <div>
                             <h3 class="section-title">Additional Information</h3>
@@ -4048,10 +4059,13 @@ const SuperAdmin = () => {
         };
 
         const getInvoiceData = () => {
+            console.log("data", data);
             return [
                 { label: 'Transaction ID', value: data.transaction_id },
                 { label: 'Amount', value: `$${data.price}` },
-                { label: 'Payment Method', value: data.payment_method || 'N/A' },
+                
+                
+                { label: 'Subscription Type', value: data.planName || 'None' },
                 { label: 'Status', value: data.status },
                 { label: 'User ID', value: data.user_id },
                 { label: 'Created Date', value: data.created_at || data.createdAt || 'N/A' }
@@ -4242,7 +4256,7 @@ const SuperAdmin = () => {
           {/* Website */}
           <button
             className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
-            onClick={() => window.open("/", "_blank")}
+            onClick={() => window.open("https://rfp2grants.ai/", "_blank")}
           >
             <MdLanguage className="w-5 h-5 flex-shrink-0" />
             <span className="text-[16px] font-medium">Website</span>
@@ -4388,7 +4402,8 @@ const SuperAdmin = () => {
 
                                     <MdLanguage className="w-5 h-5 flex-shrink-0" />
                                     <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                                        Website
+                                        <a href="https://rfp2grants.ai/" target="_blank" rel="noopener noreferrer">Website</a>
+                                        
                                     </span>
                                 </button>
                                 <button
