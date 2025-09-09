@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const GrantProposalForm = ({
     selectedGrant,
@@ -9,6 +12,7 @@ const GrantProposalForm = ({
     isGenerating = false,
     initialData = null
 }) => {
+    const navigate = useNavigate();
     const [grantProposalData, setGrantProposalData] = useState(initialData || {
         summary: "",
         objectives: "",
@@ -53,6 +57,49 @@ const GrantProposalForm = ({
             },
             methods_for_measuring_success: ""
         });
+    };
+
+    const hanleFetchGrantProposal = async (grant) => {
+        try {
+            const res = await axios.get(`${BASE_URL}/getGrantProposal/${grant._id}`);
+            if (res.status === 200) {
+                if (res.data.message === "Grant Proposal Generated successfully.") {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: res.data.message || 'Grant proposal generated successfully.',
+                    });
+                    setTimeout(() => {
+                        navigate('/editor', { state: { jsonData: res.data.proposal, proposalId: res.data.proposalId } });
+                    }, 1000);
+                } else if (res.data.message === "Grant Proposal Generation is still in Progress. Please wait for it to complete.") {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'In Progress',
+                        text: res.data.message || 'Your grant proposal is still being generated. Please wait for it to complete.',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: res.data.message || 'Failed to fetch grant proposal.',
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: res.data.message || 'Failed to fetch grant proposal.',
+                });
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.response?.data?.message || 'Failed to fetch grant proposal.',
+            });
+            console.error("Error fetching grant proposal:", err);
+        }
     };
 
     const handleSubmit = () => {
@@ -185,7 +232,7 @@ const GrantProposalForm = ({
                     {/* Budget */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Budget <span className="text-gray-500 text-xs">(Optional)</span>
+                            Budget <span className="text-gray-500 text-xs">*</span>
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
@@ -221,7 +268,7 @@ const GrantProposalForm = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                                    Cost Share Required
+                                    Cost Share Required <span className="text-gray-500 text-xs">*</span>
                                 </label>
                                 <textarea
                                     value={grantProposalData.budget.cost_share_required}
@@ -233,7 +280,7 @@ const GrantProposalForm = ({
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                                    Budget Breakdown
+                                    Budget Breakdown <span className="text-gray-500 text-xs">*</span>
                                 </label>
                                 <textarea
                                     value={grantProposalData.budget.budget_breakdown}
@@ -249,7 +296,7 @@ const GrantProposalForm = ({
                     {/* Methods for Measuring Success */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Methods for Measuring Success <span className="text-gray-500 text-xs">(Optional)</span>
+                            Methods for Measuring Success <span className="text-gray-500 text-xs">*</span>
                         </label>
                         <textarea
                             value={grantProposalData.methods_for_measuring_success}
