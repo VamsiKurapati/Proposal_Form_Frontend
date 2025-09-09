@@ -317,22 +317,25 @@ const GrantProposalForm = ({
 
                 <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
                     <button
-                        onClick={() => handleFetchGrantProposal(selectedGrant)}
-                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                        Fetch Grant Proposal
-                    </button>
-                    <button
                         onClick={onClose}
-                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                        disabled={isGenerating}
+                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleClearForm}
-                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                        disabled={isGenerating}
+                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         Clear Form
+                    </button>
+                    <button
+                        disabled={isGenerating}
+                        onClick={() => handleFetchGrantProposal(selectedGrant)}
+                        className="px-6 py-2 text-white rounded-md flex items-center gap-2 transition-colors bg-blue-600 hover:bg-blue-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                        Fetch Grant Proposal
                     </button>
                     <button
                         onClick={handleSubmit}
