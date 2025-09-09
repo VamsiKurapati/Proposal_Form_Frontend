@@ -1243,7 +1243,7 @@ const CanvaApp = () => {
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Note" style={{ marginLeft: '8px', width: '100%' }}>
                   <div className="flex items-center gap-2">
                     <MdOutlineInfo className="w-4 h-4" />
-                    <span className="text-sm">Note: The content in each page is scrollable and you should manually paste them into new pages so that the content is not lost while exporting to PDF.</span>
+                    <span className="text-sm">Note: The text boxes in some pages are scrollable. Please paste them into new pages manually.</span>
                   </div>
                 </div>
               </div>
