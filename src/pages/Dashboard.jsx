@@ -1459,12 +1459,12 @@ const Dashboard = () => {
                                             )}
 
                                             <td className="px-4 py-2 font-semibold">
-                                                <a href={p.url || p.urlLink || p.OPPORTUNITY_NUMBER_LINK || '#'} target="_blank" rel="noopener noreferrer">
+                                                <a href={p.url || p.urlLink || p.OPPORTUNITY_NUMBER_LINK || '#'} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] hover:underline">
                                                     {p.title || p.OPPORTUNITY_TITLE || 'Not Provided'}
                                                 </a>
                                             </td>
 
-                                            <td className="px-4 py-2">{p.AGENCY_NAME || p.client || 'Not Provided'}</td>
+                                            <td className="px-4 py-2">{p.AGENCY_NAME || p.client || "Not Provided"}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
                                                 <td className="px-4 py-2 relative">
@@ -1516,7 +1516,7 @@ const Dashboard = () => {
                                             ) : (
                                                 <td className="px-4 py-2 relative">
                                                     <div className="flex items-center gap-2">
-                                                        <span>{p.currentEditor ? p.currentEditor.fullName : p.currentEditor ? p.currentEditor.email : p.currentEditor ? p.currentEditor.name : 'No Editor Assigned'}</span>
+                                                        <span>{p.currentEditor ? p.currentEditor.fullName : p.currentEditor ? p.currentEditor.email : p.currentEditor ? p.currentEditor.name : "No Editor Assigned"}</span>
                                                         {role === "company" && (
                                                             <button
                                                                 className="text-[#2563EB]"
@@ -1577,7 +1577,7 @@ const Dashboard = () => {
                                                         year: 'numeric',
                                                         month: 'short',
                                                         day: 'numeric'
-                                                    }) : 'No close date'
+                                                    }) : "No close date"
                                                 )}
                                             </td>
 
@@ -1599,7 +1599,7 @@ const Dashboard = () => {
                                                     year: 'numeric',
                                                     month: 'short',
                                                     day: 'numeric'
-                                                }) : 'Not submitted'}
+                                                }) : "Not submitted"}
                                             </td>
 
                                             <td className="px-4 py-2">
@@ -1640,7 +1640,7 @@ const Dashboard = () => {
                             {/* if no grant proposals, show a message */}
                             {paginatedGrantProposals.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-4">No grant proposals found</td>
+                                    <td colSpan={7} className="text-center py-4">"No grant proposals found"</td>
                                 </tr>
                             )}
                         </tbody>
@@ -1781,7 +1781,7 @@ const Dashboard = () => {
                             {/* if no deleted proposals, show a message */}
                             {paginatedDeletedProposals.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-4">No deleted proposals found</td>
+                                    <td colSpan={7} className="text-center py-4">"No deleted proposals found"</td>
                                 </tr>
                             )}
                         </tbody>
@@ -1832,7 +1832,7 @@ const Dashboard = () => {
                                         year: 'numeric',
                                         month: 'short',
                                         day: 'numeric'
-                                    }) : 'No close date'}</td>
+                                    }) : "No close date"}</td>
                                     <td className="px-4 py-2">{statusBadge(p.OPPORTUNITY_STATUS || p.status)}</td>
                                     <td className="px-4 py-2">{p.restoreIn}</td>
                                     <td className="px-4 py-2">
