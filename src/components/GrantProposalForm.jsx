@@ -13,6 +13,7 @@ const GrantProposalForm = ({
     initialData = null
 }) => {
     const navigate = useNavigate();
+    const BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
     const [grantProposalData, setGrantProposalData] = useState(initialData || {
         summary: "",
         objectives: "",
@@ -61,7 +62,11 @@ const GrantProposalForm = ({
 
     const handleFetchGrantProposal = async (grant) => {
         try {
-            const res = await axios.get(`${BASE_URL}/getGrantProposal/${grant._id}`);
+            const res = await axios.get(`${BASE_URL}/getGrantProposal/${grant._id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
             if (res.status === 200) {
                 if (res.data.message === "Grant Proposal Generated successfully.") {
                     Swal.fire({
