@@ -259,12 +259,9 @@ export const useProject = () => {
   const clearCurrentPage = (onComplete) => {
     setProject(prev => {
       const currentPage = prev.pages[prev.currentPage];
-      console.log("Current page:", currentPage);
       if (!currentPage || !currentPage.pageSettings) {
-        console.error('Page or pageSettings not found in clearCurrentPage');
         // Fix the page structure first
         const fixedPages = ensurePageStructure(prev.pages);
-        console.log("Fixed pages:", fixedPages);
         const newProject = {
           ...prev,
           pages: fixedPages
@@ -277,8 +274,6 @@ export const useProject = () => {
         return newProject;
       }
 
-      console.log("Current editing page:", currentEditingPage);
-
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
@@ -290,13 +285,11 @@ export const useProject = () => {
 
       // Call onComplete with the updated project if provided
       if (onComplete) {
-        console.log("Updated project in ClearCurrentPage");
         setTimeout(() => onComplete(newProject), 0);
       }
 
       return newProject;
     });
-    console.log("Project:", project);
     setSelectedElement({ pageIndex: prev.currentPage, elementId: null });
   };
 
@@ -322,12 +315,15 @@ export const useProject = () => {
   };
 
   const setBackground = (type, value, onComplete) => {
+    console.log("Current editing page in setBackground:", currentEditingPage);
     setProject(prev => {
       const currentPage = prev.pages[prev.currentPage];
+      console.log("Current page in setBackground:", currentPage);
       if (!currentPage || !currentPage.pageSettings) {
         console.error('Page or pageSettings not found in setBackground');
         // Fix the page structure first
         const fixedPages = ensurePageStructure(prev.pages);
+        console.log("Fixed pages in setBackground:", fixedPages);
         const newProject = {
           ...prev,
           pages: fixedPages
@@ -350,6 +346,7 @@ export const useProject = () => {
         };
 
         if (onComplete) {
+          console.log("Updated project in setBackground");
           onComplete(updatedProject);
         }
 
@@ -359,7 +356,7 @@ export const useProject = () => {
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
-          index === prev.currentPage
+          index === currentEditingPage
             ? {
               ...page,
               pageSettings: {
@@ -373,11 +370,13 @@ export const useProject = () => {
 
       // Provide the updated project to a callback for history saving, similar to other actions
       if (onComplete) {
+        console.log("Updated project in setBackground");
         onComplete(newProject);
       }
 
       return newProject;
     });
+    console.log("Project:", project);
   };
 
   const duplicatePage = (pageIndex, onComplete) => {
