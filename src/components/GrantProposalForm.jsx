@@ -62,7 +62,9 @@ const GrantProposalForm = ({
 
     const handleFetchGrantProposal = async (grant) => {
         try {
-            const res = await axios.get(`${BASE_URL}/getGrantProposal/${grant._id}`, {
+            const res = await axios.post(`${BASE_URL}/getGrantProposal/`, {
+                grant: grant,
+            }, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
