@@ -1438,7 +1438,7 @@ const Dashboard = () => {
                                 <th className="px-4 py-2 text-left font-medium">Current Editor</th>
                                 <th className="px-4 py-2 text-left font-medium">Close Date</th>
                                 <th className="px-4 py-2 text-left font-medium">Status</th>
-                                <th className="px-4 py-2 text-left font-medium">Funding Amount</th>
+                                <th className="px-4 py-2 text-left font-medium">Submitted Date</th>
                                 <th className="px-4 py-2 text-left font-medium">Action</th>
                             </tr>
                         </thead>
@@ -1459,17 +1459,10 @@ const Dashboard = () => {
                                             )}
 
                                             <td className="px-4 py-2 font-semibold">
-                                                <a
-                                                    href={p.OPPORTUNITY_NUMBER_LINK || '#'}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-[#111827] hover:underline"
-                                                >
-                                                    {p.OPPORTUNITY_TITLE || 'Not Provided'}
-                                                </a>
+                                                {p.title || p.OPPORTUNITY_TITLE || 'Not Provided'}
                                             </td>
 
-                                            <td className="px-4 py-2">{p.AGENCY_NAME || 'Not Provided'}</td>
+                                            <td className="px-4 py-2">{p.AGENCY_NAME || p.client || 'Not Provided'}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
                                                 <td className="px-4 py-2 relative">
@@ -1521,7 +1514,7 @@ const Dashboard = () => {
                                             ) : (
                                                 <td className="px-4 py-2 relative">
                                                     <div className="flex items-center gap-2">
-                                                        <span>{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</span>
+                                                        <span>{p.currentEditor ? p.currentEditor.fullName : p.currentEditor ? p.currentEditor.email : p.currentEditor ? p.currentEditor.name : 'No Editor Assigned'}</span>
                                                         {role === "company" && (
                                                             <button
                                                                 className="text-[#2563EB]"
@@ -1578,7 +1571,7 @@ const Dashboard = () => {
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    p.CLOSE_DATE ? new Date(p.CLOSE_DATE).toLocaleDateString('en-US', {
+                                                    p.CLOSE_DATE || p.deadline ? new Date(p.CLOSE_DATE || p.deadline).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'short',
                                                         day: 'numeric'
@@ -1600,7 +1593,11 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {p.ESTIMATED_TOTAL_FUNDING || p.AWARD_CEILING || 'Not Provided'}
+                                                {p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                }) : 'Not submitted'}
                                             </td>
 
                                             <td className="px-4 py-2">
