@@ -59,7 +59,7 @@ const GrantProposalForm = ({
         });
     };
 
-    const hanleFetchGrantProposal = async (grant) => {
+    const handleFetchGrantProposal = async (grant) => {
         try {
             const res = await axios.get(`${BASE_URL}/getGrantProposal/${grant._id}`);
             if (res.status === 200) {
@@ -76,29 +76,29 @@ const GrantProposalForm = ({
                     Swal.fire({
                         icon: 'info',
                         title: 'In Progress',
-                        text: res.data.message || 'Your grant proposal is still being generated. Please wait for it to complete.',
+                        text: res.data.message || 'Grant proposal is still being generated. Please wait for it to complete.',
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: res.data.message || 'Failed to fetch grant proposal.',
+                        text: res.data.message || 'Failed to fetch Grant proposal.',
                     });
                 }
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: res.data.message || 'Failed to fetch grant proposal.',
+                    text: res.data.message || 'Failed to fetch Grant proposal.',
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: err.response?.data?.message || 'Failed to fetch grant proposal.',
+                text: err.response?.data?.message || 'Failed to fetch Grant proposal.',
             });
-            console.error("Error fetching grant proposal:", err);
+            console.error("Error fetching Grant proposal:", err);
         }
     };
 
@@ -309,6 +309,12 @@ const GrantProposalForm = ({
                 </div>
 
                 <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+                    <button
+                        onClick={() => handleFetchGrantProposal(selectedGrant)}
+                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                        Fetch Grant Proposal
+                    </button>
                     <button
                         onClick={onClose}
                         className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
