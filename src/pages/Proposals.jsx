@@ -486,13 +486,17 @@ const Proposals = () => {
         setSavingStates(prev => ({ ...prev, [proposalId]: true }));
 
         try {
-            const res = await axios.post(API_ENDPOINTS.SAVE_RFP, { rfpId: rfp._id, rfp: rfp }, {
+            const cleanedRFP = {
+                ...rfp,
+                generatedProposal: null
+            };
+            const res = await axios.post(API_ENDPOINTS.SAVE_RFP, { rfpId: rfp._id, rfp: cleanedRFP }, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
             if (res.status === 201 || res.status === 200) {
-                setSavedProposals((prev) => [...prev, rfp]);
+                setSavedProposals((prev) => [...prev, cleanedRFP]);
             }
         } catch (err) {
             Swal.fire({
@@ -516,7 +520,7 @@ const Proposals = () => {
                 },
             });
             if (res.status === 200) {
-                setSavedProposals((prev) => prev.filter((r) => r._id !== rfpId));
+                setSavedProposals((prev) => prev.filter((r) => r.rfpId !== rfpId));
             }
         } catch (err) {
             Swal.fire({
@@ -602,13 +606,17 @@ const Proposals = () => {
         setSavingStates(prev => ({ ...prev, [grantId]: true }));
 
         try {
-            const res = await axios.post(API_ENDPOINTS.SAVE_GRANT, { grantId: grant._id, grant: grant }, {
+            const cleanedGrant = {
+                ...grant,
+                generatedProposal: null
+            };
+            const res = await axios.post(API_ENDPOINTS.SAVE_GRANT, { grantId: grant._id, grant: cleanedGrant }, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
             if (res.status === 201 || res.status === 200) {
-                setSavedGrants((prev) => [...prev, grant]);
+                setSavedGrants((prev) => [...prev, cleanedGrant]);
             }
         } catch (err) {
             Swal.fire({
@@ -632,7 +640,7 @@ const Proposals = () => {
                 },
             });
             if (res.status === 200) {
-                setSavedGrants((prev) => prev.filter((grant) => grant._id !== grantId));
+                setSavedGrants((prev) => prev.filter((grant) => grant.grantId !== grantId));
             }
         } catch (err) {
             Swal.fire({
