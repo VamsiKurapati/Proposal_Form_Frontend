@@ -1239,7 +1239,7 @@ const CanvaApp = () => {
               </div>
 
               {/* Showing a note div at bottom right to inform the users that the content in each page is scrollable and they should manually paste them into new pages so that the content is not lost while exporting to PDF*/}
-              <div className="absolute bottom-2 right-12 max-w-[100px] flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute bottom-2 right-12 max-w-[130px] flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Note" style={{ marginLeft: '8px', width: '100%' }}>
                   <div className="flex items-center gap-2">
                     <MdOutlineInfo className="w-4 h-4" />

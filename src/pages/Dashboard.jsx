@@ -1159,16 +1159,16 @@ const Dashboard = () => {
 
                                             <td className="px-4 py-2 font-semibold">
                                                 <a
-                                                    href={`https://proposal-form-backend.vercel.app/api/proposal/${p.link}`}
+                                                    href={p.url || p.urlLink || p.link || '#'}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-[#2563EB] hover:underline"
                                                 >
-                                                    {p.title}
+                                                    {p.title || p.OPPORTUNITY_TITLE || 'Not Provided'}
                                                 </a>
                                             </td>
 
-                                            <td className="px-4 py-2">{p.client}</td>
+                                            <td className="px-4 py-2">{p.client || "Not Provided"}</td>
 
                                             {p.currentEditor && p.currentEditor.email === userEmail ? (
                                                 <td className="px-4 py-2 relative">
@@ -1220,7 +1220,7 @@ const Dashboard = () => {
                                             ) : (
                                                 <td className="px-4 py-2 relative">
                                                     <div className="flex items-center gap-2">
-                                                        <span>{p.currentEditor ? p.currentEditor.fullName : 'No Editor Assigned'}</span>
+                                                        <span>{p.currentEditor ? p.currentEditor.fullName : p.currentEditor ? p.currentEditor.email : p.currentEditor ? p.currentEditor.name : "No Editor Assigned"}</span>
                                                         {role === "company" && (
                                                             <button
                                                                 className="text-[#2563EB]"
@@ -1277,7 +1277,7 @@ const Dashboard = () => {
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    p.deadline ? new Date(p.deadline).toLocaleDateString('en-US', {
+                                                    p.deadline || p.CLOSE_DATE ? new Date(p.deadline || p.CLOSE_DATE).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'short',
                                                         day: 'numeric'
@@ -1307,7 +1307,7 @@ const Dashboard = () => {
                                                         className="border border-[#111827] rounded px-2 py-1 text-[#111827] text-[16px] w-full bg-[#F3F4F6] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                                                     />
                                                 ) : (
-                                                    p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-US', {
+                                                    p.submittedAt || p.SUBMITTED_AT ? new Date(p.submittedAt || p.SUBMITTED_AT).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'short',
                                                         day: 'numeric'
@@ -1459,7 +1459,9 @@ const Dashboard = () => {
                                             )}
 
                                             <td className="px-4 py-2 font-semibold">
-                                                {p.title || p.OPPORTUNITY_TITLE || 'Not Provided'}
+                                                <a href={p.url || p.urlLink || p.OPPORTUNITY_NUMBER_LINK || '#'} target="_blank" rel="noopener noreferrer">
+                                                    {p.title || p.OPPORTUNITY_TITLE || 'Not Provided'}
+                                                </a>
                                             </td>
 
                                             <td className="px-4 py-2">{p.AGENCY_NAME || p.client || 'Not Provided'}</td>
@@ -1593,7 +1595,7 @@ const Dashboard = () => {
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-US', {
+                                                {p.submittedAt || p.SUBMITTED_AT ? new Date(p.submittedAt || p.SUBMITTED_AT).toLocaleDateString('en-US', {
                                                     year: 'numeric',
                                                     month: 'short',
                                                     day: 'numeric'
