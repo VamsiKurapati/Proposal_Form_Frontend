@@ -23,16 +23,16 @@ const ElementsPanel = ({ show, onClose, addTextElement, imageInputRef, addShapeE
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-green-700">Elements Library</span>
             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-              Images & Shapes
+              Shapes
             </span>
           </div>
           <p className="text-sm text-gray-600">
-            Add images, shapes, and SVG icons to your design
+            Add shapes to your design
           </p>
         </div>
 
         <div className="space-y-4">
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Add Elements</label>
             <div className="space-y-3">
               <button
@@ -42,7 +42,7 @@ const ElementsPanel = ({ show, onClose, addTextElement, imageInputRef, addShapeE
                 Add Image
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Shapes Section */}
           <div>

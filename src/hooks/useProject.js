@@ -315,15 +315,15 @@ export const useProject = () => {
   };
 
   const setBackground = (type, value, onComplete) => {
-    console.log("Current editing page in setBackground:", currentEditingPage);
+    // console.log("Current editing page in setBackground:", currentEditingPage);
     setProject(prev => {
       const currentPage = prev.pages[prev.currentPage];
-      console.log("Current page in setBackground:", currentPage);
+      // console.log("Current page in setBackground:", currentPage);
       if (!currentPage || !currentPage.pageSettings) {
         console.error('Page or pageSettings not found in setBackground');
         // Fix the page structure first
         const fixedPages = ensurePageStructure(prev.pages);
-        console.log("Fixed pages in setBackground:", fixedPages);
+        // console.log("Fixed pages in setBackground:", fixedPages);
         const newProject = {
           ...prev,
           pages: fixedPages
@@ -333,7 +333,7 @@ export const useProject = () => {
         const updatedProject = {
           ...newProject,
           pages: newProject.pages.map((page, index) =>
-            index === newProject.currentPage
+            index === currentEditingPage
               ? {
                 ...page,
                 pageSettings: {
@@ -346,7 +346,7 @@ export const useProject = () => {
         };
 
         if (onComplete) {
-          console.log("Updated project in setBackground");
+          // console.log("Updated project in setBackground");
           onComplete(updatedProject);
         }
 
@@ -370,13 +370,13 @@ export const useProject = () => {
 
       // Provide the updated project to a callback for history saving, similar to other actions
       if (onComplete) {
-        console.log("Updated project in setBackground");
+        // console.log("Updated project in setBackground");
         onComplete(newProject);
       }
 
       return newProject;
     });
-    console.log("Project:", project);
+    // console.log("Project:", project);
   };
 
   const duplicatePage = (pageIndex, onComplete) => {
