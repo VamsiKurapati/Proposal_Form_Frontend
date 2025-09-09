@@ -43,6 +43,8 @@ const handlePDFGeneration = async () => {
             responseType: 'arraybuffer' // Important: tell axios to expect binary data
         });
 
+        console.log("Response data:", res.data);
+
         const contentType = (res.headers && (res.headers['content-type'] || res.headers['Content-Type'])) || '';
 
         let pdfBlob;
