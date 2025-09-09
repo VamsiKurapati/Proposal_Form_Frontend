@@ -29,6 +29,7 @@ import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
 import NavbarComponent from './NavbarComponent.jsx';
 import handlePDFGeneration from '../components/Generate_PDF.jsx';
+import { MdOutlineInfo, MdOutlineRefresh } from 'react-icons/md';
 
 const CanvaApp = () => {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ const CanvaApp = () => {
   const [sets, setSets] = React.useState({});
   const [svgPreviews, setSvgPreviews] = React.useState({});
   const [autoSaveIndicator, setAutoSaveIndicator] = React.useState(false);
+  const [complianceIndicator, setComplianceIndicator] = React.useState(false);
 
   const panelState = usePanelState();
 
@@ -973,6 +975,7 @@ const CanvaApp = () => {
       //Continue to basic if subscription is basic and advanced if subscription is pro or enterprise and show a banner to upgrade to advanced if subscription is basic
       const subscription = JSON.parse(localStorage.getItem('subscription'));
       if (subscription.plan_name === 'Basic') {
+        setComplianceIndicator(true);
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
           proposalId,
           jsonData,
@@ -994,6 +997,7 @@ const CanvaApp = () => {
           });
         }
       } else if (subscription.plan_name === 'Pro' || subscription.plan_name === 'Enterprise') {
+        setComplianceIndicator(true);
         const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
           proposalId,
           jsonData,
@@ -1015,6 +1019,7 @@ const CanvaApp = () => {
           });
         }
       } else {
+        setComplianceIndicator(false);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -1036,6 +1041,8 @@ const CanvaApp = () => {
           text: 'Failed to continue',
         });
       }
+    } finally {
+      setComplianceIndicator(false);
     }
   };
 
@@ -1105,6 +1112,23 @@ const CanvaApp = () => {
   return (
     <div className="h-full flex flex-col">
       <NavbarComponent />
+
+      {/* Showing a animated three dots waving indicator when the compliance check is in progress */}
+      {complianceIndicator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+            <div className="flex justify-center mb-6 space-x-2">
+              <span className="w-3 h-3 bg-[#2563EB] rounded-full animate-bounce"></span>
+              <span className="w-3 h-3 bg-[#2563EB] rounded-full animate-bounce delay-150"></span>
+              <span className="w-3 h-3 bg-[#2563EB] rounded-full animate-bounce delay-300"></span>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Checking Compliance</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Please wait while we check the compliance. This may take a few moments as we analyze your proposal.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main editor content */}
       <div
@@ -1213,6 +1237,16 @@ const CanvaApp = () => {
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => localStorage.getItem('proposalType') === "RFP" ? handleContinue() : handlePDFGeneration()} title={localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"} style={{ marginLeft: '8px' }}>
                   {localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"}
                 </button>
+              </div>
+
+              {/* Showing a note div at bottom right to inform the users that the content in each page is scrollable and they should manually paste them into new pages so that the content is not lost while exporting to PDF*/}
+              <div className="absolute bottom-2 right-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Note" style={{ marginLeft: '8px' }}>
+                  <div className="flex items-center gap-2">
+                    <MdOutlineInfo className="w-4 h-4" />
+                    <span>Note: The content in each page is scrollable and you should manually paste them into new pages so that the content is not lost while exporting to PDF.</span>
+                  </div>
+                </div>
               </div>
             </>
           )}

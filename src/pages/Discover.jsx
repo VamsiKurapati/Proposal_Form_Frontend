@@ -1843,7 +1843,7 @@ const Discover = () => {
       </div>
 
       <div className="flex justify-between items-center">
-        <span className="font-semibold text-[#111827]">{grant.AWARD_CEILING === "Not Provided" ? "Not Disclosed" : grant.AWARD_CEILING}</span>
+        <span className="font-semibold text-[#111827]">{grant.AWARD_CEILING === "none" ? "Not Disclosed" : `$${grant.AWARD_CEILING}`}</span>
         <div className="flex gap-2">
           <button
             onClick={() => handleGenerateGrantProposal(grant)}
@@ -1879,7 +1879,7 @@ const Discover = () => {
         </td>
         <td className="px-4 py-3 text-left">
           <span className="text-[#2563EB] text-[14px] font-semibold">
-            {grant.AWARD_CEILING === "Not Provided" ? "Not Disclosed" : grant.AWARD_CEILING}
+            {grant.AWARD_CEILING === "none" ? "Not Disclosed" : `$${grant.AWARD_CEILING}`}
           </span>
         </td>
         <td className="px-4 py-3 text-left">
