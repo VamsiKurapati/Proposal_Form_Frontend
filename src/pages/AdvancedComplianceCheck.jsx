@@ -212,9 +212,9 @@ const AdvancedComplianceCheck = () => {
                     {/* Navigation Buttons */}
                     <div className="flex flex-col md:flex-row items-center justify-between mt-8 gap-4">
                         <button className="border border-[#4B5563] text-[#4B5563] px-6 py-2 rounded transition text-[16px] flex items-center gap-2"
-                            onClick={() => navigate('/editor')}>
+                            onClick={() => navigate(-1)}>
                             <IoIosArrowBack className="text-[20px] text-[#4B5563]" />
-                            Back to Editor
+                            Back
                         </button>
                         <button className="bg-[#2563EB] text-white px-8 py-2 rounded transition text-[16px]"
                             onClick={() => handleGeneratePDF()}>

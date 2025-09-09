@@ -1098,6 +1098,7 @@ const CanvaApp = () => {
 
   //Use effect to save the project to localStorage when there is any change in the project
   useEffect(() => {
+    console.log("Project changed in CanvaApp");
     localStorage.setItem('canva-project', JSON.stringify(project));
   }, [project]);
 
