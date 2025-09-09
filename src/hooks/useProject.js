@@ -259,10 +259,12 @@ export const useProject = () => {
   const clearCurrentPage = (onComplete) => {
     setProject(prev => {
       const currentPage = prev.pages[prev.currentPage];
+      console.log("Current page:", currentPage);
       if (!currentPage || !currentPage.pageSettings) {
         console.error('Page or pageSettings not found in clearCurrentPage');
         // Fix the page structure first
         const fixedPages = ensurePageStructure(prev.pages);
+        console.log("Fixed pages:", fixedPages);
         const newProject = {
           ...prev,
           pages: fixedPages
@@ -275,6 +277,8 @@ export const useProject = () => {
         return newProject;
       }
 
+      console.log("Current editing page:", currentEditingPage);
+
       const newProject = {
         ...prev,
         pages: prev.pages.map((page, index) =>
@@ -286,11 +290,13 @@ export const useProject = () => {
 
       // Call onComplete with the updated project if provided
       if (onComplete) {
+        console.log("Updated project in ClearCurrentPage");
         setTimeout(() => onComplete(newProject), 0);
       }
 
       return newProject;
     });
+    console.log("Project:", project);
     setSelectedElement({ pageIndex: prev.currentPage, elementId: null });
   };
 
