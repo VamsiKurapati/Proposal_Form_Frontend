@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import axios from 'axios';
-import { MdOutlineArrowBack, MdOutlineRefresh } from 'react-icons/md';
+import { MdOutlineArrowBack, MdOutlineInfo, MdOutlineRefresh } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
@@ -29,7 +29,6 @@ import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
 import NavbarComponent from './NavbarComponent.jsx';
 import handlePDFGeneration from '../components/Generate_PDF.jsx';
-import { MdOutlineInfo, MdOutlineRefresh } from 'react-icons/md';
 
 const CanvaApp = () => {
   const navigate = useNavigate();
