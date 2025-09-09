@@ -32,55 +32,38 @@ const handlePDFGeneration = async () => {
         } else {
             jsonData = project;
         }
-        const res = await axios.post('https://proposal-form-backend.vercel.app/api/proposals/generatePDF', {
-            project: jsonData,
-            isCompressed
-        }, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Accept': 'application/pdf,application/octet-stream,text/plain,application/json'
+        const res = await axios.post(
+            'https://proposal-form-backend.vercel.app/api/proposals/generatePDF',
+            {
+                project: jsonData,
+                isCompressed
             },
-        }, {
-            responseType: 'arraybuffer' // Important: tell axios to expect binary data
-        });
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Accept: 'application/pdf, application/octet-stream'
+                },
+                responseType: 'blob'
+            }
+        );
 
-        console.log("Response data:", res.data);
-
+        console.log("Response status:", res.status);
         const contentType = (res.headers && (res.headers['content-type'] || res.headers['Content-Type'])) || '';
-
         console.log("Content type:", contentType);
 
-        let pdfBlob;
-        if (contentType.includes('application/pdf')) {
-            // Server returned raw PDF bytes
-            pdfBlob = new Blob([res.data], { type: 'application/pdf' });
-            console.log("PDF blob:", pdfBlob);
-        } else {
-            // Fallback: server returned base64 (as text) inside the ArrayBuffer
-            let base64Payload = '';
+        // If server sent JSON, extract and show the error/info
+        if (contentType && contentType.includes('application/json')) {
+            const text = await res.data.text();
             try {
-                const decodedText = new TextDecoder('utf-8').decode(res.data);
-                // Could be plain base64 or data URL
-                base64Payload = decodedText.replace(/^data:application\/pdf;base64,/, '').trim();
-                console.log("Base64 payload:", base64Payload);
+                const json = JSON.parse(text);
+                throw new Error(json.message || 'Server returned JSON instead of a PDF.');
             } catch (e) {
-                // As a last resort, try to interpret as already-correct bytes
-                pdfBlob = new Blob([res.data], { type: 'application/pdf' });
-                console.log("PDF blob:", pdfBlob);
-            }
-
-            if (!pdfBlob) {
-                // Convert base64 string to Uint8Array
-                const byteCharacters = atob(base64Payload);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                pdfBlob = new Blob([byteArray], { type: 'application/pdf' });
-                console.log("PDF blob:", pdfBlob);
+                throw new Error(typeof text === 'string' && text.length < 500 ? text : 'Server returned JSON instead of a PDF.');
             }
         }
+
+        // Expect a PDF blob
+        const pdfBlob = res.data && res.data instanceof Blob ? res.data : new Blob([res.data], { type: 'application/pdf' });
 
         const blobUrl = URL.createObjectURL(pdfBlob);
         console.log("Blob URL:", blobUrl);
