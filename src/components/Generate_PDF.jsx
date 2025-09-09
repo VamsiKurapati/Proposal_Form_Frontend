@@ -22,6 +22,7 @@ const handlePDFGeneration = async () => {
     loadingDiv.innerHTML = 'Preparing PDF export...';
     document.body.appendChild(loadingDiv);
     try {
+        console.log("Sending request to generate PDF...");
         let jsonData = null;
         let isCompressed = false;
         if (shouldCompress(project)) {
@@ -47,10 +48,13 @@ const handlePDFGeneration = async () => {
 
         const contentType = (res.headers && (res.headers['content-type'] || res.headers['Content-Type'])) || '';
 
+        console.log("Content type:", contentType);
+
         let pdfBlob;
         if (contentType.includes('application/pdf')) {
             // Server returned raw PDF bytes
             pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+            console.log("PDF blob:", pdfBlob);
         } else {
             // Fallback: server returned base64 (as text) inside the ArrayBuffer
             let base64Payload = '';
@@ -58,9 +62,11 @@ const handlePDFGeneration = async () => {
                 const decodedText = new TextDecoder('utf-8').decode(res.data);
                 // Could be plain base64 or data URL
                 base64Payload = decodedText.replace(/^data:application\/pdf;base64,/, '').trim();
+                console.log("Base64 payload:", base64Payload);
             } catch (e) {
                 // As a last resort, try to interpret as already-correct bytes
                 pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+                console.log("PDF blob:", pdfBlob);
             }
 
             if (!pdfBlob) {
@@ -72,11 +78,12 @@ const handlePDFGeneration = async () => {
                 }
                 const byteArray = new Uint8Array(byteNumbers);
                 pdfBlob = new Blob([byteArray], { type: 'application/pdf' });
+                console.log("PDF blob:", pdfBlob);
             }
         }
 
         const blobUrl = URL.createObjectURL(pdfBlob);
-
+        console.log("Blob URL:", blobUrl);
         // Download automatically
         const link = document.createElement("a");
         link.href = blobUrl;
@@ -84,6 +91,7 @@ const handlePDFGeneration = async () => {
             .toISOString()
             .slice(0, 19)
             .replace(/:/g, "-")}.pdf`;
+        console.log("Link:", link);
         document.body.appendChild(link);
         link.click();
         link.remove();
