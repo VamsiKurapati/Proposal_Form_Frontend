@@ -77,6 +77,7 @@ const GrantProposalForm = ({
                         text: res.data.message || 'Grant proposal generated successfully.',
                     });
                     setTimeout(() => {
+                        localStorage.setItem('proposalType', "GRANT");
                         navigate('/editor', { state: { jsonData: res.data.proposal, proposalId: res.data.proposalId } });
                     }, 1000);
                 } else if (res.data.message === "Grant Proposal Generation is still in Progress. Please wait for it to complete.") {

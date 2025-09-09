@@ -28,6 +28,7 @@ import ToolsPanel from '../components/ToolsPanel.jsx';
 import ProjectsPanel from '../components/ProjectsPanel.jsx';
 
 import NavbarComponent from './NavbarComponent.jsx';
+import handlePDFGeneration from '../components/Generate_PDF.jsx';
 
 const CanvaApp = () => {
   const navigate = useNavigate();
@@ -1208,8 +1209,8 @@ const CanvaApp = () => {
                   )}
                 </div>
 
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => handleContinue()} title="Continue" style={{ marginLeft: '8px' }}>
-                  Continue
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => localStorage.getItem('proposalType') === "RFP" ? handleContinue() : handlePDFGeneration()} title={localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"} style={{ marginLeft: '8px' }}>
+                  {localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"}
                 </button>
               </div>
             </>

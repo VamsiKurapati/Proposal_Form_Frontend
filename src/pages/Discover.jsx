@@ -1460,6 +1460,7 @@ const Discover = () => {
             confirmButtonColor: '#2563EB'
           });
           setTimeout(() => {
+            localStorage.setItem('proposalType', "GRANT");
             navigate('/editor', {
               state: {
                 jsonData: res.data.proposal, proposalId: res.data.proposalId

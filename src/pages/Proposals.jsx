@@ -554,6 +554,7 @@ const Proposals = () => {
 
     const handleContinue = (proposal) => {
         localStorage.setItem('proposalId', proposal.proposalId);
+        localStorage.setItem('proposalType', "RFP");
         navigate('/editor', { state: { jsonData: proposal.generatedProposal || null } });
     };
 
@@ -651,6 +652,8 @@ const Proposals = () => {
     };
 
     const handleContinueGrant = (grant) => {
+        localStorage.setItem('proposalId', grant.proposalId);
+        localStorage.setItem('proposalType', "GRANT");
         navigate('/editor', { state: { jsonData: grant.generatedProposal || null } });
     };
 
@@ -768,6 +771,7 @@ const Proposals = () => {
                         confirmButtonColor: '#2563EB'
                     });
                     setTimeout(() => {
+                        localStorage.setItem('proposalType', "GRANT");
                         navigate('/editor', {
                             state: {
                                 jsonData: res.data.proposal, proposalId: res.data.proposalId

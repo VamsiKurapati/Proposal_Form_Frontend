@@ -43,6 +43,7 @@ const GenerateProposalPage = () => {
             text: res.data.message || 'Proposal generated successfully. Redirecting to editor.',
           });
           setTimeout(() => {
+            localStorage.setItem('proposalType', "RFP");
             navigate('/editor', {
               state: {
                 jsonData: res.data.proposal, proposalId: res.data.proposalId
