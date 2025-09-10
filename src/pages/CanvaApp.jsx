@@ -1134,15 +1134,33 @@ const CanvaApp = () => {
               <p className="text-[#2563EB] text-sm leading-relaxed">
                 Please follow the instructions below for better experience.
               </p>
-              <ul className="text-[#111827] text-sm leading-relaxed text-left">
-                <li><span className="text-[#000000] text-sm leading-relaxed text-left">1.Do not delete default text boxes <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
+              <ul className="text-[#111827] text-sm leading-relaxed text-left mt-4">
+                <li className="mb-4">
+                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                    1.Do not delete default text boxes
+                  </span>
+                  <br />
+                  <span className="text-[#111827] text-sm leading-relaxed text-left mt-1">
+                    To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.
+                  </span>
                 </li>
-                <li><span className="text-[#000000] text-sm leading-relaxed text-left">2. Be cautious with large content sections <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
+                <li className="mb-4">
+                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                    2. Be cautious with large content sections
+                  </span>
+                  <br />
+                  <span className="text-[#111827] text-sm leading-relaxed text-left mt-1">
+                    If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.
+                  </span>
                 </li>
-                <li><span className="text-[#000000] text-sm leading-relaxed text-left">3. Use overlays creatively <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
+                <li className="mb-4">
+                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                    3. Use overlays creatively
+                  </span>
+                  <br />
+                  <span className="text-[#111827] text-sm leading-relaxed text-left mt-1">
+                    You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.
+                  </span>
                 </li>
               </ul>
             </div>
