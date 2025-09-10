@@ -994,7 +994,7 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-1000 bottom-4 p-1 w-40 sm:w-[110%] h-[110%] bg-[#F3F4F6] rounded-md border border-[#E5E7EB] overflow-y-auto">
+                            <div className="fixed z-1000 p-1 w-52 h-full bg-[#F3F4F6] rounded-md border border-[#E5E7EB] overflow-y-auto">
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="flex flex-col justify-between items-center mb-2 last:mb-0">
                                         <span className="font-medium text-[12px] sm:text-base">{ev.title}</span>

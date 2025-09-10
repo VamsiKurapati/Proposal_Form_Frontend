@@ -5,7 +5,7 @@ import { MdOutlineEdit, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineLo
 import NavbarComponent from "./NavbarComponent";
 import { useEmployeeProfile } from "../context/EmployeeProfileContext";
 import { useUser } from "../context/UserContext";
-import { handlePDFGeneration } from "../components/Generate_PDF";
+import handlePDFGeneration from "../components/Generate_PDF";
 
 // Main component for Employee Profile Dashboard
 const EmployeeProfileDashboard = () => {
@@ -32,6 +32,10 @@ const EmployeeProfileDashboard = () => {
       setLogoUrl(employeeData.logoUrl);
     }
   }, [employeeData]);
+
+  const handleGeneratePDF = async (proposal) => {
+    await handlePDFGeneration(proposal);
+  };
 
   // Updated Button handlers
   const handleEditProfile = () => {
@@ -288,7 +292,7 @@ const EmployeeProfileDashboard = () => {
                       className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
                       disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
                       title={role === "Viewer" ? "Viewer cannot edit proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can edit this proposal" : "Edit Details"}
-                      onClick={() => handlePDFGeneration(proposal.generatedProposal)}>
+                      onClick={() => navigate('/proposal_page', { state: { proposal: proposal.generatedProposal, proposalType: `${proposal.rfpId ? "RFP" : proposal.grantId ? "GRANT" : "No"}`, proposalId: proposal._id } })}>
                       <MdOutlineEdit className="w-4 h-4 shrink-0" title="Edit Details" />
                       Edit
                     </button>
@@ -326,7 +330,7 @@ const EmployeeProfileDashboard = () => {
                       className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
                       disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
                       title={role === "Viewer" ? "Viewer cannot view proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can view this proposal" : "View Details"}
-                      onClick={() => handlePDFGeneration(proposal.generatedProposal)}>
+                      onClick={() => handleGeneratePDF(proposal.generatedProposal)}>
                       <MdOutlineVisibility className="w-4 h-4 shrink-0" title="View Details" />
                       View
                     </button>
