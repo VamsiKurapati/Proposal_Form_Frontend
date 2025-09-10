@@ -998,7 +998,7 @@ const Dashboard = () => {
                                 style={{
                                     background: "linear-gradient(135deg, rgb(100, 149, 237) 30%, rgb(147, 112, 219) 100%)"
                                 }}>
-                                <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
+                                <div className="text-sm font-medium text-white mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded scrollbar-hide">
                                         <span className="font-medium text-sm mb-1 break-words">{ev.title}</span>
