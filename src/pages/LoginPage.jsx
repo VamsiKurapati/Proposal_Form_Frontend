@@ -42,7 +42,7 @@ const LoginPage = () => {
 
   const triggerRFPDiscovery = (token, role) => {
     if (role !== "SuperAdmin") {
-      axios.post(`https://proposal-form-backend.vercel.app/api/rfp/triggerRFPDiscovery`, {}, {
+      axios.post(`${import.meta.env.VITE_API_BASE_URL}/rfp/triggerRFPDiscovery`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -59,7 +59,7 @@ const LoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await axios.post('https://proposal-form-backend.vercel.app/api/auth/login', form);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, form);
       if (res.status === 200) {
         triggerRFPDiscovery(res.data.token, res.data.user.role);
         toast.success("Login successful");

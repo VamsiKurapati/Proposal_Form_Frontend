@@ -15,7 +15,7 @@ import { MdOutlineCheck, MdOutlineClose } from "react-icons/md";
 
 export default function ChangePassword() {
     const navigate = useNavigate();
-    const baseUrl = "https://proposal-form-backend.vercel.app/api/profile";
+    const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/profile`;
 
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");

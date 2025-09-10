@@ -4,7 +4,7 @@ import axios from 'axios';
 class CloudImageService {
   constructor() {
     // Use environment variables from .env file
-    this.baseUrl = 'https://proposal-form-backend.vercel.app/api/image';
+    this.baseUrl = `${import.meta.env.VITE_API_BASE_URL}/image`;
     this.maxFileSize = 1024 * 1024; // 1MB
     this.maxImages = 15;
     this.uploadedImages = this.loadUploadedImages();

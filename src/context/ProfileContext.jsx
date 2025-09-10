@@ -25,7 +25,7 @@ export const ProfileProvider = ({ children }) => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProfile', {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/profile/getProfile`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
@@ -61,7 +61,7 @@ export const ProfileProvider = ({ children }) => {
                         activeProposals: response.data.activeProposals
                     },
                     proposalList: response.data.proposals,
-                    logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
+                    logoUrl_1: response.data.logoUrl ? `${import.meta.env.VITE_API_BASE_URL}/profile/getProfileImage/file/${response.data.logoUrl}` : null
                 };
                 setCompanyData(data);
                 setHasInitialized(true);
@@ -77,7 +77,7 @@ export const ProfileProvider = ({ children }) => {
         if (role === "Editor" || role === "Viewer") {
             try {
                 const token = localStorage.getItem("token");
-                const res = await axios.get(`https://proposal-form-backend.vercel.app/api/profile/getCompanyProfile`, {
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/profile/getCompanyProfile`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

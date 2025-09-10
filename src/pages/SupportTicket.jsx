@@ -74,7 +74,7 @@ const SupportTicket = () => {
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
 
-    const baseUrl = "https://proposal-form-backend.vercel.app/api/support";
+    const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/support`;
 
     const fetchConversationMessages = async (ticketId) => {
         setLoadingMessages(true);

@@ -12,7 +12,7 @@ export const SubscriptionPlansProvider = ({ children }) => {
         const fetchSubscriptionPlans = async () => {
             if (subscriptionPlans.length > 0) return;
             try {
-                const res = await axios.get("https://proposal-form-backend.vercel.app/getSubscriptionPlansData", {
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/getSubscriptionPlansData`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }

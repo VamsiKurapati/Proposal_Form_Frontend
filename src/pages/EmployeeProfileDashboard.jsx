@@ -7,6 +7,8 @@ import { useEmployeeProfile } from "../context/EmployeeProfileContext";
 import { useUser } from "../context/UserContext";
 import handlePDFGeneration from "../components/Generate_PDF";
 
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/profile`;
+
 // Main component for Employee Profile Dashboard
 const EmployeeProfileDashboard = () => {
   const navigate = useNavigate();
@@ -93,7 +95,7 @@ const EmployeeProfileDashboard = () => {
 
     try {
       const response = await axios.post(
-        'https://proposal-form-backend.vercel.app/api/profile/uploadLogo',
+        `${baseUrl}/uploadLogo`,
         formData,
         {
           headers: {
@@ -102,7 +104,7 @@ const EmployeeProfileDashboard = () => {
           },
         }
       );
-      setLogoUrl("https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl);
+      setLogoUrl(`${baseUrl}/getProfileImage/file/${response.data.logoUrl}`);
       // //console.log(logoUrl);
       setEditMode(false);
       setSelectedFile(null);

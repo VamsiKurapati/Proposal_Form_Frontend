@@ -22,7 +22,7 @@ import GrantProposalForm from "../components/GrantProposalForm";
 import Subscription from "../components/Subscription";
 
 // Constants
-const API_BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/rfp`;
 const STATUS_STYLES = {
   "In Progress": "bg-blue-100 text-blue-600",
   Submitted: "bg-green-100 text-green-600",

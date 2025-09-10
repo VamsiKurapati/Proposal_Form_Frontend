@@ -3,7 +3,7 @@ import { FaRegCheckCircle } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/admin`;
 
 const PricingCard = ({ id, plan, price, features, popular, highlightFirst, onPriceUpdated }) => {
     // Custom hook to handle edit price functionality

@@ -454,7 +454,7 @@ const CompanyProfileUpdate = () => {
             formData.append("numberOfEmployees", form.numberOfEmployees);
             formData.append("founded", form.founded);
 
-            const response = await axios.put("https://proposal-form-backend.vercel.app/api/profile/updateCompanyProfile", formData,
+            const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/profile/updateCompanyProfile`, formData,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`

@@ -11,7 +11,7 @@ import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
 // Initialize Stripe
 const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY);
 
-const baseUrl = "https://proposal-form-backend.vercel.app/api/stripe";
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/stripe`;
 
 const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
     const stripe = useStripe();
@@ -306,93 +306,93 @@ const StripePaymentPage = () => {
     // Create subscription plans data with proper null checks
     const subscriptionPlansData = React.useMemo(() => {
         if (!subscriptionPlans || subscriptionPlans.length === 0) {
-          console.log("No subscription plans available from context");
-          return [];
+            console.log("No subscription plans available from context");
+            return [];
         }
-      
+
         // Helper function to safely get plan data
         const getPlanData = (planName) => {
-          const plan = subscriptionPlans.find((p) => p.name === planName);
-          if (!plan) {
-            console.warn(`Plan ${planName} not found in subscription plans`);
-            return null;
-          }
-          return plan;
+            const plan = subscriptionPlans.find((p) => p.name === planName);
+            if (!plan) {
+                console.warn(`Plan ${planName} not found in subscription plans`);
+                return null;
+            }
+            return plan;
         };
-      
+
         const basicPlan = getPlanData("Basic");
         const proPlan = getPlanData("Pro");
         const enterprisePlan = getPlanData("Enterprise");
-      
+
         // Return empty array if any required plan is missing
         if (!basicPlan || !proPlan || !enterprisePlan) {
-          console.error("One or more required subscription plans are missing");
-          return [];
+            console.error("One or more required subscription plans are missing");
+            return [];
         }
-      
+
         const plans = [
-          {
-            id: "basic",
-            name: "Basic Plan",
-            _id: basicPlan._id,
-            monthlyPrice: basicPlan.monthlyPrice || 0,
-            yearlyPrice: basicPlan.yearlyPrice || 0,
-            features: [
-              `Up to ${basicPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-              `Up to ${basicPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
-              "AI-Driven RFP Discovery",
-              "AI-Driven Grant Discovery",
-              "AI-Proposal Recommendation",
-              "Basic Compliance Check",
-              "Proposal Tracking Dashboard",
-              `${basicPlan.maxEditors || 0} Editors, ${basicPlan.maxViewers || 0} Viewers, Unlimited Members`,
-              "Team Collaboration",
-              "Support",
-            ],
-            missingFeatures: ["Advanced Compliance Check"],
-            popular: mostPopularPlan === "Basic",
-          },
-          {
-            id: "professional",
-            name: "Professional Plan",
-            _id: proPlan._id,
-            monthlyPrice: proPlan.monthlyPrice || 0,
-            yearlyPrice: proPlan.yearlyPrice || 0,
-            features: [
-              "Includes All Basic Features",
-              `Up to ${proPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-              `Up to ${proPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
-              `${proPlan.maxEditors || 0} Editors, ${proPlan.maxViewers || 0} Viewers, Unlimited Members`,
-              "Advanced Compliance Check",
-            ],
-            missingFeatures: ["Dedicated Support"],
-            popular: mostPopularPlan === "Pro",
-          },
+            {
+                id: "basic",
+                name: "Basic Plan",
+                _id: basicPlan._id,
+                monthlyPrice: basicPlan.monthlyPrice || 0,
+                yearlyPrice: basicPlan.yearlyPrice || 0,
+                features: [
+                    `Up to ${basicPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${basicPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    "AI-Driven RFP Discovery",
+                    "AI-Driven Grant Discovery",
+                    "AI-Proposal Recommendation",
+                    "Basic Compliance Check",
+                    "Proposal Tracking Dashboard",
+                    `${basicPlan.maxEditors || 0} Editors, ${basicPlan.maxViewers || 0} Viewers, Unlimited Members`,
+                    "Team Collaboration",
+                    "Support",
+                ],
+                missingFeatures: ["Advanced Compliance Check"],
+                popular: mostPopularPlan === "Basic",
+            },
+            {
+                id: "professional",
+                name: "Professional Plan",
+                _id: proPlan._id,
+                monthlyPrice: proPlan.monthlyPrice || 0,
+                yearlyPrice: proPlan.yearlyPrice || 0,
+                features: [
+                    "Includes All Basic Features",
+                    `Up to ${proPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${proPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    `${proPlan.maxEditors || 0} Editors, ${proPlan.maxViewers || 0} Viewers, Unlimited Members`,
+                    "Advanced Compliance Check",
+                ],
+                missingFeatures: ["Dedicated Support"],
+                popular: mostPopularPlan === "Pro",
+            },
         ];
-      
+
         //  Only include Enterprise plan if isContact is NOT true
         if (!enterprisePlan.isContact) {
-          plans.push({
-            id: "enterprise",
-            name: "Enterprise Plan",
-            _id: enterprisePlan._id,
-            monthlyPrice: enterprisePlan.monthlyPrice || 0,
-            yearlyPrice: enterprisePlan.yearlyPrice || 0,
-            features: [
-              "Includes All Basic & Pro Features",
-              `Up to ${enterprisePlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-              `Up to ${enterprisePlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
-              "Unlimited Editors, Unlimited Viewers, Unlimited Members",
-              "Dedicated Support",
-            ],
-            missingFeatures: [],
-            popular: mostPopularPlan === "Enterprise",
-          });
+            plans.push({
+                id: "enterprise",
+                name: "Enterprise Plan",
+                _id: enterprisePlan._id,
+                monthlyPrice: enterprisePlan.monthlyPrice || 0,
+                yearlyPrice: enterprisePlan.yearlyPrice || 0,
+                features: [
+                    "Includes All Basic & Pro Features",
+                    `Up to ${enterprisePlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
+                    `Up to ${enterprisePlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    "Unlimited Editors, Unlimited Viewers, Unlimited Members",
+                    "Dedicated Support",
+                ],
+                missingFeatures: [],
+                popular: mostPopularPlan === "Enterprise",
+            });
         }
-      
+
         return plans;
-      }, [subscriptionPlans, mostPopularPlan]);
-      
+    }, [subscriptionPlans, mostPopularPlan]);
+
 
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [billingCycle, setBillingCycle] = useState('monthly');

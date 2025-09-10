@@ -202,7 +202,7 @@ const EmployeeProfileUpdate = () => {
             }
             formData.append("skills", skillsArray);
 
-            const response = await axios.put("https://proposal-form-backend.vercel.app/api/profile/updateEmployeeProfile", formData,
+            const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/profile/updateEmployeeProfile`, formData,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`

@@ -266,7 +266,7 @@ const CreateProfile = () => {
         formData.append("linkedIn", form.linkedIn);
       }
 
-      const res = await axios.post("https://proposal-form-backend.vercel.app/api/auth/signup", formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, formData);
 
       if (res.status === 201) {
         Swal.fire({

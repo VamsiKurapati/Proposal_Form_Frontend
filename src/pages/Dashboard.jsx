@@ -99,7 +99,7 @@ const getSummaryCardTextColor = (label) => {
 };
 
 const PAGE_SIZE = 5;
-const BASE_URL = 'https://proposal-form-backend.vercel.app/api/dashboard';
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/dashboard`;
 
 const Dashboard = () => {
     const user = localStorage.getItem("user");
@@ -996,8 +996,7 @@ const Dashboard = () => {
                         {isDropdownOpen && (
                             <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto"
                                 style={{
-                                    background: "linear-gradient(135deg, hsla(234, 100%, 83%, 1) 30%, hsla(270, 77%, 71%, 1) 100%);",
-                                    border: "2px solid rgb(25, 66, 148)"
+                                    background: "linear-gradient(135deg, rgb(100, 149, 237) 30%, rgb(147, 112, 219) 100%)"
                                 }}>
                                 <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (

@@ -17,6 +17,8 @@ export const EmployeeProfileProvider = ({ children }) => {
     const [fetchedEmployeeData, setFetchedEmployeeData] = useState(false);
     const { role } = useUser();
 
+    const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/profile`;
+
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockEmployeeData = useCallback(() => ({
         name: "John Doe",
@@ -120,7 +122,7 @@ export const EmployeeProfileProvider = ({ children }) => {
         }
 
         try {
-            const res = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getProposals', {
+            const res = await axios.get(`${baseUrl}/getProposals`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -163,7 +165,7 @@ export const EmployeeProfileProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get('https://proposal-form-backend.vercel.app/api/profile/getEmployeeProfile', {
+            const response = await axios.get(`${baseUrl}/getEmployeeProfile`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -178,7 +180,7 @@ export const EmployeeProfileProvider = ({ children }) => {
                 skills: response.data.skills,
                 email: response.data.email,
                 phone: response.data.phone,
-                logoUrl_1: response.data.logoUrl ? "https://proposal-form-backend.vercel.app/api/profile/getProfileImage/file/" + response.data.logoUrl : null
+                logoUrl_1: response.data.logoUrl ? `${baseUrl}/getProfileImage/file/${response.data.logoUrl}` : null
             };
             setEmployeeData(data);
             setHasInitialized(true);

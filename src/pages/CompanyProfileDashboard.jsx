@@ -5,10 +5,6 @@ import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCe
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
 
-// Short desc, job title, highest edu, skills
-
-const baseUrl = "https://proposal-form-backend.vercel.app/api";
-
 // Unified Badge Styles
 const badgeStyles = {
   // Status badges
@@ -231,8 +227,6 @@ const ContactModal = ({ member, isOpen, onClose }) => {
   const contactOptions = [
     { icon: <MdOutlineEmail className="w-5 h-5" />, label: "Send Email", action: () => window.open(`mailto:${member.email}`) },
     { icon: <MdOutlinePhone className="w-5 h-5" />, label: "Call", action: () => window.open(`tel:${member.phone}`) },
-    // { icon: <MdOutlineLinkedCamera className="w-5 h-5" />, label: "LinkedIn", action: () => window.open(`${member.linkedIn}`) },
-    // { icon: <MdOutlineOpenInNew className="w-5 h-5" />, label: "Schedule Meeting", action: () => window.open('https://calendly.com') },
   ];
 
   return (
@@ -284,7 +278,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
     try {
       let skillsArray = formData.skills.split(',').map(skill => skill.trim());
       formData.skills = skillsArray;
-      const response = await axios.post(`${baseUrl}/profile/addEmployee`, formData,
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/addEmployee`, formData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -490,7 +484,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
       formDataToSend.append('company', formData.company);
       formDataToSend.append('file', formData.file);
 
-      const response = await axios.post(`${baseUrl}/profile/addCaseStudy`, formDataToSend,
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/addCaseStudy`, formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -637,7 +631,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${baseUrl}/profile/addLicenseAndCertification`, formData,
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/addLicenseAndCertification`, formData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -794,7 +788,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
       formDataToSend.append('type', formData.file.type === 'application/pdf' ? 'PDF' : 'TXT');
       formDataToSend.append('document', formData.file);
 
-      const response = await axios.post(`${baseUrl}/profile/addDocument`, formDataToSend,
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/addDocument`, formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -1001,7 +995,7 @@ const CompanyProfileDashboard = () => {
 
       // Download the actual document from the backend as binary
       const response = await axios.get(
-        `${baseUrl}/profile/getDocument/${docItem.fileId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/profile/getDocument/${docItem.fileId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -1090,7 +1084,7 @@ const CompanyProfileDashboard = () => {
     const loadPayments = async () => {
       if (activeTab !== "Payment") return;
       try {
-        const res = await axios.get(`${baseUrl}/profile/getPaymentById/${userId}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/profile/getPaymentById/${userId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const allPayments = res.data;
@@ -1226,7 +1220,7 @@ const CompanyProfileDashboard = () => {
 
     try {
       const response = await axios.post(
-        `${baseUrl}/profile/uploadLogo`,
+        `${import.meta.env.VITE_API_BASE_URL}/profile/uploadLogo`,
         formData,
         {
           headers: {
@@ -1235,7 +1229,7 @@ const CompanyProfileDashboard = () => {
           },
         }
       );
-      setLogoUrl(`${baseUrl}/profile/getProfileImage/file/${response.data.logoUrl}`);
+      setLogoUrl(`${import.meta.env.VITE_API_BASE_URL}/profile/getProfileImage/file/${response.data.logoUrl}`);
       // //console.log(logoUrl);
       setEditMode(false);
       setSelectedFile(null);

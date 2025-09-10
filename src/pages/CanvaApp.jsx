@@ -977,7 +977,7 @@ const CanvaApp = () => {
       const subscription = JSON.parse(localStorage.getItem('subscription'));
       if (subscription.plan_name === 'Basic') {
         setComplianceIndicator(true);
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/basicComplianceCheck`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/proposals/basicComplianceCheck`, {
           proposalId,
           jsonData,
           isCompressed
@@ -999,7 +999,7 @@ const CanvaApp = () => {
         }
       } else if (subscription.plan_name === 'Pro' || subscription.plan_name === 'Enterprise') {
         setComplianceIndicator(true);
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/advancedComplianceCheck`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/proposals/advancedComplianceCheck`, {
           proposalId,
           jsonData,
           isCompressed
@@ -1063,7 +1063,7 @@ const CanvaApp = () => {
     if (proposalId && project) {
       setAutoSaveIndicator(true);
       try {
-        const res = await axios.post(`https://proposal-form-backend.vercel.app/api/proposals/autoSave`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/proposals/autoSave`, {
           proposalId,
           jsonData,
           isCompressed

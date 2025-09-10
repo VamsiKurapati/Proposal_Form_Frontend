@@ -9,9 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 
-
-
-const API_URL = "https://proposal-form-backend.vercel.app/api";
 export default function Contact() {
   const navigate = useNavigate();
 
@@ -36,7 +33,7 @@ export default function Contact() {
     setMessage("");
 
     try {
-      const response = await axios.post(`${API_URL}/contact`, formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/contact`, formData);
       if (response.status === 201) {
         setMessage(response.data.message || 'Your request has been sent successfully!');
         setFormData({ name: "", company: "", email: "", description: "" });

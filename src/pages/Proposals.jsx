@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import GrantProposalForm from '../components/GrantProposalForm';
 
 // Constants
-const API_BASE_URL = "https://proposal-form-backend.vercel.app/api";
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 const API_ENDPOINTS = {
     GET_SAVED_AND_DRAFT_RFPS: `${API_BASE_URL}/rfp/getSavedAndDraftRFPs`,
     SAVE_RFP: `${API_BASE_URL}/rfp/saveRFP`,

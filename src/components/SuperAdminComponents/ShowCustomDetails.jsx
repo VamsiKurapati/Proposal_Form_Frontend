@@ -8,7 +8,7 @@ import {
 } from "react-icons/md";
 import Swal from "sweetalert2";
 
-const baseUrl = "https://proposal-form-backend.vercel.app/api";
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const ShowCustomDetails = () => {
   const [customPlans, setCustomPlans] = useState([]);

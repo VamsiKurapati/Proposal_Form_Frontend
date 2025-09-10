@@ -13,7 +13,7 @@ const GrantProposalForm = ({
     initialData = null
 }) => {
     const navigate = useNavigate();
-    const BASE_URL = "https://proposal-form-backend.vercel.app/api/rfp";
+    const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/rfp`;
     const [grantProposalData, setGrantProposalData] = useState(initialData || {
         summary: "",
         objectives: "",

@@ -34,7 +34,7 @@ const handlePDFGeneration = async (proposal) => {
             jsonData = project;
         }
         const res = await axios.post(
-            'https://proposal-form-backend.vercel.app/api/proposals/generatePDF',
+            `${import.meta.env.VITE_API_BASE_URL}/proposals/generatePDF`,
             {
                 project: jsonData,
                 isCompressed
