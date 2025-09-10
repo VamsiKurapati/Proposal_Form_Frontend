@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import cloudImageService from '../utils/cloudImageService';
+import Swal from 'sweetalert2';
 
 const UploadsPanel = ({ show, onClose, onImageSelect }) => {
   const [uploads, setUploads] = useState([]);
@@ -47,7 +48,13 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
       cloudImageService.validateFile(file);
       return true;
     } catch (error) {
-      window.alert(error.message);
+      Swal.fire({
+        title: error.message,
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return false;
     }
   };
@@ -75,7 +82,13 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
       setUploads(cloudUploads);
     } catch (error) {
       console.error('Error processing files:', error);
-      window.alert('Error uploading files. Please try again.');
+      Swal.fire({
+        title: 'Error uploading files. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     } finally {
       setIsUploading(false);
     }
@@ -123,7 +136,13 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
   const handleDeleteUpload = async (upload) => {
     // Don't allow deletion of template images
     if (upload.isTemplate) {
-      window.alert('Template images cannot be deleted.');
+      Swal.fire({
+        title: 'Template images cannot be deleted.',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
@@ -306,14 +325,28 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
               )}
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (uploads.length > 0) {
-                  if (window.confirm('Are you sure you want to clear all uploads?')) {
+                  const result = await Swal.fire({
+                    title: 'Are you sure you want to clear all uploads?',
+                    icon: 'warning',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                  });
+                  if (result.isConfirmed) {
                     cloudImageService.clearUploadedImages();
                     setUploads([]);
                   }
                 } else {
-                  window.alert('No uploads to clear');
+                  const result = await Swal.fire({
+                    title: 'No uploads to clear',
+                    icon: 'warning',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                  });
+                  // no action
                 }
               }}
               className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"

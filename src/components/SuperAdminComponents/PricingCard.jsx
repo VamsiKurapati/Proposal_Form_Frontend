@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { FaRegCheckCircle } from "react-icons/fa";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const baseUrl = "https://proposal-form-backend.vercel.app/api/admin";
-// const baseUrl = "http://localhost:5000/api/admin";
 
 const PricingCard = ({ id, plan, price, features, popular, highlightFirst, onPriceUpdated }) => {
     // Custom hook to handle edit price functionality
@@ -38,7 +38,13 @@ const PricingCard = ({ id, plan, price, features, popular, highlightFirst, onPri
                 setIsEditing(false);
             } catch (err) {
                 console.error("API error:", err);
-                alert("Failed to update price: " + (err.response?.data?.message || err.message));
+                Swal.fire({
+                    title: "Failed to update price: " + (err.response?.data?.message || err.message),
+                    icon: "error",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
             } finally {
                 setLoading(false);
             }

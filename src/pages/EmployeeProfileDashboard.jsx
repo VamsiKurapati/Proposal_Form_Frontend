@@ -4,12 +4,15 @@ import axios from "axios";
 import { MdOutlineEdit, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineClose, MdOutlineCheck, MdOutlineCalendarToday, MdOutlineVisibility } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useEmployeeProfile } from "../context/EmployeeProfileContext";
+import { useUser } from "../context/UserContext";
+import { handlePDFGeneration } from "../components/Generate_PDF";
 
 // Main component for Employee Profile Dashboard
 const EmployeeProfileDashboard = () => {
   const navigate = useNavigate();
   // Use context
   const { employeeData, loading, error, refreshProfile, proposalsInProgress, completedProposals, refreshProposals } = useEmployeeProfile();
+  const { role } = useUser();
   // Logo upload state and ref
   const [logoUrl, setLogoUrl] = useState(null);
   const fileInputRef = useRef(null);
@@ -18,8 +21,8 @@ const EmployeeProfileDashboard = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  console.log("Completed Proposals : ", completedProposals);
-  console.log("Proposals In Progress : ", proposalsInProgress);
+  // console.log("Completed Proposals : ", completedProposals);
+  // console.log("Proposals In Progress : ", proposalsInProgress);
 
   // Set logoUrl from employeeData
   useEffect(() => {
@@ -271,17 +274,22 @@ const EmployeeProfileDashboard = () => {
                 <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-3">
                     <span className={`text-[12px] px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
-                      {proposal.status}
+                      {proposal.status || "Not Disclosed"}
                     </span>
                   </div>
-                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title}</h4>
-                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName}</p>
+                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title || "Not Disclosed"}</h4>
+                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName || "Not Disclosed"}</p>
                   <div className="flex items-center gap-1 text-[#6B7280] text-[12px] mb-4">
                     <MdOutlineCalendarToday className="w-4 h-4 shrink-0" />
-                    <span>{proposal.deadline}</span>
+                    <span>{proposal.deadline || "Not Disclosed"}</span>
                   </div>
                   <div className="flex justify-end">
-                    <button className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors">
+                    <button
+                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+                      disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
+                      title={role === "Viewer" ? "Viewer cannot edit proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can edit this proposal" : "Edit Details"}
+                      onClick={() => handlePDFGeneration(proposal.generatedProposal)}>
+                      <MdOutlineEdit className="w-4 h-4 shrink-0" title="Edit Details" />
                       Edit
                     </button>
                   </div>
@@ -304,18 +312,22 @@ const EmployeeProfileDashboard = () => {
                 <div key={proposal.id} className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB] hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-1">
                     <span className={`text-[12px] px-2 py-1 rounded-full ${getStatusColor(proposal.status)}`}>
-                      {proposal.status}
+                      {proposal.status || "Not Disclosed"}
                     </span>
                   </div>
-                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title}</h4>
-                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName}</p>
+                  <h4 className="text-[#111827] text-[16px] mb-2">{proposal.title || "Not Disclosed"}</h4>
+                  <p className="text-[#4B5563] text-[13px] mb-2">{proposal.clientName || "Not Disclosed"}</p>
                   <div className="flex items-center gap-1 text-[#6B7280] text-[12px] mb-4">
                     <MdOutlineCalendarToday className="w-4 h-4 shrink-0" />
-                    <span>{proposal.deadline}</span>
+                    <span>{proposal.deadline || "Not Disclosed"}</span>
                   </div>
                   <div className="flex justify-end">
-                    <button className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1">
-                      <MdOutlineVisibility className="w-4 h-4 shrink-0" />
+                    <button
+                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+                      disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
+                      title={role === "Viewer" ? "Viewer cannot view proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can view this proposal" : "View Details"}
+                      onClick={() => handlePDFGeneration(proposal.generatedProposal)}>
+                      <MdOutlineVisibility className="w-4 h-4 shrink-0" title="View Details" />
                       View
                     </button>
                   </div>

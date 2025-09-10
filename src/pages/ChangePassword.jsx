@@ -111,7 +111,7 @@ export default function ChangePassword() {
                 }
             });
 
-            if (response.status === 200) {
+            if (response.status === 201) {
                 toast.success("Password changed successfully");
                 setTimeout(() => {
                     navigate("/");

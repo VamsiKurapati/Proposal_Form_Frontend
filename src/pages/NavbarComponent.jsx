@@ -38,11 +38,11 @@ const NavbarComponent = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b shadow-sm h-16 flex items-center justify-between px-8 z-50">
       <div className="flex items-center gap-4">
-        <div className="md:hidden">
+        <div className="md:hidden hover:cursor-pointer">
           <FiMenu className="text-lg" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} />
         </div>
         <div
-          className="w-[127px] h-[36px] cursor-pointer"
+          className="w-[127px] h-[36px] hover:cursor-pointer"
           onClick={() => role === null ? navigate("/") : role === "SuperAdmin" ? navigate("/admin") : navigate("/dashboard")}
         >
           <img src={"/Logo.png"} alt="logo" className="w-full h-full" />
@@ -72,7 +72,7 @@ const NavbarComponent = () => {
         )}
       </div>
       <div className="flex items-center gap-4">
-        <button className="flex items-center gap-2" onClick={() => handleProfileClick()}>
+        <button className="flex items-center gap-2 hover:cursor-pointer" onClick={() => handleProfileClick()}>
           <FaUserCircle className="text-2xl text-gray-700" />
         </button>
       </div>

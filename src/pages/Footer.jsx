@@ -5,6 +5,18 @@ import { LuInstagram, LuLinkedin, LuTwitter } from "react-icons/lu";
 export default function Footer() {
     const navigate = useNavigate();
 
+    const handleRefClick = (id) => {
+        if (location.pathname !== "/") {
+            navigate("/");
+        }
+        setTimeout(() => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
+
     return (
         <>
             {/* Footer */}
@@ -18,9 +30,9 @@ export default function Footer() {
                         <div className="flex flex-col items-start text-left">
                             <h4 className="text-[18px] text-[#000000] font-semibold mb-4">Company</h4>
                             <ul className="text-[16px] text-[#1E293B] font-regular space-y-2">
-                                <li><a href="#about">About</a></li>
+                                <li><a href="#about" onClick={() => handleRefClick("about")}>About</a></li>
                                 <li>Blog</li>
-                                <li><a href="/contact">Contact</a></li>
+                                <li><a href="/contact" onClick={() => handleRefClick("contact")}>Contact</a></li>
                             </ul>
                         </div>
                         <div className="flex flex-col items-start text-left">

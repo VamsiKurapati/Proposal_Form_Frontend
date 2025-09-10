@@ -2,6 +2,7 @@
 import { optimizeSVG, getOptimizationStats } from './svg.js';
 import cloudImageService from './cloudImageService.js';
 import handlePDFGeneration from '../components/Generate_PDF.jsx';
+import Swal from 'sweetalert2';
 
 export function exportToJSON(project) {
   // Process images for export (handle cloud URLs)
@@ -107,7 +108,13 @@ export function importFromJSON(event, setProject, setSelectedElement, clearHisto
         setSelectedElement({ pageIndex: 0, elementId: null });
         event.target.value = '';
       } catch (error) {
-        alert('Error importing file. Please check the file format.');
+        Swal.fire({
+          title: 'Error importing file. Please check the file format.',
+          icon: 'error',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         console.error('Import error:', error);
       }
     };

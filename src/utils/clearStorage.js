@@ -1,4 +1,5 @@
 // Utility to clear localStorage and help with quota issues
+import Swal from 'sweetalert2';
 
 export const clearAllStorage = () => {
     try {
@@ -63,9 +64,21 @@ const formatBytes = (bytes) => {
 window.clearCanvaStorage = () => {
     const success = clearAllStorage();
     if (success) {
-        alert('All storage cleared successfully! Please refresh the page.');
+        Swal.fire({
+            title: 'All storage cleared successfully! Please refresh the page.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
     } else {
-        alert('Failed to clear storage. Please try again.');
+        Swal.fire({
+            title: 'Failed to clear storage. Please try again.',
+            icon: 'error',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
     }
 };
 

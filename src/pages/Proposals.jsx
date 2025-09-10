@@ -34,9 +34,9 @@ const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole
                         {isLoading ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#111827]" aria-hidden="true"></div>
                         ) : proposal_info.bookmarked ? (
-                            <MdOutlineBookmark className="w-5 h-5" />
+                            <MdOutlineBookmark className="w-5 h-5 shrink-0" />
                         ) : (
-                            <MdOutlineBookmarkBorder className="w-5 h-5" />
+                            <MdOutlineBookmarkBorder className="w-5 h-5 shrink-0" />
                         )}
                     </button>
                     <button
@@ -45,13 +45,13 @@ const ProposalCard = ({ proposal_info, onBookmark, onShare, onGenerate, userRole
                         aria-label="Share proposal"
                         className="text-[#111827]"
                     >
-                        <MdOutlineShare className="w-5 h-5" />
+                        <MdOutlineShare className="w-5 h-5 shrink-0" />
                     </button>
                 </div>
             </div>
             <p className="text-[#4B5563] text-[16px] mb-2">{proposal_info.description}</p>
             <div className="flex items-center text-[14px] text-[#4B5563CC] mb-2">
-                <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563]" />
+                <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563] shrink-0" />
                 Deadline: {proposal_info.deadline}
             </div>
         </div>
@@ -105,9 +105,9 @@ const GrantCard = ({ grant_info, onBookmark, onShare, onGenerate, userRole, butt
                         {isLoading ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#111827]" aria-hidden="true"></div>
                         ) : grant_info.bookmarked ? (
-                            <MdOutlineBookmark className="w-5 h-5" />
+                            <MdOutlineBookmark className="w-5 h-5 shrink-0" />
                         ) : (
-                            <MdOutlineBookmarkBorder className="w-5 h-5" />
+                            <MdOutlineBookmarkBorder className="w-5 h-5 shrink-0" />
                         )}
                     </button>
                     <button
@@ -116,7 +116,7 @@ const GrantCard = ({ grant_info, onBookmark, onShare, onGenerate, userRole, butt
                         aria-label="Share grant"
                         className="text-[#111827]"
                     >
-                        <MdOutlineShare className="w-5 h-5" />
+                        <MdOutlineShare className="w-5 h-5 shrink-0" />
                     </button>
                 </div>
             </div>
@@ -134,7 +134,7 @@ const GrantCard = ({ grant_info, onBookmark, onShare, onGenerate, userRole, butt
             </div>
 
             <div className="flex items-center text-[14px] text-[#4B5563CC] mb-2">
-                <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563]" />
+                <MdOutlineCalendarMonth className="w-4 h-4 mr-1 text-[#4B5563] shrink-0" />
                 {grant_info.CLOSE_DATE ? `Close Date: ${grant_info.CLOSE_DATE}` :
                     grant_info.ESTIMATED_APPLICATION_DUE_DATE ? `Due Date: ${grant_info.ESTIMATED_APPLICATION_DUE_DATE}` :
                         "Deadline: Not Provided"}
@@ -239,7 +239,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                     : 'text-[#2563EB] hover:bg-[#2563EB] hover:text-white'
                     }`}
             >
-                <MdOutlineChevronLeft className="w-4 h-4" />
+                <MdOutlineChevronLeft className="w-4 h-4 shrink-0" />
                 Previous
             </button>
 
@@ -271,7 +271,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                     }`}
             >
                 Next
-                <MdOutlineChevronRight className="w-4 h-4" />
+                <MdOutlineChevronRight className="w-4 h-4 shrink-0" />
             </button>
         </div>
     );

@@ -30,32 +30,26 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
-    axios.post(`${API_URL}/contact`, formData)
-      .then((response) => {
-        setMessage("Your request has been sent successfully!");
-
-        alert("Your request has been sent successfully!");
+    try {
+      const response = await axios.post(`${API_URL}/contact`, formData);
+      if (response.status === 201) {
+        setMessage(response.data.message || 'Your request has been sent successfully!');
         setFormData({ name: "", company: "", email: "", description: "" });
-
-        navigate("/");
-      })
-      .catch((error) => {
-        setMessage("Failed to send request. Please try again.");
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to send request. Please try again.',
-        });
-        console.error(error);
-      })
-      .finally(() => setLoading(false));
-
-  }
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Failed to send request. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (

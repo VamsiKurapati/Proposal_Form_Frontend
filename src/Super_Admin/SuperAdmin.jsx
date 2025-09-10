@@ -7,16 +7,11 @@ import {
     MdOutlinePayments,
     MdOutlineHeadsetMic,
     MdOutlineFilterList,
-    MdOutlineMoreVert,
-    MdOutlineGroup,
     MdOutlineLogout,
     MdOutlineLock,
     MdOutlineDocumentScanner,
     MdOutlineFileUpload,
     MdOutlineMoney,
-    MdOutlinePaid,
-    MdOutlinePriorityHigh,
-    MdOutlinePayment,
     MdOutlineKeyboardArrowDown,
     MdOutlineShoppingBag,
     MdOutlineHeadphones,
@@ -24,8 +19,6 @@ import {
     MdOutlineMenu,
     MdOutlineVisibility,
     MdOutlineClose,
-    MdOutlineSettings,
-    MdOutlineWeb,
     MdOutlineEmail,
     MdOutlineFilePresent,
     MdOutlineFileDownload,
@@ -43,7 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import ToastContainer from '../pages/ToastContainer';
 import { toast } from 'react-toastify';
 import Card from '../components/SuperAdminComponents/Card';
-import PricingCard from '../components/SuperAdminComponents/PricingCard';
+import Swal from 'sweetalert2';
 
 
 import proposalimg from '../assets/superAdmin/proposal.png';
@@ -2310,7 +2303,13 @@ const SuperAdmin = () => {
             setIsContact(!isContact);
         } catch (error) {
             console.error(error);
-            alert("Failed to update contacts: " + (error.response?.data?.message || error.message));
+            Swal.fire({
+                title: "Failed to update contacts: " + (error.response?.data?.message || error.message),
+                icon: "error",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         } finally {
             setLoading(false);
         }

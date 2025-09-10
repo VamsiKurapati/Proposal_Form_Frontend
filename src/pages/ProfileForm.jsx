@@ -4,6 +4,7 @@ import axios from "axios";
 import 'react-phone-input-2/lib/style.css';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from 'react-phone-input-2';
+import Swal from "sweetalert2";
 
 // Reusable input component
 const FormInput = ({
@@ -235,7 +236,13 @@ const CreateProfile = () => {
         formData.append("password", signupData?.password);
       } else {
         setRedirecting(true);
-        alert("Please sign up again to create your profile");
+        Swal.fire({
+          title: "Please sign up again to create your profile",
+          icon: "warning",
+          timer: 2000,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         setTimeout(() => navigate("/sign_up"), 2000);
         return;
       }
@@ -262,7 +269,13 @@ const CreateProfile = () => {
       const res = await axios.post("https://proposal-form-backend.vercel.app/api/auth/signup", formData);
 
       if (res.status === 201) {
-        alert("Profile created successfully");
+        Swal.fire({
+          title: "Profile created successfully",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         setForm({
           companyName: "",
           adminName: "",
@@ -284,7 +297,13 @@ const CreateProfile = () => {
       }
     } catch (err) {
       console.error(err);
-      alert("Submission failed: " + (err.response?.data?.message || err.message));
+      Swal.fire({
+        title: "Submission failed: " + (err.response?.data?.message || err.message),
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     } finally {
       setLoading(false);
     }

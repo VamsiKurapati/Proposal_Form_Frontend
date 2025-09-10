@@ -39,6 +39,7 @@ const CanvaApp = () => {
   const [svgPreviews, setSvgPreviews] = React.useState({});
   const [autoSaveIndicator, setAutoSaveIndicator] = React.useState(false);
   const [complianceIndicator, setComplianceIndicator] = React.useState(false);
+  const [initialLoad, setInitialLoad] = React.useState(false);
 
   const panelState = usePanelState();
 
@@ -354,6 +355,7 @@ const CanvaApp = () => {
         // Import the JSON data into the project
         importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
         setHasLoadedJSON(true);
+        setInitialLoad(true);
       } catch (error) {
         console.error('Error loading JSON data from navigation state:', error);
       }
@@ -1108,9 +1110,45 @@ const CanvaApp = () => {
     localStorage.setItem('canva-project', JSON.stringify(project));
   }, [project]);
 
+  useEffect(() => {
+    if (initialLoad) {
+      setTimeout(() => {
+        setInitialLoad(false);
+      }, 10000);
+    }
+  }, [initialLoad]);
+
   return (
     <div className="h-full flex flex-col">
       <NavbarComponent />
+
+      {/* Show the instructions div here */}
+      {initialLoad && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+            <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl mb-4">
+              <div className="flex justify-end">
+                <button className="bg-[#2563EB] text-white px-5 py-2 rounded-lg transition text-[16px]" onClick={() => setInitialLoad(false)}>X</button>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">Instructions</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Please follow the instructions below for better experience.
+              </p>
+              <ul className="text-gray-600 text-sm leading-relaxed text-left">
+                <li><span className="text-gray-600 text-sm leading-relaxed text-left">1.Do not delete default text boxes / <br /></span>
+                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
+                </li>
+                <li><span className="text-gray-600 text-sm leading-relaxed text-left">2. Be cautious with large content sections / <br /></span>
+                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
+                </li>
+                <li><span className="text-gray-600 text-sm leading-relaxed text-left">3. Use overlays creatively / <br /></span>
+                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Showing a animated three dots waving indicator when the compliance check is in progress */}
       {complianceIndicator && (
@@ -1450,7 +1488,11 @@ const CanvaApp = () => {
           }}
         >
           <Footer
-            onHelpClick={() => alert('Keyboard Shortcuts:\n\nCtrl/Cmd + C: Copy element\nCtrl/Cmd + X: Cut element\nCtrl/Cmd + V: Paste last copied item\nCtrl/Cmd + Z: Undo\nCtrl/Cmd + Shift + Z: Redo\nDelete/Backspace: Delete element\n\nPaste Behavior:\n- Ctrl+V pastes whatever was last copied (element or external text)\n- If you copy/cut an element, that gets pasted\n- If you copy text from outside, that gets pasted\n- Last copied item always takes precedence\n\nHelp documentation coming soon!')}
+            onHelpClick={() => Swal.fire({
+              icon: 'info',
+              title: 'Info',
+              text: 'Keyboard Shortcuts:\n\nCtrl/Cmd + C: Copy element\nCtrl/Cmd + X: Cut element\nCtrl/Cmd + V: Paste last copied item\nCtrl/Cmd + Z: Undo\nCtrl/Cmd + Shift + Z: Redo\nDelete/Backspace: Delete element\n\nPaste Behavior:\n- Ctrl+V pastes whatever was last copied (element or external text)\n- If you copy/cut an element, that gets pasted\n- If you copy text from outside, that gets pasted\n- Last copied item always takes precedence\n\nHelp documentation coming soon!',
+            })}
             onFullscreenClick={() => {
               if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();

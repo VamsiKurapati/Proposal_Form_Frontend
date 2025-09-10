@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import Swal from "sweetalert2";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -56,7 +57,13 @@ const SignupForm = () => {
     try {
       navigate("/create-profile", { state: { role, signupData: form } });
     } catch (error) {
-      alert("Signup failed: " + (error.response?.data?.message || "Server error"));
+      Swal.fire({
+        title: "Signup failed: " + (error.response?.data?.message || "Server error"),
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     } finally {
       setIsSubmitting(false);
     }

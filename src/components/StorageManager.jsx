@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getStorageUsage, getAvailableStorage, clearOldData, STORAGE_KEYS } from '../utils/storage';
+import Swal from 'sweetalert2';
 
 const StorageManager = ({ show, onClose }) => {
     const [storageInfo, setStorageInfo] = useState({
@@ -26,10 +27,22 @@ const StorageManager = ({ show, onClose }) => {
         try {
             localStorage.removeItem(STORAGE_KEYS.HISTORY);
             updateStorageInfo();
-            alert('History cleared successfully!');
+            Swal.fire({
+                title: 'History cleared successfully!',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         } catch (error) {
             console.error('Error clearing history:', error);
-            alert('Failed to clear history');
+            Swal.fire({
+                title: 'Failed to clear history',
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         }
     };
 
@@ -38,11 +51,23 @@ const StorageManager = ({ show, onClose }) => {
             try {
                 localStorage.clear();
                 updateStorageInfo();
-                alert('All data cleared successfully!');
+                Swal.fire({
+                    title: 'All data cleared successfully!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 onClose();
             } catch (error) {
                 console.error('Error clearing all data:', error);
-                alert('Failed to clear data');
+                Swal.fire({
+                    title: 'Failed to clear data',
+                    icon: 'error',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
             }
         }
     };
@@ -80,7 +105,7 @@ const StorageManager = ({ show, onClose }) => {
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                                 className={`h-2 rounded-full transition-all ${storageInfo.percentage > 80 ? 'bg-red-500' :
-                                        storageInfo.percentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
+                                    storageInfo.percentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
                                     }`}
                                 style={{ width: `${storageInfo.percentage}%` }}
                             ></div>

@@ -57,7 +57,7 @@ const LeftSidebar = ({ isOpen, onClose, filters, setFilters }) => {
           aria-label="Close filters"
           title="Close filters"
         >
-          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827]" />
+          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827] shrink-0" />
         </button>
       </div>
 
@@ -129,7 +129,7 @@ const GrantsFilterSidebar = ({ isOpen, onClose, grantFilters, setGrantFilters })
           aria-label="Close filters"
           title="Close filters"
         >
-          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827]" />
+          <MdOutlineClose className="w-6 h-6 text-[#4B5563] hover:text-[#111827] shrink-0" />
         </button>
       </div>
 
@@ -311,7 +311,7 @@ const IndustryMultiSelect = ({ selectedIndustries, onIndustryChange, industries 
               aria-label={`Remove ${industry}`}
               title={`Remove ${industry}`}
             >
-              <MdOutlineClose className="w-3 h-3" />
+              <MdOutlineClose className="w-3 h-3 shrink-0" />
             </button>
           </span>
         ))}
@@ -327,7 +327,7 @@ const IndustryMultiSelect = ({ selectedIndustries, onIndustryChange, industries 
             : "Select industries..."
           }
         </span>
-        <MdOutlineExpandMore className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <MdOutlineExpandMore className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''} shrink-0`} />
       </button>
 
       {isOpen && (
@@ -350,7 +350,7 @@ const IndustryMultiSelect = ({ selectedIndustries, onIndustryChange, industries 
               >
                 <span className="text-sm text-[#111827]">{industry}</span>
                 {selectedIndustries.includes(industry) && (
-                  <MdOutlineCheck className="w-4 h-4 text-[#2563EB]" />
+                  <MdOutlineCheck className="w-4 h-4 text-[#2563EB] shrink-0" />
                 )}
               </div>
             ))}
@@ -1540,18 +1540,18 @@ const Discover = () => {
             {rfp.match}% Match
           </span>
         </div>
-        <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title}</h3>
-        <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description}</p>
+        <h3 className="font-semibold text-[#111827] text-[18px] mb-1">{rfp.title || "Not Disclosed"}</h3>
+        <p className="text-[16px] text-[#4B5563] mb-2 truncate overflow-hidden whitespace-nowrap">{rfp.description || "Not Disclosed"}</p>
         <div className="text-[14px] text-[#4B5563CC] space-y-1">
           <div className="flex items-center gap-2">
-            <MdOutlinePayments className="text-[16px] text-[#4B5563]" /> {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}
+            <MdOutlinePayments className="text-[16px] text-[#2563EB] shrink-0" /> {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}
           </div>
           <div className="flex items-center gap-2">
-            <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563]" /> Deadline: {rfp.deadline}
+            <MdOutlineCalendarMonth className="text-[16px] text-[#4B5563] shrink-0" /> Deadline: {rfp.deadline || "Not Disclosed"}
           </div>
           <div className="flex items-center gap-2">
             <MdOutlineAccountBalance className="text-[16px] text-[#4B5563] shrink-0" />
-            <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization} </p>
+            <p className="truncate overflow-hidden whitespace-nowrap"> {rfp.organization || "Not Disclosed"} </p>
           </div>
         </div>
       </div>
@@ -1599,26 +1599,26 @@ const Discover = () => {
       {/* Top Row: Title and Actions */}
       <div>
         <div className="flex justify-between items-center gap-8 mb-2">
-          <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title}</h3>
+          <h3 className="font-semibold text-[#111827] text-[18px]">{rfp.title || "Not Disclosed"}</h3>
           <div className="flex top-2 gap-2 text-lg text-[#111827]">
             {loadingSave[rfp._id] ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827] shrink-0"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
-                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} shrink-0`}
                 title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
                 onClick={() => handleSave(rfp)}
-                className="cursor-pointer"
+                className="cursor-pointer shrink-0"
                 title="Save"
               />
             )}
             <MdOutlineShare
               onClick={() => handleShare(rfp.link)}
-              className="cursor-pointer"
+              className="cursor-pointer shrink-0"
               title="Share"
             />
           </div>
@@ -1626,25 +1626,25 @@ const Discover = () => {
 
         {/* Description */}
         <p className="text-[14px] text-[#4B5563] mb-3 line-clamp-2">
-          {rfp.description}
+          {rfp.description || "Not Disclosed"}
         </p>
 
         {/* Meta Info */}
         <div className="text-[14px] text-[#6B7280] mb-4 space-y-1">
           <div className="flex items-center gap-2">
-            <MdOutlineCalendarMonth className="text-[16px]" />
-            <span>Deadline: {rfp.deadline}</span>
+            <MdOutlineCalendarMonth className="text-[16px] shrink-0" />
+            <span>Deadline: {rfp.deadline || "Not Disclosed"}</span>
           </div>
           {/* <div className="flex items-center gap-2">
               <MdOutlineAccountBalance className="text-[16px]" />
-              <span>{rfp.organization}</span>
+              <span>{rfp.organization || "Not Disclosed"}</span>
             </div> */}
         </div>
       </div>
 
       {/* Footer */}
       <div className="flex justify-between items-center">
-        <span className="font-semibold text-[#111827]">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}</span>
+        <span className="font-semibold text-[#2563EB] shrink-0">{rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget || "Not Disclosed"}</span>
         <a
           href={rfp.link}
           className="text-[14px] text-[#2563EB]"
@@ -1662,22 +1662,22 @@ const Discover = () => {
       <tr className="border-b last:border-none hover:bg-gray-50">
         <td className="px-4 py-3 text-left">
           <div className="font-medium text-[#111827] text-[14px] max-w-[200px] truncate" title={rfp.title}>
-            {rfp.title}
+            {rfp.title || "Not Disclosed"}
           </div>
         </td>
         <td className="px-4 py-3 text-left">
           <div className="text-[#4B5563] text-[14px] max-w-[150px] truncate" title={rfp.organization}>
-            {rfp.organization}
+            {rfp.organization || "Not Disclosed"}
           </div>
         </td>
         <td className="px-4 py-3 text-left">
           <span className="text-[#2563EB] text-[14px] font-semibold">
-            {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget}
+            {rfp.budget === "Not found" ? "Not Disclosed" : rfp.budget || "Not Disclosed"}
           </span>
         </td>
         <td className="px-4 py-3 text-left">
           <div className="text-[#4B5563] text-[14px]">
-            {rfp.deadline}
+            {rfp.deadline || "Not Disclosed"}
           </div>
         </td>
         <td className="px-4 py-3 text-center">
@@ -1692,21 +1692,21 @@ const Discover = () => {
           <div className="flex gap-2 text-xl justify-center text-[#4B5563]">
             <MdOutlineShare
               title="Share"
-              className="cursor-pointer hover:text-[#2563EB] transition-colors"
+              className="cursor-pointer hover:text-[#2563EB] transition-colors shrink-0"
               onClick={() => handleShare(rfp.link)}
             />
             {loadingSave[rfp._id] ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563]"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563] shrink-0"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={role === "Viewer" ? undefined : () => handleUnsave(rfp._id)}
-                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"}`}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"} shrink-0`}
                 title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
                 onClick={() => handleSave(rfp)}
-                className="cursor-pointer hover:text-[#2563EB] transition-colors"
+                className="cursor-pointer hover:text-[#2563EB] transition-colors shrink-0"
                 title="Save"
               />
             )}
@@ -1757,17 +1757,17 @@ const Discover = () => {
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-3 text-[#111827] text-lg">
             {loadingSaveGrant[grant._id] ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827]"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#111827] shrink-0"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={role === "Viewer" ? undefined : () => handleUnsaveGrant(grant._id)}
-                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} text-[#111827]`}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} text-[#111827] shrink-0`}
                 title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
-              <FaRegBookmark onClick={() => handleSaveGrant(grant)} className="cursor-pointer" title="Save" />
+              <FaRegBookmark onClick={() => handleSaveGrant(grant)} className="cursor-pointer shrink-0" title="Save" />
             )}
-            <MdOutlineShare onClick={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK)} className="cursor-pointer text-[#111827]" title="Share" />
+            <MdOutlineShare onClick={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK)} className="cursor-pointer text-[#111827] shrink-0" title="Share" />
           </div>
 
           <div className="flex justify-center mt-3 gap-2">
@@ -1798,23 +1798,23 @@ const Discover = () => {
           <h3 className="font-semibold text-[#111827] text-[18px] line-clamp-2">{grant.OPPORTUNITY_TITLE}</h3>
           <div className="flex top-2 gap-2 text-lg text-[#111827]">
             {loadingSaveGrant[grant._id] ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#4B5563]"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#4B5563] shrink-0"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={role === "Viewer" ? undefined : () => handleUnsaveGrant(grant._id)}
-                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer"} shrink-0`}
                 title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
                 onClick={() => handleSaveGrant(grant)}
-                className="cursor-pointer"
+                className="cursor-pointer shrink-0"
                 title="Save"
               />
             )}
             <MdOutlineShare
               onClick={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK)}
-              className="cursor-pointer"
+              className="cursor-pointer shrink-0"
               title="Share"
             />
           </div>
@@ -1826,7 +1826,7 @@ const Discover = () => {
 
         <div className="text-[14px] text-[#6B7280] mb-4 space-y-1">
           <div className="flex items-center gap-2">
-            <MdOutlineCalendarMonth className="text-[16px]" />
+            <MdOutlineCalendarMonth className="text-[16px] shrink-0" />
             <span>Deadline: {grant.ESTIMATED_APPLICATION_DUE_DATE === "Not Provided" ? "Not Disclosed" : grant.ESTIMATED_APPLICATION_DUE_DATE}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -1903,21 +1903,21 @@ const Discover = () => {
           <div className="flex gap-2 text-xl justify-center text-[#4B5563]">
             <MdOutlineShare
               title="Share"
-              className="cursor-pointer hover:text-[#2563EB] transition-colors"
+              className="cursor-pointer hover:text-[#2563EB] transition-colors shrink-0"
               onClick={() => handleShare(grant.OPPORTUNITY_NUMBER_LINK)}
             />
             {loadingSaveGrant[grant._id] ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563]"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4B5563] shrink-0"></div>
             ) : isSaved ? (
               <MdOutlineBookmark
                 onClick={role === "Viewer" ? undefined : () => handleUnsaveGrant(grant._id)}
-                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"}`}
+                className={`${role === "Viewer" ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-[#2563EB] transition-colors"} shrink-0`}
                 title={role === "Viewer" ? "Viewer cannot unsave" : "Unsave"}
               />
             ) : (
               <FaRegBookmark
                 onClick={() => handleSaveGrant(grant)}
-                className="cursor-pointer hover:text-[#2563EB] transition-colors"
+                className="cursor-pointer hover:text-[#2563EB] transition-colors shrink-0"
                 title="Save"
               />
             )}
@@ -2029,7 +2029,7 @@ const Discover = () => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Upload RFP File</h3>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <MdOutlineClose className="w-6 h-6" />
+              <MdOutlineClose className="w-6 h-6 shrink-0" />
             </button>
           </div>
 
@@ -2202,7 +2202,7 @@ const Discover = () => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Upload Grant File</h3>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <MdOutlineClose className="w-6 h-6" />
+              <MdOutlineClose className="w-6 h-6 shrink-0" />
             </button>
           </div>
 
@@ -2245,7 +2245,7 @@ const Discover = () => {
                       }}
                       className="text-red-500 hover:text-red-700"
                     >
-                      <MdOutlineClose className="w-4 h-4" />
+                      <MdOutlineClose className="w-4 h-4 shrink-0" />
                     </button>
                   </div>
                 </div>
@@ -2342,7 +2342,7 @@ const Discover = () => {
 
   // Check if any filters are active (including search and industries)
   const hasAnyActiveFilters = () => {
-    return hasActiveRFPFilters() || hasActiveGrantFilters() || selectedIndustries.length > 0 || searchQuery.trim() !== "";
+    return hasActiveRFPFilters() || hasActiveGrantFilters() || searchQuery.trim() !== "";
   };
 
   const flag = JSON.parse(localStorage.getItem("subscription"));
@@ -2433,7 +2433,7 @@ const Discover = () => {
                   {/* Search Input with Advanced Search Button */}
                   <div className="relative flex-1 w-full md:max-w-[90%]">
                     <div className="relative">
-                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
+                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] shrink-0" />
                       <input
                         type="text"
                         placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
@@ -2465,7 +2465,7 @@ const Discover = () => {
                         onClick={clearAllFilters}
                         className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
                       >
-                        <MdOutlineClose className="w-4 h-4" />
+                        <MdOutlineClose className="w-4 h-4 shrink-0" title="Clear All Filters" />
                         Clear All Filters
                       </button>
                     )}
@@ -2475,7 +2475,7 @@ const Discover = () => {
                   <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
                     onClick={() => setUploadModalOpen(true)}
                   >
-                    <MdOutlineUpload className="w-5 h-5" />
+                    <MdOutlineUpload className="w-5 h-5 shrink-0" title="Upload RFP" />
                     Upload RFP
                   </button>
                 </div>
@@ -2547,7 +2547,7 @@ const Discover = () => {
                         </>
                       ) : (
                         <>
-                          <MdOutlineSearch className="w-5 h-5" />
+                          <MdOutlineSearch className="w-5 h-5 shrink-0" title="Search RFPs" />
                           <span>Search RFPs</span>
                         </>
                       )}
@@ -2655,7 +2655,7 @@ const Discover = () => {
                   {/* Search Input with Advanced Search Button */}
                   <div className="relative flex-1 w-full md:max-w-[90%]">
                     <div className="relative">
-                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]" />
+                      <MdOutlineSearch className="absolute w-6 h-6 left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] shrink-0" />
                       <input
                         type="text"
                         placeholder={activeTab === "rfp" ? "Search RFPs by title, organization or category" : "Search Grants by title, agency or category"}
@@ -2687,7 +2687,7 @@ const Discover = () => {
                         onClick={clearAllFilters}
                         className="mt-2 px-4 py-2 text-sm text-[#EF4444] hover:text-[#DC2626] font-medium hover:underline flex items-center gap-1"
                       >
-                        <MdOutlineClose className="w-4 h-4" />
+                        <MdOutlineClose className="w-4 h-4 shrink-0" title="Clear All Filters" />
                         Clear All Filters
                       </button>
                     )}
@@ -2697,7 +2697,7 @@ const Discover = () => {
                   <button className="flex items-center gap-2 text-[16px] text-white bg-[#2563EB] px-4 py-3 rounded-md hover:cursor-pointer transition-colors"
                     onClick={() => setUploadGrantModalOpen(true)}
                   >
-                    <MdOutlineUpload className="w-5 h-5" />
+                    <MdOutlineUpload className="w-5 h-5 shrink-0" title="Upload Grant" />
                     Upload Grant
                   </button>
                 </div>
@@ -2771,7 +2771,7 @@ const Discover = () => {
                         </>
                       ) : (
                         <>
-                          <MdOutlineSearch className="w-5 h-5" />
+                          <MdOutlineSearch className="w-5 h-5 shrink-0" title="Search Grants" />
                           <span>Search Grants</span>
                         </>
                       )}

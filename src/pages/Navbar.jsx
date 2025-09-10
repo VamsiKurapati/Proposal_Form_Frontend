@@ -7,6 +7,18 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
+    const handleRefClick = (id) => {
+        if (location.pathname !== "/") {
+            navigate("/");
+        }
+        setTimeout(() => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
+
     return (
         <>
             {/* Navbar */}
@@ -44,16 +56,16 @@ export default function Navbar() {
                 {isOpen && (
                     <div className="absolute top-16 right-0 backdrop-blur bg-white/60 shadow-lg w-full md:hidden transition-all duration-300 ease-in-out z-100">
                         <div className="flex flex-col items-center space-y-4 p-4">
-                            <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
-                            <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
-                            <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
+                            <a href="#about" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("about")}>About Us</a>
+                            <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("solutions")}>Solutions</a>
+                            <a href="#plans" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("plans")}>Plans</a>
                             <button className="text-[#6B7280] text-[16px] px-4 py-2"
                                 onClick={() => navigate("/login")}
                             >
                                 Login
                             </button>
                             <button className="bg-[#2563EB] text-white px-4 py-2 rounded-lg transition"
-                                onClick={() => navigate("/request-demo")}
+                                onClick={() => navigate("/contact")}
                             >
                                 Request Demo
                             </button>

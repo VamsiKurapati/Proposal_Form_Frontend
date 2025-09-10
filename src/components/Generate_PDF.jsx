@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { shouldCompress, compressData } from '../utils/compression';
+import Swal from 'sweetalert2';
 
-const handlePDFGeneration = async () => {
-    const project = JSON.parse(localStorage.getItem('canva-project'));
+const handlePDFGeneration = async (proposal) => {
+    const project = JSON.parse(localStorage.getItem('canva-project')) || JSON.parse(proposal);
     const loadingDiv = document.createElement('div');
     loadingDiv.style.cssText = `
         position: fixed;
@@ -86,7 +87,13 @@ const handlePDFGeneration = async () => {
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch (err) {
         console.error("PDF export error:", err);
-        alert("Failed to generate PDF. Please try again.");
+        Swal.fire({
+            title: "Failed to generate PDF. Please try again.",
+            icon: "error",
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
     } finally {
         // Remove loading indicator
         document.body.removeChild(loadingDiv);

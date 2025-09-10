@@ -13,12 +13,9 @@ export const EmployeeProfileProvider = ({ children }) => {
     const [proposalsInProgress, setProposalsInProgress] = useState([]);
     const [completedProposals, setCompletedProposals] = useState([]);
     const [hasInitialized, setHasInitialized] = useState(false);
-
+    const [fetchedProposals, setFetchedProposals] = useState(false);
+    const [fetchedEmployeeData, setFetchedEmployeeData] = useState(false);
     const { role } = useUser();
-
-    // useEffect(() => {
-    //     console.log("Role in EmployeeProfileContext: ", role);
-    // }, [role]);
 
     // Mock data fallback (copy from CompanyProfileDashboard)
     const getMockEmployeeData = useCallback(() => ({
@@ -147,8 +144,12 @@ export const EmployeeProfileProvider = ({ children }) => {
     }, [role, hasInitialized, proposalsInProgress.length, getMockProposals]);
 
     useEffect(() => {
-        fetchProposals();
-    }, [fetchProposals]);
+        if (!fetchedProposals) {
+            fetchProposals();
+            setFetchedProposals(true);
+        }
+
+    }, [fetchProposals, fetchedProposals]);
 
     const refreshProposals = fetchProposals;
 
@@ -188,10 +189,13 @@ export const EmployeeProfileProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, [role, hasInitialized, employeeData, getMockEmployeeData]);
+    }, [role, hasInitialized, employeeData, getMockEmployeeData, fetchedEmployeeData]);
 
     useEffect(() => {
-        fetchEmployeeData();
+        if (!fetchedEmployeeData) {
+            fetchEmployeeData();
+            setFetchedEmployeeData(true);
+        }
     }, [fetchEmployeeData]);
 
     const refreshEmployeeProfile = fetchEmployeeData;

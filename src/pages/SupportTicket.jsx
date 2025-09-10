@@ -7,6 +7,7 @@ import { TbTrashX } from "react-icons/tb";
 
 import NavbarComponent from "./NavbarComponent";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const categories = [
     "Billing & Payments",
@@ -433,10 +434,13 @@ const SupportTicket = () => {
                                                             );
                                                             setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
-                                                            alert(
-                                                                err.response?.data?.message ||
-                                                                "Failed to reopen ticket."
-                                                            );
+                                                            Swal.fire({
+                                                                title: err.response?.data?.message || "Failed to reopen ticket.",
+                                                                icon: "error",
+                                                                timer: 1500,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                            });
                                                         }
                                                     }}
                                                 >
@@ -640,10 +644,13 @@ const SupportTicket = () => {
                                                                 await fetchConversationMessages(ticket._id || ticket.id);
                                                                 setNewMessage("");
                                                             } catch (err) {
-                                                                alert(
-                                                                    err.response?.data?.message ||
-                                                                    "Failed to send message."
-                                                                );
+                                                                Swal.fire({
+                                                                    title: err.response?.data?.message || "Failed to send message.",
+                                                                    icon: "error",
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false,
+                                                                    showCancelButton: false,
+                                                                });
                                                             }
                                                             setSendingMessage(false);
                                                         }}
@@ -704,10 +711,13 @@ const SupportTicket = () => {
                                                             );
                                                             setTickets(updatedTickets.data.tickets || []);
                                                         } catch (err) {
-                                                            alert(
-                                                                err.response?.data?.message ||
-                                                                "Failed to reopen ticket."
-                                                            );
+                                                            Swal.fire({
+                                                                title: err.response?.data?.message || "Failed to reopen ticket.",
+                                                                icon: "error",
+                                                                timer: 1500,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                            });
                                                         }
                                                     }}
                                                 >

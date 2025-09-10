@@ -6,6 +6,7 @@ import {
   MdOutlineFileUpload,
   MdOutlineVisibility,
 } from "react-icons/md";
+import Swal from "sweetalert2";
 
 const baseUrl = "https://proposal-form-backend.vercel.app/api";
 
@@ -45,7 +46,13 @@ const ShowCustomDetails = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      alert("Custom plan updated successfully");
+      Swal.fire({
+        title: "Custom plan updated successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       setCustomPlans(customPlans.map((plan) => plan._id === id ? response.data : plan));
       setFilteredPlans(filteredPlans.map((plan) => plan._id === id ? response.data : plan));
       setIsFormDataEditing(false);
@@ -72,11 +79,23 @@ const ShowCustomDetails = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then(() => {
-      alert("Custom plan deleted successfully");
+      Swal.fire({
+        title: "Custom plan deleted successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       setCustomPlans(customPlans.filter((plan) => plan._id !== id));
       setFilteredPlans(filteredPlans.filter((plan) => plan._id !== id));
     }).catch((error) => {
-      alert("Failed to delete custom plan");
+      Swal.fire({
+        title: "Failed to delete custom plan",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       console.error(error);
     });
   }
@@ -113,7 +132,13 @@ const ShowCustomDetails = () => {
     ];
     for (let field of requiredFields) {
       if (!formData[field] || formData[field].toString().trim() === "") {
-        alert("Please fill in all the fields before submitting.");
+        Swal.fire({
+          title: "Please fill in all the fields before submitting.",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         return;
       }
     }
@@ -125,7 +150,13 @@ const ShowCustomDetails = () => {
         },
       })
       .then(() => {
-        alert("Your request has been sent successfully!");
+        Swal.fire({
+          title: "Your request has been sent successfully!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         setFormData({
           email: "",
           price: "",
@@ -138,7 +169,13 @@ const ShowCustomDetails = () => {
         setCustomToggle(false);
       })
       .catch((error) => {
-        alert("Failed to send request. Please try again.");
+        Swal.fire({
+          title: "Failed to send request. Please try again.",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         console.error(error);
       })
       .finally(() => setLoading(false));
@@ -248,11 +285,23 @@ const ShowCustomDetails = () => {
         },
       })
       .then(() => {
-        alert("Custom plan submitted successfully!");
+        Swal.fire({
+          title: "Custom plan submitted successfully!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         setCustomToggle(false);
       })
       .catch((error) => {
-        alert("Failed to submit custom plan");
+        Swal.fire({
+          title: "Failed to submit custom plan",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         console.error(error);
       })
       .finally(() => setLoading(false));
@@ -292,10 +341,22 @@ const ShowCustomDetails = () => {
       .then((response) => {
         setPaymentDetails(response.data);
         setIsEditing(false);
-        alert("Payment details updated successfully!");
+        Swal.fire({
+          title: "Payment details updated successfully!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       })
       .catch((error) => {
-        alert("Failed to update payment details");
+        Swal.fire({
+          title: "Failed to update payment details",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         console.error(error);
       });
   };

@@ -292,11 +292,25 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
         }
       );
       //console.log('Response:', response.data.message);
-      alert(response.data.message);
+      if (response.status === 201) {
+        Swal.fire({
+          title: response.data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+      }
       onClose();
     } catch (error) {
       //console.error('Error adding team member:', error);
-      alert('Failed to add team member. Please try again.');
+      Swal.fire({
+        title: 'Failed to add team member. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -444,7 +458,13 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         setFormData({ ...formData, file: file });
         setFilePreview(file.name);
       } else {
-        alert('Please upload only PDF or TXT files.');
+        Swal.fire({
+          title: 'Please upload only PDF or TXT files.',
+          icon: 'error',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         e.target.value = '';
       }
     }
@@ -454,7 +474,13 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     if (!formData.file) {
-      alert('Please upload a PDF or TXT file.');
+      Swal.fire({
+        title: 'Please upload a PDF or TXT file.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
@@ -473,11 +499,25 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         }
       );
       //console.log('Response:', response.data.message);
-      alert(response.data.message);
+      if (response.status === 201) {
+        Swal.fire({
+          title: response.data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+      }
       onClose();
     } catch (error) {
       //console.error('Error adding case study:', error);
-      alert('Failed to add case study. Please try again.');
+      Swal.fire({
+        title: 'Failed to add case study. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -604,12 +644,26 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
           }
         }
       );
+      if (response.status === 201) {
+        Swal.fire({
+          title: response.data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+      }
       //console.log('Response:', response.data.message);
-      alert(response.data.message);
       onClose();
     } catch (error) {
       //console.error('Error adding certificate:', error);
-      alert('Failed to add certificate. Please try again.');
+      Swal.fire({
+        title: 'Failed to add certificate. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -708,7 +762,13 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         setFormData({ ...formData, file: file });
         setFilePreview(file.name);
       } else {
-        alert('Please upload only PDF or TXT files.');
+        Swal.fire({
+          title: 'Please upload only PDF or TXT files.',
+          icon: 'error',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
         e.target.value = '';
       }
     }
@@ -718,7 +778,13 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     if (!formData.file) {
-      alert('Please upload a file.');
+      Swal.fire({
+        title: 'Please upload a file.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
@@ -737,11 +803,25 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         }
       );
       //console.log('Response:', response.data.message);
-      alert(response.data.message);
+      if (response.status === 201) {
+        Swal.fire({
+          title: response.data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+      }
       onClose();
     } catch (error) {
       //console.error('Error adding document:', error);
-      alert('Failed to add document. Please try again.');
+      Swal.fire({
+        title: 'Failed to add document. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -944,7 +1024,13 @@ const CompanyProfileDashboard = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       //console.error('Error downloading document:', error);
-      alert('Failed to download document. Please try again.');
+      Swal.fire({
+        title: 'Failed to download document. Please try again.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -954,7 +1040,13 @@ const CompanyProfileDashboard = () => {
       window.open(caseStudy.fileUrl, '_blank');
     } else {
       // For case studies without file URLs, show an alert
-      alert(`Opening case study: ${caseStudy.title}`);
+      Swal.fire({
+        title: `Opening case study: ${caseStudy.title}`,
+        icon: 'info',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -1080,7 +1172,13 @@ const CompanyProfileDashboard = () => {
       `);
       printWindow.document.close();
     } catch (e) {
-      alert('Failed to open invoice for printing.');
+      Swal.fire({
+        title: 'Failed to open invoice for printing.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 
@@ -1142,9 +1240,21 @@ const CompanyProfileDashboard = () => {
       setEditMode(false);
       setSelectedFile(null);
       setPreviewUrl(null);
-      alert('Logo updated!');
+      Swal.fire({
+        title: 'Logo updated!',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     } catch (err) {
-      alert('Failed to upload image');
+      Swal.fire({
+        title: 'Failed to upload image',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   };
 

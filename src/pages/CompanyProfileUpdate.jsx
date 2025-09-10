@@ -6,6 +6,7 @@ import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useProfile } from "../context/ProfileContext";
+import Swal from "sweetalert2";
 
 const INDUSTRY_OPTIONS = [
     "Information Technology",
@@ -462,12 +463,32 @@ const CompanyProfileUpdate = () => {
             );
 
             if (response.status === 200) {
-                alert("Profile updated successfully!");
-                navigate("/company_profile_dashboard");
+                Swal.fire({
+                    title: 'Profile updated successfully!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
+                setTimeout(() => {
+                    navigate("/company_profile_dashboard");
+                }, 1500);
             }
         } catch (error) {
             console.error(error);
-            alert("Failed to update profile: " + (error.response?.data?.message || error.message));
+            Swal.fire({
+                title: 'Failed to update profile ',
+                text: `${error.response?.data?.message || error.message}`,
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: true,
+                showCancelButton: false,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#6B7280',
+                cancelButtonText: 'Cancel',
+                dangerMode: true,
+            });
         } finally {
             // setLoading(false); // This line is removed
         }
