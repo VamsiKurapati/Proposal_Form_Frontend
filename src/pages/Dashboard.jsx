@@ -994,7 +994,10 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full bg-gradient-to-b from-[#F3F4F6] to-[#FFFFFF] rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto">
+                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto"
+                                style={{
+                                    background: "linear-gradient(135deg, hsla(234, 100%, 83%, 1) 30%, hsla(270, 77%, 71%, 1) 100%);"
+                                }}>
                                 <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded">
@@ -1707,6 +1710,7 @@ const Dashboard = () => {
                             <button
                                 className="flex items-center gap-1 px-2 py-1 border rounded text-[#2563EB] border-[#2563EB] text-[14px] md:text-[16px] hover:bg-[#2563EB] hover:text-white"
                                 onClick={() => handleAddEvent()}
+                                disabled={role === "Viewer"}
                             >
                                 <MdOutlineEdit className="w-5 h-5" /> Add Event
                             </button>
