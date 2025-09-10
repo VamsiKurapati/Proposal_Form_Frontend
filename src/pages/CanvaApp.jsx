@@ -1131,12 +1131,12 @@ const CanvaApp = () => {
                 <button className="flex items-center justify-center" onClick={() => setInitialLoad(false)}><MdOutlineClose className="w-6 h-6 text-red-500 hover:text-red-600" /></button>
               </div>
               <h3 className="text-xl font-semibold text-[#2563EB] mb-3">Instructions</h3>
-              <p className="text-[#2563EB] text-sm leading-relaxed">
+              <p className="text-[#2563EB] text-lg leading-relaxed">
                 Please follow the instructions below for better experience.
               </p>
-              <ul className="text-[#111827] text-sm leading-relaxed text-left mt-4">
+              <ul className="text-[#111827] text-lg leading-relaxed text-left mt-4">
                 <li className="mb-4">
-                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                  <span className="text-[#000000] text-lg leading-relaxed text-left">
                     1.Do not delete default text boxes
                   </span>
                   <br />
@@ -1145,7 +1145,7 @@ const CanvaApp = () => {
                   </span>
                 </li>
                 <li className="mb-4">
-                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                  <span className="text-[#000000] text-lg leading-relaxed text-left">
                     2. Be cautious with large content sections
                   </span>
                   <br />
@@ -1154,7 +1154,7 @@ const CanvaApp = () => {
                   </span>
                 </li>
                 <li className="mb-4">
-                  <span className="text-[#000000] text-sm leading-relaxed text-left">
+                  <span className="text-[#000000] text-lg leading-relaxed text-left">
                     3. Use overlays creatively
                   </span>
                   <br />
