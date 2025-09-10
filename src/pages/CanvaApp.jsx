@@ -1114,7 +1114,7 @@ const CanvaApp = () => {
     if (initialLoad) {
       setTimeout(() => {
         setInitialLoad(false);
-      }, 10000);
+      }, 15000);
     }
   }, [initialLoad]);
 
@@ -1130,19 +1130,19 @@ const CanvaApp = () => {
               <div className="flex justify-end">
                 <button className="bg-[#2563EB] text-white px-5 py-2 rounded-lg transition text-[16px]" onClick={() => setInitialLoad(false)}>X</button>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">Instructions</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <h3 className="text-xl font-semibold text-[#2563EB] mb-3">Instructions</h3>
+              <p className="text-[#2563EB] text-sm leading-relaxed">
                 Please follow the instructions below for better experience.
               </p>
-              <ul className="text-gray-600 text-sm leading-relaxed text-left">
-                <li><span className="text-gray-600 text-sm leading-relaxed text-left">1.Do not delete default text boxes / <br /></span>
-                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
+              <ul className="text-[#111827] text-sm leading-relaxed text-left">
+                <li><span className="text-[#000000] text-sm leading-relaxed text-left">1.Do not delete default text boxes <br /></span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
                 </li>
-                <li><span className="text-gray-600 text-sm leading-relaxed text-left">2. Be cautious with large content sections / <br /></span>
-                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
+                <li><span className="text-[#000000] text-sm leading-relaxed text-left">2. Be cautious with large content sections / <br /></span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
                 </li>
-                <li><span className="text-gray-600 text-sm leading-relaxed text-left">3. Use overlays creatively / <br /></span>
-                  <span className="text-gray-600 text-sm leading-relaxed text-left ml-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
+                <li><span className="text-[#000000] text-sm leading-relaxed text-left">3. Use overlays creatively / <br /></span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
                 </li>
               </ul>
             </div>
@@ -1277,14 +1277,14 @@ const CanvaApp = () => {
               </div>
 
               {/* Showing a note div at bottom right to inform the users that the content in each page is scrollable and they should manually paste them into new pages so that the content is not lost while exporting to PDF*/}
-              <div className="absolute bottom-2 right-12 max-w-[130px] flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              {/* <div className="absolute bottom-2 right-12 max-w-[130px] flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <div className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors flex items-center gap-2" title="Note" style={{ marginLeft: '8px', width: '100%' }}>
                   <div className="flex items-center gap-2">
                     <MdOutlineInfo className="w-4 h-4" />
                     <span className="text-sm">Note: The text boxes in some pages are scrollable. Please paste them into new pages manually.</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </>
           )}
 

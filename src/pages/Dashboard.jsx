@@ -997,7 +997,7 @@ const Dashboard = () => {
                             <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto"
                                 style={{
                                     background: "linear-gradient(135deg, hsla(234, 100%, 83%, 1) 30%, hsla(270, 77%, 71%, 1) 100%);",
-                                    border: "2px solid #E5E7EB"
+                                    border: "2px solid rgb(25, 66, 148)"
                                 }}>
                                 <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (
