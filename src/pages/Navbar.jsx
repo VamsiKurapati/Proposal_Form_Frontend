@@ -26,9 +26,9 @@ export default function Navbar() {
                 </div>
 
                 <div className="hidden md:flex space-x-8">
-                    <a href="#about" className="text-[#111827] hover:text-[#2563EB]">About Us</a>
-                    <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]">Solutions</a>
-                    <a href="#plans" className="text-[#111827] hover:text-[#2563EB]">Plans</a>
+                    <a href="#about" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("about")}>About Us</a>
+                    <a href="#solutions" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("solutions")}>Solutions</a>
+                    <a href="#plans" className="text-[#111827] hover:text-[#2563EB]" onClick={() => handleRefClick("plans")}>Plans</a>
                 </div>
 
                 <div className="hidden md:flex items-center space-x-4">
