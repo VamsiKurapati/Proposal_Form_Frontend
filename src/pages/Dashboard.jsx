@@ -994,13 +994,13 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto"
+                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto scrollbar-hide"
                                 style={{
                                     background: "linear-gradient(135deg, rgb(100, 149, 237) 30%, rgb(147, 112, 219) 100%)"
                                 }}>
                                 <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (
-                                    <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded">
+                                    <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded scrollbar-hide">
                                         <span className="font-medium text-sm mb-1 break-words">{ev.title}</span>
                                         <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
                                             <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
