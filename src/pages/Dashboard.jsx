@@ -994,17 +994,32 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-1000 bottom-4 left-0 p-1 w-52 h-full bg-[#F3F4F6] rounded-md border border-[#E5E7EB] overflow-y-auto">
-                                {sortedEvents.map((ev, i) => (
-                                    <div key={i} className="flex flex-col justify-between items-center mb-2 last:mb-0">
-                                        <span className="font-medium text-[12px] sm:text-base">{ev.title}</span>
-                                        <span className={`ml-2 px-2 py-[2px] rounded-full text-[10px] sm:text-xs font-medium ${statusBgMap[ev.status]}`}>
-                                            <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]} mr-1`}></span>
-                                            {ev.status}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
+                            <>
+                                {/* Backdrop */}
+                                <div
+                                    className="fixed inset-0 z-[9998] bg-black bg-opacity-50"
+                                    onClick={() => setOpenDropdownDate(null)}
+                                ></div>
+                                {/* Modal */}
+                                <div className="fixed z-[9999] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-80 max-h-96 bg-white rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto">
+                                    <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
+                                    {sortedEvents.map((ev, i) => (
+                                        <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded">
+                                            <span className="font-medium text-sm mb-1 break-words">{ev.title}</span>
+                                            <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusBgMap[ev.status]}`}>
+                                                <span className={`inline-block w-2 h-2 rounded-full ${statusDotMap[ev.status]}`}></span>
+                                                {ev.status}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    <button
+                                        onClick={() => setOpenDropdownDate(null)}
+                                        className="mt-3 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </>
                         )}
                     </>
                 )}

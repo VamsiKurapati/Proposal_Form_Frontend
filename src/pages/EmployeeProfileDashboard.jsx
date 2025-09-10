@@ -327,9 +327,8 @@ const EmployeeProfileDashboard = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
-                      disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
-                      title={role === "Viewer" ? "Viewer cannot view proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can view this proposal" : "View Details"}
+                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1 cursor-pointer"
+                      title="View Details"
                       onClick={() => handleGeneratePDF(proposal.generatedProposal)}>
                       <MdOutlineVisibility className="w-4 h-4 shrink-0" title="View Details" />
                       View
