@@ -967,6 +967,11 @@ const Dashboard = () => {
         const dateKey = moment(value).format("YYYY-MM-DD");
         const isDropdownOpen = openDropdownDate === dateKey;
 
+        // Check if this is a rightmost cell to prevent dropdown overflow
+        // For rightmost cells (Thursday, Friday, Saturday), position dropdown to the left
+        const dayOfWeek = moment(value).day(); // 0 = Sunday, 6 = Saturday
+        const isRightmostCell = dayOfWeek >= 4; // Thursday, Friday, Saturday (last 3 days)
+
         return (
             <div
                 className={`relative h-full w-full min-h-[56px] min-w-[56px] p-1 sm:min-h-[80px] sm:min-w-[80px] sm:p-2 ${isEmpty ? 'bg-[#F3F4F6]' : bgColor[sortedEvents[0]?.status]} border border-[#E5E7EB] flex flex-col justify-start items-start transition`}
@@ -994,7 +999,10 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto custom-scrollbar"
+                            <div className={`absolute z-[9999] top-0 p-3 w-64 h-full rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto custom-scrollbar ${isRightmostCell
+                                ? 'right-full mr-2'
+                                : 'left-full ml-2'
+                                }`}
                                 style={{
                                     background: "linear-gradient(135deg, rgb(100, 149, 237) 30%, rgb(147, 112, 219) 100%)"
                                 }}>
