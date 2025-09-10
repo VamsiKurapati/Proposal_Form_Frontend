@@ -994,7 +994,7 @@ const Dashboard = () => {
                         )}
                         {/* Dropdown with all events */}
                         {isDropdownOpen && (
-                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 max-h-80 bg-white rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto">
+                            <div className="absolute z-[9999] top-0 left-full ml-2 p-3 w-64 h-full bg-gradient-to-b from-[#F3F4F6] to-[#FFFFFF] rounded-lg border border-[#E5E7EB] shadow-lg overflow-y-auto">
                                 <div className="text-sm font-medium text-gray-700 mb-3">All Events for {moment(value).format('MMM DD, YYYY')}</div>
                                 {sortedEvents.map((ev, i) => (
                                     <div key={i} className="flex flex-col justify-between items-start mb-3 last:mb-0 p-2 bg-gray-50 rounded">
