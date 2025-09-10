@@ -42,7 +42,14 @@ const getAvailableStorage = () => {
 // Safe setItem with quota checking
 const safeSetItem = (key, value) => {
     if (!isLocalStorageAvailable()) {
-        console.warn('localStorage is not available');
+        // console.warn('localStorage is not available');
+        Swal.fire({
+            title: 'localStorage is not available',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return false;
     }
 
@@ -51,7 +58,14 @@ const safeSetItem = (key, value) => {
         const available = getAvailableStorage();
 
         if (dataSize > available) {
-            console.warn(`Data size (${dataSize} bytes) exceeds available storage (${available} bytes)`);
+            // console.warn(`Data size (${dataSize} bytes) exceeds available storage (${available} bytes)`);
+            Swal.fire({
+                title: `Data size (${dataSize} bytes) exceeds available storage (${available} bytes)`,
+                icon: 'warning',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
 
             // Try to clear some space
             clearOldData();
@@ -59,7 +73,14 @@ const safeSetItem = (key, value) => {
             // Check again after clearing
             const newAvailable = getAvailableStorage();
             if (dataSize > newAvailable) {
-                console.error('Even after clearing old data, storage is insufficient');
+                // console.error('Even after clearing old data, storage is insufficient');
+                Swal.fire({
+                    title: 'Even after clearing old data, storage is insufficient',
+                    icon: 'warning',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 return false;
             }
         }
@@ -68,7 +89,14 @@ const safeSetItem = (key, value) => {
         return true;
     } catch (error) {
         if (error.name === 'QuotaExceededError') {
-            console.error('localStorage quota exceeded');
+            // console.error('localStorage quota exceeded');
+            Swal.fire({
+                title: 'localStorage quota exceeded',
+                icon: 'warning',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             clearOldData();
 
             // Try one more time
@@ -76,11 +104,25 @@ const safeSetItem = (key, value) => {
                 localStorage.setItem(key, JSON.stringify(value));
                 return true;
             } catch (retryError) {
-                console.error('Failed to save data even after clearing space:', retryError);
+                // console.error('Failed to save data even after clearing space:', retryError);
+                Swal.fire({
+                    title: 'Failed to save data even after clearing space:',
+                    icon: 'warning',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 return false;
             }
         } else {
-            console.error('Error saving to localStorage:', error);
+            // console.error('Error saving to localStorage:', error);
+            Swal.fire({
+                title: 'Error saving to localStorage:',
+                icon: 'warning',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             return false;
         }
     }
@@ -89,7 +131,14 @@ const safeSetItem = (key, value) => {
 // Safe getItem
 const safeGetItem = (key) => {
     if (!isLocalStorageAvailable()) {
-        console.warn('localStorage is not available');
+        // console.warn('localStorage is not available');
+        Swal.fire({
+            title: 'localStorage is not available',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return null;
     }
 
@@ -97,7 +146,14 @@ const safeGetItem = (key) => {
         const item = localStorage.getItem(key);
         return item ? JSON.parse(item) : null;
     } catch (error) {
-        console.error('Error reading from localStorage:', error);
+        // console.error('Error reading from localStorage:', error);
+        Swal.fire({
+            title: 'Error reading from localStorage:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return null;
     }
 };
@@ -109,9 +165,23 @@ const clearOldData = () => {
     keysToClear.forEach(key => {
         try {
             localStorage.removeItem(key);
-            console.log(`Cleared ${key} to free up space`);
+            // console.log(`Cleared ${key} to free up space`);
+            Swal.fire({
+                title: `Cleared ${key} to free up space`,
+                icon: 'warning',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         } catch (error) {
-            console.error(`Error clearing ${key}:`, error);
+            // console.error(`Error clearing ${key}:`, error);
+            Swal.fire({
+                title: `Error clearing ${key}:`,
+                icon: 'warning',
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         }
     });
 };

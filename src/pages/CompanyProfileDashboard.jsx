@@ -1080,7 +1080,7 @@ const CompanyProfileDashboard = () => {
 
   React.useEffect(() => {
     const userId = JSON.parse(localStorage.getItem("user"))?._id;
-    console.log("userId", userId);
+    // console.log("userId", userId);
     const loadPayments = async () => {
       if (activeTab !== "Payment") return;
       try {

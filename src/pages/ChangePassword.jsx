@@ -118,7 +118,7 @@ export default function ChangePassword() {
                 }, 2000);
             }
         } catch (error) {
-            console.error("Password change error:", error);
+            // console.error("Password change error:", error);
             if (error.response?.data?.message) {
                 toast.error(error.response.data.message);
             } else {

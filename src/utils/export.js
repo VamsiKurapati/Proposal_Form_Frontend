@@ -115,7 +115,7 @@ export function importFromJSON(event, setProject, setSelectedElement, clearHisto
           showConfirmButton: false,
           showCancelButton: false,
         });
-        console.error('Import error:', error);
+        // console.error('Import error:', error);
       }
     };
     reader.readAsText(file);
@@ -195,7 +195,14 @@ export function importFromJSONData(jsonData, setProject, setSelectedElement, cle
     setProject(migratedProject);
     setSelectedElement({ pageIndex: 0, elementId: null });
   } catch (error) {
-    console.error('Import error:', error);
+    // console.error('Import error:', error);
+    Swal.fire({
+      title: 'Import error:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     throw error;
   }
 }
@@ -285,7 +292,14 @@ export function exportToOptimizedSVG(project) {
 
     return { success: true, stats };
   } catch (error) {
-    console.error('SVG export error:', error);
+    // console.error('SVG export error:', error);
+    Swal.fire({
+      title: 'SVG export error:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     return { success: false, error: error.message };
   }
 }

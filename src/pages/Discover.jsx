@@ -779,7 +779,7 @@ const Discover = () => {
       setOriginalSavedGrants(savedGrants ?? []);
       setRetryCount(0);
     } catch (err) {
-      console.error("Failed to load grants:", err);
+      // console.error("Failed to load grants:", err);
       setError("Failed to load recent and saved grants. Please try again later.");
     } finally {
       setLoadingRecentGrants(false);
@@ -810,7 +810,13 @@ const Discover = () => {
       setOtherGrants(grants);
       setOriginalOtherGrants(grants);
     } catch (err) {
-      console.error("Failed to fetch other grants:", err);
+      // console.error("Failed to fetch other grants:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to fetch other grants',
+        text: err.response?.data?.message || 'Failed to fetch other grants. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
       setOtherGrants([]);
       setOriginalOtherGrants([]);
     } finally {
@@ -856,7 +862,13 @@ const Discover = () => {
         });
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err.response?.data?.message || 'Failed to save grant. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
       Swal.fire({
         icon: 'error',
         title: 'Save Failed',
@@ -906,7 +918,13 @@ const Discover = () => {
         });
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Unsave Failed',
+        text: err.response?.data?.message || 'Failed to unsave grant. Please try again.',
+        confirmButtonColor: '#2563EB'
+      });
       Swal.fire({
         icon: 'error',
         title: 'Unsave Failed',
@@ -1319,23 +1337,23 @@ const Discover = () => {
     // Open the grant proposal modal
     setSelectedGrant(grant);
 
-    // Reset form data to empty
-    setGrantProposalData({
-      summary: "",
-      objectives: "",
-      activities: "",
-      beneficiaries: "",
-      geography: "",
-      start_date: "",
-      estimated_duration: "",
-      budget: {
-        total_project_cost: "",
-        total_requested_amount: "",
-        cost_share_required: "",
-        budget_breakdown: ""
-      },
-      methods_for_measuring_success: ""
-    });
+    // // Reset form data to empty
+    // setGrantProposalData({
+    //   summary: "",
+    //   objectives: "",
+    //   activities: "",
+    //   beneficiaries: "",
+    //   geography: "",
+    //   start_date: "",
+    //   estimated_duration: "",
+    //   budget: {
+    //     total_project_cost: "",
+    //     total_requested_amount: "",
+    //     cost_share_required: "",
+    //     budget_breakdown: ""
+    //   },
+    //   methods_for_measuring_success: ""
+    // });
 
     setShowGrantProposalModal(true);
   };
@@ -1515,7 +1533,7 @@ const Discover = () => {
       // console.log("Selected Grant:", selectedGrant);
 
     } catch (error) {
-      console.error("Error generating Grant proposal:", error);
+      // console.error("Error generating Grant proposal:", error);
       Swal.fire({
         icon: 'warning',
         title: 'Failed',
@@ -2007,7 +2025,7 @@ const Discover = () => {
           });
         }
       } catch (error) {
-        console.error('Error adding document:', error);
+        // console.error('Error adding document:', error);
         const errorMessage = error.response?.data?.message || 'Failed to add document. Please try again.';
         Swal.fire({
           icon: 'error',
@@ -2180,7 +2198,7 @@ const Discover = () => {
           });
         }
       } catch (error) {
-        console.error('Error adding document:', error);
+        // console.error('Error adding document:', error);
         const errorMessage = error.response?.data?.message || 'Failed to add document. Please try again.';
         Swal.fire({
           icon: 'error',

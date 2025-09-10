@@ -1,4 +1,5 @@
 // SVG utility functions
+import Swal from 'sweetalert2';
 
 // Browser-compatible SVG optimizer
 export function optimizeSVG(svgContent) {
@@ -9,7 +10,14 @@ export function optimizeSVG(svgContent) {
     const svg = doc.querySelector('svg');
 
     if (!svg) {
-      console.warn('No SVG element found in content');
+      // console.warn('No SVG element found in content');
+      Swal.fire({
+        title: 'No SVG element found in content',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return svgContent;
     }
 
@@ -79,7 +87,14 @@ export function optimizeSVG(svgContent) {
 
     return optimized;
   } catch (error) {
-    console.error('SVG optimization error:', error);
+    // console.error('SVG optimization error:', error);
+    Swal.fire({
+      title: 'SVG optimization error:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     return svgContent;
   }
 }
@@ -200,7 +215,14 @@ export function optimizeSVGForA4(svgContent) {
     const svg = doc.querySelector('svg');
 
     if (!svg) {
-      console.warn('No SVG element found in content');
+      // console.warn('No SVG element found in content');
+      Swal.fire({
+        title: 'No SVG element found in content',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return svgContent;
     }
 
@@ -223,7 +245,14 @@ export function optimizeSVGForA4(svgContent) {
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   } catch (error) {
-    console.error('Error optimizing SVG for A4:', error);
+    // console.error('Error optimizing SVG for A4:', error);
+    Swal.fire({
+      title: 'Error optimizing SVG for A4:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     // Return original content if optimization fails
     return svgContent;
   }
@@ -241,7 +270,14 @@ export function encodeSVGToBase64(svgString) {
     }
     return btoa(binary);
   } catch (error) {
-    console.error('Error encoding SVG:', error);
+    // console.error('Error encoding SVG:', error);
+    Swal.fire({
+      title: 'Error encoding SVG:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     // Fallback to simple encoding if TextEncoder is not available
     return btoa(unescape(encodeURIComponent(svgString)));
   }
@@ -273,7 +309,14 @@ export async function getTemplateSets() {
 
     return sets;
   } catch (error) {
-    console.error('Error loading template sets:', error);
+    // console.error('Error loading template sets:', error);
+    Swal.fire({
+      title: 'Error loading template sets:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     return {};
   }
 }
@@ -287,7 +330,14 @@ export function scaleSVGToFitPage(svgContent, pageWidth, pageHeight) {
     const svgElement = doc.querySelector('svg');
 
     if (!svgElement) {
-      console.warn('No SVG element found in template');
+      // console.warn('No SVG element found in template');
+      Swal.fire({
+        title: 'No SVG element found in template',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return svgContent;
     }
 
@@ -337,7 +387,14 @@ export function scaleSVGToFitPage(svgContent, pageWidth, pageHeight) {
     return serializer.serializeToString(doc);
 
   } catch (error) {
-    console.error('Error scaling SVG template:', error);
+    // console.error('Error scaling SVG template:', error);
+    Swal.fire({
+      title: 'Error scaling SVG template:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     return svgContent; // Return original if scaling fails
   }
 } 

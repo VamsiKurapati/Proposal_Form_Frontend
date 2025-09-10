@@ -106,7 +106,7 @@ const GrantProposalForm = ({
                 title: 'Error',
                 text: err.response?.data?.message || 'Failed to fetch Grant proposal.',
             });
-            console.error("Error fetching Grant proposal:", err);
+            // console.error("Error fetching Grant proposal:", err);
         }
     };
 

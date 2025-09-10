@@ -35,7 +35,7 @@ const StorageManager = ({ show, onClose }) => {
                 showCancelButton: false,
             });
         } catch (error) {
-            console.error('Error clearing history:', error);
+            // console.error('Error clearing history:', error);
             Swal.fire({
                 title: 'Failed to clear history',
                 icon: 'error',
@@ -60,7 +60,7 @@ const StorageManager = ({ show, onClose }) => {
                 });
                 onClose();
             } catch (error) {
-                console.error('Error clearing all data:', error);
+                // console.error('Error clearing all data:', error);
                 Swal.fire({
                     title: 'Failed to clear data',
                     icon: 'error',

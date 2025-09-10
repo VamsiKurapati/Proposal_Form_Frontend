@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Cloud Image Service for handling image uploads and lazy loading
 class CloudImageService {
@@ -16,7 +17,14 @@ class CloudImageService {
       const saved = localStorage.getItem('canva-cloud-images');
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error('Error loading cloud images:', error);
+      // console.error('Error loading cloud images:', error);
+      Swal.fire({
+        title: 'Error loading cloud images:',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return [];
     }
   }
@@ -26,7 +34,14 @@ class CloudImageService {
     try {
       localStorage.setItem('canva-cloud-images', JSON.stringify(this.uploadedImages));
     } catch (error) {
-      console.error('Error saving cloud images:', error);
+      // console.error('Error saving cloud images:', error);
+      Swal.fire({
+        title: 'Error saving cloud images:',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   }
 
@@ -162,7 +177,14 @@ class CloudImageService {
 
       return imageData;
     } catch (error) {
-      console.error('Upload error:', error);
+      // console.error('Upload error:', error);
+      Swal.fire({
+        title: 'Upload error:',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw error;
     }
   }
@@ -212,7 +234,14 @@ class CloudImageService {
 
       return imageData;
     } catch (error) {
-      console.error('Upload template image error:', error);
+      // console.error('Upload template image error:', error);
+      Swal.fire({
+        title: 'Upload template image error:',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw error;
     }
   }
@@ -252,7 +281,14 @@ class CloudImageService {
       throw new Error(result.message || 'Delete failed');
 
     } catch (error) {
-      console.error('Delete error:', error);
+      // console.error('Delete error:', error);
+      Swal.fire({
+        title: 'Delete error:',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw error;
     }
   }

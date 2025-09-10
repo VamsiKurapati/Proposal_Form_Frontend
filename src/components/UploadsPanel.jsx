@@ -15,7 +15,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
         const cloudUploads = cloudImageService.getUploadedImages();
         setUploads(cloudUploads);
       } catch (error) {
-        console.error('Error loading uploads:', error);
+        // console.error('Error loading uploads:', error);
         setUploads([]);
       }
     };
@@ -81,7 +81,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
       const cloudUploads = cloudImageService.getUploadedImages();
       setUploads(cloudUploads);
     } catch (error) {
-      console.error('Error processing files:', error);
+      // console.error('Error processing files:', error);
       Swal.fire({
         title: 'Error uploading files. Please try again.',
         icon: 'error',
@@ -152,7 +152,7 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
       const cloudUploads = cloudImageService.getUploadedImages();
       setUploads(cloudUploads);
     } catch (error) {
-      console.error('Error deleting upload:', error);
+      // console.error('Error deleting upload:', error);
       // Even if there's an error, refresh the list
       const cloudUploads = cloudImageService.getUploadedImages();
       setUploads(cloudUploads);

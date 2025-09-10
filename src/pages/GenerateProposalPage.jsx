@@ -83,7 +83,7 @@ const GenerateProposalPage = () => {
         });
       }
     } catch (error) {
-      console.error("Error generating proposal:", error);
+      // console.error("Error generating proposal:", error);
       setIsGeneratingProposal(false);
       Swal.fire({
         icon: 'warning',

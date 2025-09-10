@@ -1,4 +1,5 @@
 import pako from 'pako';
+import Swal from 'sweetalert2';
 
 // Compress data using gzip compression
 export const compressData = (data) => {
@@ -19,7 +20,14 @@ export const compressData = (data) => {
             compressionRatio: ((jsonString.length - base64Compressed.length) / jsonString.length * 100).toFixed(1)
         };
     } catch (error) {
-        console.error('Compression failed:', error);
+        // console.error('Compression failed:', error);
+        Swal.fire({
+            title: 'Compression failed:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         throw new Error('Failed to compress data');
     }
 };
@@ -36,7 +44,14 @@ export const decompressData = (compressedBase64) => {
         // Parse JSON
         return JSON.parse(decompressed);
     } catch (error) {
-        console.error('Decompression failed:', error);
+        // console.error('Decompression failed:', error);
+        Swal.fire({
+            title: 'Decompression failed:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         throw new Error('Failed to decompress data');
     }
 };

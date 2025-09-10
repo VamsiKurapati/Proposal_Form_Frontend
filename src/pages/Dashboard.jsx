@@ -153,7 +153,7 @@ const Dashboard = () => {
     };
 
     const handleEditChange = (field, value) => {
-        console.log(field, value);
+        // console.log(field, value);
         setEditForm(prev => ({ ...prev, [field]: value }));
     };
 
@@ -203,7 +203,7 @@ const Dashboard = () => {
                 });
             }
         } catch (err) {
-            console.error("Error updating proposal:", err);
+            // console.error("Error updating proposal:", err);
             Swal.fire(
                 'Error!',
                 'Failed to update proposal',
@@ -255,7 +255,7 @@ const Dashboard = () => {
                 );
             }
         } catch (err) {
-            console.error("Error updating grant proposal:", err);
+            // console.error("Error updating grant proposal:", err);
             Swal.fire(
                 'Error!',
                 'Failed to update grant proposal',
@@ -437,13 +437,13 @@ const Dashboard = () => {
                 if (res.status === 200) {
                     // Add restoreIn field to proposals being moved to deletedProposals
                     const proposalsToDelete = proposalsState.filter((_, idx) => selectedProposals.includes(idx));
-                    console.log("proposalsToDelete", proposalsToDelete);
+                    // console.log("proposalsToDelete", proposalsToDelete);
                     const proposalsWithRestoreIn = proposalsToDelete.map(proposal => ({
                         ...proposal,
                         restoreIn: "15 days"
                     }));
 
-                    console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
+                    // console.log("proposalsWithRestoreIn", proposalsWithRestoreIn);
 
                     // Update summary stats when proposals are moved to deleted
                     setSummaryStats(prev => {
@@ -815,7 +815,7 @@ const Dashboard = () => {
         const handleSubmit = async (e) => {
             e.preventDefault();
             // Handle form submission logic here
-            console.log('Event Data:', formData);
+            // console.log('Event Data:', formData);
             if (!formData.title) {
                 setErrors({ title: 'Title is required' });
                 return;
@@ -829,7 +829,7 @@ const Dashboard = () => {
                 return;
             }
             setErrors({});
-            console.log('Event Data:', formData);
+            // console.log('Event Data:', formData);
             try {
                 const token = localStorage.getItem('token');
 

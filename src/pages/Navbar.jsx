@@ -8,9 +8,7 @@ export default function Navbar() {
     const navigate = useNavigate();
 
     const handleRefClick = (id) => {
-        if (location.pathname !== "/") {
-            navigate("/");
-        }
+        navigate("/");
         setTimeout(() => {
             const element = document.getElementById(id);
             if (element) {

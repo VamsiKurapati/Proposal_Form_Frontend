@@ -4,10 +4,17 @@ import Swal from 'sweetalert2';
 export const clearAllStorage = () => {
     try {
         localStorage.clear();
-        console.log('All localStorage data cleared successfully');
+        // console.log('All localStorage data cleared successfully');
         return true;
     } catch (error) {
-        console.error('Failed to clear localStorage:', error);
+        // console.error('Failed to clear localStorage:', error);
+        Swal.fire({
+            title: 'Failed to clear localStorage:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return false;
     }
 };
@@ -17,10 +24,17 @@ export const clearProjectData = () => {
         localStorage.removeItem('canva-project');
         localStorage.removeItem('canva-cloud-images');
         localStorage.removeItem('canva-history');
-        console.log('Project data cleared successfully');
+        // console.log('Project data cleared successfully');
         return true;
     } catch (error) {
-        console.error('Failed to clear project data:', error);
+        // console.error('Failed to clear project data:', error);
+        Swal.fire({
+            title: 'Failed to clear project data:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return false;
     }
 };
@@ -47,7 +61,14 @@ export const getStorageInfo = () => {
             items
         };
     } catch (error) {
-        console.error('Error getting storage info:', error);
+        // console.error('Error getting storage info:', error);
+        Swal.fire({
+            title: 'Error getting storage info:',
+            icon: 'warning',
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         return null;
     }
 };
@@ -84,6 +105,6 @@ window.clearCanvaStorage = () => {
 
 window.getCanvaStorageInfo = () => {
     const info = getStorageInfo();
-    console.log('Storage Info:', info);
+    // console.log('Storage Info:', info);
     return info;
 }; 

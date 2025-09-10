@@ -1,5 +1,7 @@
 // canva-app/src/utils/loadTemplates.js
 
+import Swal from 'sweetalert2';
+
 // Vite's import.meta.glob to import all SVGs in subfolders
 async function importAll() {
   try {
@@ -21,7 +23,14 @@ async function importAll() {
     });
     return files;
   } catch (error) {
-    console.error('Error importing SVG files:', error);
+    // console.error('Error importing SVG files:', error);
+    Swal.fire({
+      title: 'Error importing SVG files:',
+      icon: 'warning',
+      timer: 1500,
+      showConfirmButton: false,
+      showCancelButton: false,
+    });
     return {};
   }
 }

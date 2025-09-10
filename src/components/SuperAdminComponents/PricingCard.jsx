@@ -24,8 +24,8 @@ const PricingCard = ({ id, plan, price, features, popular, highlightFirst, onPri
             setLoading(true);
             try {
                 const token = localStorage.getItem("token");
-                console.log("Making API call to:", `${baseUrl}/updateSubscriptionPlan/${planId}`);
-                console.log("Request payload:", { price: editPrice });
+                // console.log("Making API call to:", `${baseUrl}/updateSubscriptionPlan/${planId}`);
+                // console.log("Request payload:", { price: editPrice });
 
                 const response = await axios.put(
                     `${baseUrl}/updateSubscriptionPlanPrice/${planId}`,
@@ -33,11 +33,11 @@ const PricingCard = ({ id, plan, price, features, popular, highlightFirst, onPri
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                console.log("API response:", response.data);
+                // console.log("API response:", response.data);
                 onPriceUpdated && onPriceUpdated(editPrice);
                 setIsEditing(false);
             } catch (err) {
-                console.error("API error:", err);
+                // console.error("API error:", err);
                 Swal.fire({
                     title: "Failed to update price: " + (err.response?.data?.message || err.message),
                     icon: "error",

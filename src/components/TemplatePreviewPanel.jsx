@@ -1,6 +1,7 @@
 import React from 'react';
 import { scaleSVGToFitPage } from '../utils/svg';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
+import Swal from 'sweetalert2';
 
 const TemplatePreviewPanel = ({ show, folder, svgPreviews, onClose, setBackground }) => {
   if (!show || !folder) return null;
@@ -16,7 +17,14 @@ const TemplatePreviewPanel = ({ show, folder, svgPreviews, onClose, setBackgroun
         setBackground('svg', scaledSVG);
       })
       .catch(error => {
-        console.error('Error loading template:', error);
+        // console.error('Error loading template:', error);
+        Swal.fire({
+          title: "Failed to load template",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       });
   };
 

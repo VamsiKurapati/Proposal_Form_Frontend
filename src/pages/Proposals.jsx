@@ -829,7 +829,7 @@ const Proposals = () => {
             setSelectedGrant(null);
 
         } catch (error) {
-            console.error("Error generating Grant proposal:", error);
+            // console.error("Error generating Grant proposal:", error);
             Swal.fire({
                 icon: 'warning',
                 title: 'Failed',

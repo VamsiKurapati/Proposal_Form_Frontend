@@ -65,7 +65,7 @@ const LazyImageElement = ({ element, onLoad, onError }) => {
           onLoad();
         }
       } catch (error) {
-        console.error('Error loading image:', error);
+        // console.error('Error loading image:', error);
         setHasError(true);
         setIsLoading(false);
 

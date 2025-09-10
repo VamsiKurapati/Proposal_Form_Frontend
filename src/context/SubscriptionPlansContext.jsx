@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 const SubscriptionPlansContext = createContext();
 
 export const useSubscriptionPlans = () => useContext(SubscriptionPlansContext);
@@ -23,12 +24,26 @@ export const SubscriptionPlansProvider = ({ children }) => {
                     setSubscriptionPlans(res.data.plans);
                     setMostPopularPlan(res.data.mostPopularPlan || null);
                 } else {
-                    console.error('Invalid subscription plans data structure:', res.data);
+                    // console.error('Invalid subscription plans data structure:', res.data);
+                    Swal.fire({
+                        title: "Invalid subscription plans data structure",
+                        icon: "error",
+                        timer: 1500,
+                        showConfirmButton: false,
+                        showCancelButton: false,
+                    });
                     setSubscriptionPlans([]);
                     setMostPopularPlan(null);
                 }
             } catch (error) {
-                console.error('Error fetching subscription plans:', error);
+                // console.error('Error fetching subscription plans:', error);
+                Swal.fire({
+                    title: "Error fetching subscription plans",
+                    icon: "error",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 setSubscriptionPlans([]);
                 setMostPopularPlan(null);
             }

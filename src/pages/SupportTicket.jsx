@@ -103,7 +103,14 @@ const SupportTicket = () => {
 
             setConversationMessages(allMsgs);
         } catch (err) {
-            console.error("Fetch conversation error:", err);
+            // console.error("Fetch conversation error:", err);
+            Swal.fire({
+                title: "Error fetching conversation:",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             setConversationMessages([]);
         }
         setLoadingMessages(false);
@@ -134,10 +141,14 @@ const SupportTicket = () => {
                     setTickets([]);
                 }
             } catch (error) {
-                console.error(
-                    "❌ Error fetching tickets:",
-                    error.response?.data || error.message
-                );
+                // console.error("❌ Error fetching tickets:", error.response?.data || error.message);
+                Swal.fire({
+                    title: "Error fetching tickets:",
+                    icon: "warning",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 setTickets([]);
             } finally {
                 setLoading(false);
@@ -192,7 +203,7 @@ const SupportTicket = () => {
         formData.append("subCategory", subCategory);
         formData.append("description", description);
         formData.append("plan_name", subsplanName.plan_name);
-        console.log("subsplanName", subsplanName.plan_name);
+        // console.log("subsplanName", subsplanName.plan_name);
         if (attachments) formData.append("attachments", attachments);
 
         try {
@@ -240,6 +251,14 @@ const SupportTicket = () => {
                 setErrorMsg(res.data.message || "Failed to submit ticket.");
             }
         } catch (err) {
+            // console.error("Error submitting ticket:", err);
+            Swal.fire({
+                title: "Error submitting ticket:",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             setErrorMsg(err.response?.data?.message || "An error occurred.");
         }
         setSubmitting(false);

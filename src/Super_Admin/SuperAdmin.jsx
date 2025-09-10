@@ -1593,24 +1593,32 @@ const SuperAdmin = () => {
                 },
             });
             setPlans(data.data);
-            console.log("data.data.plans", data.data.plans);
+            // console.log("data.data.plans", data.data.plans);
             for (let i = 0; i < data.data.plans.length; i++) {
                 if (data.data.plans[i].name === "Enterprise") {
                     setIsContact(data.data.plans[i].isContact);
-                    console.log("Enterprise isContact:", data.data.plans[i].isContact);
+                    // console.log("Enterprise isContact:", data.data.plans[i].isContact);
                     break;
                 }
             }
         } catch (err) {
-            console.error("Failed to fetch plans:", err);
+            // console.error("Failed to fetch plans:", err);
+            Swal.fire({
+                title: "Failed to fetch plans:",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         }
     };
 
     useEffect(() => {
         subPlan();
     }, []);
+
     useEffect(() => {
-        console.log("Updated isContact:", isContact);
+        // console.log("Updated isContact:", isContact);
     }, [isContact]);
 
 
@@ -1683,7 +1691,14 @@ const SuperAdmin = () => {
             await subPlan();
             cancelEdit(planId);
         } catch (err) {
-            console.error("Failed to update plan:", err);
+            // console.error("Failed to update plan:", err);
+            Swal.fire({
+                title: "Failed to update plan:",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         } finally {
             setLoading(false);
         }
@@ -2302,7 +2317,7 @@ const SuperAdmin = () => {
             );
             setIsContact(!isContact);
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             Swal.fire({
                 title: "Failed to update contacts: " + (error.response?.data?.message || error.message),
                 icon: "error",
@@ -3344,7 +3359,14 @@ const SuperAdmin = () => {
                 }, 1000);
             }
         } catch (error) {
-            console.error("Error in logout: ", error);
+            // console.error("Error in logout: ", error);
+            Swal.fire({
+                title: "Error in logout: ",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
         }
     };
 
@@ -3378,7 +3400,6 @@ const SuperAdmin = () => {
                                             <p className="text-gray-900 font-mono text-sm">{selectedUser._id}</p>
                                         </div>
                                         <div className='flex flex-row gap-2'>
-                                            {console.log("selectedUser", selectedUser)}
                                             <p className="text-gray-900 font-bold text-2xl mb-1">{selectedUser.companyName}</p>
                                             <span className={`h-fit px-2 py-1 text-xs rounded-full ${getStatusColor(selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active'))}`}>
                                                 {selectedUser.blocked ? 'Blocked' : (selectedUser.status || 'Active')}
@@ -4036,7 +4057,7 @@ const SuperAdmin = () => {
 
             toast.success('Invoice downloaded successfully!');
         } catch (error) {
-            console.error('Error downloading invoice:', error);
+            // console.error('Error downloading invoice:', error);
             toast.error('Failed to download invoice. Please try again.');
         }
     };
@@ -4144,7 +4165,7 @@ const SuperAdmin = () => {
 
             toast.success('Invoice opened for printing!');
         } catch (error) {
-            console.error('Error printing invoice:', error);
+            // console.error('Error printing invoice:', error);
             toast.error('Failed to open invoice for printing. Please try again.');
         }
     };
@@ -4158,7 +4179,7 @@ const SuperAdmin = () => {
         };
 
         const getInvoiceData = () => {
-            console.log("data", data);
+            // console.log("data", data);
             return [
                 { label: 'Transaction ID', value: data.transaction_id },
                 { label: 'Amount', value: `$${data.price}` },

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Type, Image, Plus, Trash2, Download } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const FloatingToolbar = ({
   addTextElement,
@@ -69,7 +70,14 @@ const FloatingToolbar = ({
         });
       }
     } catch (error) {
-      console.warn('Error closing panels:', error);
+      // console.warn('Error closing panels:', error);
+      Swal.fire({
+        title: "Failed to close panels",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   }, [selectedEl, selectedElement, updateUIState]);
 
@@ -88,7 +96,14 @@ const FloatingToolbar = ({
         updateUIState(panelStates);
       }
     } catch (error) {
-      console.warn('Error opening panel:', error);
+      // console.warn('Error opening panel:', error);
+      Swal.fire({
+        title: "Failed to open panel",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     }
   }, [selectedEl, selectedElement, updateUIState]);
 
@@ -187,8 +202,8 @@ const FloatingToolbar = ({
                         properties: { ...selectedEl.properties, bold: !selectedEl.properties.bold }
                       })}
                       className={`w-8 h-8 flex items-center justify-center text-sm font-bold rounded-md ${selectedEl.properties.bold
-                          ? 'bg-black bg-opacity-20 text-black'
-                          : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-black bg-opacity-20 text-black'
+                        : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       title="Bold"
                     >
@@ -199,8 +214,8 @@ const FloatingToolbar = ({
                         properties: { ...selectedEl.properties, italic: !selectedEl.properties.italic }
                       })}
                       className={`w-8 h-8 flex items-center justify-center text-sm italic rounded-md ${selectedEl.properties.italic
-                          ? 'bg-black bg-opacity-20 text-black'
-                          : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-black bg-opacity-20 text-black'
+                        : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       title="Italic"
                     >
@@ -211,8 +226,8 @@ const FloatingToolbar = ({
                         properties: { ...selectedEl.properties, underline: !selectedEl.properties.underline }
                       })}
                       className={`w-8 h-8 flex items-center justify-center text-sm underline rounded-md ${selectedEl.properties.underline
-                          ? 'bg-black bg-opacity-20 text-black'
-                          : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-black bg-opacity-20 text-black'
+                        : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       title="Underline"
                     >
@@ -288,8 +303,8 @@ const FloatingToolbar = ({
                       properties: { ...selectedEl.properties, listStyle: selectedEl.properties.listStyle === 'bullet' ? 'none' : 'bullet' }
                     })}
                     className={`w-8 h-8 flex items-center justify-center rounded-md ${selectedEl.properties.listStyle === 'bullet'
-                        ? 'bg-black bg-opacity-20 text-black'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-black bg-opacity-20 text-black'
+                      : 'text-gray-700 hover:bg-gray-100'
                       }`}
                     title="Toggle List"
                   >
@@ -532,8 +547,8 @@ const FloatingToolbar = ({
                           properties: { ...selectedEl.properties, strokeDasharray: undefined }
                         })}
                         className={`w-10 h-10 border rounded-md flex items-center justify-center ${!selectedEl.properties.strokeDasharray || selectedEl.properties.strokeDasharray === 'none'
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-300 hover:border-gray-400'
                           }`}
                         title="Solid Line"
                       >
@@ -546,8 +561,8 @@ const FloatingToolbar = ({
                           properties: { ...selectedEl.properties, strokeDasharray: '5,5' }
                         })}
                         className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '5,5'
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-300 hover:border-gray-400'
                           }`}
                         title="Dashed Line"
                       >
@@ -560,8 +575,8 @@ const FloatingToolbar = ({
                           properties: { ...selectedEl.properties, strokeDasharray: '2,2' }
                         })}
                         className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '2,2'
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-300 hover:border-gray-400'
                           }`}
                         title="Dotted Line"
                       >
@@ -576,8 +591,8 @@ const FloatingToolbar = ({
                           properties: { ...selectedEl.properties, strokeDasharray: '5,5,2,2' }
                         })}
                         className={`w-10 h-10 border rounded-md flex items-center justify-center ${selectedEl.properties.strokeDasharray === '5,5,2,2'
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-300 hover:border-gray-400'
                           }`}
                         title="Dash-Dot Line"
                       >
@@ -832,8 +847,8 @@ const FloatingToolbar = ({
             onClick={addPage}
             disabled={totalPages >= 50}
             className={`p-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg ${totalPages >= 50
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:scale-105'
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:scale-105'
               }`}
             title={totalPages >= 50 ? "Maximum page limit reached (50 pages)" : "Add Page"}
           >

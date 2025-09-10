@@ -7,7 +7,14 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Check if pageSettings exists, if not use fallback values
     if (!page.pageSettings) {
-      console.error('Page settings not found for page at index:', pageIndex);
+      // console.error('Page settings not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Page settings not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Update the page to include pageSettings if missing
       const defaultSettings = { width: 794, height: 1123 };
       setProject(prev => {
@@ -26,7 +33,14 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Also check if elements array exists
     if (!page.elements) {
-      console.error('Elements array not found for page at index:', pageIndex);
+      // console.error('Elements array not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Elements array not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Update the page to include elements array if missing
       setProject(prev => {
         const newProject = {
@@ -95,7 +109,14 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
     if (!page) return;
 
     if (!page.pageSettings || !page.elements) {
-      console.error('Page structure invalid in deleteElement, fixing...');
+      // console.error('Page structure invalid in deleteElement, fixing...');
+      Swal.fire({
+        title: "Page structure invalid in deleteElement, fixing...",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Fix the page structure first
       const defaultSettings = { width: 794, height: 1123 };
       setProject(prev => {
@@ -142,12 +163,26 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Add defensive checks to prevent the error
     if (!page) {
-      console.error('Page not found at index:', pageIndex);
+      // console.error('Page not found at index:', pageIndex);
+      Swal.fire({
+        title: "Page not found at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
     if (!page.pageSettings) {
-      console.error('Page settings not found for page at index:', pageIndex);
+      // console.error('Page settings not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Page settings not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Fallback to default page settings
       const defaultSettings = { width: 794, height: 1123 };
       const newElement = {
@@ -249,12 +284,26 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Add defensive checks to prevent the error
     if (!page) {
-      console.error('Page not found at index:', pageIndex);
+      // console.error('Page not found at index:', pageIndex);
+      Swal.fire({
+        title: "Page not found at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
     if (!page.pageSettings) {
-      console.error('Page settings not found for page at index:', pageIndex);
+      // console.error('Page settings not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Page settings not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Fallback to default page settings
       const defaultSettings = { width: 794, height: 1123 };
       const newElement = {
@@ -322,12 +371,26 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Add defensive checks to prevent the error
     if (!page) {
-      console.error('Page not found at index:', pageIndex);
+      // console.error('Page not found at index:', pageIndex);
+      Swal.fire({
+        title: "Page not found at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
     if (!page.pageSettings) {
-      console.error('Page settings not found for page at index:', pageIndex);
+      // console.error('Page settings not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Page settings not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Fallback to default page settings
       const defaultSettings = { width: 794, height: 1123 };
       const newElement = {
@@ -411,12 +474,26 @@ export const useElements = (project, setProject, generateId, currentEditingPage,
 
     // Add defensive checks to prevent the error
     if (!page) {
-      console.error('Page not found at index:', pageIndex);
+      // console.error('Page not found at index:', pageIndex);
+      Swal.fire({
+        title: "Page not found at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       return;
     }
 
     if (!page.pageSettings) {
-      console.error('Page settings not found for page at index:', pageIndex);
+      // console.error('Page settings not found for page at index:', pageIndex);
+      Swal.fire({
+        title: "Page settings not found for page at index:",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       // Fallback to default page settings
       const defaultSettings = { width: 794, height: 1123 };
       let newElement = null;

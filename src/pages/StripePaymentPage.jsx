@@ -55,7 +55,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                     setError('Invalid response from payment server. Please try again.');
                 }
             } catch (err) {
-                console.error('Error creating payment intent:', err);
+                // console.error('Error creating payment intent:', err);
                 if (err.response && err.response.status === 401) {
                     setError('Authentication expired. Please log in again.');
                 } else if (err.response && err.response.data && err.response.data.message) {
@@ -134,7 +134,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                     setError('Payment successful but subscription activation failed. Please contact support.');
                 }
             } catch (err) {
-                console.error('Error activating subscription:', err);
+                // console.error('Error activating subscription:', err);
                 if (err.response && err.response.status === 401) {
                     setError('Authentication expired. Please log in again.');
                 } else if (err.response && err.response.data && err.response.data.message) {
@@ -180,7 +180,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                             setError('Payment successful but subscription activation failed. Please contact support.');
                         }
                     } catch (err) {
-                        console.error('Error activating subscription after 3D Secure:', err);
+                        // console.error('Error activating subscription after 3D Secure:', err);
                         if (err.response && err.response.status === 401) {
                             setError('Authentication expired. Please log in again.');
                         } else if (err.response && err.response.data && err.response.data.message) {
@@ -192,7 +192,7 @@ const CheckoutForm = ({ selectedPlan, billingCycle, onSuccess, onError }) => {
                     setLoading(false);
                 }
             } catch (err) {
-                console.error('Error during 3D Secure authentication:', err);
+                // console.error('Error during 3D Secure authentication:', err);
                 setError('Authentication failed. Please try again.');
                 setLoading(false);
             }
@@ -306,7 +306,14 @@ const StripePaymentPage = () => {
     // Create subscription plans data with proper null checks
     const subscriptionPlansData = React.useMemo(() => {
         if (!subscriptionPlans || subscriptionPlans.length === 0) {
-            console.log("No subscription plans available from context");
+            // console.log("No subscription plans available from context");
+            Swal.fire({
+                title: "No subscription plans available from context",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             return [];
         }
 
@@ -314,7 +321,14 @@ const StripePaymentPage = () => {
         const getPlanData = (planName) => {
             const plan = subscriptionPlans.find((p) => p.name === planName);
             if (!plan) {
-                console.warn(`Plan ${planName} not found in subscription plans`);
+                // console.warn(`Plan ${planName} not found in subscription plans`);
+                Swal.fire({
+                    title: `Plan ${planName} not found in subscription plans`,
+                    icon: "warning",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                });
                 return null;
             }
             return plan;
@@ -326,7 +340,14 @@ const StripePaymentPage = () => {
 
         // Return empty array if any required plan is missing
         if (!basicPlan || !proPlan || !enterprisePlan) {
-            console.error("One or more required subscription plans are missing");
+            // console.error("One or more required subscription plans are missing");
+            Swal.fire({
+                title: "One or more required subscription plans are missing",
+                icon: "warning",
+                timer: 1500,
+                showConfirmButton: false,
+                showCancelButton: false,
+            });
             return [];
         }
 
@@ -422,7 +443,15 @@ const StripePaymentPage = () => {
     };
 
     const handlePaymentError = (error) => {
-        console.error('Payment error:', error);
+        // console.error('Payment error:', error);
+        Swal.fire({
+            title: 'Payment error:',
+            icon: "warning",
+            text: error,
+            timer: 1500,
+            showConfirmButton: false,
+            showCancelButton: false,
+        });
         // Error is handled in the CheckoutForm component
     };
 

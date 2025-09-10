@@ -475,7 +475,7 @@ const CompanyProfileUpdate = () => {
                 }, 1500);
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             Swal.fire({
                 title: 'Failed to update profile ',
                 text: `${error.response?.data?.message || error.message}`,

@@ -23,7 +23,7 @@ const handlePDFGeneration = async (proposal) => {
     loadingDiv.innerHTML = 'Preparing PDF export...';
     document.body.appendChild(loadingDiv);
     try {
-        console.log("Sending request to generate PDF...");
+        // console.log("Sending request to generate PDF...");
         let jsonData = null;
         let isCompressed = false;
         if (shouldCompress(project)) {
@@ -48,9 +48,9 @@ const handlePDFGeneration = async (proposal) => {
             }
         );
 
-        console.log("Response status:", res.status);
+        // console.log("Response status:", res.status);
         const contentType = (res.headers && (res.headers['content-type'] || res.headers['Content-Type'])) || '';
-        console.log("Content type:", contentType);
+        // console.log("Content type:", contentType);
 
         // If server sent JSON, extract and show the error/info
         if (contentType && contentType.includes('application/json')) {
@@ -67,7 +67,7 @@ const handlePDFGeneration = async (proposal) => {
         const pdfBlob = res.data && res.data instanceof Blob ? res.data : new Blob([res.data], { type: 'application/pdf' });
 
         const blobUrl = URL.createObjectURL(pdfBlob);
-        console.log("Blob URL:", blobUrl);
+        // console.log("Blob URL:", blobUrl);
         // Download automatically
         const link = document.createElement("a");
         link.href = blobUrl;
@@ -75,7 +75,7 @@ const handlePDFGeneration = async (proposal) => {
             .toISOString()
             .slice(0, 19)
             .replace(/:/g, "-")}.pdf`;
-        console.log("Link:", link);
+        // console.log("Link:", link);
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -86,7 +86,7 @@ const handlePDFGeneration = async (proposal) => {
         // Cleanup
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch (err) {
-        console.error("PDF export error:", err);
+        // console.error("PDF export error:", err);
         Swal.fire({
             title: "Failed to generate PDF. Please try again.",
             icon: "error",

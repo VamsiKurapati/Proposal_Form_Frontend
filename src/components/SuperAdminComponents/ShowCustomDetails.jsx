@@ -58,7 +58,14 @@ const ShowCustomDetails = () => {
       setIsFormDataEditing(false);
       setEditFormData(null);
     } catch (error) {
-      console.error("Error editing custom plan:", error);
+      // console.error("Error editing custom plan:", error);
+      Swal.fire({
+        title: "Failed to edit custom plan",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw error;
     }
   };
@@ -96,7 +103,14 @@ const ShowCustomDetails = () => {
         showConfirmButton: false,
         showCancelButton: false,
       });
-      console.error(error);
+      // console.error(error);
+      Swal.fire({
+        title: "Failed to delete custom plan",
+        icon: "error",
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
     });
   }
 
@@ -176,7 +190,14 @@ const ShowCustomDetails = () => {
           showConfirmButton: false,
           showCancelButton: false,
         });
-        console.error(error);
+        // console.error(error);
+        Swal.fire({
+          title: "Failed to send request. Please try again.",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       })
       .finally(() => setLoading(false));
   };
@@ -190,11 +211,18 @@ const ShowCustomDetails = () => {
         const response = await axios.get(`${baseUrl}/admin/getCustomPlanData`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log(response.data);
+        // console.log(response.data);
         setCustomPlans(response.data);
         setFilteredPlans(response.data);
       } catch (err) {
         setError(err);
+        Swal.fire({
+          title: "Failed to fetch custom plans",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       } finally {
         setLoading(false);
       }
@@ -205,7 +233,7 @@ const ShowCustomDetails = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setPaymentDetails(response.data[0]);
-      console.log("Payment Details", response.data);
+      // console.log("Payment Details", response.data);
     };
 
     fetchPaymentdetails();
@@ -302,7 +330,14 @@ const ShowCustomDetails = () => {
           showConfirmButton: false,
           showCancelButton: false,
         });
-        console.error(error);
+        // console.error(error);
+        Swal.fire({
+          title: "Failed to submit custom plan",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       })
       .finally(() => setLoading(false));
   };
@@ -357,7 +392,14 @@ const ShowCustomDetails = () => {
           showConfirmButton: false,
           showCancelButton: false,
         });
-        console.error(error);
+        // console.error(error);
+        Swal.fire({
+          title: "Failed to update payment details",
+          icon: "error",
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
       });
   };
 
