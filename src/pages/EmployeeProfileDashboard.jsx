@@ -289,7 +289,7 @@ const EmployeeProfileDashboard = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
                       disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
                       title={role === "Viewer" ? "Viewer cannot edit proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can edit this proposal" : "Edit Details"}
                       onClick={() => navigate('/proposal_page', { state: { proposal: proposal.generatedProposal, proposalType: `${proposal.rfpId ? "RFP" : proposal.grantId ? "GRANT" : "No"}`, proposalId: proposal._id } })}>
@@ -327,7 +327,7 @@ const EmployeeProfileDashboard = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+                      className="text-[#2563EB] text-[14px] font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
                       disabled={role === "Viewer" || (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email))}
                       title={role === "Viewer" ? "Viewer cannot view proposals" : (role !== "company" && !(proposal.currentEditor && proposal.currentEditor.email === employeeData.email)) ? "Only current editor can view this proposal" : "View Details"}
                       onClick={() => handleGeneratePDF(proposal.generatedProposal)}>
