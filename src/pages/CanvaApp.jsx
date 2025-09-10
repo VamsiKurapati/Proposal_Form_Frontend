@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import axios from 'axios';
-import { MdOutlineArrowBack, MdOutlineInfo, MdOutlineRefresh } from 'react-icons/md';
+import { MdOutlineArrowBack, MdOutlineInfo, MdOutlineRefresh, MdOutlineClose } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProject';
 import { useElements } from '../hooks/useElements';
@@ -1128,7 +1128,7 @@ const CanvaApp = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50" style={{ transition: 'opacity 0.3s ease-in-out' }}>
             <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl mb-4">
               <div className="flex justify-end">
-                <button className="bg-[#2563EB] text-white px-5 py-2 rounded-lg transition text-[16px]" onClick={() => setInitialLoad(false)}>X</button>
+                <button className="flex items-center justify-center" onClick={() => setInitialLoad(false)}><MdOutlineClose className="w-6 h-6 text-red-500 hover:text-red-600" /></button>
               </div>
               <h3 className="text-xl font-semibold text-[#2563EB] mb-3">Instructions</h3>
               <p className="text-[#2563EB] text-sm leading-relaxed">
@@ -1136,13 +1136,13 @@ const CanvaApp = () => {
               </p>
               <ul className="text-[#111827] text-sm leading-relaxed text-left">
                 <li><span className="text-[#000000] text-sm leading-relaxed text-left">1.Do not delete default text boxes <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">To ensure basic & advanced compliance checks work correctly, always edit the existing default text boxes instead of deleting and replacing them.</span>
                 </li>
-                <li><span className="text-[#000000] text-sm leading-relaxed text-left">2. Be cautious with large content sections / <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
+                <li><span className="text-[#000000] text-sm leading-relaxed text-left">2. Be cautious with large content sections <br /></span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">If a section contains a large amount of content, it may appear scrollable in the editor but could get cut off during PDF export. Adjust content to fit within visible bounds.</span>
                 </li>
-                <li><span className="text-[#000000] text-sm leading-relaxed text-left">3. Use overlays creatively / <br /></span>
-                  <span className="text-[#111827] text-sm leading-relaxed text-left ml-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
+                <li><span className="text-[#000000] text-sm leading-relaxed text-left">3. Use overlays creatively <br /></span>
+                  <span className="text-[#111827] text-sm leading-relaxed text-left pl-4 mt-[2px]">You can overlay shapes, text, and images to create more visually appealing designs. Make sure the elements are properly aligned and do not obstruct readability.</span>
                 </li>
               </ul>
             </div>
