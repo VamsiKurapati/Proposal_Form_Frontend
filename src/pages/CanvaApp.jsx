@@ -342,7 +342,15 @@ const CanvaApp = () => {
     if (location.state?.jsonData && !hasLoadedJSON) {
       try {
         // Use the JSON data from the navigation state if it exists, otherwise use the project from localStorage
-        const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
+        // const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
+        let jsonData = null;
+        if (location.state.jsonData) {
+          jsonData = location.state.jsonData;
+          console.log('jsonData from navigation state', jsonData);
+        } else {
+          jsonData = localStorage.getItem('canva-project');
+          console.log('jsonData from localStorage', jsonData);
+        }
         const proposalId = location.state.proposalId || localStorage.getItem('proposalId');
 
         localStorage.setItem('proposalId', proposalId);
