@@ -126,12 +126,12 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
           <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
             <div className="flex flex-col">
               <span className="text-[14px] text-[#111827]">{deadline.title}</span>
-              <span className="text-[11px] text-[#9CA3AF]">{deadline.date}</span>
+              <span className="text-[11px] text-[#9CA3AF]">{deadline.endDate}</span>
             </div>
             <StatusBadge status={deadline.status} />
           </div>
         ))}
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <h4 className="font-semibold text-[16px] mb-4">Recent Activity</h4>
           {activity.map((act, i) => (
             <div key={i} className="flex justify-between rounded-lg items-center bg-[#F9FAFB] p-2 mb-2">
@@ -141,7 +141,7 @@ const RightSidebar = ({ deadlines, activity, isMobile, onClose }) => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -808,6 +808,9 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         });
       }
       onClose();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       //console.error('Error adding document:', error);
       Swal.fire({

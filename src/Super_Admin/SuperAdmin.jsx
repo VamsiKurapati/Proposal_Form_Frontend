@@ -24,7 +24,6 @@ import {
     MdOutlineFileDownload,
     MdLanguage,
     MdOutlinePhone,
-    MdOutlineSubscriptions,
     MdOutlinePermContactCalendar
 } from 'react-icons/md';
 import { IoLogoLinkedin } from "react-icons/io";
@@ -32,7 +31,7 @@ import { LuCrown } from "react-icons/lu";
 import { FaRegCheckCircle } from "react-icons/fa";
 
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import ToastContainer from '../pages/ToastContainer';
 import { toast } from 'react-toastify';
 import Card from '../components/SuperAdminComponents/Card';
@@ -50,7 +49,6 @@ import payment from '../assets/superAdmin/payment.png';
 import error from '../assets/superAdmin/error.png';
 import request from '../assets/superAdmin/request.png';
 import other from '../assets/superAdmin/other.png';
-import { Edit3 } from 'lucide-react';
 import ShowCustomDetails from '../components/SuperAdminComponents/ShowCustomDetails';
 
 

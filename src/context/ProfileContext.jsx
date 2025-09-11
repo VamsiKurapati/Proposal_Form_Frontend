@@ -39,6 +39,8 @@ export const ProfileProvider = ({ children }) => {
                     phone: response.data.phone,
                     website: response.data.website,
                     linkedIn: response.data.linkedIn,
+                    activity: response.data.activity || [],
+                    deadlines: response.data.deadlines || [],
                     profile: {
                         bio: response.data.bio,
                         services: response.data.services,
