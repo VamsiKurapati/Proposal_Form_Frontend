@@ -1242,17 +1242,16 @@ const CanvaApp = () => {
           {!isGridView && (
             //Add a back button to go back to the previous page
             <>
-              <div className="absolute top-2 left-4 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+              <div className="absolute top-2 left-4 z-10 flex items-center gap-2" style={{ transition: 'opacity 0.3s ease-in-out' }}>
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => navigate(-1)} title="Back">
                   <MdOutlineArrowBack className="w-4 h-4" />
                 </button>
-              </div>
-              {/* Show an Option to display instructions, if initialLoad is true or false */}
-              <div className="absolute top-2 left-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => setInitialLoad(!initialLoad)} title={initialLoad ? "Hide Instructions" : "Show Instructions"}>
                   <MdOutlineInfo className="w-4 h-4" />
                 </button>
               </div>
+
               <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
                 <FloatingToolbar
                   addTextElement={addTextElementWithHistory}
