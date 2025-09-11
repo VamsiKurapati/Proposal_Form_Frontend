@@ -300,6 +300,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           showCancelButton: false,
         });
       }
+      window.location.reload();
       onClose();
     } catch (error) {
       //console.error('Error adding team member:', error);
@@ -505,6 +506,10 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
           showConfirmButton: false,
           showCancelButton: false,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        window.location.reload();
       }
       onClose();
     } catch (error) {
@@ -629,7 +634,6 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
     name: '',
     issuer: '',
     validTill: '',
-    description: ''
   });
 
   const handleSubmit = async (e) => {
@@ -651,6 +655,9 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
           showCancelButton: false,
         });
       }
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
       //console.log('Response:', response.data.message);
       onClose();
     } catch (error) {
@@ -709,16 +716,6 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
               onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-              rows="3"
             />
           </div>
 
@@ -810,6 +807,9 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
           showCancelButton: false,
         });
       }
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
       onClose();
       setTimeout(() => {
         window.location.reload();
