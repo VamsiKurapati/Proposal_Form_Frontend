@@ -114,7 +114,7 @@ export default function ChangePassword() {
             if (response.status === 201) {
                 toast.success("Password changed successfully");
                 setTimeout(() => {
-                    navigate("/");
+                    navigate(-1);
                 }, 2000);
             }
         } catch (error) {
@@ -255,7 +255,7 @@ export default function ChangePassword() {
                     </div>
 
                     <div className="flex justify-end gap-2">
-                        <button type="button" className="w-1/2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 flex items-center justify-center gap-2" onClick={() => navigate("/")}>
+                        <button type="button" className="w-1/2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 flex items-center justify-center gap-2" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
                         <button type="submit" className="w-1/2 bg-[#2563EB] text-white px-4 py-2 rounded-md hover:bg-[#1D4ED8] flex items-center justify-center gap-2" disabled={loading}>
