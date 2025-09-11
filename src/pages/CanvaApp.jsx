@@ -1114,7 +1114,7 @@ const CanvaApp = () => {
     if (initialLoad) {
       setTimeout(() => {
         setInitialLoad(false);
-      }, 15000);
+      }, 30000); //30 seconds to handle the case where the user is not closing the instructions by himself
     }
   }, [initialLoad]);
 
@@ -1291,6 +1291,13 @@ const CanvaApp = () => {
 
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => localStorage.getItem('proposalType') === "RFP" ? handleContinue() : handlePDFGeneration()} title={localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"} style={{ marginLeft: '8px' }}>
                   {localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"}
+                </button>
+              </div>
+
+              {/* Show an Option to display instructions, if initialLoad is true or false */}
+              <div className="absolute top-8 right-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => setInitialLoad(!initialLoad)} title={initialLoad ? "Hide Instructions" : "Show Instructions"}>
+                  <MdOutlineInfo className="w-4 h-4" /> {initialLoad ? "Hide Instructions" : "Show Instructions"}
                 </button>
               </div>
 

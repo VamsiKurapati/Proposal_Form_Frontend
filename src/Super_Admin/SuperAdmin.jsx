@@ -673,86 +673,102 @@ const SuperAdmin = () => {
     const [filteredEnterpriseSupport, setFilteredEnterpriseSupport] = useState([]);
     const [filteredNotifications, setFilteredNotifications] = useState([]);
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseUrl}/admin/getCompanyStatsAndData`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const stats = response.data.stats;
-            setUsersStats(stats);
-            const companiesData = response.data.CompanyData;
-            setCompaniesData(companiesData);
-            setFilteredUsers(companiesData);
-            planManagementStats["Active Users"] = stats["Active Users"];
-        } catch (error) {
-            //console.log("error", error);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const fetchCompanyStats = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${baseUrl}/admin/getCompanyStatsAndData`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const stats = response.data.stats;
+                setUsersStats(stats);
+                const companiesData = response.data.CompanyData;
+                setCompaniesData(companiesData);
+                setFilteredUsers(companiesData);
+                planManagementStats["Active Users"] = stats["Active Users"];
+            } catch (error) {
+                //console.log("error", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompanyStats();
     }, []);
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseUrl}/admin/getPaymentStatsAndData`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const paymentsData = response.data.PaymentData;
-            setPaymentsData(paymentsData);
-            const ps = response.data.PaymentStats || {};
-            const { ["Revenue This Month"]: revenueThisMonth, ...otherStats } = ps;
-            setPaymentsStats(otherStats);
-            planManagementStats["Revenue This Month"] = revenueThisMonth ?? 0;
-            setFilteredTransactions(paymentsData);
-        } catch (error) {
-            //console.log("error", error);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const fetchPaymentStats = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${baseUrl}/admin/getPaymentStatsAndData`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const paymentsData = response.data.PaymentData;
+                setPaymentsData(paymentsData);
+                const ps = response.data.PaymentStats || {};
+                const { ["Revenue This Month"]: revenueThisMonth, ...otherStats } = ps;
+                setPaymentsStats(otherStats);
+                planManagementStats["Revenue This Month"] = revenueThisMonth ?? 0;
+                setFilteredTransactions(paymentsData);
+            } catch (error) {
+                //console.log("error", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPaymentStats();
     }, []);
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseUrl}/admin/getSupportStatsAndData`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const supportTicketsData = response.data.TicketData;
-            setSupportTicketsData(supportTicketsData);
-            const supportTicketsStats = response.data.TicketStats;
-            setSupportTicketsStats(supportTicketsStats);
-            setFilteredSupport(supportTicketsData);
-            setFilteredEnterpriseSupport((supportTicketsData || []).filter(t => (t.plan_name || '').toLowerCase() === 'enterprise'));
-        } catch (error) {
-            //console.log("error", error);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const fetchSupportStats = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${baseUrl}/admin/getSupportStatsAndData`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const supportTicketsData = response.data.TicketData;
+                setSupportTicketsData(supportTicketsData);
+                const supportTicketsStats = response.data.TicketStats;
+                setSupportTicketsStats(supportTicketsStats);
+                setFilteredSupport(supportTicketsData);
+                setFilteredEnterpriseSupport((supportTicketsData || []).filter(t => (t.plan_name || '').toLowerCase() === 'enterprise'));
+            } catch (error) {
+                //console.log("error", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSupportStats();
     }, []);
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseUrl}/admin/getNotificationsData`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const notificationsData = response.data;
-            setNotificationsData(notificationsData);
-            setFilteredNotifications(notificationsData);
-        } catch (error) {
-            //console.log("error", error);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const fetchNotificationsData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${baseUrl}/admin/getNotificationsData`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const notificationsData = response.data;
+                setNotificationsData(notificationsData);
+                setFilteredNotifications(notificationsData);
+            } catch (error) {
+                //console.log("error", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNotificationsData();
     }, []);
 
     useEffect(() => {
@@ -3340,10 +3356,6 @@ const SuperAdmin = () => {
         );
     };
 
-    const handleChangePassword = () => {
-        navigate('/change-password');
-    };
-
     const handleLogout = async () => {
         try {
             const res = await axios.post(`${baseUrl}/auth/logout`, {}, {
@@ -4381,7 +4393,7 @@ const SuperAdmin = () => {
 
                                 {/* Change Password */}
                                 <button
-                                    onClick={() => handleChangePassword()}
+                                    onClick={() => navigate('/change-password')}
                                     className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
                                 >
                                     <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
@@ -4524,7 +4536,7 @@ const SuperAdmin = () => {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleChangePassword()}
+                                    onClick={() => navigate('/change-password')}
                                     className="w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors "
                                 >
                                     <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
@@ -4593,7 +4605,7 @@ const SuperAdmin = () => {
                                 {showProfile && (
                                     <div className="absolute top-16 right-0 w-64 bg-[#F8F9FA] rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000">
                                         {/* <button className="w-full text-left rounded-lg p-2 flex items-center space-x-3 transition-colors text-[#4B5563]"
-                                                    onClick={() => handleChangePassword()}
+                                                    onClick={() => navigate('/change-password')}
                                                 >
                                                     <MdOutlineLock className="w-4 h-4" />
                                                     <span className="text-[16px] font-medium">Change Password</span>
