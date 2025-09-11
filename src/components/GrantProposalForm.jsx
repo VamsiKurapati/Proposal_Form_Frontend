@@ -240,7 +240,7 @@ const GrantProposalForm = ({
                     {/* Budget */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Budget <span className="text-gray-500 text-xs">*</span>
+                            Budget <span className="text-red-500 text-xs">*</span>
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
@@ -276,7 +276,7 @@ const GrantProposalForm = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                                    Cost Share Required <span className="text-gray-500 text-xs">*</span>
+                                    Cost Share Required <span className="text-red-500 text-xs">*</span>
                                 </label>
                                 <textarea
                                     value={grantProposalData.budget.cost_share_required}
@@ -288,7 +288,7 @@ const GrantProposalForm = ({
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                                    Budget Breakdown <span className="text-gray-500 text-xs">*</span>
+                                    Budget Breakdown <span className="text-red-500 text-xs">*</span>
                                 </label>
                                 <textarea
                                     value={grantProposalData.budget.budget_breakdown}
@@ -304,7 +304,7 @@ const GrantProposalForm = ({
                     {/* Methods for Measuring Success */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Methods for Measuring Success <span className="text-gray-500 text-xs">*</span>
+                            Methods for Measuring Success <span className="text-red-500 text-xs">*</span>
                         </label>
                         <textarea
                             value={grantProposalData.methods_for_measuring_success}

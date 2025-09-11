@@ -328,7 +328,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name<span className="text-red-500">*</span></label>
             <input
               type="text"
               value={formData.name}
@@ -339,7 +339,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Short Description<span className="text-red-500">*</span></label>
             <textarea
               value={formData.shortDesc}
               onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
@@ -349,7 +349,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualification</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Highest Qualification<span className="text-red-500">*</span></label>
             <input
               type="text"
               value={formData.highestQualification}
@@ -360,7 +360,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)<span className="text-red-500">*</span></label>
             <input
               type="text"
               value={formData.skills}
@@ -372,7 +372,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Job Title<span className="text-red-500">*</span></label>
             <input
               type="text"
               value={formData.jobTitle}
@@ -383,7 +383,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email<span className="text-red-500">*</span></label>
             <input
               type="email"
               value={formData.email}
@@ -394,7 +394,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone<span className="text-red-500">*</span></label>
             <input
               type="tel"
               value={formData.phone}
@@ -405,7 +405,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Access Level<span className="text-red-500">*</span></label>
             <select
               value={formData.accessLevel}
               onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}

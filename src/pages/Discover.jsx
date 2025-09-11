@@ -1613,7 +1613,7 @@ const Discover = () => {
   );
 
   const RecentRFPCard = ({ rfp, isSaved }) => (
-    <div className="bg-white rounded-xl p-4 shadow-sm w-[355px] mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0">
+    <div className={`bg-white rounded-xl p-4 shadow-sm w-full mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0`}>
       {/* Top Row: Title and Actions */}
       <div>
         <div className="flex justify-between items-center gap-8 mb-2">
@@ -1809,8 +1809,8 @@ const Discover = () => {
     </div>
   );
 
-  const RecentGrantCard = ({ grant, isSaved }) => (
-    <div className="bg-white rounded-xl p-4 shadow-sm w-[355px] mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0">
+  const RecentGrantCard = ({ grant, isSaved, width }) => (
+    <div className={`bg-white rounded-xl p-4 shadow-sm ${width === "355px" ? "w-[355px]" : "w-full"} mr-4 flex flex-col justify-between border border-[#E5E7EB] flex-shrink-0`}>
       <div>
         <div className="flex justify-between items-center gap-8 mb-2">
           <h3 className="font-semibold text-[#111827] text-[18px] line-clamp-2">{grant.OPPORTUNITY_TITLE}</h3>
@@ -2748,6 +2748,7 @@ const Discover = () => {
                       grant={grant}
                       isSaved={!!savedGrants.find((s) => s._id === grant._id)}
                       handleGenerateProposal={handleGenerateGrantProposal}
+                      width="355px"
                     />
                   ))}
                 </div>
@@ -2812,6 +2813,7 @@ const Discover = () => {
                         grant={grant}
                         isSaved={!!savedGrants.find((s) => s._id === grant._id)}
                         handleGenerateProposal={handleGenerateGrantProposal}
+                        width="full"
                       />
                     ))}
                   </div>
