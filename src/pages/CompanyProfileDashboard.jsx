@@ -427,7 +427,6 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
-              onClick={() => handleSubmit(formData)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Member
