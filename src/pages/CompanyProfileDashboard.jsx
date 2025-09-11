@@ -299,8 +299,10 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           showConfirmButton: false,
           showCancelButton: false,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
-      window.location.reload();
       onClose();
     } catch (error) {
       //console.error('Error adding team member:', error);
@@ -311,6 +313,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      return;
     }
   };
 
@@ -510,7 +513,6 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         setTimeout(() => {
           window.location.reload();
         }, 1500);
-        window.location.reload();
       }
       onClose();
     } catch (error) {
@@ -522,6 +524,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      return;
     }
   };
 
@@ -671,6 +674,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      return;
     }
   };
 
@@ -809,14 +813,11 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
           showConfirmButton: false,
           showCancelButton: false,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
       onClose();
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
     } catch (error) {
       //console.error('Error adding document:', error);
       Swal.fire({
@@ -826,6 +827,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      return;
     }
   };
 
