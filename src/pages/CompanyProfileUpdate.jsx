@@ -249,7 +249,7 @@ const PhoneInputField = ({
 
 const CompanyProfileUpdate = () => {
     const navigate = useNavigate();
-    const { companyData, loading } = useProfile();
+    const { companyData, setCompanyData, loading } = useProfile();
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
@@ -445,6 +445,7 @@ const CompanyProfileUpdate = () => {
             formData.append("linkedIn", form.linkedIn);
             formData.append("bio", form.bio);
             formData.append("preferredIndustries", JSON.stringify(form.preferredIndustries));
+            const filteredPreferredIndustries = form.preferredIndustries.filter(industry => industry.trim());
             const filteredServices = form.services.filter(service => service.trim());
             formData.append("services", JSON.stringify(filteredServices));
             const filteredAwards = form.awards.filter(award => award.trim());
@@ -470,6 +471,30 @@ const CompanyProfileUpdate = () => {
                     showConfirmButton: false,
                     showCancelButton: false,
                 });
+                setCompanyData(prevData => ({
+                    ...prevData,
+                    companyName: form.companyName,
+                    adminName: form.adminName,
+                    industry: form.industry,
+                    location: form.location,
+                    email: form.email,
+                    phone: form.phone,
+                    website: form.website,
+                    linkedIn: form.linkedIn,
+                    profile: {
+                        ...prevData.profile,
+                        bio: form.bio,
+                        services: filteredServices,
+                        awards: filteredAwards,
+                        clients: filteredClients,
+                        preferredIndustries: filteredPreferredIndustries,
+                    },
+                    companyDetails: {
+                        ...prevData.companyDetails,
+                        "No.of employees": { value: form.numberOfEmployees },
+                        "Founded": { value: form.founded },
+                    }
+                }));
                 setTimeout(() => {
                     navigate("/company_profile_dashboard");
                 }, 1500);
