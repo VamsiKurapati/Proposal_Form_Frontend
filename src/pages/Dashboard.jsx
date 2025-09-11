@@ -1129,7 +1129,7 @@ const Dashboard = () => {
                                 : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
                                 }`}
                             onClick={role === "Viewer" ? undefined : () => setShowDeleteOptions(true)}
-                            disabled={role === "Viewer"}
+                            disabled={role === "Viewer" || paginatedProposals.length === 0}
                             title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete RFP proposals"}
                         >
                             <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete RFP
@@ -1430,7 +1430,7 @@ const Dashboard = () => {
                                 : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
                                 }`}
                             onClick={role === "Viewer" ? undefined : () => setShowGrantDeleteOptions(true)}
-                            disabled={role === "Viewer"}
+                            disabled={role === "Viewer" || paginatedGrantProposals.length === 0}
                             title={role === "Viewer" ? "Viewer cannot delete grant proposals" : "Delete grant proposals"}
                         >
                             <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete Grants
@@ -1674,7 +1674,7 @@ const Dashboard = () => {
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentGrantPage(p => Math.min(totalGrantPages, p + 1))}
-                            disabled={currentGrantPage === totalGrantPages}
+                            disabled={currentGrantPage === totalGrantPages || paginatedGrantProposals.length === 0}
                         >Next</button>
                     </div>
                     {showGrantDeleteOptions && (
@@ -1682,6 +1682,8 @@ const Dashboard = () => {
                             <button
                                 className="bg-red-500 text-white px-4 py-2 rounded"
                                 onClick={handleDeleteGrantProposals}
+                                disabled={paginatedGrantProposals.length === 0}
+                                title={paginatedGrantProposals.length === 0 ? "No grant proposals to delete" : "Delete grant proposals"}
                             >
                                 Delete
                             </button>
@@ -1691,6 +1693,8 @@ const Dashboard = () => {
                                     setShowGrantDeleteOptions(false);
                                     setSelectedGrantProposals([]);
                                 }}
+                                disabled={paginatedGrantProposals.length === 0}
+                                title={paginatedGrantProposals.length === 0 ? "No grant proposals to delete" : "Cancel"}
                             >
                                 Cancel
                             </button>
@@ -1718,7 +1722,8 @@ const Dashboard = () => {
                             <button
                                 className="flex items-center gap-1 px-2 py-1 border rounded text-[#2563EB] border-[#2563EB] text-[14px] md:text-[16px] hover:bg-[#2563EB] hover:text-white"
                                 onClick={() => handleAddEvent()}
-                                disabled={role === "Viewer"}
+                                disabled={role === "Viewer" || paginatedProposals.length === 0}
+                                title={role === "Viewer" || paginatedProposals.length === 0 ? "Viewer cannot add events" : "Add event"}
                             >
                                 <MdOutlineEdit className="w-5 h-5" /> Add Event
                             </button>
@@ -1783,7 +1788,7 @@ const Dashboard = () => {
                                                 className={`${role === "Viewer" ? "text-[#9CA3AF] cursor-not-allowed opacity-50" : "text-[#2563EB]"}`}
                                                 title={role === "Viewer" ? "Viewer cannot delete permanently" : "Delete Permanently"}
                                                 onClick={role === "Viewer" ? undefined : () => handleDeletePermanently(idx)}
-                                                disabled={role === "Viewer"}
+                                                disabled={role === "Viewer" || paginatedDeletedProposals.length === 0}
                                             >
                                                 <MdOutlineDeleteForever className="w-5 h-5" />
                                             </button>
@@ -1804,7 +1809,7 @@ const Dashboard = () => {
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentDeletedPage(p => Math.max(1, p - 1))}
-                            disabled={currentDeletedPage === 1}
+                            disabled={currentDeletedPage === 1 || paginatedDeletedProposals.length === 0}
                         >Prev</button>
                         {Array.from({ length: totalDeletedPages }, (_, i) => (
                             <button
@@ -1817,7 +1822,7 @@ const Dashboard = () => {
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentDeletedPage(p => Math.min(totalDeletedPages, p + 1))}
-                            disabled={currentDeletedPage === totalDeletedPages}
+                            disabled={currentDeletedPage === totalDeletedPages || paginatedDeletedProposals.length === 0}
                         >Next</button>
                     </div>
                 </div>
@@ -1857,7 +1862,7 @@ const Dashboard = () => {
                                                 className={`${role === "Viewer" ? "text-[#9CA3AF] cursor-not-allowed opacity-50" : "text-[#2563EB]"}`}
                                                 title={role === "Viewer" ? "Viewer cannot delete permanently" : "Delete Permanently"}
                                                 onClick={role === "Viewer" ? undefined : () => handleDeleteGrantPermanently(idx)}
-                                                disabled={role === "Viewer"}
+                                                disabled={role === "Viewer" || paginatedDeletedGrantProposals.length === 0}
                                             >
                                                 <MdOutlineDeleteForever className="w-5 h-5" />
                                             </button>
@@ -1878,7 +1883,7 @@ const Dashboard = () => {
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentDeletedGrantPage(p => Math.max(1, p - 1))}
-                            disabled={currentDeletedGrantPage === 1}
+                            disabled={currentDeletedGrantPage === 1 || paginatedDeletedGrantProposals.length === 0}
                         >Prev</button>
                         {Array.from({ length: totalDeletedGrantPages }, (_, i) => (
                             <button
@@ -1890,7 +1895,7 @@ const Dashboard = () => {
                         <button
                             className="px-2 py-1 border rounded disabled:opacity-50"
                             onClick={() => setCurrentDeletedGrantPage(p => Math.min(totalDeletedGrantPages, p + 1))}
-                            disabled={currentDeletedGrantPage === totalDeletedGrantPages}
+                            disabled={currentDeletedGrantPage === totalDeletedGrantPages || paginatedDeletedGrantProposals.length === 0}
                         >Next</button>
                     </div>
                 </div>
