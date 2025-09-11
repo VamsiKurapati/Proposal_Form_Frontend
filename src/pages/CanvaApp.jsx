@@ -346,11 +346,13 @@ const CanvaApp = () => {
         let jsonData = null;
         if (location.state.jsonData) {
           jsonData = location.state.jsonData;
+          setProject(jsonData);
           //Set the location state to null to prevent the user from manipulating the JSON data
           location.state.jsonData = null;
           console.log('jsonData from navigation state', jsonData);
         } else {
           jsonData = localStorage.getItem('canva-project');
+          setProject(jsonData);
           console.log('jsonData from localStorage', jsonData);
         }
         const proposalId = location.state.proposalId || localStorage.getItem('proposalId');
@@ -1109,9 +1111,10 @@ const CanvaApp = () => {
     return () => clearInterval(interval);
   }, [project, autoSave]);
 
-  //Use effect to save the project to localStorage when there is any change in the project
+  //Use effect to save the project to setProject and localStorage when there is any change in the project
   useEffect(() => {
     // console.log("Project changed in CanvaApp");
+    setProject(project);
     localStorage.setItem('canva-project', JSON.stringify(project));
   }, [project]);
 
