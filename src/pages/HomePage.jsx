@@ -157,6 +157,13 @@ export default function HomePage() {
     return "border-[#03D4CC]";
   };
 
+  const handleContactClick = () => {
+    navigate("/contact");
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 100);
+  };
+
   return (
     <section className="w-full font-inter bg-white">
       <Navbar />
@@ -376,7 +383,7 @@ export default function HomePage() {
                   ? "bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
                   : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
-                onClick={() => (plan.name === "Enterprise" && !plan.isContact) ? navigate("/contact") : navigate("/sign_up")}
+                onClick={() => (plan.name === "Enterprise" && !plan.isContact) ? handleContactClick() : navigate("/sign_up")}
               >
                 {plan.button}
               </button>
