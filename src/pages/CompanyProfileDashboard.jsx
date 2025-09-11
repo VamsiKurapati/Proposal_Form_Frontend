@@ -427,7 +427,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
               Cancel
             </button>
             <button
-              type="submit"
+              type="button"
               onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
@@ -617,7 +617,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               Cancel
             </button>
             <button
-              type="submit"
+              type="button"
               onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
@@ -730,7 +730,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
               Cancel
             </button>
             <button
-              type="submit"
+              type="button"
               onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
@@ -913,7 +913,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
               Cancel
             </button>
             <button
-              type="submit"
+              type="button"
               onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
