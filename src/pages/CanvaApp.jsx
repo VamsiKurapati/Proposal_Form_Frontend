@@ -342,19 +342,7 @@ const CanvaApp = () => {
     if (location.state?.jsonData && !hasLoadedJSON) {
       try {
         // Use the JSON data from the navigation state if it exists, otherwise use the project from localStorage
-        // const jsonData = location.state.jsonData || localStorage.getItem('canva-project');
-        let jsonData = null;
-        if (location.state.jsonData) {
-          jsonData = location.state.jsonData;
-          setProject(jsonData);
-          //Set the location state to null to prevent the user from manipulating the JSON data
-          location.state.jsonData = null;
-          console.log('jsonData from navigation state', jsonData);
-        } else {
-          jsonData = localStorage.getItem('canva-project');
-          setProject(jsonData);
-          console.log('jsonData from localStorage', jsonData);
-        }
+        const jsonData = localStorage.getItem('canva-project') || location.state.jsonData;
         const proposalId = location.state.proposalId || localStorage.getItem('proposalId');
 
         localStorage.setItem('proposalId', proposalId);
@@ -1114,7 +1102,7 @@ const CanvaApp = () => {
   //Use effect to save the project to setProject and localStorage when there is any change in the project
   useEffect(() => {
     // console.log("Project changed in CanvaApp");
-    setProject(project);
+    // setProject(project);
     localStorage.setItem('canva-project', JSON.stringify(project));
   }, [project]);
 
