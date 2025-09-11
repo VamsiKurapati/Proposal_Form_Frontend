@@ -712,7 +712,7 @@ const SuperAdmin = () => {
                 const ps = response.data.PaymentStats || {};
                 const { ["Revenue This Month"]: revenueThisMonth, ...otherStats } = ps;
                 setPaymentsStats(otherStats);
-                planManagementStats["Revenue This Month"] = revenueThisMonth ?? 0;
+                planManagementStats["Revenue This Month"] = revenueThisMonth || 0;
                 setFilteredTransactions(paymentsData);
             } catch (error) {
                 //console.log("error", error);
@@ -793,7 +793,8 @@ const SuperAdmin = () => {
                 return (
                     (transaction.transaction_id && transaction.transaction_id.toLowerCase().includes(term)) ||
                     (transaction.user_id && transaction.user_id.toLowerCase().includes(term)) ||
-                    (transaction.payment_method && String(transaction.payment_method).toLowerCase().includes(term))
+                    (transaction.payment_method && String(transaction.payment_method).toLowerCase().includes(term)) ||
+                    (transaction.companyName && transaction.companyName.toLowerCase().includes(term))
                 );
             }));
         } else {
@@ -2358,7 +2359,7 @@ const SuperAdmin = () => {
                     <div>
                         <h2 className="text-white text-2xl font-bold">Active Users</h2>
                         <p className="text-white text-4xl font-bold mt-2">
-                            {usersStats["Active Users"]}
+                            {planManagementStats["Active Users"]}
                         </p>
 
                     </div>
@@ -2378,7 +2379,7 @@ const SuperAdmin = () => {
 
                         <h2 className="text-white text-2xl font-bold">Revenue This Month</h2>
                         <p className="text-white text-4xl font-bold mt-2">
-                            {paymentsStats["Revenue This Month"]}
+                            {planManagementStats["Revenue This Month"]}
                         </p>
 
                     </div>
