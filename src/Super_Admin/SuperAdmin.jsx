@@ -3340,6 +3340,10 @@ const SuperAdmin = () => {
         );
     };
 
+    const handleChangePassword = () => {
+        navigate('/change-password');
+    };
+
     const handleLogout = async () => {
         try {
             const res = await axios.post(`${baseUrl}/auth/logout`, {}, {
@@ -4377,7 +4381,7 @@ const SuperAdmin = () => {
 
                                 {/* Change Password */}
                                 <button
-                                    onClick={() => navigate("/change-password")}
+                                    onClick={() => handleChangePassword()}
                                     className="w-full text-left rounded-lg p-3 flex items-center space-x-3 transition-colors text-[#4B5563] hover:bg-gray-100"
                                 >
                                     <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
@@ -4520,7 +4524,7 @@ const SuperAdmin = () => {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => navigate('/change-password')}
+                                    onClick={() => handleChangePassword()}
                                     className="w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors "
                                 >
                                     <MdOutlineLock className="w-5 h-5 flex-shrink-0" />
@@ -4589,7 +4593,7 @@ const SuperAdmin = () => {
                                 {showProfile && (
                                     <div className="absolute top-16 right-0 w-64 bg-[#F8F9FA] rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000">
                                         {/* <button className="w-full text-left rounded-lg p-2 flex items-center space-x-3 transition-colors text-[#4B5563]"
-                                                    onClick={() => navigate('/change-password')}
+                                                    onClick={() => handleChangePassword()}
                                                 >
                                                     <MdOutlineLock className="w-4 h-4" />
                                                     <span className="text-[16px] font-medium">Change Password</span>
