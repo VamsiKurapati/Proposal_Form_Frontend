@@ -4578,8 +4578,6 @@ const SuperAdmin = () => {
 
                                 <div className="flex items-center">
                                     <div className="w-full h-8 rounded-lg flex items-center justify-center mr-3">
-
-
                                         <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : activeTab === 'notifications' ? 'Notifications' : 'Contact Request'}</span>
 
                                     </div>
@@ -4588,7 +4586,7 @@ const SuperAdmin = () => {
                             <div className="flex items-center space-x-4">
                                 <button className="p-2 transition-colors relative"
                                     onClick={() => {
-                                        setActiveTab('notifications');
+                                        activeTab === 'notifications' ? setActiveTab('user-management') : setActiveTab('notifications');
                                         closeAllInvoiceRows();
                                     }}
                                 >
