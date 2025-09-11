@@ -346,6 +346,8 @@ const CanvaApp = () => {
         let jsonData = null;
         if (location.state.jsonData) {
           jsonData = location.state.jsonData;
+          //Set the location state to null to prevent the user from manipulating the JSON data
+          location.state.jsonData = null;
           console.log('jsonData from navigation state', jsonData);
         } else {
           jsonData = localStorage.getItem('canva-project');
@@ -354,11 +356,6 @@ const CanvaApp = () => {
         const proposalId = location.state.proposalId || localStorage.getItem('proposalId');
 
         localStorage.setItem('proposalId', proposalId);
-
-        // After using jsonData for 1st time, delete it from the navigation state for security reasons to prevent users from manipulating the JSON data and also to avoid resetting the project when the user refreshes the page
-        if (location.state.jsonData) {
-          delete location.state.jsonData;
-        }
 
         // Import the JSON data into the project
         importFromJSONData(jsonData, setProject, setCurrentEditingPage, setSelectedElement);
@@ -1260,6 +1257,12 @@ const CanvaApp = () => {
                   <MdOutlineArrowBack className="w-4 h-4" />
                 </button>
               </div>
+              {/* Show an Option to display instructions, if initialLoad is true or false */}
+              <div className="absolute top-2 left-8 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => setInitialLoad(!initialLoad)} title={initialLoad ? "Hide Instructions" : "Show Instructions"}>
+                  <MdOutlineInfo className="w-4 h-4" />
+                </button>
+              </div>
               <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
                 <FloatingToolbar
                   addTextElement={addTextElementWithHistory}
@@ -1299,13 +1302,6 @@ const CanvaApp = () => {
 
                 <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => localStorage.getItem('proposalType') === "RFP" ? handleContinue() : handlePDFGeneration()} title={localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"} style={{ marginLeft: '8px' }}>
                   {localStorage.getItem('proposalType') === "RFP" ? "Continue" : "Generate PDF"}
-                </button>
-              </div>
-
-              {/* Show an Option to display instructions, if initialLoad is true or false */}
-              <div className="absolute top-8 right-12 flex items-center gap-2 z-10" style={{ transition: 'opacity 0.3s ease-in-out' }}>
-                <button className="rounded-lg bg-[#2563EB] text-white p-2 hover:bg-[#1d4ed8] transition-colors" onClick={() => setInitialLoad(!initialLoad)} title={initialLoad ? "Hide Instructions" : "Show Instructions"}>
-                  <MdOutlineInfo className="w-4 h-4" /> {initialLoad ? "Hide Instructions" : "Show Instructions"}
                 </button>
               </div>
 
