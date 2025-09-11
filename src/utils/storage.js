@@ -1,4 +1,5 @@
 // Storage utility for handling localStorage operations with quota management
+import Swal from "sweetalert2";
 
 const STORAGE_KEYS = {
     PROJECT: 'canva-project',

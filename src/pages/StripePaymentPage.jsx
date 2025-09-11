@@ -7,6 +7,7 @@ import { MdOutlinePayments, MdOutlineSecurity, MdOutlineSupport } from 'react-ic
 import axios from 'axios';
 import { STRIPE_CONFIG, CARD_ELEMENT_OPTIONS, getStripeErrorMessage, getStripeConfigStatus, handleStripeError } from '../config/stripe';
 import { useSubscriptionPlans } from '../context/SubscriptionPlansContext';
+import Swal from 'sweetalert2';
 
 // Initialize Stripe
 const stripePromise = loadStripe(STRIPE_CONFIG.PUBLISHABLE_KEY);
