@@ -327,7 +327,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Name<span className="text-red-500">*</span></label>
             <input
@@ -428,12 +428,13 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Member
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
@@ -537,7 +538,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
             <input
@@ -617,12 +618,13 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Case Study
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
@@ -685,7 +687,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Certificate Name</label>
             <input
@@ -729,12 +731,13 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Certificate
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
@@ -843,7 +846,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
           <p>💡 <strong>Tip:</strong> Upload relevant company documents that showcase your expertise and capabilities. These documents will be used to enhance proposal recommendations and improve your proposal creation process.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
             <input
@@ -911,12 +914,13 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              onClick={(e) => handleSubmit(e)}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
               Add Document
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
