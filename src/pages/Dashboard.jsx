@@ -847,6 +847,7 @@ const Dashboard = () => {
                         'Event added successfully',
                         'success'
                     );
+                    setCalendarEvents(prev => [...prev, res.data.event]);
                     onClose();
                 } else {
                     setCalendarError('Failed to add event');
