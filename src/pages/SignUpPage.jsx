@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, EyeOff, Eye } from "lucide-react";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -10,7 +10,7 @@ const SignupForm = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0); // Step 0 = Choose Role
   const [role, setRole] = useState(""); // company | freelancer
-
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -133,8 +133,9 @@ const SignupForm = () => {
                               : "Confirm Password"}
                       </label>
                       <input
-                        type={field.includes("password") ? "password" : field === "email" ? "email" : "text"}
+                        type={field.includes("password") ? showPassword ? "text" : "password" : field === "email" ? "email" : "text"}
                         name={field}
+                        required={field === "fullName" || field === "email" || field === "password" || field === "confirmPassword"}
                         placeholder={
                           field === "password"
                             ? "Minimum 8 characters"
@@ -144,9 +145,18 @@ const SignupForm = () => {
                         }
                         value={form[field]}
                         onChange={handleChange}
-                        className={`w-full p-3 bg-[#0000000F] rounded-md ${errors[field] ? "border border-red-500" : ""
+                        className={`w-full p-3 bg-[#0000000F] rounded-md ${errors[field] ? "border border-red-500" : ""} ${field.includes("password") ? "pr-12" : ""}
                           }`}
                       />
+                      {field.includes("password") && (
+                        <button
+                          type="button"
+                          className="absolute right-3 top-[52px]  text-gray-600"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      )}
                       {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
                     </div>
                   ))}
