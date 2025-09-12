@@ -173,6 +173,7 @@ const CreateProfile = () => {
   const validateForm = () => {
     const newErrors = {};
     const phoneNumber = parsePhoneNumberFromString(form.phone.startsWith('+') ? form.phone : `+${form.phone}`);
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (role === "company") {
       if (!form.companyName.trim()) newErrors.companyName = "Company Name is required";
 
@@ -193,6 +194,7 @@ const CreateProfile = () => {
       else if (!phoneNumber || !phoneNumber.isValid()) newErrors.phone = "Enter a valid phone number (7-15 digits, numbers only)";
 
       if (!form.email.trim()) newErrors.email = "Email is required";
+      else if (!email || !emailRegex.test(form.email)) newErrors.email = "Enter a valid Email address";
 
       if (!form.linkedIn.trim()) newErrors.linkedIn = "LinkedIn is required";
       else if (!isValidUrl(form.linkedIn)) newErrors.linkedIn = "Please enter a valid URL (e.g., https://linkedin.com/username)";

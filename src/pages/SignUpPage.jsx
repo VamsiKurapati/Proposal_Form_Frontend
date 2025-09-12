@@ -31,7 +31,7 @@ const SignupForm = () => {
   const validateStepOne = () => {
     const newErrors = {};
     if (!form.fullName.trim()) newErrors.fullName = "Full name is required";
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(form.email)) newErrors.email = "Enter a valid email address";
     if (form.password.length < 8) newErrors.password = "Password must be at least 8 characters";
     if (form.password !== form.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
@@ -132,31 +132,33 @@ const SignupForm = () => {
                               ? "Create Password"
                               : "Confirm Password"}
                       </label>
-                      <input
-                        type={field.includes("password") ? showPassword ? "text" : "password" : field === "email" ? "email" : "text"}
-                        name={field}
-                        required={field === "fullName" || field === "email" || field === "password" || field === "confirmPassword"}
-                        placeholder={
-                          field === "password"
-                            ? "Minimum 8 characters"
-                            : field === "confirmPassword"
-                              ? "Retype password"
-                              : `Enter ${field}`
-                        }
-                        value={form[field]}
-                        onChange={handleChange}
-                        className={`w-full p-3 bg-[#0000000F] rounded-md ${errors[field] ? "border border-red-500" : ""} ${field.includes("password") ? "pr-12" : ""}
-                          }`}
-                      />
-                      {field.includes("password") && (
-                        <button
-                          type="button"
-                          className="absolute right-3 top-[52px]  text-gray-600"
-                          onClick={() => setShowPassword((prev) => !prev)}
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      )}
+                      <div className="relative">
+                        <input
+                          type={field.includes("password") ? (showPassword ? "text" : "password") : field === "email" ? "email" : "text"}
+                          name={field}
+                          required={field === "fullName" || field === "email" || field === "password" || field === "confirmPassword"}
+                          placeholder={
+                            field === "password"
+                              ? "Minimum 8 characters"
+                              : field === "confirmPassword"
+                                ? "Retype password"
+                                : `Enter ${field}`
+                          }
+                          value={form[field]}
+                          onChange={handleChange}
+                          className={`w-full p-3 bg-[#0000000F] rounded-md ${errors[field] ? "border border-red-500" : ""} pr-12`}
+                        />
+
+                        {field.includes("password") && (
+                          <button
+                            type="button"
+                            className="absolute right-3 top-3 text-gray-600"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        )}
+                      </div>
                       {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
                     </div>
                   ))}

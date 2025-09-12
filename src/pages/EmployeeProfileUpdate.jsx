@@ -305,7 +305,7 @@ const EmployeeProfileUpdate = () => {
                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                     error={errors.email}
                                     required
-                                    disabled={loading}
+                                    disabled={true}
                                     placeholder="contact@company.com"
                                 />
                             </div>

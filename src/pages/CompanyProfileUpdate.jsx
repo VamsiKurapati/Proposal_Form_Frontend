@@ -409,7 +409,7 @@ const CompanyProfileUpdate = () => {
         else if (form.bio.length < 100) newErrors.bio = "Bio must be at least 100 characters long";
 
         // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (form.email && !emailRegex.test(form.email)) {
             newErrors.email = "Please enter a valid email address";
         }
@@ -622,7 +622,7 @@ const CompanyProfileUpdate = () => {
                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                     error={errors.email}
                                     required
-                                    disabled={loading}
+                                    disabled={true}
                                     placeholder="contact@company.com"
                                 />
                             </div>

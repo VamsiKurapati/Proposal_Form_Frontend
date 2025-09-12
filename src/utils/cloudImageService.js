@@ -299,15 +299,31 @@ class CloudImageService {
   }
 
   // Clear all uploaded images from local storage
-  clearUploadedImages() {
-    console.log("Images:", this.uploadedImages);
-    this.uploadedImages = [];
-    this.saveUploadedImages();
+  async clearUploadedImages() {
+    try {
+      const deletePromises = this.uploadedImages.map(img => this.deleteImage(img.filename || img.fileId));
 
-    // Dispatch custom event to notify components
-    window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
-      detail: { action: 'cleared' }
-    }));
+      await Promise.allSettled(deletePromises);
+
+      // Clear local storage
+      this.uploadedImages = [];
+      this.saveUploadedImages();
+
+      // Dispatch event to notify components
+      window.dispatchEvent(new CustomEvent('cloudImagesUpdated', {
+        detail: { action: 'cleared' }
+      }));
+
+    } catch (error) {
+      console.error('Error clearing images:', error);
+      Swal.fire({
+        title: 'Error clearing images',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+    }
   }
 
   // Check if image is cloud-based (uploaded images)

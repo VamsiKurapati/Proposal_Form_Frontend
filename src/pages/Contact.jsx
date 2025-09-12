@@ -32,6 +32,32 @@ export default function Contact() {
     setLoading(true);
     setMessage("");
 
+    // Simple validation
+    if (!formData.name.trim()) {
+      setMessage("Name is required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.company.trim()) {
+      setMessage("Company name is required.");
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      setMessage("Description is required.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/contact`, formData);
       if (response.status === 201) {
