@@ -266,9 +266,9 @@ const ShowCustomDetails = () => {
 
   const handleExport = () => {
     const csvContent = [
-      ["Company", "Email", "Plan Type"].join(","),
+      ["Company", "Email", "Plan Type", "Amount", "Max Editors", "Max Viewers", "Max RFP Proposal Generations", "Max Grant Proposal Generations"].join(","),
       ...filteredPlans.map((plan) =>
-        [plan.companyName, plan.email, plan.planType].join(",")
+        [plan.companyName, plan.email, plan.planType, plan.price, plan.maxEditors, plan.maxViewers, plan.maxRFPProposalGenerations, plan.maxGrantProposalGenerations].join(",")
       ),
     ].join("\n");
 

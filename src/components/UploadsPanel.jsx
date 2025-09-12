@@ -331,8 +331,8 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
                     title: 'Are you sure you want to clear all uploads?',
                     icon: 'warning',
                     timer: 1500,
-                    showConfirmButton: false,
-                    showCancelButton: false,
+                    showConfirmButton: true,
+                    showCancelButton: true,
                   });
                   if (result.isConfirmed) {
                     cloudImageService.clearUploadedImages();

@@ -460,13 +460,14 @@ const SuperAdmin = () => {
     };
 
     const handleExportUsers = () => {
-        const headers = ['_id', 'companyName', 'email', 'establishedYear', 'location'];
+        const headers = ['_id', 'companyName', 'email', 'establishedYear', 'location', 'status'];
         const rows = (filteredUsers || []).map(u => ({
             _id: u._id,
             companyName: u.companyName,
             email: u.email,
             establishedYear: u.establishedYear,
-            location: u.location
+            location: u.location,
+            status: u.status
         }));
         exportArrayToCSV('companies.csv', headers, rows);
     };
@@ -481,13 +482,7 @@ const SuperAdmin = () => {
             price: t.price || "Not Disclosed",
             status: t.status || "Not Disclosed",
             transaction_id: t.transaction_id || "Not Disclosed",
-            paid_at: t.paid_at || "Not Disclosed",
-            start_date: t.start_date || "Not Disclosed",
-            end_date: t.end_date || "Not Disclosed",
-            max_editors: t.max_editor || "Not Disclosed",
-            max_viewers: t.max_viewers || "Not Disclosed",
-            max_rfp: t.max_rfp_generations || "Not Disclosed",
-            max_grants: t.max_grant_generations || "Not Disclosed"
+            paid_at: t.paid_at || "Not Disclosed"
         }));
         exportArrayToCSV('transactions.csv', headers, rows);
     };

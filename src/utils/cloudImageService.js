@@ -300,6 +300,7 @@ class CloudImageService {
 
   // Clear all uploaded images from local storage
   clearUploadedImages() {
+    console.log("Images:", this.uploadedImages);
     this.uploadedImages = [];
     this.saveUploadedImages();
 
