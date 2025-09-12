@@ -72,7 +72,6 @@ const SuperAdmin = () => {
     const [completedTickets, setCompletedTickets] = useState(false);
 
     // Profile
-    const [showProfile, setShowProfile] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     // View Modals
@@ -4600,28 +4599,9 @@ const SuperAdmin = () => {
                                         <span className="absolute top-[1px] right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                     )}
                                 </button>
-                                <div className="w-8 h-8 bg-[#2563eb] rounded-full flex items-center justify-center transition-colors cursor-pointer"
-                                    onClick={() => setShowProfile(!showProfile)}
-                                >
+                                <div className="w-8 h-8 bg-[#2563eb] rounded-full flex items-center justify-center transition-colors cursor-pointer">
                                     <MdOutlinePerson className="w-5 h-5 text-white" />
                                 </div>
-                                {showProfile && (
-                                    <div className="absolute top-16 right-0 w-64 bg-[#F8F9FA] rounded-lg shadow-lg p-2 flex flex-col gap-2 z-1000">
-                                        {/* <button className="w-full text-left rounded-lg p-2 flex items-center space-x-3 transition-colors text-[#4B5563]"
-                                                    onClick={() => navigate('/change-password')}
-                                                >
-                                                    <MdOutlineLock className="w-4 h-4" />
-                                                    <span className="text-[16px] font-medium">Change Password</span>
-                                                </button>
-                                                <button className="w-full text-left rounded-lg p-2 flex items-center space-x-3 transition-colors text-[#4B5563]"
-                                                    onClick={() => handleLogout()}
-                                                >
-                                                    <MdOutlineLogout className="w-4 h-4" />
-                                                    <span className="text-[16px] font-medium">Logout</span>
-                                                </button> */}
-
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
