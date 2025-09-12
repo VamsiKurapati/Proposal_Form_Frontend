@@ -445,7 +445,7 @@ const CompanyProfileUpdate = () => {
             formData.append("linkedIn", form.linkedIn);
             formData.append("bio", form.bio);
             formData.append("preferredIndustries", JSON.stringify(form.preferredIndustries));
-            const filteredPreferredIndustries = form.preferredIndustries.filter(industry => industry.trim());
+            // const filteredPreferredIndustries = form.preferredIndustries.filter(industry => industry.trim());
             const filteredServices = form.services.filter(service => service.trim());
             formData.append("services", JSON.stringify(filteredServices));
             const filteredAwards = form.awards.filter(award => award.trim());
@@ -453,7 +453,7 @@ const CompanyProfileUpdate = () => {
             const filteredClients = form.clients.filter(client => client.trim());
             formData.append("clients", JSON.stringify(filteredClients));
             formData.append("numberOfEmployees", form.numberOfEmployees);
-            formData.append("founded", form.founded);
+            formData.append("establishedYear", form.founded);
 
             const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/profile/updateCompanyProfile`, formData,
                 {
