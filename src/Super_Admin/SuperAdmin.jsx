@@ -474,7 +474,7 @@ const SuperAdmin = () => {
     const handleExportTransactions = () => {
         const headers = ['plan_name', 'company_name', 'company_email', 'payment_method', 'price', 'status', 'transaction_id', 'paid_at', 'start_date', 'end_date', 'max_editors', 'max_viewers', 'max_rfp', 'max_grants'];
         const rows = (filteredTransactions || []).map(t => ({
-            plan_name: planName,
+            plan_name: t.planName,
             company_name: t.companyName || "Not Disclosed",
             company_email: t.email || "Not Disclosed",
             payment_method: t.payment_method || "Not Disclosed",
