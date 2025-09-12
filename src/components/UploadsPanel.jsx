@@ -330,7 +330,6 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
                   const result = await Swal.fire({
                     title: 'Are you sure you want to clear all uploads?',
                     icon: 'warning',
-                    timer: 1500,
                     showConfirmButton: true,
                     showCancelButton: true,
                   });
