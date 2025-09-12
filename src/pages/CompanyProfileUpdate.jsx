@@ -249,7 +249,7 @@ const PhoneInputField = ({
 
 const CompanyProfileUpdate = () => {
     const navigate = useNavigate();
-    const { companyData, setCompanyData, loading } = useProfile();
+    const { companyData, loading } = useProfile();
 
     const [form, setForm] = useState({
         companyName: companyData?.companyName || "",
@@ -471,32 +471,9 @@ const CompanyProfileUpdate = () => {
                     showConfirmButton: false,
                     showCancelButton: false,
                 });
-                setCompanyData(prevData => ({
-                    ...prevData,
-                    companyName: form.companyName,
-                    adminName: form.adminName,
-                    industry: form.industry,
-                    location: form.location,
-                    email: form.email,
-                    phone: form.phone,
-                    website: form.website,
-                    linkedIn: form.linkedIn,
-                    profile: {
-                        ...prevData.profile,
-                        bio: form.bio,
-                        services: filteredServices,
-                        awards: filteredAwards,
-                        clients: filteredClients,
-                        preferredIndustries: filteredPreferredIndustries,
-                    },
-                    companyDetails: {
-                        ...prevData.companyDetails,
-                        "No.of employees": { value: form.numberOfEmployees },
-                        "Founded": { value: form.founded },
-                    }
-                }));
                 setTimeout(() => {
                     navigate("/company_profile_dashboard");
+                    window.location.reload();
                 }, 1500);
             }
         } catch (error) {

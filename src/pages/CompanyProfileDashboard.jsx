@@ -2038,10 +2038,10 @@ const CompanyProfileDashboard = () => {
                         </div>
                         <button
                           disabled={deletingDocument[doc._id]}
-                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                          className="text-[#2563EB] hover:text-[#2563EB] rounded-full p-1 shrink-0 transition-colors"
                           onClick={() => handleDownloadDocument(doc)}
                         >
-                          {deletingDocument[doc._id] ? <MdOutlineDownload className="w-5 h-5 animate-spin" /> : <MdOutlineDownload className="w-5 h-5" />}
+                          <MdOutlineDownload className="w-5 h-5 text-[#2563EB] shrink-0" />
                         </button>
                       </div>
                       <div className="text-[11px] text-[#4B5563]">
