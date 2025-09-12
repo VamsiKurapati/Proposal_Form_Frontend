@@ -1295,7 +1295,7 @@ const CompanyProfileDashboard = () => {
   const handleDeleteEmployee = async (emp) => {
     setDeletingEmployee(prev => ({ ...prev, [emp._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteEmployee/${emp._id}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteEmployee/${emp.employeeId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.status === 200) {
@@ -1321,7 +1321,7 @@ const CompanyProfileDashboard = () => {
         showCancelButton: false,
       });
     } finally {
-      setDeletingEmployee(prev => ({ ...prev, [emp._id]: false }));
+      setDeletingEmployee(prev => ({ ...prev, [emp.employeeId]: false }));
     }
   };
 
@@ -1544,7 +1544,7 @@ const CompanyProfileDashboard = () => {
     <div className="h-full relative">
       <NavbarComponent />
 
-      <div className="bg-[#F8F9FA] w-full mt-16 md:mt-0 md:fixed md:top-16 left-0 right-0 z-10 shadow-md px-8 md:px-12 py-[14px]">
+      <div className="bg-[#F8F9FA] w-full mt-16 lg:mt-0 lg:fixed lg:top-16 left-0 right-0 z-10 shadow-md px-8 lg:px-12 py-[14px]">
         {/* Profile image and info */}
         <div className="w-full">
           {/* For <lg: Row 1 - image and edit button */}
@@ -1924,7 +1924,7 @@ const CompanyProfileDashboard = () => {
                         <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start relative">
                           <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>{member.accessLevel}</span>
                           <button
-                            disabled={deletingEmployee[member._id]}
+                            disabled={deletingEmployee[member.employeeId]}
                             onClick={() => handleDeleteEmployee(member)}
                             className="text-red-500 hover:text-red-600 text-[15px] hover:underline transition-colors absolute top-2 right-2"
                           >
@@ -1952,7 +1952,7 @@ const CompanyProfileDashboard = () => {
                               View Profile
                             </button>
                             <button
-                              disabled={deletingEmployee[member._id]}
+                              disabled={deletingEmployee[member.employeeId]}
                               onClick={() => handleContactMember(member)}
                               className="text-[#2563EB] text-[15px] hover:underline transition-colors"
                             >
