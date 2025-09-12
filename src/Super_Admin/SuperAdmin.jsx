@@ -2292,34 +2292,35 @@ const SuperAdmin = () => {
                     </>
                 ) : null}
 
-                {/* Buttons */}
-                {!editingPlans[plan._id] ? (
-                    <button
-                        className="w-full py-2 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white font-medium shadow mt-auto"
-                        onClick={() => startEdit(plan)}
-                    >
-                        Edit
-                    </button>
-                ) : (
-                    <div className="flex gap-2 mt-auto">
-                        <button
-                            className="w-1/2 py-2 rounded-lg bg-gray-300 text-black font-medium shadow"
-                            onClick={() => cancelEdit(plan._id)}
-                            disabled={loading}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className="w-1/2 py-2 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white font-medium shadow"
-                            onClick={() => saveEdit(plan._id)}
-                            disabled={loading}
-                        >
-                            {loading ? "Saving..." : "Save"}
-                        </button>
-                    </div>
-                )}
-
-
+                {
+                    !isContact && (
+                        !editingPlans[plan._id] ? (
+                            <button
+                                className="w-full py-2 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white font-medium shadow mt-auto"
+                                onClick={() => startEdit(plan)}
+                            >
+                                Edit
+                            </button>
+                        ) : (
+                            <div className="flex gap-2 mt-auto">
+                                <button
+                                    className="w-1/2 py-2 rounded-lg bg-gray-300 text-black font-medium shadow"
+                                    onClick={() => cancelEdit(plan._id)}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="w-1/2 py-2 rounded-lg bg-gradient-to-b from-[#6C63FF] to-[#3F73BD] text-white font-medium shadow"
+                                    onClick={() => saveEdit(plan._id)}
+                                    disabled={loading}
+                                >
+                                    {loading ? "Saving..." : "Save"}
+                                </button>
+                            </div>
+                        )
+                    )
+                }
             </div>
         );
 
