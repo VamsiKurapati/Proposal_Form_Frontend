@@ -860,6 +860,9 @@ const Discover = () => {
           text: 'Grant saved successfully!',
           confirmButtonColor: '#2563EB'
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       // console.error(err);
@@ -916,6 +919,9 @@ const Discover = () => {
           text: 'Grant unsaved successfully!',
           confirmButtonColor: '#2563EB'
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       // console.error(err);
@@ -1241,7 +1247,15 @@ const Discover = () => {
         setOriginalSaved((prev) =>
           prev.map(r => r._id === rfp._id ? { ...r, isSaved: true } : r)
         );
-
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'RFP saved successfully!',
+          confirmButtonColor: '#2563EB'
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
         //console.log("RFP data:", rfp);
       }
     } catch (err) {
@@ -1291,6 +1305,15 @@ const Discover = () => {
         setOriginalSaved((prev) =>
           prev.filter((r) => r._id !== rfpId)
         );
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'RFP unsaved successfully!',
+          confirmButtonColor: '#2563EB'
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       //console.error(err);
