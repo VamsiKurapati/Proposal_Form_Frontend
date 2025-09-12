@@ -278,8 +278,51 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
     accessLevel: 'Member'
   });
 
+  const [addingTeamMember, setAddingTeamMember] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAddingTeamMember(true);
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const phoneNumber = parsePhoneNumberFromString(formData.phone.startsWith('+') ? formData.phone : `+${formData.phone}`);
+
+    if (!formData.name || !formData.shortDesc || !formData.highestQualification || !formData.skills || !formData.jobTitle || !formData.phone || !formData.accessLevel || !formData.email) {
+      Swal.fire({
+        title: 'Please fill in all fields.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+      setAddingTeamMember(false);
+      return;
+    }
+
+    if (!phoneNumber || !phoneNumber.isValid()) {
+      Swal.fire({
+        title: 'Please enter a valid phone number.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+      setAddingTeamMember(false);
+      return;
+    }
+
+    if (formData.email && !emailRegex.test(formData.email)) {
+      Swal.fire({
+        title: 'Please enter a valid email address.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+      setAddingTeamMember(false);
+      return;
+    }
+
     try {
       let skillsArray = formData.skills.split(',').map(skill => skill.trim());
       formData.skills = skillsArray;
@@ -313,7 +356,10 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      setAddingTeamMember(false);
       return;
+    } finally {
+      setAddingTeamMember(false);
     }
   };
 
@@ -325,7 +371,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 h-full max-w-[90vw] z-50 overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Team Member</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} disabled={addingTeamMember} className="text-gray-500 hover:text-gray-700">
             <MdOutlineClose className="w-6 h-6" />
           </button>
         </div>
@@ -425,6 +471,7 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={addingTeamMember}
               className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
               Cancel
@@ -432,9 +479,10 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={(e) => handleSubmit(e)}
+              disabled={addingTeamMember}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              Add Member
+              {addingTeamMember ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingTeamMember ? "Adding..." : "Add Member"}
             </button>
           </div>
         </div>
@@ -450,7 +498,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
     company: '',
     file: null,
   });
-
+  const [addingCaseStudy, setAddingCaseStudy] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
 
   const handleFileChange = (e) => {
@@ -475,7 +523,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setAddingCaseStudy(true);
     if (!formData.file) {
       Swal.fire({
         title: 'Please upload a PDF or TXT file.',
@@ -484,6 +532,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      setAddingCaseStudy(false);
       return;
     }
 
@@ -524,7 +573,8 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
-      return;
+    } finally {
+      setAddingCaseStudy(false);
     }
   };
 
@@ -536,7 +586,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Case Study</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} disabled={addingCaseStudy} className="text-gray-500 hover:text-gray-700">
             <MdOutlineClose className="w-6 h-6" />
           </button>
         </div>
@@ -615,16 +665,18 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={addingCaseStudy}
               className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
-              Cancel
+              {addingCaseStudy ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCaseStudy ? "Adding..." : "Add Case Study"}
             </button>
             <button
               type="button"
               onClick={(e) => handleSubmit(e)}
+              disabled={addingCaseStudy}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              Add Case Study
+              {addingCaseStudy ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCaseStudy ? "Adding..." : "Add Case Study"}
             </button>
           </div>
         </div>
@@ -640,9 +692,24 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
     issuer: '',
     validTill: '',
   });
+  const [addingCertificate, setAddingCertificate] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAddingCertificate(true);
+
+    if (!formData.name || !formData.issuer || !formData.validTill) {
+      Swal.fire({
+        title: 'Please fill in all fields.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+      setAddingCertificate(false);
+      return;
+    }
+
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/addLicenseAndCertification`, formData,
         {
@@ -674,7 +741,8 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
-      return;
+    } finally {
+      setAddingCertificate(false);
     }
   };
 
@@ -686,7 +754,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Certificate</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} disabled={addingCertificate} className="text-gray-500 hover:text-gray-700">
             <MdOutlineClose className="w-6 h-6" />
           </button>
         </div>
@@ -729,6 +797,7 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={addingCertificate}
               className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
               Cancel
@@ -736,9 +805,10 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={(e) => handleSubmit(e)}
+              disabled={addingCertificate}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              Add Certificate
+              {addingCertificate ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCertificate ? "Adding..." : "Add Certificate"}
             </button>
           </div>
         </div>
@@ -753,6 +823,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
     name: '',
     file: null,
   });
+  const [uploadingDocument, setUploadingDocument] = useState(false);
 
   const [filePreview, setFilePreview] = useState(null);
 
@@ -777,6 +848,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
   };
 
   const handleSubmit = async (e) => {
+    setUploadingDocument(true);
     e.preventDefault();
 
     if (!formData.file) {
@@ -787,6 +859,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
+      setUploadingDocument(false);
       return;
     }
 
@@ -827,7 +900,8 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
         showConfirmButton: false,
         showCancelButton: false,
       });
-      return;
+    } finally {
+      setUploadingDocument(false);
     }
   };
 
@@ -839,7 +913,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-96 max-w-[90vw] z-50 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Add Document</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} disabled={uploadingDocument} className="text-gray-500 hover:text-gray-700">
             <MdOutlineClose className="w-6 h-6" />
           </button>
         </div>
@@ -910,6 +984,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={uploadingDocument}
               className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
               Cancel
@@ -917,9 +992,10 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={(e) => handleSubmit(e)}
+              disabled={uploadingDocument}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              Add Document
+              {uploadingDocument ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {uploadingDocument ? "Uploading..." : "Add Document"}
             </button>
           </div>
         </div>
@@ -1124,7 +1200,7 @@ const CompanyProfileDashboard = () => {
   const handleDeleteCertificate = async (cert) => {
     setDeletingCertificate(prev => ({ ...prev, [cert._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCertificate/${cert._id}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCertification/${cert._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.status === 200) {
