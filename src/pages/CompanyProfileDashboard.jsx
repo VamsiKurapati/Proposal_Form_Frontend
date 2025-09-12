@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineSettings, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineCheck, MdOutlinePayments } from "react-icons/md";
+import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineCheck, MdOutlinePayments, MdOutlineDelete } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
 import Swal from "sweetalert2";
@@ -958,6 +958,10 @@ const CompanyProfileDashboard = () => {
   const [showAddCertificateModal, setShowAddCertificateModal] = useState(false);
   const [showAddDocumentModal, setShowAddDocumentModal] = useState(false);
   const [filteredProposals, setFilteredProposals] = useState([]);
+  const [deletingCaseStudy, setDeletingCaseStudy] = useState({});
+  const [deletingCertificate, setDeletingCertificate] = useState({});
+  const [deletingDocument, setDeletingDocument] = useState({});
+  const [deletingEmployee, setDeletingEmployee] = useState({});
 
   // Payments tab state
   const [payments, setPayments] = useState([]);
@@ -1083,12 +1087,153 @@ const CompanyProfileDashboard = () => {
     setShowAddCaseStudyModal(true);
   };
 
+  const handleDeleteCaseStudy = async (cs) => {
+    setDeletingCaseStudy[cs._id](true);
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCaseStudy/${cs._id}}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      if (res.status === 200) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Case study has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete case study.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+    } finally {
+      setDeletingCaseStudy({});
+    }
+  };
+
+  const handleDeleteCertificate = async (cert) => {
+    setDeletingCertificate[cert._id](true);
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCertificate/${cert._id}}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      if (res.status === 200) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Certificate has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete certificate.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+    } finally {
+      setDeletingCertificate({});
+    }
+  };
+
+  const handleDeleteDocument = async (doc) => {
+    setDeletingDocument[doc._id](true);
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteDocument/${doc._id}}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      if (res.status === 200) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Document has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete document.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+    } finally {
+      setDeletingDocument({});
+    }
+  };
+
+  const handleDeleteEmployee = async (emp) => {
+    setDeletingEmployee[emp._id](true);
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteEmployee/${emp._id}}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      if (res.status === 200) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Employee has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (err) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete employee.',
+        icon: 'error',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
+    } finally {
+      setDeletingEmployee({});
+    }
+  };
+
   const handleAddCertification = () => {
     setShowAddCertificateModal(true);
+    setDeletingCertificate({});
+    setDeletingCaseStudy({});
+    setDeletingDocument({});
+    setDeletingEmployee({});
   };
 
   const handleAddDocument = () => {
     setShowAddDocumentModal(true);
+    setDeletingDocument({});
+    setDeletingCertificate({});
+    setDeletingCaseStudy({});
+    setDeletingEmployee({});
   };
 
   React.useEffect(() => {
@@ -1671,8 +1816,15 @@ const CompanyProfileDashboard = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {companyData?.employees && companyData.employees.length > 0 ? (
                       companyData.employees.map((member, i) => (
-                        <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start">
+                        <div key={i} className="rounded-xl shadow bg-[#F9FAFB] p-4 flex flex-col gap-2 items-start relative">
                           <span className={`px-2 py-1 text-[12px] rounded-full font-medium ${badgeStyles[member.accessLevel]}`}>{member.accessLevel}</span>
+                          <button
+                            disabled={deletingEmployee[member._id]}
+                            onClick={() => handleDeleteEmployee(member)}
+                            className="text-[#2563EB] text-[15px] hover:underline transition-colors absolute top-2 right-2"
+                          >
+                            <MdOutlineDelete className="w-5 h-5 text-red-500" />
+                          </button>
                           <div className="flex items-center gap-3 w-full">
                             <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xl font-bold text-gray-500 overflow-hidden">
                               {member.avatar ? (
@@ -1688,12 +1840,14 @@ const CompanyProfileDashboard = () => {
                           </div>
                           <div className="flex gap-4 mt-2 mx-auto">
                             <button
+                              disabled={deletingEmployee[member._id]}
                               onClick={() => handleViewProfile(member)}
                               className="text-[#2563EB] text-[15px] hover:underline transition-colors"
                             >
                               View Profile
                             </button>
                             <button
+                              disabled={deletingEmployee[member._id]}
                               onClick={() => handleContactMember(member)}
                               className="text-[#2563EB] text-[15px] hover:underline transition-colors"
                             >
@@ -1760,7 +1914,16 @@ const CompanyProfileDashboard = () => {
                 {companyData?.documentList && companyData.documentList.length > 0 ? (
                   companyData.documentList.map((doc, i) => (
                     <div key={i} className="flex flex-col bg-[#F9FAFB] rounded-xl p-4 shadow-sm border border-[#E5E7EB]">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-end mb-1">
+                        <button
+                          disabled={deletingDocument[doc._id]}
+                          onClick={() => handleDeleteDocument(doc)}
+                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                        >
+                          {deletingDocument[doc._id] ? <MdOutlineDelete className="w-5 h-5 animate-spin" /> : <MdOutlineDelete className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between mb-1 gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
                           <div className="flex flex-col min-w-0">
@@ -1769,14 +1932,15 @@ const CompanyProfileDashboard = () => {
                           </div>
                         </div>
                         <button
+                          disabled={deletingDocument[doc._id]}
                           className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
                           onClick={() => handleDownloadDocument(doc)}
                         >
-                          <MdOutlineDownload className="w-5 h-5" />
+                          {deletingDocument[doc._id] ? <MdOutlineDownload className="w-5 h-5 animate-spin" /> : <MdOutlineDownload className="w-5 h-5" />}
                         </button>
                       </div>
                       <div className="text-[11px] text-[#4B5563]">
-                        <span>Last modified: {doc.lastModified}</span>
+                        <span>Last modified: {new Date(doc.updatedAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))
@@ -1801,13 +1965,21 @@ const CompanyProfileDashboard = () => {
                 {companyData?.caseStudiesList && companyData.caseStudiesList.length > 0 ? (
                   companyData.caseStudiesList.map((cs, i) => (
                     <div key={i} className="bg-[#F9FAFB] rounded-xl shadow-sm border border-[#E5E7EB] overflow-hidden flex flex-col">
+                      <div className="flex justify-end p-2">
+                        <button
+                          disabled={deletingCaseStudy[cs._id]}
+                          onClick={() => handleDeleteCaseStudy(cs)}
+                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                        >
+                          {deletingCaseStudy[cs._id] ? <MdOutlineDelete className="w-5 h-5 text-red-500 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500" />}
+                        </button>
+                      </div>
                       <div className="flex-1 flex flex-col p-4">
                         <div className="flex items-center gap-2 mb-1">
                           <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
                           <div className="font-medium text-[#111827] justify-center text-[15px] mb-1 line-clamp-2" title={cs.title}>{cs.title}</div>
+                          <span className="text-[11px] text-[#4B5563]">{cs.company}</span>
                         </div>
-                        <div className="text-[13px] text-[#6B7280] mb-1 line-clamp-3" title={cs.description}>{cs.description}</div>
-                        <div className="text-[12px] text-[#9CA3AF] mb-2">{cs.readTime}</div>
                         <button
                           onClick={() => handleReadCaseStudy(cs)}
                           className="text-[#2563EB] text-[14px] flex items-center gap-1 mt-auto hover:underline transition-colors"
@@ -1841,6 +2013,15 @@ const CompanyProfileDashboard = () => {
                       key={i}
                       className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
                     >
+                      <div className="flex items-center justify-end mb-1">
+                        <button
+                          disabled={deletingCertificate[cert._id]}
+                          onClick={() => handleDeleteCertificate(cert)}
+                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                        >
+                          {deletingCertificate[cert._id] ? <MdOutlineDelete className="w-5 h-5 text-red-500 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500" />}
+                        </button>
+                      </div>
                       <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 mt-1" />
                       <div>
                         <div className="font-semibold text-[16px] text-[#111827]">{cert.name}</div>
