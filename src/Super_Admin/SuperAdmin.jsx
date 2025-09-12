@@ -710,7 +710,7 @@ const SuperAdmin = () => {
                 const paymentsData = response.data.PaymentData;
                 setPaymentsData(paymentsData);
                 const ps = response.data.PaymentStats || {};
-                const { ["Revenue This Month"]: revenueThisMonth, ...otherStats } = ps;
+                const { revenueThisMonth, ...otherStats } = ps;
                 setPaymentsStats(otherStats);
                 planManagementStats["Revenue This Month"] = revenueThisMonth || 0;
                 setFilteredTransactions(paymentsData);
