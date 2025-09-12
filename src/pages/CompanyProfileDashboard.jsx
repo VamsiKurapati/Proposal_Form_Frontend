@@ -1088,9 +1088,9 @@ const CompanyProfileDashboard = () => {
   };
 
   const handleDeleteCaseStudy = async (cs) => {
-    setDeletingCaseStudy[cs._id](true);
+    setDeletingCaseStudy(prev => ({ ...prev, [cs._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCaseStudy/${cs._id}}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCaseStudy/${cs._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
@@ -1117,14 +1117,14 @@ const CompanyProfileDashboard = () => {
         showCancelButton: false,
       });
     } finally {
-      setDeletingCaseStudy({});
+      setDeletingCaseStudy(prev => ({ ...prev, [cs._id]: false }));
     }
   };
 
   const handleDeleteCertificate = async (cert) => {
-    setDeletingCertificate[cert._id](true);
+    setDeletingCertificate(prev => ({ ...prev, [cert._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCertificate/${cert._id}}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteCertificate/${cert._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.status === 200) {
@@ -1150,14 +1150,14 @@ const CompanyProfileDashboard = () => {
         showCancelButton: false,
       });
     } finally {
-      setDeletingCertificate({});
+      setDeletingCertificate(prev => ({ ...prev, [cert._id]: false }));
     }
   };
 
   const handleDeleteDocument = async (doc) => {
-    setDeletingDocument[doc._id](true);
+    setDeletingDocument(prev => ({ ...prev, [doc._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteDocument/${doc._id}}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteDocument/${doc._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.status === 200) {
@@ -1183,14 +1183,14 @@ const CompanyProfileDashboard = () => {
         showCancelButton: false,
       });
     } finally {
-      setDeletingDocument({});
+      setDeletingDocument(prev => ({ ...prev, [doc._id]: false }));
     }
   };
 
   const handleDeleteEmployee = async (emp) => {
-    setDeletingEmployee[emp._id](true);
+    setDeletingEmployee(prev => ({ ...prev, [emp._id]: true }));
     try {
-      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteEmployee/${emp._id}}`, {
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/profile/deleteEmployee/${emp._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.status === 200) {
@@ -1216,7 +1216,7 @@ const CompanyProfileDashboard = () => {
         showCancelButton: false,
       });
     } finally {
-      setDeletingEmployee({});
+      setDeletingEmployee(prev => ({ ...prev, [emp._id]: false }));
     }
   };
 
@@ -1914,7 +1914,7 @@ const CompanyProfileDashboard = () => {
                 {companyData?.documentList && companyData.documentList.length > 0 ? (
                   companyData.documentList.map((doc, i) => (
                     <div key={i} className="flex flex-col bg-[#F9FAFB] rounded-xl p-4 shadow-sm border border-[#E5E7EB]">
-                      <div className="flex items-center justify-end mb-1">
+                      <div className="flex items-center justify-end">
                         <button
                           disabled={deletingDocument[doc._id]}
                           onClick={() => handleDeleteDocument(doc)}
@@ -1923,7 +1923,7 @@ const CompanyProfileDashboard = () => {
                           {deletingDocument[doc._id] ? <MdOutlineDelete className="w-5 h-5 animate-spin" /> : <MdOutlineDelete className="w-5 h-5" />}
                         </button>
                       </div>
-                      <div className="flex items-center justify-between mb-1 gap-2">
+                      <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <MdOutlineDocumentScanner className="w-6 h-6 text-[#2563EB]" />
                           <div className="flex flex-col min-w-0">
@@ -2013,7 +2013,7 @@ const CompanyProfileDashboard = () => {
                       key={i}
                       className="flex items-start gap-3 border border-[#E5E7EB] rounded-lg p-4 bg-[#FFFFFF] hover:shadow transition-shadow"
                     >
-                      <div className="flex items-center justify-end mb-1">
+                      <div className="flex items-center justify-end">
                         <button
                           disabled={deletingCertificate[cert._id]}
                           onClick={() => handleDeleteCertificate(cert)}
@@ -2022,8 +2022,8 @@ const CompanyProfileDashboard = () => {
                           {deletingCertificate[cert._id] ? <MdOutlineDelete className="w-5 h-5 text-red-500 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500" />}
                         </button>
                       </div>
-                      <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 mt-1" />
-                      <div>
+                      <MdOutlineVerifiedUser className="text-[#2563EB] w-6 h-6 shrink-0" />
+                      <div className="flex flex-col items-start">
                         <div className="font-semibold text-[16px] text-[#111827]">{cert.name}</div>
                         <div className="font-medium text-[13px] text-[#4B5563]">{cert.issuer}</div>
                         <div className="text-[11px] text-[#6B7280] mt-1">Valid till: {cert.validTill}</div>
