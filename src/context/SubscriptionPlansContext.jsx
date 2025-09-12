@@ -8,6 +8,7 @@ export const useSubscriptionPlans = () => useContext(SubscriptionPlansContext);
 export const SubscriptionPlansProvider = ({ children }) => {
     const [subscriptionPlans, setSubscriptionPlans] = useState([]);
     const [mostPopularPlan, setMostPopularPlan] = useState(null);
+    const [hasFetchedPlans, setHasFetchedPlans] = useState(false);
 
     useEffect(() => {
         const fetchSubscriptionPlans = async () => {
@@ -48,7 +49,10 @@ export const SubscriptionPlansProvider = ({ children }) => {
                 setMostPopularPlan(null);
             }
         };
-        fetchSubscriptionPlans();
+        if (!hasFetchedPlans) {
+            fetchSubscriptionPlans();
+            setHasFetchedPlans(true);
+        }
     }, [subscriptionPlans]);
 
     return (

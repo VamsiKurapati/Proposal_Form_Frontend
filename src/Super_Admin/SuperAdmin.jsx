@@ -472,14 +472,22 @@ const SuperAdmin = () => {
     };
 
     const handleExportTransactions = () => {
-        const headers = ['transaction_id', 'user_id', 'payment_method', 'price', 'created_at', 'status'];
+        const headers = ['plan_name', 'company_name', 'company_email', 'payment_method', 'price', 'status', 'transaction_id', 'paid_at', 'start_date', 'end_date', 'max_editors', 'max_viewers', 'max_rfp', 'max_grants'];
         const rows = (filteredTransactions || []).map(t => ({
-            transaction_id: t.transaction_id,
-            user_id: t.user_id,
-            payment_method: t.payment_method,
-            price: t.price,
-            created_at: t.created_at || t.createdAt,
-            status: t.status
+            plan_name: planName,
+            company_name: t.companyName || "Not Disclosed",
+            company_email: t.email || "Not Disclosed",
+            payment_method: t.payment_method || "Not Disclosed",
+            price: t.price || "Not Disclosed",
+            status: t.status || "Not Disclosed",
+            transaction_id: t.transaction_id || "Not Disclosed",
+            paid_at: t.paid_at || "Not Disclosed",
+            start_date: t.start_date || "Not Disclosed",
+            end_date: t.end_date || "Not Disclosed",
+            max_editors: t.max_editor || "Not Disclosed",
+            max_viewers: t.max_viewers || "Not Disclosed",
+            max_rfp: t.max_rfp_generations || "Not Disclosed",
+            max_grants: t.max_grant_generations || "Not Disclosed"
         }));
         exportArrayToCSV('transactions.csv', headers, rows);
     };
