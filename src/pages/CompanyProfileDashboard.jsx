@@ -4,6 +4,7 @@ import axios from "axios";
 import { MdOutlineEdit, MdOutlineSearch, MdOutlineAddAPhoto, MdOutlineBusinessCenter, MdOutlineHome, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineGroups, MdOutlineDocumentScanner, MdOutlineFolder, MdOutlineAssignment, MdOutlineVerifiedUser, MdOutlineDownload, MdOutlineOpenInNew, MdOutlineGroup, MdOutlineCalendarToday, MdOutlineAdd, MdOutlineClose, MdOutlinePhone, MdOutlineEmail, MdOutlineCheck, MdOutlinePayments, MdOutlineDelete } from "react-icons/md";
 import NavbarComponent from "./NavbarComponent";
 import { useProfile } from "../context/ProfileContext";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import Swal from "sweetalert2";
 
 // Unified Badge Styles
@@ -482,7 +483,14 @@ const AddTeamMemberModal = ({ isOpen, onClose }) => {
               disabled={addingTeamMember}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              {addingTeamMember ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingTeamMember ? "Adding..." : "Add Member"}
+              {addingTeamMember ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                  Adding...
+                </>
+              ) : (
+                'Add Member'
+              )}
             </button>
           </div>
         </div>
@@ -676,7 +684,14 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               disabled={addingCaseStudy}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              {addingCaseStudy ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCaseStudy ? "Adding..." : "Add Case Study"}
+              {addingCaseStudy ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                  Adding...
+                </>
+              ) : (
+                'Add Case Study'
+              )}
             </button>
           </div>
         </div>
@@ -808,7 +823,14 @@ const AddCertificateModal = ({ isOpen, onClose }) => {
               disabled={addingCertificate}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              {addingCertificate ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCertificate ? "Adding..." : "Add Certificate"}
+              {addingCertificate ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                  Adding...
+                </>
+              ) : (
+                'Add Certificate'
+              )}
             </button>
           </div>
         </div>
@@ -995,7 +1017,14 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
               disabled={uploadingDocument}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              {uploadingDocument ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {uploadingDocument ? "Uploading..." : "Add Document"}
+              {isUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                'Add Document'
+              )}
             </button>
           </div>
         </div>
@@ -1723,7 +1752,7 @@ const CompanyProfileDashboard = () => {
         </div>
       </div>
 
-      <div className="relative hidden md:block md:mt-[25.5rem] lg:mt-[20rem]">
+      <div className="relative hidden lg:block lg:mt-[20rem]">
         <div className="relative z-10">
           <Sidebar active={activeTab} onSelect={setActiveTab} />
         </div>
@@ -1750,10 +1779,10 @@ const CompanyProfileDashboard = () => {
         Activity
       </button>
 
-      <main className="flex-1 md:-mt-7 py-16 px-4 sm:px-8 pb-10 overflow-y-auto md:ml-64 lg:mr-64">
+      <main className="flex-1 lg:-mt-7 py-16 px-4 sm:px-8 pb-10 overflow-y-auto lg:ml-64 lg:mr-64">
         <div className="bg-[#FFFFFF] ml-3">
           {/* Mobile Dropdown */}
-          <div className="relative md:hidden right-0 -mt-12 mb-4"><MobileDropdown activeTab={activeTab} onSelect={setActiveTab} /></div>
+          <div className="relative lg:hidden right-0 -mt-12 mb-4"><MobileDropdown activeTab={activeTab} onSelect={setActiveTab} /></div>
           {activeTab === "Overview" && (
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -1897,7 +1926,7 @@ const CompanyProfileDashboard = () => {
                           <button
                             disabled={deletingEmployee[member._id]}
                             onClick={() => handleDeleteEmployee(member)}
-                            className="text-[#2563EB] text-[15px] hover:underline transition-colors absolute top-2 right-2"
+                            className="text-red-500 hover:text-red-600 text-[15px] hover:underline transition-colors absolute top-2 right-2"
                           >
                             <MdOutlineDelete className="w-5 h-5 text-red-500" />
                           </button>
@@ -1994,9 +2023,9 @@ const CompanyProfileDashboard = () => {
                         <button
                           disabled={deletingDocument[doc._id]}
                           onClick={() => handleDeleteDocument(doc)}
-                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                          className="text-red-500 hover:text-red-600 rounded-full p-1 shrink-0 transition-colors"
                         >
-                          {deletingDocument[doc._id] ? <MdOutlineDelete className="w-5 h-5 animate-spin" /> : <MdOutlineDelete className="w-5 h-5" />}
+                          {deletingDocument[doc._id] ? <MdOutlineDelete className="w-5 h-5 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500 hover:text-red-600" />}
                         </button>
                       </div>
                       <div className="flex items-center justify-between gap-2">
@@ -2045,7 +2074,7 @@ const CompanyProfileDashboard = () => {
                         <button
                           disabled={deletingCaseStudy[cs._id]}
                           onClick={() => handleDeleteCaseStudy(cs)}
-                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                          className="text-red-500 hover:text-red-600 rounded-full p-1 shrink-0 transition-colors"
                         >
                           {deletingCaseStudy[cs._id] ? <MdOutlineDelete className="w-5 h-5 text-red-500 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500" />}
                         </button>
@@ -2093,7 +2122,7 @@ const CompanyProfileDashboard = () => {
                         <button
                           disabled={deletingCertificate[cert._id]}
                           onClick={() => handleDeleteCertificate(cert)}
-                          className="text-[#2563EB] hover:bg-[#EFF6FF] rounded-full p-1 shrink-0 transition-colors"
+                          className="text-red-500 hover:text-red-600 rounded-full p-1 shrink-0 transition-colors"
                         >
                           {deletingCertificate[cert._id] ? <MdOutlineDelete className="w-5 h-5 text-red-500 animate-spin" /> : <MdOutlineDelete className="w-5 h-5 text-red-500" />}
                         </button>

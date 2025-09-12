@@ -619,11 +619,11 @@ const CompanyProfileUpdate = () => {
                                     label="Email"
                                     type="email"
                                     value={form.email}
-                                    onChange={(e) => handleInputChange('email', e.target.value)}
+                                    // onChange={(e) => handleInputChange('email', e.target.value)}
                                     error={errors.email}
                                     required
                                     disabled={true}
-                                    placeholder="contact@company.com"
+                                    placeholder="Enter email"
                                 />
                             </div>
 

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdOutlineArrowBack, MdOutlineSave, MdOutlineCancel, MdOutlineBusinessCenter, MdOutlineLocationOn, MdOutlineMail, MdOutlineCall, MdOutlineLanguage, MdOutlineDescription, MdOutlineGroup, MdOutlineGraphicEq, MdOutlineDomain, MdOutlineCalendarToday } from "react-icons/md";
+import { MdOutlineSave, MdOutlineBusinessCenter, MdOutlineDomain } from "react-icons/md";
 import 'react-phone-input-2/lib/style.css';
 import PhoneInput from 'react-phone-input-2';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useEmployeeProfile } from "../context/EmployeeProfileContext";
-import { skipToken } from "@reduxjs/toolkit/query";
 import Swal from "sweetalert2";
 
 const INDUSTRY_OPTIONS = [
@@ -134,7 +133,7 @@ const PhoneInputField = ({
 
 const EmployeeProfileUpdate = () => {
     const navigate = useNavigate();
-    const { employeeData, loading, error, refreshProfile } = useEmployeeProfile();
+    const { employeeData, loading } = useEmployeeProfile();
 
     const [form, setForm] = useState({
         location: employeeData?.location || "",
@@ -186,7 +185,6 @@ const EmployeeProfileUpdate = () => {
             return;
         }
 
-        // setLoading(true); // This line is removed
         try {
             const formData = new FormData();
             formData.append("location", form.location);
@@ -220,6 +218,7 @@ const EmployeeProfileUpdate = () => {
                 });
                 setTimeout(() => {
                     navigate("/employee_profile_dashboard");
+                    window.location.reload();
                 }, 1500);
             }
         } catch (error) {

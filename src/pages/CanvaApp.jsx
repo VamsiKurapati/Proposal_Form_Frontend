@@ -1120,7 +1120,7 @@ const CanvaApp = () => {
       {/* Show the instructions div here */}
       {initialLoad && (
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-99999 min-h-screen overflow-y-auto custom-scrollbar" style={{ transition: 'opacity 0.3s ease-in-out' }}>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50 h-full overflow-y-auto custom-scrollbar" style={{ transition: 'opacity 0.3s ease-in-out' }}>
             <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl mb-4">
               <div className="flex justify-end">
                 <button className="flex items-center justify-center" onClick={() => setInitialLoad(false)}><MdOutlineClose className="w-6 h-6 text-red-500 hover:text-red-600" /></button>
@@ -1165,7 +1165,7 @@ const CanvaApp = () => {
 
       {/* Showing a animated three dots waving indicator when the compliance check is in progress */}
       {complianceIndicator && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 h-full overflow-y-auto custom-scrollbar">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 h-full overflow-y-auto custom-scrollbar" style={{ transition: 'opacity 0.3s ease-in-out' }}>
           <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
             <div className="flex justify-center mb-6 space-x-2">
               <span className="w-3 h-3 bg-[#2563EB] rounded-full animate-bounce"></span>
