@@ -676,7 +676,7 @@ const AddCaseStudyModal = ({ isOpen, onClose }) => {
               disabled={addingCaseStudy}
               className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
-              {addingCaseStudy ? <MdOutlineAdd className="w-5 h-5 animate-spin" /> : <MdOutlineAdd className="w-5 h-5" />} {addingCaseStudy ? "Adding..." : "Add Case Study"}
+              Cancel
             </button>
             <button
               type="button"
@@ -1017,7 +1017,7 @@ const AddDocumentModal = ({ isOpen, onClose }) => {
               disabled={uploadingDocument}
               className="flex-1 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8]"
             >
-              {isUploading ? (
+              {uploadingDocument ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
                   Uploading...
