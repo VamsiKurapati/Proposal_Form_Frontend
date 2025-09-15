@@ -170,11 +170,14 @@ const Dashboard = () => {
 
             if (res.status === 200) {
                 setEditIdx(null);
-                Swal.fire(
-                    'Success!',
-                    'Proposal updated!',
-                    'success'
-                );
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Proposal updated!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false
+                });
 
                 setTimeout(() => {
                     window.location.reload();
@@ -182,11 +185,13 @@ const Dashboard = () => {
             }
         } catch (err) {
             // console.error("Error updating proposal:", err);
-            Swal.fire(
-                'Error!',
-                'Failed to update proposal',
-                'error'
-            );
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update proposal',
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: true
+            });
         }
     };
 
@@ -216,11 +221,14 @@ const Dashboard = () => {
 
             if (res.status === 200) {
                 setEditGrantIdx(null);
-                Swal.fire(
-                    'Success!',
-                    'Grant proposal updated!',
-                    'success'
-                );
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Grant proposal updated!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false
+                });
 
                 setTimeout(() => {
                     window.location.reload();
@@ -228,11 +236,13 @@ const Dashboard = () => {
             }
         } catch (err) {
             // console.error("Error updating grant proposal:", err);
-            Swal.fire(
-                'Error!',
-                'Failed to update grant proposal',
-                'error'
-            );
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update grant proposal',
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: true
+            });
         }
     };
 
