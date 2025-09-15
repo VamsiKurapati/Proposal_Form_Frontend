@@ -944,7 +944,7 @@ const Proposals = () => {
                                                 onGenerate={() => handleContinue(proposal)}
                                                 userRole={role}
                                                 buttonText="Continue"
-                                                isCurrentEditor={proposal.currentEditor?.email === userEmail}
+                                                isCurrentEditor={proposal.currentEditor?.email === userEmail || role === "company"}
                                                 isLoading={savingStates[proposal._id] || false}
                                             />
                                         );
@@ -1023,7 +1023,7 @@ const Proposals = () => {
                                             onGenerate={() => handleContinueGrant(grant)}
                                             userRole={role}
                                             buttonText="Continue"
-                                            isCurrentEditor={grant.currentEditor?.email === userEmail}
+                                            isCurrentEditor={grant.currentEditor?.email === userEmail || role === "company"}
                                             isLoading={savingStates[grant._id] || false}
                                         />
                                     );
