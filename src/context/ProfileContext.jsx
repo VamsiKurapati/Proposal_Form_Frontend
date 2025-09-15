@@ -14,10 +14,15 @@ export const ProfileProvider = ({ children }) => {
 
     const { role } = useUser();
 
+    console.log("Role in ProfileContext: ", role);
+
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
         // Only fetch if we haven't initialized yet or if we don't have data or if role is null
-        if (role === null || !role.includes("company", "employee") || (hasInitialized && companyData)) {
+        if (role === null || !role.includes("company", "Editor", "Viewer") || (hasInitialized && companyData)) {
+            console.log("Role in ProfileContext: ", role);
+            console.log("HasInitialized in ProfileContext: ", hasInitialized);
+            console.log("CompanyData in ProfileContext: ", companyData);
             return;
         }
 
