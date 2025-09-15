@@ -83,6 +83,7 @@ export const ProfileProvider = ({ children }) => {
 
         if (role === "Editor" || role === "Viewer") {
             try {
+                console.log("Getting company profile for Editor or Viewer");
                 const token = localStorage.getItem("token");
                 const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/profile/getCompanyProfile`, {
                     headers: {
