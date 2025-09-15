@@ -50,16 +50,37 @@ class CloudImageService {
     // Check file size (configurable from .env)
     const maxSizeMB = this.maxFileSize / (1024 * 1024);
     if (file.size > this.maxFileSize) {
+      Swal.fire({
+        title: `File size must be less than ${maxSizeMB}MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw new Error(`File size must be less than ${maxSizeMB}MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
     }
 
     // Check file type
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        title: 'Only PNG, JPG, JPEG, and SVG files are allowed.',
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw new Error('Only PNG, JPG, JPEG, and SVG files are allowed.');
     }
 
     if (this.uploadedImages.length >= this.maxImages) {
+      Swal.fire({
+        title: `Maximum ${this.maxImages} images allowed. Please delete some images first.`,
+        icon: 'warning',
+        timer: 1500,
+        showConfirmButton: false,
+        showCancelButton: false,
+      });
       throw new Error(`Maximum ${this.maxImages} images allowed. Please delete some images first.`);
     }
 
