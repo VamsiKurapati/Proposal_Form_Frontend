@@ -1073,7 +1073,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Search and Actions for RFP Proposals */}
-                <div className="flex flex-row items-center justify-between mb-4 gap-2">
+                <div className="flex flex-row items-center justify-between mb-4 gap-2 mt-2">
                     <div className="flex relative w-full md:w-1/3 items-center gap-2">
                         <MdOutlineSearch className="absolute left-3 text-gray-500" />
                         <input
@@ -1085,17 +1085,19 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="justify-end group flex gap-2">
-                        <button
-                            className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
-                                ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
-                                : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
-                                }`}
-                            onClick={role === "Viewer" ? undefined : () => setShowDeleteOptions(true)}
-                            disabled={role === "Viewer" || paginatedProposals.length === 0}
-                            title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete RFP proposals"}
-                        >
-                            <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete RFP
-                        </button>
+                        {paginatedProposals.length > 0 && role !== "Viewer" && (
+                            <button
+                                className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
+                                    ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
+                                    : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
+                                    }`}
+                                onClick={role === "Viewer" ? undefined : () => setShowDeleteOptions(true)}
+                                disabled={role === "Viewer" || paginatedProposals.length === 0}
+                                title={role === "Viewer" ? "Viewer cannot delete proposals" : "Delete RFP proposals"}
+                            >
+                                <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete RFP
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -1386,17 +1388,19 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="justify-end group flex gap-2">
-                        <button
-                            className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
-                                ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
-                                : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
-                                }`}
-                            onClick={role === "Viewer" ? undefined : () => setShowGrantDeleteOptions(true)}
-                            disabled={role === "Viewer" || paginatedGrantProposals.length === 0}
-                            title={role === "Viewer" ? "Viewer cannot delete grant proposals" : "Delete grant proposals"}
-                        >
-                            <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete Grants
-                        </button>
+                        {paginatedGrantProposals.length > 0 && role !== "Viewer" && (
+                            <button
+                                className={`flex items-center gap-1 px-4 py-2 border rounded text-[14px] md:text-[16px] ${role === "Viewer"
+                                    ? "border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed opacity-50"
+                                    : "text-[#2563EB] border-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white"
+                                    }`}
+                                onClick={role === "Viewer" ? undefined : () => setShowGrantDeleteOptions(true)}
+                                disabled={role === "Viewer" || paginatedGrantProposals.length === 0}
+                                title={role === "Viewer" ? "Viewer cannot delete grant proposals" : "Delete grant proposals"}
+                            >
+                                <MdOutlineDeleteForever className={`w-5 h-5 ${role === "Viewer" ? "" : "group-hover:text-white"}`} /> Delete Grants
+                            </button>
+                        )}
                     </div>
                 </div>
 
