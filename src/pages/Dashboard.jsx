@@ -169,38 +169,16 @@ const Dashboard = () => {
             );
 
             if (res.status === 200) {
-                // ✅ Update local proposals list
-                setProposalsState(prev =>
-                    prev.map(p =>
-                        p._id === proposalId ? { ...p, ...editForm } : p
-                    )
-                );
-
-                setEditIdx(null); // exit edit mode
+                setEditIdx(null);
                 Swal.fire(
                     'Success!',
                     'Proposal updated!',
                     'success'
                 );
 
-                //Update the Summary Stats for the proposal that was updated
-                setSummaryStats(prev => {
-                    // Find the proposal to get its old status
-                    const oldProposal = proposalsState.find(p => p._id === proposalId);
-                    if (!oldProposal) return prev;
-
-                    return prev.map(stat => {
-                        // Subtract 1 from the old status
-                        if (stat.label === oldProposal.status) {
-                            return { ...stat, value: Math.max(0, stat.value - 1) };
-                        }
-                        // Add 1 to the new status
-                        if (stat.label === editForm.status) {
-                            return { ...stat, value: stat.value + 1 };
-                        }
-                        return stat;
-                    });
-                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             }
         } catch (err) {
             // console.error("Error updating proposal:", err);
@@ -237,22 +215,16 @@ const Dashboard = () => {
             );
 
             if (res.status === 200) {
-                setGrantProposals(prev =>
-                    prev.map(p =>
-                        p._id === proposalId ? {
-                            ...p,
-                            CLOSE_DATE: editGrantForm.deadline,
-                            OPPORTUNITY_STATUS: editGrantForm.status
-                        } : p
-                    )
-                );
-
                 setEditGrantIdx(null);
                 Swal.fire(
                     'Success!',
                     'Grant proposal updated!',
                     'success'
                 );
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             }
         } catch (err) {
             // console.error("Error updating grant proposal:", err);
