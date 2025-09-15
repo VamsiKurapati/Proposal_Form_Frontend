@@ -72,14 +72,14 @@ const GenerateProposalPage = () => {
           Swal.fire({
             icon: 'warning',
             title: 'Failed',
-            text: res.data.message || 'Failed to generate proposal. Please try again after some time.',
+            text: res.data.message || res.data.error || 'Failed to generate proposal. Please try again after some time.',
           });
         }
       } else {
         Swal.fire({
           icon: 'warning',
           title: 'Failed',
-          text: res.data.message || 'Failed to generate proposal. Please try again after some time.',
+          text: res.data.message || res.data.error || 'Failed to generate proposal. Please try again after some time.',
         });
       }
     } catch (error) {
@@ -88,7 +88,7 @@ const GenerateProposalPage = () => {
       Swal.fire({
         icon: 'warning',
         title: 'Failed',
-        text: error.response?.data?.message || 'Failed to generate proposal. Please try again after some time.',
+        text: error.response?.data?.message || error.response?.data?.error || 'Failed to generate proposal. Please try again after some time.',
       });
       return;
     }
