@@ -682,27 +682,6 @@ const Dashboard = () => {
                     }
                 });
                 if (res.status === 200) {
-                    //Update the stats
-                    const deletedProposal = deletedProposals[idx];
-                    setSummaryStats(prev => prev.map(stat => {
-                        if (stat.label === "All Proposals") {
-                            return { ...stat, value: stat.value - 1 };
-                        }
-                        if (stat.label === "In Progress" && deletedProposal.status === "In Progress") {
-                            return { ...stat, value: stat.value - 1 };
-                        }
-                        if (stat.label === "Submitted" && deletedProposal.status === "Submitted") {
-                            return { ...stat, value: stat.value - 1 };
-                        }
-                        if (stat.label === "Won" && deletedProposal.status === "Won") {
-                            return { ...stat, value: stat.value - 1 };
-                        }
-                        if (stat.label === "Rejected" && deletedProposal.status === "Rejected") {
-                            return { ...stat, value: stat.value - 1 };
-                        }
-                        return stat;
-                    }));
-
                     setDeletedProposals(prev => prev.filter((_, i) => i !== idx));
 
                     Swal.fire(
