@@ -59,7 +59,14 @@ class CloudImageService {
       throw new Error('Only PNG, JPG, JPEG, and SVG files are allowed.');
     }
 
+
     // Check if we've reached the maximum number of images (configurable from .env)
+    console.log("--------------------------------------");
+    console.log("Uploading image: ", file.name);
+    console.log("this.uploadedImages.length", this.uploadedImages.length);
+    console.log("this.maxImages", this.maxImages);
+    console.log("--------------------------------------");
+    console.log("\n\n");
     if (this.uploadedImages.length >= this.maxImages) {
       throw new Error(`Maximum ${this.maxImages} images allowed. Please delete some images first.`);
     }
