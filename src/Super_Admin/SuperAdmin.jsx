@@ -4364,6 +4364,11 @@ const SuperAdmin = () => {
                                         ? "bg-[#2563eb] text-white"
                                         : "text-[#4B5563]"
                                         }`}
+                                    onClick={() => {
+                                        setActiveTab("contact-request");
+                                        closeAllInvoiceRows();
+                                        setShowMobileMenu(false);
+                                    }}
                                 >
                                     <MdOutlinePermContactCalendar className="w-4 h-4" />
                                     <span className="text-[16px] font-medium">Contact Request</span>
@@ -4420,9 +4425,6 @@ const SuperAdmin = () => {
 
 
 
-            {/* Mobile Content - Visible on small screens */}
-            {/*  */}
-
             <div className="flex h-screen relative ">
                 {/* Left Sidebar - Half visible by default, expands on hover */}
                 {/* Toggle Hover Feature Button */}
@@ -4467,21 +4469,6 @@ const SuperAdmin = () => {
                                     </span>
                                 </button>
 
-                                {/* <button
-                                className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${
-                                    activeTab === 'subscriptions' ? 'bg-[#2563eb] text-white' : 'text-white'
-                                }`}
-                                onClick={() => {
-                                    setActiveTab('subscriptions');
-                                    closeAllInvoiceRows();
-                                }}
-                                >
-                                <MdOutlineSubscriptions className="w-5 h-5 flex-shrink-0" />
-                                <span className="text-[16px] font-medium lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                                    Subscriptions
-                                </span>
-                                </button> */}
-
                                 <button
                                     className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'plan-management' ? 'bg-[#6C63FF] text-white' : 'text-white'
                                         }`}
@@ -4497,7 +4484,7 @@ const SuperAdmin = () => {
                                 </button>
 
                                 <button
-                                    className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'enterprise-support' ? 'bg-[#6C63FF] text-white' : 'text-white'
+                                    className={`w-full text-left text-white rounded-lg p-3 flex items-center justify-center lg:justify-start space-x-3 transition-colors ${activeTab === 'contact-request' ? 'bg-[#6C63FF] text-white' : 'text-white'
                                         }`}
                                     onClick={() => {
                                         setActiveTab('contact-request');
@@ -4582,7 +4569,7 @@ const SuperAdmin = () => {
 
                                 <div className="flex items-center">
                                     <div className="w-full h-8 rounded-lg flex items-center justify-center mr-3">
-                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'support' ? 'Support' : activeTab === 'notifications' ? 'Notifications' : 'Contact Request'}</span>
+                                        <span className="text-white font-bold text-lg">{activeTab === 'user-management' ? 'User Management' : activeTab === 'payments' ? 'Payments' : activeTab === 'plan-management' ? 'Plan Management' : activeTab === 'contact-request' ? 'Contact Request' : activeTab === 'support' ? 'Support' : activeTab === 'notifications' ? 'Notifications' : 'Contact Request'}</span>
 
                                     </div>
                                 </div>
@@ -4613,8 +4600,8 @@ const SuperAdmin = () => {
                             {/* Content based on active tab */}
                             {activeTab === 'user-management' && renderUserManagement()}
                             {activeTab === 'payments' && renderPayments()}
-                            {activeTab === 'support' && renderSupport()}
                             {activeTab === 'plan-management' && renderPlanManagement()}
+                            {activeTab === 'support' && renderSupport()}
                             {activeTab === 'notifications' && renderNotifications()}
                             {activeTab === 'contact-request' && renderContactRequest()}
                         </div>
