@@ -17,10 +17,7 @@ export const ProfileProvider = ({ children }) => {
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
         // Only fetch if we haven't initialized yet or if we don't have data or if role is null
-        if (role === null || !role.includes("company", "Editor", "Viewer") || (hasInitialized && companyData)) {
-            console.log("Role in ProfileContext: ", role);
-            console.log("HasInitialized in ProfileContext: ", hasInitialized);
-            console.log("CompanyData in ProfileContext: ", companyData);
+        if (role === null || !["company", "Editor", "Viewer"].includes(role) || (hasInitialized && companyData)) {
             return;
         }
 
@@ -116,8 +113,16 @@ export const ProfileProvider = ({ children }) => {
         }
     }, [role, hasInitialized, companyData]);
 
+    // Reset state when role changes
     useEffect(() => {
-        console.log("Fetching company data in ProfileContext");
+        if (role) {
+            setHasInitialized(false);
+            setCompanyData(null);
+            setError(null);
+        }
+    }, [role]);
+
+    useEffect(() => {
         fetchCompanyData();
     }, [fetchCompanyData]);
 
