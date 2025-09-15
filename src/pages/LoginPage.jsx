@@ -147,10 +147,16 @@ const LoginPage = () => {
           {isSubmitting ? "Logging in..." : "Log In"}
         </button>
 
-        <div className="mt-4 text-center text-[16px] text-gray-600">
-          Don’t have an account?{" "}
+        <div className="mt-4 text-center text-[16px] text-gray-600 mb-4">
+          Don't have an account?{" "}
           <a href="/sign_up" className="text-[#2563EB] font-medium hover:underline">
             Sign Up
+          </a>
+        </div>
+
+        <div className="text-center text-[16px] text-gray-600">
+          <a href="/forgot-password" className="text-[#2563EB] font-medium hover:underline">
+            Forgot Password?
           </a>
         </div>
       </div>

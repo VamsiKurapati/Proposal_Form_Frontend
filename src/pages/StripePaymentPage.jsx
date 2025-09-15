@@ -360,8 +360,8 @@ const StripePaymentPage = () => {
                 monthlyPrice: basicPlan.monthlyPrice || 0,
                 yearlyPrice: basicPlan.yearlyPrice || 0,
                 features: [
-                    `Up to ${basicPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-                    `Up to ${basicPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    `Up to ${basicPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations per month`,
+                    `Up to ${basicPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations per month`,
                     "AI-Driven RFP Discovery",
                     "AI-Driven Grant Discovery",
                     "AI-Proposal Recommendation",
@@ -382,8 +382,8 @@ const StripePaymentPage = () => {
                 yearlyPrice: proPlan.yearlyPrice || 0,
                 features: [
                     "Includes All Basic Features",
-                    `Up to ${proPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-                    `Up to ${proPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    `Up to ${proPlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations per month`,
+                    `Up to ${proPlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations per month`,
                     `${proPlan.maxEditors || 0} Editors, ${proPlan.maxViewers || 0} Viewers, Unlimited Members`,
                     "Advanced Compliance Check",
                 ],
@@ -402,8 +402,8 @@ const StripePaymentPage = () => {
                 yearlyPrice: enterprisePlan.yearlyPrice || 0,
                 features: [
                     "Includes All Basic & Pro Features",
-                    `Up to ${enterprisePlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations`,
-                    `Up to ${enterprisePlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations`,
+                    `Up to ${enterprisePlan.maxRFPProposalGenerations || 0} AI - RFP Proposal Generations per month`,
+                    `Up to ${enterprisePlan.maxGrantProposalGenerations || 0} AI - Grant Proposal Generations per month`,
                     "Unlimited Editors, Unlimited Viewers, Unlimited Members",
                     "Dedicated Support",
                 ],

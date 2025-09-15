@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 const ProfileForm = lazy(() => import("./pages/ProfileForm"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 
 const Discovery = lazy(() => import("./pages/Discover"));
 
@@ -50,6 +51,8 @@ const App = () => {
           <Route path="/change-password" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer", "SuperAdmin"]}>
             <ChangePassword />
           </ProtectedRoutes>} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route path="/discover" element={<ProtectedRoutes allowedRoles={["company", "Editor", "Viewer"]}>
             <Discovery />
