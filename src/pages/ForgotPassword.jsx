@@ -22,11 +22,18 @@ export default function ForgotPassword() {
 
     // OTP step state
     const [otp, setOtp] = useState("");
+    const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const [otpLoading, setOtpLoading] = useState(false);
+
+    // OTP Timer state
+    const [otpTimer, setOtpTimer] = useState(0); // Timer in seconds
+    const [otpExpired, setOtpExpired] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0); // Resend cooldown in seconds
+    const [resendLoading, setResendLoading] = useState(false);
 
     // Password validation state
     const [passwordValidation, setPasswordValidation] = useState({
@@ -61,6 +68,41 @@ export default function ForgotPassword() {
             });
         }
     }, [newPassword]);
+
+    // OTP Timer effect
+    useEffect(() => {
+        let interval;
+        if (otpTimer > 0) {
+            interval = setInterval(() => {
+                setOtpTimer((prev) => {
+                    if (prev <= 1) {
+                        setOtpExpired(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [otpTimer]);
+
+    // Resend cooldown effect
+    useEffect(() => {
+        let interval;
+        if (resendCooldown > 0) {
+            interval = setInterval(() => {
+                setResendCooldown((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendCooldown]);
+
+    // Auto request new OTP when timer expires
+    useEffect(() => {
+        if (otpExpired && currentStep === 2) {
+            handleResendOTP();
+        }
+    }, [otpExpired, currentStep]);
 
     const PasswordValidation = (password) => {
         if (password.length < 8) {
@@ -102,6 +144,9 @@ export default function ForgotPassword() {
 
             if (response.status === 200) {
                 toast.success("OTP sent to your email address");
+                // Start 10-minute timer (600 seconds)
+                setOtpTimer(600);
+                setOtpExpired(false);
                 setTimeout(() => {
                     setCurrentStep(2);
                 }, 1500);
@@ -117,12 +162,110 @@ export default function ForgotPassword() {
         }
     }
 
+    // Resend OTP function
+    const handleResendOTP = async () => {
+        if (resendCooldown > 0) {
+            toast.error(`Please wait ${resendCooldown} seconds before requesting a new OTP`);
+            return;
+        }
+
+        try {
+            setResendLoading(true);
+            const response = await axios.post(`${baseUrl}/forgotPassword`, {
+                email
+            });
+
+            if (response.status === 200) {
+                toast.success("New OTP sent to your email address");
+                // Reset timer to 10 minutes
+                setOtpTimer(600);
+                setOtpExpired(false);
+                // Clear OTP digits
+                setOtpDigits(["", "", "", "", "", ""]);
+                setOtp("");
+                // Set 30-second cooldown for resend
+                setResendCooldown(30);
+            }
+        } catch (error) {
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Failed to resend OTP. Please try again.");
+            }
+        } finally {
+            setResendLoading(false);
+        }
+    }
+
+    // Format timer display
+    const formatTimer = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    // Handle OTP digit input
+    const handleOtpDigitChange = (index, value) => {
+        // Only allow single digit
+        if (value.length > 1) return;
+
+        // Only allow numbers
+        if (value && !/^\d$/.test(value)) return;
+
+        const newOtpDigits = [...otpDigits];
+        newOtpDigits[index] = value;
+        setOtpDigits(newOtpDigits);
+
+        // Update the OTP string
+        const otpString = newOtpDigits.join("");
+        setOtp(otpString);
+
+        // Auto-focus next input
+        if (value && index < 5) {
+            const nextInput = document.getElementById(`otp-${index + 1}`);
+            if (nextInput) nextInput.focus();
+        }
+    };
+
+    // Handle backspace
+    const handleOtpKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+            const prevInput = document.getElementById(`otp-${index - 1}`);
+            if (prevInput) prevInput.focus();
+        }
+    };
+
+    // Handle paste
+    const handleOtpPaste = (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+        const newOtpDigits = ["", "", "", "", "", ""];
+
+        for (let i = 0; i < pastedData.length; i++) {
+            newOtpDigits[i] = pastedData[i];
+        }
+
+        setOtpDigits(newOtpDigits);
+        setOtp(pastedData);
+
+        // Focus the next empty input or the last one
+        const nextEmptyIndex = newOtpDigits.findIndex(digit => digit === "");
+        const focusIndex = nextEmptyIndex === -1 ? 5 : nextEmptyIndex;
+        const nextInput = document.getElementById(`otp-${focusIndex}`);
+        if (nextInput) nextInput.focus();
+    };
+
     // Step 2: Verify OTP and reset password
     const handleResetPassword = async (e) => {
         e.preventDefault();
 
         if (otp === "" || newPassword === "" || confirmNewPassword === "") {
             toast.error("All fields are required");
+            return;
+        }
+
+        if (otpExpired) {
+            toast.error("OTP has expired. Please request a new one.");
             return;
         }
 
@@ -160,6 +303,7 @@ export default function ForgotPassword() {
                     setTimeout(() => {
                         setCurrentStep(1);
                         setOtp("");
+                        setOtpDigits(["", "", "", "", "", ""]);
                         setNewPassword("");
                         setConfirmNewPassword("");
                     }, 1500);
@@ -169,6 +313,7 @@ export default function ForgotPassword() {
             } else if (response.status === 400) {
                 toast.error(response.data.message || "Failed to reset password. Please try again.");
                 setOtp("");
+                setOtpDigits(["", "", "", "", "", ""]);
                 setNewPassword("");
                 setConfirmNewPassword("");
             }
@@ -244,22 +389,72 @@ export default function ForgotPassword() {
                         <p className="font-normal text-[16px] text-[#6B7280] mb-6">
                             Enter the OTP sent to <span className="font-semibold text-[#2563EB]">{email}</span> and your new password
                         </p>
+
+                        {/* OTP Timer and Status */}
+                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${otpExpired ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {otpExpired ? 'OTP Expired' : 'OTP Valid'}
+                                    </span>
+                                </div>
+                                {otpTimer > 0 && !otpExpired && (
+                                    <div className="text-sm font-mono text-blue-600">
+                                        Expires in: {formatTimer(otpTimer)}
+                                    </div>
+                                )}
+                            </div>
+                            {otpExpired && (
+                                <div className="mt-2 text-sm text-red-600">
+                                    OTP has expired. Please request a new one.
+                                </div>
+                            )}
+                        </div>
+
                         <form onSubmit={handleResetPassword}>
-                            <div className="mb-4 relative">
-                                <label htmlFor="otp" className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
+                            <div className="mb-4">
+                                <label className="block text-[14px] font-medium text-[#374151] mb-2 flex items-center gap-2">
                                     <FaKey className="text-[#2563EB] text-[18px]" />
                                     OTP Code
                                 </label>
-                                <input
-                                    type="text"
-                                    id="otp"
-                                    value={otp}
-                                    onChange={(e) => setOtp(e.target.value)}
-                                    className="w-full px-3 py-2 border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
-                                    placeholder="Enter 6-digit OTP"
-                                    maxLength="6"
-                                    required
-                                />
+                                <div className="flex gap-2 mb-3">
+                                    {otpDigits.map((digit, index) => (
+                                        <input
+                                            key={index}
+                                            id={`otp-${index}`}
+                                            type="text"
+                                            value={digit}
+                                            onChange={(e) => handleOtpDigitChange(index, e.target.value)}
+                                            onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                                            onPaste={handleOtpPaste}
+                                            className="w-12 h-12 text-center text-lg font-semibold border border-[#D1D5DB] rounded-md focus:ring-2 focus:ring-[#2563EB] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                                            maxLength="1"
+                                            disabled={otpExpired}
+                                            required
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleResendOTP}
+                                        disabled={resendLoading || resendCooldown > 0 || otpExpired}
+                                        className="px-4 py-2 text-sm font-medium text-[#2563EB] border border-[#2563EB] rounded-md hover:bg-[#2563EB] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                    >
+                                        {resendLoading ? (
+                                            <FaSpinner className="animate-spin" />
+                                        ) : (
+                                            <FaEnvelope />
+                                        )}
+                                        {resendCooldown > 0 ? `Resend (${resendCooldown}s)` : 'Resend'}
+                                    </button>
+                                </div>
+                                {resendCooldown > 0 && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Please wait {resendCooldown} seconds before requesting a new OTP
+                                    </p>
+                                )}
                             </div>
 
                             <div className="mb-4 relative">
@@ -400,10 +595,10 @@ export default function ForgotPassword() {
                                 <button
                                     type="submit"
                                     className="w-1/2 bg-[#2563EB] text-white px-4 py-2 rounded-md hover:bg-[#1D4ED8] flex items-center justify-center gap-2"
-                                    disabled={otpLoading}
+                                    disabled={otpLoading || otpExpired}
                                 >
                                     {otpLoading ? <FaSpinner className="animate-spin" /> : <FaLock />}
-                                    {otpLoading ? "Resetting Password..." : "Reset Password"}
+                                    {otpLoading ? "Resetting Password..." : otpExpired ? "OTP Expired" : "Reset Password"}
                                 </button>
                             </div>
                         </form>
