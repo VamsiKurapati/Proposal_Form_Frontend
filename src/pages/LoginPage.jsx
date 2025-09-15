@@ -51,6 +51,9 @@ const LoginPage = () => {
   };
 
   const handleLogin = async () => {
+    // Clear all localStorage data
+    localStorage.clear();
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
