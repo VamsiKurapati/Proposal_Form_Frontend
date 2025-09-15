@@ -14,8 +14,6 @@ export const ProfileProvider = ({ children }) => {
 
     const { role } = useUser();
 
-    console.log("Role in ProfileContext: ", role);
-
     // Fetch company data from backend
     const fetchCompanyData = useCallback(async () => {
         // Only fetch if we haven't initialized yet or if we don't have data or if role is null
@@ -119,6 +117,7 @@ export const ProfileProvider = ({ children }) => {
     }, [role, hasInitialized, companyData]);
 
     useEffect(() => {
+        console.log("Fetching company data in ProfileContext");
         fetchCompanyData();
     }, [fetchCompanyData]);
 
