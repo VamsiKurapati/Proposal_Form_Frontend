@@ -325,7 +325,15 @@ const CanvaApp = () => {
     setIsEditingOriginal(elementId);
   }, [isEditing, saveToHistory, setIsEditingOriginal, project]);
 
+  const processEscapeSequences = (text) => {
+    if (typeof text !== 'string') return text;
 
+    return text
+      .replace(/\\t/g, '\t')  // Convert \t to actual tab characters
+      .replace(/\\n/g, '\n')  // Convert \n to actual newline characters
+      .replace(/\\r/g, '\r')  // Convert \r to actual carriage return characters
+      .replace(/\\\\/g, '\\'); // Convert \\ to single backslash
+  };
 
 
 
@@ -656,7 +664,7 @@ const CanvaApp = () => {
             updateElement(currentEditingPage, selectedEl.id, {
               properties: {
                 ...selectedEl.properties,
-                text: externalText
+                text: processEscapeSequences(externalText)
               }
             });
 
@@ -687,7 +695,7 @@ const CanvaApp = () => {
               rotation: 0,
               zIndex: page.elements.length + 1,
               properties: {
-                text: externalText,
+                text: processEscapeSequences(externalText),
                 fontSize: 16,
                 fontFamily: 'Arial, sans-serif',
                 color: '#000000',
@@ -740,7 +748,7 @@ const CanvaApp = () => {
                   updateElement(currentEditingPage, selectedEl.id, {
                     properties: {
                       ...selectedEl.properties,
-                      text: externalText
+                      text: processEscapeSequences(externalText)
                     }
                   });
 
@@ -771,7 +779,7 @@ const CanvaApp = () => {
                     rotation: 0,
                     zIndex: page.elements.length + 1,
                     properties: {
-                      text: externalText,
+                      text: processEscapeSequences(externalText),
                       fontSize: 16,
                       fontFamily: 'Arial, sans-serif',
                       color: '#000000',
@@ -878,7 +886,7 @@ const CanvaApp = () => {
             rotation: 0,
             zIndex: page.elements.length + 1,
             properties: {
-              text: externalText,
+              text: processEscapeSequences(externalText),
               fontSize: 16,
               fontFamily: 'Arial, sans-serif',
               color: '#000000',
