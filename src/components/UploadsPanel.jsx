@@ -70,16 +70,51 @@ const UploadsPanel = ({ show, onClose, onImageSelect }) => {
 
   const handleFileUpload = async (files) => {
     const fileArray = Array.from(files);
-    const validFiles = fileArray.filter(validateFile);
 
-    if (validFiles.length === 0) return;
+    if (fileArray.length === 0) return;
 
     setIsUploading(true);
+    let uploadedCount = 0;
+    let skippedCount = 0;
+
     try {
-      await Promise.all(validFiles.map(processFile));
+      // Process files sequentially to respect the upload limit
+      for (const file of fileArray) {
+        try {
+          // Validate each file individually (this checks the current limit)
+          if (validateFile(file)) {
+            await processFile(file);
+            uploadedCount++;
+          } else {
+            skippedCount++;
+          }
+        } catch (error) {
+          // If it's a limit error, increment skipped count
+          if (error.message && error.message.includes('Maximum')) {
+            skippedCount++;
+          } else {
+            // For other errors, still increment skipped count
+            skippedCount++;
+            console.error('Upload error for file:', file.name, error);
+          }
+        }
+      }
+
       // Refresh uploads from cloud service
       const cloudUploads = cloudImageService.getUploadedImages();
       setUploads(cloudUploads);
+
+      // Show summary if some files were skipped
+      if (skippedCount > 0) {
+        Swal.fire({
+          title: `Upload Complete`,
+          html: `Successfully uploaded: ${uploadedCount} images<br/>Skipped: ${skippedCount} images`,
+          icon: 'info',
+          timer: 3000,
+          showConfirmButton: false,
+          showCancelButton: false,
+        });
+      }
     } catch (error) {
       // console.error('Error processing files:', error);
       Swal.fire({
